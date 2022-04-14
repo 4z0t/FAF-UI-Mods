@@ -1,3 +1,6 @@
+local TableInsert = table.insert
+local TableRemove = table.remove
+
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
@@ -21,13 +24,13 @@ function LinqFromMetaTable:Select(p)
 end
 
 function LinqFromMetaTable:Where(p)
-    local result = from()
+    local result = {}
     for k, v in self.t do
         if p(k, v) then
-            result:AddValue(v)
+            TableInsert(result, v)
         end
     end
-    return result
+    return from(result)
 end
 
 function LinqFromMetaTable:Distinct()
@@ -52,7 +55,7 @@ end
 function LinqFromMetaTable:Values()
     local result = {}
     for k, v in self.t do
-        table.insert(result, v)
+        TableInsert(result, v)
     end
     return from(result)
 end
@@ -60,7 +63,7 @@ end
 function LinqFromMetaTable:Keys()
     local result = {}
     for k, v in self.t do
-        table.insert(result, k)
+        TableInsert(result, k)
     end
     return from(result)
 end
@@ -186,13 +189,13 @@ end
 function LinqFromMetaTable:ToArray()
     local result = {}
     for k, v in self.t do
-        table.insert(result, v)
+        TableInsert(result, v)
     end
     return result
 end
 
 function LinqFromMetaTable:AddValue(v)
-    table.insert(self.t, v)
+    TableInsert(self.t, v)
 end
 
 function LinqFromMetaTable:AddKeyValue(k, v)
@@ -204,14 +207,14 @@ function LinqFromMetaTable:RemoveKey(k)
 end
 
 function LinqFromMetaTable:RemoveByKey(k)
-    table.remove(self.t, k)
+    TableRemove(self.t, k)
     return self
 end
 
 function LinqFromMetaTable:RemoveByValue(vToRemove)
     for k, v in ipairs(self.t) do
         if v == vToRemove then
-            table.remove(self.t, k)
+            TableRemove(self.t, k)
             return self
         end
     end
