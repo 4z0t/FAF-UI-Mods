@@ -33,7 +33,7 @@ end
 function LinqFromMetaTable:Distinct()
     local result = from()
     for k, v in self.t do
-        if not resul:Contains(v) then
+        if not result:Contains(v) then
             result:AddValue(v)
         end
     end
@@ -129,10 +129,11 @@ function LinqFromMetaTable:Foreach(action)
     return self -- ?
 end
 
-function LinqFromMetaTable:Dump()
+function LinqFromMetaTable:Dump(fmtStr)
     LOG("-----")
+    fmtStr = fmtStr or '%s:\t%s'
     for k, v in self.t do
-        LOG(string.format('%s:\t%s', k, v))
+        LOG(string.format(fmtStr, tostring(k), tostring(v)))
     end
     LOG("-----")
     return self -- ?
@@ -222,6 +223,10 @@ function LinqFromMetaTable:ToDictionary()
     return self.t
 end
 
+function LinqFromMetaTable:__newindex(key,value)
+    error('attempt to set new index for a Linq object')
+end
+
 -- local WrapperLinqFromMetaTable = table.deepcopy(LinqFromMetaTable)
 
 -- function WrapperLinqFromMetaTable:__index(key)
@@ -240,8 +245,8 @@ end
 
 function from(t)
     local result = {}
-    setmetatable(result, LinqFromMetaTable)
     result.t = t or {}
+    setmetatable(result, LinqFromMetaTable)
     return result
 end
 From = from
