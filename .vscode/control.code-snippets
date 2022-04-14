@@ -1,0 +1,344 @@
+{
+    "ResetLayout": {
+        "body": [
+            "${1:control}:ResetLayout()"
+        ],
+        "prefix": [
+            "ResetLayout"
+        ],
+        "description": "reset the control's layout to the defaults, in this case\r\nmakes a circular dependency where you must have at least 4 defined\r\nOverload this in your own classes to make it behave differently"
+    },
+    "OnFrame": {
+        "body": [
+            "${1:control}:OnFrame(${2:elapsedTime})"
+        ],
+        "prefix": [
+            "OnFrame"
+        ],
+        "description": "called when a frame update is ready, elapsedTime is time since last frame"
+    },
+    "ScrollSetTop": {
+        "body": [
+            "${1:control}:ScrollSetTop(${2:axis}, ${3:top})"
+        ],
+        "prefix": [
+            "ScrollSetTop"
+        ],
+        "description": "called when the scrollbar wants to set a new visible top line"
+    },
+    "Disable": {
+        "body": [
+            "${1:control}:Disable()"
+        ],
+        "prefix": [
+            "Disable"
+        ],
+        "description": ""
+    },
+    "Enable": {
+        "body": [
+            "${1:control}:Enable()"
+        ],
+        "prefix": [
+            "Enable"
+        ],
+        "description": ""
+    },
+    "OnKeyboardFocusChange": {
+        "body": [
+            "${1:control}:OnKeyboardFocusChange()"
+        ],
+        "prefix": [
+            "OnKeyboardFocusChange"
+        ],
+        "description": "called when another control takes keyboard focus"
+    },
+    "OnDestroy": {
+        "body": [
+            "${1:control}:OnDestroy()"
+        ],
+        "prefix": [
+            "OnDestroy"
+        ],
+        "description": "called when the control is destroyed"
+    },
+    "IsScrollable": {
+        "body": [
+            "${1:control}:IsScrollable(${2:axis})"
+        ],
+        "prefix": [
+            "IsScrollable"
+        ],
+        "description": "called to determine if the control is scrollable on a particular access. Must return true or false."
+    },
+    "ScrollPages": {
+        "body": [
+            "${1:control}:ScrollPages(${2:axis}, ${3:delta})"
+        ],
+        "prefix": [
+            "ScrollPages"
+        ],
+        "description": "called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)"
+    },
+    "OnHide": {
+        "body": [
+            "${1:control}:OnHide(${2:hidden})"
+        ],
+        "prefix": [
+            "OnHide"
+        ],
+        "description": "called when the control is shown or hidden\r\nif this function returns true, its children will not get their OnHide functions called"
+    },
+    "HandleEvent": {
+        "body": [
+            "${1:control}:HandleEvent(${2:event})"
+        ],
+        "prefix": [
+            "HandleEvent"
+        ],
+        "description": ""
+    },
+    "OnInit": {
+        "body": [
+            "${1:control}:OnInit()"
+        ],
+        "prefix": [
+            "OnInit"
+        ],
+        "description": ""
+    },
+    "GetScrollValues": {
+        "body": [
+            "${1:control}:GetScrollValues(${2:axis})"
+        ],
+        "prefix": [
+            "GetScrollValues"
+        ],
+        "description": "called when the scrollbar for the control requires data to size itself\r\nGetScrollValues must return 4 values in this order:\r\nrangeMin, rangeMax, visibleMin, visibleMax\r\naixs can be \"Vert\" or \"Horz\""
+    },
+    "OnEnable": {
+        "body": [
+            "${1:control}:OnEnable()"
+        ],
+        "prefix": [
+            "OnEnable"
+        ],
+        "description": "called when the control is enabled"
+    },
+    "ScrollLines": {
+        "body": [
+            "${1:control}:ScrollLines(${2:axis}, ${3:delta})"
+        ],
+        "prefix": [
+            "ScrollLines"
+        ],
+        "description": "called when the scrollbar wants to scroll a specific number of lines (negative indicates scroll up)"
+    },
+    "OnLoseKeyboardFocus": {
+        "body": [
+            "${1:control}:OnLoseKeyboardFocus()"
+        ],
+        "prefix": [
+            "OnLoseKeyboardFocus"
+        ],
+        "description": "called when we have keyboard focus and another control is clicked on"
+    },
+    "OnDisable": {
+        "body": [
+            "${1:control}:OnDisable()"
+        ],
+        "prefix": [
+            "OnDisable"
+        ],
+        "description": "called when the control is disabled"
+    },
+    "IsDisabled": {
+        "body": [
+            "${1:control}:IsDisabled()"
+        ],
+        "prefix": [
+            "IsDisabled"
+        ],
+        "description": ""
+    },
+    "GetParent": {
+        "body": [
+            "${1:control}:GetParent()"
+        ],
+        "prefix": [
+            "GetParent"
+        ],
+        "description": "returns parent of a control"
+    },
+    "Destroy": {
+        "body": [
+            "${1:control}:Destroy()"
+        ],
+        "prefix": [
+            "Destroy"
+        ],
+        "description": "destroys a contol"
+    },
+    "ClearChildren": {
+        "body": [
+            "${1:control}:ClearChildren()"
+        ],
+        "prefix": [
+            "ClearChildren"
+        ],
+        "description": "clears children of a contol destroying them"
+    },
+    "SetParent": {
+        "body": [
+            "${1:control}:SetParent(${2:parent})"
+        ],
+        "prefix": [
+            "SetParent"
+        ],
+        "description": "sets new parent for a control"
+    },
+    "DisableHitTest": {
+        "body": [
+            "${1:control}:DisableHitTest()"
+        ],
+        "prefix": [
+            "DisableHitTest"
+        ],
+        "description": ""
+    },
+    "EnableHitTest": {
+        "body": [
+            "${1:control}:EnableHitTest()"
+        ],
+        "prefix": [
+            "EnableHitTest"
+        ],
+        "description": ""
+    },
+    "IsHitTestDisabled": {
+        "body": [
+            "${1:control}:IsHitTestDisabled()"
+        ],
+        "prefix": [
+            "IsHitTestDisabled"
+        ],
+        "description": ""
+    },
+    "Hide": {
+        "body": [
+            "${1:control}:Hide()"
+        ],
+        "prefix": [
+            "Hide"
+        ],
+        "description": ""
+    },
+    "Show": {
+        "body": [
+            "${1:control}:Show()"
+        ],
+        "prefix": [
+            "Show"
+        ],
+        "description": ""
+    },
+    "SetHidden": {
+        "body": [
+            "${1:control}:SetHidden(${2:bool})"
+        ],
+        "prefix": [
+            "SetHidden"
+        ],
+        "description": ""
+    },
+    "IsHidden": {
+        "body": [
+            "${1:control}:IsHidden()"
+        ],
+        "prefix": [
+            "IsHidden"
+        ],
+        "description": ""
+    },
+    "AbandonKeyboardFocus": {
+        "body": [
+            "${1:control}:AbandonKeyboardFocus()"
+        ],
+        "prefix": [
+            "AbandonKeyboardFocus"
+        ],
+        "description": ""
+    },
+    "AcquireKeyboardFocus": {
+        "body": [
+            "${1:control}:AcquireKeyboardFocus(${2:blocksKeyDown})"
+        ],
+        "prefix": [
+            "AcquireKeyboardFocus"
+        ],
+        "description": ""
+    },
+    "NeedsFrameUpdate": {
+        "body": [
+            "${1:control}:NeedsFrameUpdate()"
+        ],
+        "prefix": [
+            "NeedsFrameUpdate"
+        ],
+        "description": ""
+    },
+    "SetNeedsFrameUpdate": {
+        "body": [
+            "${1:control}:SetNeedsFrameUpdate(${2:needsFrameUpdate})"
+        ],
+        "prefix": [
+            "SetNeedsFrameUpdate"
+        ],
+        "description": ""
+    },
+    "SetAlpha": {
+        "body": [
+            "${1:control}:SetAlpha(${2:alpha}, ${3:applyToChildren})"
+        ],
+        "prefix": [
+            "SetAlpha"
+        ],
+        "description": ""
+    },
+    "GetAlpha": {
+        "body": [
+            "${1:control}:GetAlpha()"
+        ],
+        "prefix": [
+            "GetAlpha"
+        ],
+        "description": ""
+    },
+    "GetName": {
+        "body": [
+            "${1:control}:GetName()"
+        ],
+        "prefix": [
+            "GetName"
+        ],
+        "description": ""
+    },
+    "SetName": {
+        "body": [
+            "${1:control}:SetName(${2:name})"
+        ],
+        "prefix": [
+            "SetName"
+        ],
+        "description": ""
+    },
+    "Dump": {
+        "body": [
+            "${1:control}:Dump()"
+        ],
+        "prefix": [
+            "Dump"
+        ],
+        "description": ""
+    }
+}
