@@ -168,9 +168,9 @@ end
 
 function LinqFromMetaTable:Copy()
     local result = {}
-    self:Foreach(function(k, v)
+    for k,v in self.t do
         result[k] = v
-    end)
+    end
     return from(result)
 end
 
