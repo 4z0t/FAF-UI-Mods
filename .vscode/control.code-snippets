@@ -7,8 +7,17 @@
             "ResetLayout"
         ],
         "description": "reset the control's layout to the defaults, in this case\r\nmakes a circular dependency where you must have at least 4 defined\r\nOverload this in your own classes to make it behave differently"
+    }, 
+    "OnFrame1": {
+        "body": [
+            "${1:control}.OnFrame = function(self, delta)\n\nend"
+        ],
+        "prefix": [
+            "OnFrame"
+        ],
+        "description": "called when a frame update is ready, elapsedTime is time since last frame"
     },
-    "OnFrame": {
+    "OnFrame2": {
         "body": [
             "${1:control}:OnFrame(${2:elapsedTime})"
         ],
@@ -44,7 +53,16 @@
         ],
         "description": ""
     },
-    "OnKeyboardFocusChange": {
+    "OnKeyboardFocusChange1": {
+        "body": [
+            "${1:control}.OnKeyboardFocusChange = function(self)\n\nend"
+        ],
+        "prefix": [
+            "OnKeyboardFocusChange"
+        ],
+        "description": "called when another control takes keyboard focus"
+    },
+    "OnKeyboardFocusChange2": {
         "body": [
             "${1:control}:OnKeyboardFocusChange()"
         ],
@@ -53,7 +71,16 @@
         ],
         "description": "called when another control takes keyboard focus"
     },
-    "OnDestroy": {
+    "OnDestroy1": {
+        "body": [
+            "${1:control}.OnDestroy = function(self)\n\nend"
+        ],
+        "prefix": [
+            "OnDestroy"
+        ],
+        "description": "called when the control is destroyed"
+    },
+    "OnDestroy2": {
         "body": [
             "${1:control}:OnDestroy()"
         ],
@@ -80,7 +107,16 @@
         ],
         "description": "called when the scrollbar wants to scroll a specific number of pages (negative indicates scroll up)"
     },
-    "OnHide": {
+    "OnHide1": {
+        "body": [
+            "${1:control}.OnHide = function(self, hidden)\n\nend"
+        ],
+        "prefix": [
+            "OnHide"
+        ],
+        "description": "called when the control is shown or hidden\r\nif this function returns true, its children will not get their OnHide functions called"
+    },
+    "OnHide2": {
         "body": [
             "${1:control}:OnHide(${2:hidden})"
         ],
@@ -89,7 +125,16 @@
         ],
         "description": "called when the control is shown or hidden\r\nif this function returns true, its children will not get their OnHide functions called"
     },
-    "HandleEvent": {
+    "HandleEvent1": {
+        "body": [
+            "${1:control}.HandleEvent = function(self, event)\n\nend"
+        ],
+        "prefix": [
+            "HandleEvent"
+        ],
+        "description": ""
+    },
+    "HandleEvent2": {
         "body": [
             "${1:control}:HandleEvent(${2:event})"
         ],
@@ -340,5 +385,14 @@
             "Dump"
         ],
         "description": ""
+    },
+    "ApplyFunction": {
+        "body": [
+            "${1:control}:ApplyFunction(function(control)\n\nend)"
+        ],
+        "prefix": [
+            "ApplyFunction"
+        ],
+        "description": "applies a function to this control and all children, function will recieve the control object as the only parameter"
     }
 }
