@@ -1,0 +1,85 @@
+{
+    "Group": {
+        "body": [
+            "local Group = import('/lua/maui/group.lua').Group"
+        ],
+        "prefix": [
+            "local Group"
+        ],
+        "description": ""
+    },
+    "Bitmap": {
+        "body": [
+            "local Bitmap = import('/lua/maui/bitmap.lua').Bitmap"
+        ],
+        "prefix": [
+            "local Bitmap"
+        ],
+        "description": ""
+    },
+    "UIUtil": {
+        "body": [
+            "local UIUtil = import('/lua/ui/uiutil.lua')"
+        ],
+        "prefix": [
+            "local UIUtil"
+        ],
+        "description": ""
+    },
+    "Button": {
+        "body": [
+            "local Button = import('/lua/maui/button.lua').Button"
+        ],
+        "prefix": [
+            "local Button"
+        ],
+        "description": ""
+    },
+    "LazyVar": {
+        "body": [
+            "local LazyVar = import('/lua/lazyvar.lua')"
+        ],
+        "prefix": [
+            "local LazyVar"
+        ],
+        "description": ""
+    },
+    "LayoutHelpers": {
+        "body": [
+            "local LayoutHelpers = import('/lua/maui/layouthelpers.lua')"
+        ],
+        "prefix": [
+            "local LayoutHelpers"
+        ],
+        "description": ""
+    },
+    "Tooltip": {
+        "body": [
+            "local Tooltip = import('/lua/ui/game/tooltip.lua')"
+        ],
+        "prefix": [
+            "local Tooltip"
+        ],
+        "description": ""
+    },
+    "Prefs": {
+        "body": [
+            "local Prefs = import('/lua/user/prefs.lua')"
+        ],
+        "prefix": [
+            "local Prefs"
+        ],
+        "description": ""
+    },
+   
+//     local Dragger = import('/lua/maui/dragger.lua').Dragger
+// local Prefs = import('/lua/user/prefs.lua')
+// local Window = import('/lua/maui/window.lua').Window
+// local Edit = import('/lua/maui/edit.lua').Edit
+// local Text = import('/lua/maui/text.lua').Text
+
+
+// local Control = import('/lua/maui/control.lua').Control
+
+// local FindClients = import('/lua/ui/game/chat.lua').FindClients
+}
