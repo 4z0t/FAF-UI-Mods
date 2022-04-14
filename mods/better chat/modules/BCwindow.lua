@@ -29,7 +29,7 @@ local OptionsWindow = OptionsUtils.OptionsWindow
         ...
     }
 ]]
-FADE_TIME = 10
+
 local playersCache = nil
 local MINWIDTH = 200
 local MINHEIGHT = 100
