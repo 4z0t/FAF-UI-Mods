@@ -32,32 +32,8 @@ local tacticalNukesOption = LazyVar.Create(tacticalNukesOverlay)
 local massExtractorsOption = LazyVar.Create(massExtractorsOverlay)
 
 local overlays = {}
+local overlayGroup 
 
-function init(isReplay, parent)
-    AddBeatFunction(CreateUnitOverlays, true)
-    engineersOption.OnDirty = function(self)
-        engineersOverlay = self()
-    end
-    factoriesOption.OnDirty = function(self)
-        factoriesOverlay = self()
-    end
-    supportCommanderOption.OnDirty = function(self)
-        supportCommanderOverlay = self()
-    end
-    tacticalNukesOption.OnDirty = function(self)
-        tacticalNukesOverlay = self()
-    end
-    massExtractorsOption.OnDirty = function(self)
-        massExtractorsOverlay = self()
-    end
-
-    GlobalOptions.AddOptions('IEL', 'Idle Engineers Light',
-        {OptionsUtils.Filter('Show engineers ovelays', 'engineersOverlay', engineersOption),
-         OptionsUtils.Filter('Show factories ovelays', 'factoriesOverlay', factoriesOption),
-         OptionsUtils.Filter('Show Nukes and TMLs ovelays', 'tacticalNukesOverlay', tacticalNukesOption),
-         OptionsUtils.Filter('Show Mex ovelays', 'massExtractorsOverlay', massExtractorsOption)})
-
-end
 
 function CreateUnitOverlayControl(unit)
     -- creates an empty overlay control for a unit
@@ -240,6 +216,49 @@ function CreateUnitOverlays()
             end
         end
     end
+end
+
+function UpdateOverlays()
+
+end
+
+
+function initOverlayGroup()
+    overlayGroup = Group(worldView)
+    LayoutHelpers.FillParent(overlayGroup, worldView)
+    -- overlayGroup.OnDestroy = function(self)
+    --    ForkThread(initOverlayGroup)
+    -- end
+    -- prepare for updating overlays
+end
+
+function init(isReplay, parent)
+    
+
+    initOverlayGroup()
+    AddBeatFunction(CreateUnitOverlays, true)
+    engineersOption.OnDirty = function(self)
+        engineersOverlay = self()
+    end
+    factoriesOption.OnDirty = function(self)
+        factoriesOverlay = self()
+    end
+    supportCommanderOption.OnDirty = function(self)
+        supportCommanderOverlay = self()
+    end
+    tacticalNukesOption.OnDirty = function(self)
+        tacticalNukesOverlay = self()
+    end
+    massExtractorsOption.OnDirty = function(self)
+        massExtractorsOverlay = self()
+    end
+
+    GlobalOptions.AddOptions('IEL', 'Idle Engineers Light',
+        {OptionsUtils.Filter('Show engineers ovelays', 'engineersOverlay', engineersOption),
+         OptionsUtils.Filter('Show factories ovelays', 'factoriesOverlay', factoriesOption),
+         OptionsUtils.Filter('Show Nukes and TMLs ovelays', 'tacticalNukesOverlay', tacticalNukesOption),
+         OptionsUtils.Filter('Show Mex ovelays', 'massExtractorsOverlay', massExtractorsOption)})
+
 end
 
 function Remove(id)
