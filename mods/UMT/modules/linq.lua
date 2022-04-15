@@ -247,8 +247,7 @@ end
 -- end
 
 function from(t)
-    local result = {}
-    result.t = t or {}
+    local result = {t = t or {}}
     setmetatable(result, LinqFromMetaTable)
     return result
 end
