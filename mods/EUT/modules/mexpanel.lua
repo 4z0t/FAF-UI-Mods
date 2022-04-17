@@ -163,8 +163,8 @@ MexPanel = Class(Group) {
         local iconName = '/textures/ui/common/game/strategicicons/' .. category.icon .. '_rest.dds'
         group.stratIcon:SetTexture(iconName)
         group.stratIcon:SetAlpha(0.3)
-        LayoutHelpers.AtLeftIn(group.stratIcon, group, (22 - group.stratIcon.Width()) / 2)
-        LayoutHelpers.AtTopIn(group.stratIcon, group, (40 - group.stratIcon.Height()) / 2)
+        LayoutHelpers.AtHorizontalCenterIn(group.stratIcon, group)
+        LayoutHelpers.AtTopIn(group.stratIcon, group, 11)
 
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
@@ -173,7 +173,7 @@ MexPanel = Class(Group) {
             group.pauseIcon:SetTexture(iconName)
             LayoutHelpers.SetDimensions(group.pauseIcon, 24, 24)
             group.pauseIcon:SetAlpha(0.3)
-            LayoutHelpers.AtLeftIn(group.pauseIcon, group, (22 - group.pauseIcon.Width()) / 2)
+            LayoutHelpers.AtHorizontalCenterIn(group.pauseIcon, group)
             LayoutHelpers.AtTopIn(group.pauseIcon, group, 8)
         end
 
@@ -184,14 +184,14 @@ MexPanel = Class(Group) {
             group.upgrIcon:SetTexture(iconName)
             LayoutHelpers.SetDimensions(group.upgrIcon, 8, 8)
             group.upgrIcon:SetAlpha(0.3)
-            LayoutHelpers.AtLeftIn(group.upgrIcon, group, (22 - group.upgrIcon.Width()) / 2 + 6)
+            LayoutHelpers.AtHorizontalCenterIn(group.upgrIcon, group, 5)
             LayoutHelpers.AtTopIn(group.upgrIcon, group, 20)
         end
 
         group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
         group.countLabel:SetNewColor('ffaaaaaa')
         group.countLabel:DisableHitTest()
-        LayoutHelpers.AtLeftIn(group.countLabel, group, 9)
+        LayoutHelpers.AtHorizontalCenterIn(group.countLabel, group)
         LayoutHelpers.AtTopIn(group.countLabel, group, 1)
 
         group.ProgressBars = {}
