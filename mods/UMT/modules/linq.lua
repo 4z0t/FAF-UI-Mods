@@ -168,7 +168,7 @@ end
 
 function LinqFromMetaTable:Copy()
     local result = {}
-    for k,v in self.t do
+    for k, v in self.t do
         result[k] = v
     end
     return from(result)
@@ -222,11 +222,25 @@ function LinqFromMetaTable:RemoveByValue(vToRemove)
     return self
 end
 
+function LinqFromMetaTable:Sort(condition)
+    local result = self:ToArray()
+    table.sort(result, condition)
+    return from(result)
+end
+
+function LinqFromMetaTable:Map(callback)
+    local result = {}
+    for k, v in self.t do
+        result[k] = callback(k, v)
+    end
+    return from(result)
+end
+
 function LinqFromMetaTable:ToDictionary()
     return self.t
 end
 
-function LinqFromMetaTable:__newindex(key,value)
+function LinqFromMetaTable:__newindex(key, value)
     error('attempt to set new index for a Linq object')
 end
 
@@ -247,7 +261,9 @@ end
 -- end
 
 function from(t)
-    local result = {t = t or {}}
+    local result = {
+        t = t or {}
+    }
     setmetatable(result, LinqFromMetaTable)
     return result
 end
