@@ -33,7 +33,7 @@ local function CreateUI(parent)
     end
 end
 
-function main()
+function main() 
     CreateUI(GetFrame(0))
 end
 
@@ -148,7 +148,7 @@ function CreateOptionsSelector(parent)
                 UIUtil.SkinnableFile('/MODS/single.dds'), UIUtil.SkinnableFile('/MODS/double.dds'),
                 UIUtil.SkinnableFile('/MODS/disabled.dds'), UIUtil.SkinnableFile('/MODS/disabled.dds'),
                 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-            LayoutHelpers.SetDimensions(line, 80, 20)
+            LayoutHelpers.SetDimensions(line, 80, 30)
             LayoutHelpers.FillParent(line.bg, line)
             LayoutHelpers.DepthOverParent(line.bg, line, 1)
             line.bg:Disable()
@@ -156,7 +156,8 @@ function CreateOptionsSelector(parent)
             line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont, true)
             line.name:SetColor('FFE9ECE9')
             line.name:DisableHitTest()
-            LayoutHelpers.AtLeftTopIn(line.name, line, 5, 5)
+            LayoutHelpers.AtLeftIn(line.name, line, 5)
+            LayoutHelpers.AtVerticalCenterIn(line.name, line)
 
             line.render = function(self, data, id)
                 if data then
