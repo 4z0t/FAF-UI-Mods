@@ -105,7 +105,8 @@ local function MexPanelHandleEvent(control, event, category)
 
             end
         else
-            return false
+            --middle mouse button
+            return false -- calls parent HandleEvent -> move the Panel
         end
     end
 
@@ -129,7 +130,7 @@ MexPanel = Class(Group) {
         LayoutHelpers.SetDimensions(self, 170, 60)
         self.contents = Group(self)
         LayoutHelpers.SetDimensions(self.contents, 168, 50)
-        LayoutHelpers.AtCenterIn(self.contents, self, 5)
+        LayoutHelpers.AtCenterIn(self.contents, self)
         self:InitMexPanels(self.contents)
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
