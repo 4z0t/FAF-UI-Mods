@@ -264,14 +264,12 @@ From = from
 -- end
 
 function range(startValue, endValue)
-    local result = from()
+    local result = {}
     local i = startValue
-    local finished = false
-    while not finished do
-        result:AddValue(i)
+    repeat
+        TableInsert(result, i)
         i = i + 1
-        finished = i >= endValue + 1
-    end
-    return result
+    until i >= endValue + 1
+    return from(result)
 end
 Range = range
