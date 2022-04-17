@@ -4,13 +4,6 @@ local TableRemove = table.remove
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
-local passthroughCondition = function(k, v)
-    return true
-end
-local passthroughSelector = function(k, v)
-    return v
-end
-
 function LinqFromMetaTable:Select(p)
     local result = {}
     local value
