@@ -1,7 +1,7 @@
 -- upvalue for performance
 local TableInsert = table.insert
 local EntityCategoryFilterDown = EntityCategoryFilterDown
-local categoryMASSEXTRACTION = categories.MASSEXTRACTION
+local categoryMASSEXTRACTION = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
 
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
@@ -46,7 +46,7 @@ function SetPausedAll(id, state)
 end
 
 local function MatchCategory(category, unit)
-    local isUpgrading = unit:GetWorkProgress() > 0
+    -- local isUpgrading = unit:GetWorkProgress() > 0
 
     if unit.isUpgraded then
         return false
@@ -56,7 +56,7 @@ local function MatchCategory(category, unit)
         return false
     end
 
-    if isUpgrading ~= category.isUpgrading then
+    if unit.isUpgrader ~= category.isUpgrading then
         return false
     end
 
@@ -82,10 +82,12 @@ local function UpdateUI()
 
     for _, mex in mexes do
         mex.isUpgraded = false
+        mex.isUpgrader = false
     end
     for _, mex in mexes do
         local f = mex:GetFocus()
         if f ~= nil and f:IsInCategory("STRUCTURE") then
+            mex.isUpgrader = true
             f.isUpgraded = true
         end
     end
