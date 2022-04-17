@@ -8,49 +8,9 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 
-local mexCategories = {{
-    name = "T1 idle",
-    categories = categories.TECH1,
-    isUpgrading = false,
-    isPaused = nil,
-    icon = "icon_structure1_mass"
-}, {
-    name = "T1 upgrading paused",
-    categories = categories.TECH1,
-    isUpgrading = true,
-    isPaused = true,
-    icon = "icon_structure1_mass"
-}, {
-    name = "T1 upgrading",
-    categories = categories.TECH1,
-    isUpgrading = true,
-    isPaused = false,
-    icon = "icon_structure1_mass"
-}, {
-    name = "T2 idle",
-    categories = categories.TECH2,
-    isUpgrading = false,
-    isPaused = nil,
-    icon = "icon_structure2_mass"
-}, {
-    name = "T2 upgrading paused",
-    categories = categories.TECH2,
-    isUpgrading = true,
-    isPaused = true,
-    icon = "icon_structure2_mass"
-}, {
-    name = "T2 upgrading",
-    categories = categories.TECH2,
-    isUpgrading = true,
-    isPaused = false,
-    icon = "icon_structure2_mass"
-}, {
-    name = "T3",
-    categories = categories.TECH3,
-    isUpgrading = false,
-    isPaused = nil,
-    icon = "icon_structure3_mass"
-}}
+local mexCategories = import('mexcategories.lua').mexCategories
+local From = import('/mods/UMT/modules/linq.lua').From
+local MexManager = import('mexmanager.lua')
 
 local mexPanel
 function init()
@@ -58,67 +18,44 @@ function init()
         mexPanel:Destroy()
     end
     mexPanel = MexPanel(GetFrame(0))
-
 end
 
 local function MexPanelHandleEvent(control, event, category)
-
-    if event.Type == 'MouseExit' then
-        -- if hoverMexCategoryType ~= nil then
-        --     hoverMexCategoryType.ui:InternalSetSolidColor('aa000000')
-        -- end
-        -- hoverMexCategoryType = nil
-
-    elseif event.Type == 'MouseEnter' then
-        -- hoverMexCategoryType = category
-    elseif event.Type == 'ButtonPress' then
+    local id = control.id
+    if event.Type == 'ButtonPress' then
         if event.Modifiers.Right then
             if category.isPaused ~= nil then
                 if event.Modifiers.Ctrl then
-                    -- local sorted = GetUpgradingUnits(category)
-                    -- local best = sorted[1]
-
-                    -- if category.isPaused then
-                    -- 	-- unpause the best
-                    -- 	SetPaused({ best }, false)
-                    -- else
-                    -- 	-- pause all except the best
-                    -- 	local worst = sorted[table.getn(sorted)]
-                    -- 	SetPaused({ worst }, true)
-                    -- end
+                    if category.isPaused then
+                        MexManager.UnPauseBest(id)
+                    else
+                        MexManager.PauseWorst(id)
+                    end
                 else
-                    -- SetPaused(category.units, not category.isPaused)
+                    MexManager.SetPausedAll(id, not category.isPaused)
                 end
-            else
-                -- select only on screen
             end
         elseif event.Modifiers.Left then
             if event.Modifiers.Ctrl then
-
-                -- local sorted = GetUpgradingUnits(category)
-                -- local best = sorted[1]
-                -- SelectUnits({ best })
+                MexManager.SelectBest(id)
             else
-
-                -- SelectUnits(category.units)
-                -- UIP.econtrol.ui.textLabel:SetText(category.name)
-
+                MexManager.SelectAll(id)
             end
         else
-            --middle mouse button
+            -- middle mouse button
             return false -- calls parent HandleEvent -> move the Panel
         end
     end
-
-    -- if hoverMexCategoryType ~= nil then 
-    -- 	hoverMexCategoryType.ui:InternalSetSolidColor('11ffffff')
-    -- end
-
     return true
 end
 
-function Update()
-
+-- data:
+-- mexes={...}
+-- progress = {}
+function Update(data)
+    if not IsDestroyed(mexPanel) then
+        mexPanel:UpdateMexPanels(data)
+    end
 end
 
 MexPanel = Class(Group) {
@@ -146,6 +83,7 @@ MexPanel = Class(Group) {
             else
                 LayoutHelpers.AtLeftTopIn(panel, parent)
             end
+            panel.id = i
             previous = panel
             table.insert(parent.panels, panel)
         end
@@ -194,40 +132,84 @@ MexPanel = Class(Group) {
         LayoutHelpers.AtHorizontalCenterIn(group.countLabel, group)
         LayoutHelpers.AtTopIn(group.countLabel, group, 1)
 
-        group.ProgressBars = {}
-        group.BackGroundBars = {}
-        for i = 0, 9 do
+        if category.isUpgrading then
+            group.ProgressBars = {}
+            group.BackGroundBars = {}
+            for i = 0, 9 do
 
-            local progress = Bitmap(group)
-            progress:DisableHitTest()
-            progress:SetSolidColor('1100ff00')
-            progress.Width:Set(group.Width)
-            LayoutHelpers.SetHeight(progress, 2)
-            LayoutHelpers.AtLeftBottomIn(progress, group, 0, i * 2)
+                local progress = Bitmap(group)
+                progress:DisableHitTest()
+                progress:SetSolidColor('3300ff00')
+                progress.Width:Set(group.Width)
+                LayoutHelpers.SetHeight(progress, 2)
+                LayoutHelpers.AtLeftBottomIn(progress, group, 0, i * 2)
+                progress:Hide()
 
-            local bg = Bitmap(group)
-            bg:DisableHitTest()
-            bg:SetSolidColor('3300ff00')
-            LayoutHelpers.SetDimensions(bg, 2, 2)
-            LayoutHelpers.AtLeftBottomIn(bg, group, 0, i * 2)
+                local bg = Bitmap(group)
+                bg:DisableHitTest()
+                bg:SetSolidColor('1100ff00')
+                bg.Width:Set(group.Width)
+                LayoutHelpers.SetHeight(bg, 2)
+                LayoutHelpers.AtLeftBottomIn(bg, group, 0, i * 2)
+                bg:Hide()
 
-            table.insert(group.ProgressBars, progress)
-            table.insert(group.BackGroundBars, bg)
+                table.insert(group.ProgressBars, progress)
+                table.insert(group.BackGroundBars, bg)
+            end
         end
 
         group.HandleEvent = function(control, event)
-            return MexPanelHandleEvent(control, event, control.category)
+            if event.Type == 'MouseExit' then
+                control:SetSolidColor('aa000000')
+            elseif event.Type == 'MouseEnter' then
+                control:SetSolidColor('11ffffff')
+            else
+                return MexPanelHandleEvent(control, event, control.category)
+            end
         end
 
-        group.Update = function(self, units)
+        group.Update = function(control, data)
+            local alpha
+            if table.empty(data.mexes) then
+                control.countLabel:SetText("")
+                alpha = 0.3
+            else
+                local count = table.getn(data.mexes)
+                alpha = 1
+                control.countLabel:SetText(count)
+            end
 
+            control.stratIcon:SetAlpha(alpha)
+            if control.upgrIcon then
+                control.upgrIcon:SetAlpha(alpha)
+            end
+            if control.pauseIcon then
+                control.pauseIcon:SetAlpha(alpha)
+            end
+            if control.ProgressBars then
+                for i, bar in control.ProgressBars do
+                    if data.progress then
+                        local progress = data.progress[i] or 0
+                        if progress > 0 then
+                            control.ProgressBars[i]:Show()
+                            control.BackGroundBars[i]:Show()
+                            control.ProgressBars[i].Width:Set(control.BackGroundBars[i].Width() * progress)
+                        end
+                    else
+                        control.ProgressBars[i]:Hide()
+                        control.BackGroundBars[i]:Hide()
+                    end
+                end
+            end
         end
 
         return group
     end,
 
-    UpdateMexPanels = function(self, units)
-
+    UpdateMexPanels = function(self, data)
+        for i, d in data do
+            self.contents.panels[i]:Update(d)
+        end
     end,
 
     HandleEvent = function(self, event)
