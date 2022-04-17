@@ -43,7 +43,7 @@ BCLine = Class(Checkbox) {
             UIUtil.SkinnableFile('/MODS/double.dds'), UIUtil.SkinnableFile('/MODS/disabled.dds'),
             UIUtil.SkinnableFile('/MODS/disabled.dds'), 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
 
-        LayoutHelpers.DepthOverParent(self, parent, 1)
+        LayoutHelpers.DepthOverParent(self, parent)
 
         self._id = id
 
@@ -57,7 +57,7 @@ BCLine = Class(Checkbox) {
         self._bg:DisableHitTest()
         self._bg:SetSolidColor("ff000000")
         self._bg:SetAlpha(0.8)
-        LayoutHelpers.DepthUnderParent(self._bg, self, 1)
+        LayoutHelpers.DepthUnderParent(self._bg, self)
 
         if isFirst then
             LayoutHelpers.AtLeftTopIn(self, parent, 2, 2)
@@ -65,7 +65,6 @@ BCLine = Class(Checkbox) {
         else
             LayoutHelpers.Below(self, parent, 4)
             LayoutHelpers.AtRightIn(self, parent)
-
         end
         LayoutHelpers.SetHeight(self, 20)
 
@@ -87,7 +86,6 @@ BCLine = Class(Checkbox) {
                 key = self._key,
                 team = self._team,
                 modifiers = self._modifiers
-
             }
             self._window:SetData(self._id, data)
             return true
@@ -110,21 +108,15 @@ BCLine = Class(Checkbox) {
         self:Hide()
         self:Disable()
         self:SetNeedsFrameUpdate(true)
-
     end,
+
     SetText = function(self, text, color)
         self._text:SetText(text)
         if color then
             self._text:SetColor(color)
         end
     end,
-    HandleEvent = function(self, event)
-        -- prevent modifictaion in shadow mode
-        if self._window:GetShadowMode() then
-            return
-        end
-        return Checkbox.HandleEvent(self, event)
-    end,
+
     OnClick = function(self, modifiers)
 
         if self._lock then
@@ -209,7 +201,6 @@ BCLine = Class(Checkbox) {
                 end
 
                 self._text:Hide()
-                -- _edit:SetCaretPosition()
                 _edit.OnEnterPressed = function(control, text)
                     self._text:SetText(text)
                     self._text:Show()
@@ -239,19 +230,8 @@ BCLine = Class(Checkbox) {
                         })
                         self._data = text
                     end
-
-                    -- control:Destroy()
                     self._window:AcquireKeyboard()
                 end
-
-                -- _edit.OnLoseKeyboardFocus = function(control)
-                --     LOG('lost1')
-                --     self._text:Show()
-
-                --     control:Destroy()
-
-                --     self._window:AcquireKeyboard()
-                -- end
                 _edit.OnKeyboardFocusChange = function(control)
                     self._text:Show()
                     control:Destroy()
@@ -334,12 +314,10 @@ BCLine = Class(Checkbox) {
 
         else
             self._bg:SetAlpha(0)
-
             self._teamCB:SetCheck(false, true)
             self._teamCB:Disable()
             self:SetText('')
             self._keyText:SetText('')
-            -- self:Hide()
             self:Disable()
 
         end
@@ -363,11 +341,5 @@ BCLine = Class(Checkbox) {
                 self._teamCB:Deactivate()
             end
         end
-
-    end,
-
-    DisableCheckBoxes = function(self)
-
     end
-
 }
