@@ -127,7 +127,7 @@
     },
     "HandleEvent1": {
         "body": [
-            "${1:control}.HandleEvent = function(self, event)\n\nend"
+            "${1:control}.HandleEvent = function(self, event)\n\treturn false\nend"
         ],
         "prefix": [
             "HandleEvent"
