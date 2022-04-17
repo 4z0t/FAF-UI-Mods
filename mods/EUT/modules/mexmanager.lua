@@ -102,7 +102,6 @@ local function UpdateUI()
     for id, category in mexCategories do
 
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
-            mexData[id].progress = {}
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
                 return a:GetWorkProgress() > b:GetWorkProgress()
             end)

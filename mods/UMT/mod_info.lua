@@ -1,6 +1,6 @@
 name = "UI mod tools"
-uid = "ui-mod-tools-4z0t-v01"
-version = 1
+uid = "ui-mod-tools-4z0t-v02"
+version = 2
 copyright = ""
 description = [[Tools for UI modding
 docs coming soon...]]
