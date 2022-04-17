@@ -7,5 +7,3 @@ for _, t in menus.main do
 end
 
 actions['UMToptions'] = import('/mods/UMT/modules/GlobalOptions.lua').main
-
--- check HandleEvent effect children if returns true
