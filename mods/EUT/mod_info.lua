@@ -1,5 +1,5 @@
 name = "ECO UI Tools"
-version = 1
+version = 2
 copyright = ""
 description = [[Provides ECO management UI components.
 Requires Commoon Mod tools and UI mod tools.
