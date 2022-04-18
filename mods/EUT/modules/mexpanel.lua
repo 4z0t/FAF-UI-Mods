@@ -34,6 +34,8 @@ local function MexPanelHandleEvent(control, event, category)
                 else
                     MexManager.SetPausedAll(id, not category.isPaused)
                 end
+            else
+                MexManager.SelectOnScreen(id)
             end
         elseif event.Modifiers.Left then
             if event.Modifiers.Ctrl then

@@ -37,6 +37,17 @@ function SetPausedAll(id, state)
     SetPaused(mexes, state)
 end
 
+function SelectOnScreen(id)
+    local mexes = mexData[id].mexes
+    mexes = From(mexes)
+    UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
+    local mexesOnScreen = From(GetSelectedUnits())
+    local result = mexes:Where(function(k, mex)
+        return mexesOnScreen:Contains(mex)
+    end):ToDictionary()
+    SelectUnits(result)
+end
+
 local function MatchCategory(category, unit)
     -- local isUpgrading = unit:GetWorkProgress() > 0
 
