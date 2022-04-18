@@ -1,7 +1,7 @@
 -- upvalue for performance
 local TableInsert = table.insert
 local EntityCategoryFilterDown = EntityCategoryFilterDown
-local categoryMASSEXTRACTION = categories.MASSEXTRACTION * categories.STRUCTURE
+local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
 
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
@@ -11,14 +11,6 @@ local UpdateMexPanel = import('mexpanel.lua').Update
 
 local mexCategories = import('mexcategories.lua').mexCategories
 local mexData = {}
-
-local function GetUpgradingMexes(mexes)
-    return From(mexes):Map(function(k, mex)
-        return mex:GetWorkProgress()
-    end):Sort(function(a, b)
-        return a > b
-    end):ToArray()
-end
 
 function PauseWorst(id)
     local mexes = mexData[id].mexes
@@ -71,7 +63,7 @@ end
 
 local function UpdateUI()
     local mexes = GetUnits()
-    mexes = EntityCategoryFilterDown(categoryMASSEXTRACTION, mexes)
+    mexes = EntityCategoryFilterDown(categoryMex, mexes)
 
     for id, category in mexCategories do
         mexData[id] = {

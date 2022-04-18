@@ -22,7 +22,7 @@ end
 
 local function MexPanelHandleEvent(control, event, category)
     local id = control.id
-    if event.Type == 'ButtonPress' then
+    if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
         if event.Modifiers.Right then
             if category.isPaused ~= nil then
                 if event.Modifiers.Ctrl then
@@ -118,7 +118,7 @@ MexPanel = Class(Group) {
         if category.isUpgrading then
             group.upgrIcon = Bitmap(group)
             group.upgrIcon:DisableHitTest()
-            local iconName = '/mods/ui-party/textures/upgrade.dds'
+            local iconName = '/mods/EUT/textures/upgrade.dds'
             group.upgrIcon:SetTexture(iconName)
             LayoutHelpers.SetDimensions(group.upgrIcon, 8, 8)
             group.upgrIcon:SetAlpha(0.3)
