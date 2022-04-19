@@ -20,7 +20,7 @@ function LinqFromMetaTable:Where(p)
     local result = {}
     for k, v in self.t do
         if p(k, v) then
-            TableInsert(result, v)
+            result[k] = v
         end
     end
     return from(result)
