@@ -317,5 +317,6 @@ OptionsWindow = Class(Window) {
         if not self._manually_destroyed then
             self:RestoreOptions()
         end
+        Window.OnDestroy(self)
     end
 }
