@@ -1,7 +1,7 @@
 
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 KeyMapper.SetUserKeyAction('kbo', {
-    action = 'UI_Lua import("/mods/KBO/modules/view.lua").init()',
+    action = 'UI_Lua import("/mods/KBO/modules/views/view.lua").init()',
     category = 'KBO',
     order = 404
 })
