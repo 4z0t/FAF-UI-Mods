@@ -13,7 +13,13 @@ local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 local UIMain = import('/lua/ui/uimain.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
 local LazyVar = import('/lua/lazyvar.lua')
-local swapColor = LazyVar.Create("ff00ffff")
+local IScrollable = import('IScrollable.lua').IScrollable
+local BPItem = import('BlueprintItem.lua')
+local BlueprintItem = BPItem.BlueprintItem
+local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
+local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
+
+
 
 local GUI
 function init()
@@ -198,77 +204,11 @@ function CreateUI(parent)
 end
 
 
-IScrollable = Class(Group) {
-    --[[
-        _dataSize
-        _topLine
-        _numLines
-    ]]
-    __init = function(self, parent)
-        Group.__init(self, parent)
-        self._topLine = 1
-        self._scroll = UIUtil.CreateVertScrollbarFor(self) -- scroller
-    end,
 
-    GetScrollValues = function(self, axis)
-        return 1, self._dataSize, self._topLine, math.min(self._topLine + self._numLines - 1, self._dataSize)
-    end,
 
-    ScrollLines = function(self, axis, delta)
-        self:ScrollSetTop(axis, self._topLine + delta)
-    end,
-
-    ScrollPages = function(self, axis, delta)
-        self:ScrollSetTop(axis, self._topLine + math.floor(delta) * self._numLines)
-    end,
-
-    ScrollSetTop = function(self, axis, top)
-        top = math.floor(math.max(math.min(self._dataSize - self._numLines + 1, top), 1))
-        if top == self._topLine then
-            return
-        end
-        self._topLine = top
-        self:CalcVisible()
-    end,
-
-    ScrollToBottom = function(self)
-        self:ScrollSetTop(nil, self._numLines)
-    end,
-
-    -- determines what controls should be visible or not
-    -- overload
-    CalcVisible = function(self)
-        local invIndex = 1
-        local lineIndex = 1
-        for index = self._topLine, self._numLines + self._topLine - 1 do
-            self:RenderLine(lineIndex, index)
-            lineIndex = lineIndex + 1
-        end
-    end,
-
-    RenderLine = function(self, lineIndex, scrollIndex)
-
-    end,
-
-    HandleEvent = function(self, event)
-        if event.Type == 'WheelRotation' then
-            if event.WheelRotation > 0 then
-                self:ScrollLines(nil, -1)
-            else
-                self:ScrollLines(nil, 1)
-            end
-        end
-        return self:OnEvent(event)
-    end,
-
-    OnEvent = function(self, event)
-        return true
-    end
-}
-
+local swapColor = LazyVar.Create("ff00ffff")
 MAX_ITEMS = 7
-BPITEM_WIDTH = 192
-BPITEM_HEIGHT = 64
+
 
 BlueprintSelector = Class(IScrollable) {
     __init = function(self, parent, blueprintArray, skin, maxItems)
@@ -383,7 +323,8 @@ ConstructionScrollArea = Class(IScrollable) {
         group.id = index
 
         group.indexText = UIUtil.CreateText(group, tostring(index), 20, UIUtil.titleFont, true)
-        LayoutHelpers.AtLeftTopIn(group.indexText, group, 4, 5)
+        LayoutHelpers.AtLeftIn(group.indexText, group, 4)
+        LayoutHelpers.AtVerticalCenterIn(group.indexText, group)
         group.indexText:SetColor(UIUtil.fontOverColor)
 
         group.indexText.HandleEvent = function(control, event)
@@ -416,7 +357,7 @@ ConstructionScrollArea = Class(IScrollable) {
             local selector = BlueprintItem(group, skin)
             selector.bps = From(self._blueprints[skin])
             selector.id = index
-            LayoutHelpers.AtLeftTopIn(selector, group, 20 + 200 * (k - 1), 10)
+            LayoutHelpers.AtLeftTopIn(selector, group, 20 + 200 * (k - 1), 2)
             selector.OnClick = function(control, modifiers, bluprint)
                 if modifiers.Left then
                     -- if IsDestroyed(self.menu) then
@@ -430,6 +371,8 @@ ConstructionScrollArea = Class(IScrollable) {
                     control.menu = menu
                     -- end
                 elseif modifiers.Right then
+                    self._data[control.id] = self._data[control.id] or {}
+                    self._data[control.id][skin] = nil
                     control:SetBlueprint()
                 end
             end
@@ -507,79 +450,4 @@ ConstructionScrollArea = Class(IScrollable) {
 
 }
 
-BlueprintItem = Class(Group) {
-    __init = function(self, parent, skin)
-        Group.__init(self, parent)
-        LayoutHelpers.SetDimensions(self, BPITEM_WIDTH, BPITEM_HEIGHT)
 
-        self._icon = Bitmap(self)
-        self._icon:Hide()
-        LayoutHelpers.AtLeftIn(self._icon, self, 2)
-        LayoutHelpers.AtVerticalCenterIn(self._icon, self)
-
-        self._name = UIUtil.CreateText(self, '', 10, UIUtil.bodyFont, true)
-        LayoutHelpers.AtRightBottomIn(self._name, self, 4, 3)
-
-        self._blueprint = false
-
-        self._blueprintText = UIUtil.CreateText(self, '', 10, UIUtil.bodyFont, true)
-        self._blueprintText:SetColor(UIUtil.panelColor)
-        LayoutHelpers.AtRightTopIn(self._blueprintText, self, 4, 3)
-
-        self._bg = Bitmap(self)
-        self._bg._over = '/textures/ui/' .. skin .. '/MODS/double.dds'
-        self._bg._rest = '/textures/ui/' .. skin .. '/MODS/single.dds'
-        self._bg:SetTexture(self._bg._rest)
-        self._bg:SetAlpha(0.5)
-        LayoutHelpers.FillParent(self._bg, self)
-        
-
-        self._icon:DisableHitTest()
-        self._bg:DisableHitTest()
-        self._blueprintText:DisableHitTest()
-        self._name:DisableHitTest()
-
-    end,
-
-    SetBlueprint = function(self, blueprint)
-        if blueprint then
-            local icon = UIUtil.UIFile('/icons/units/' .. blueprint .. '_icon.dds', true)
-            self._blueprint = blueprint
-            self._icon:SetTexture(icon)
-
-            self._icon:Show()
-            self._blueprintText:SetText(blueprint)
-            self._name:SetText(LOC(__blueprints[blueprint].Interface.HelpText))
-        else
-            self._icon:Hide()
-            self._blueprint = false
-            self._blueprintText:SetText('')
-            self._name:SetText('')
-        end
-    end,
-    GetBlueprint = function(self)
-        return self._blueprint
-    end,
-
-    HandleEvent = function(self, event)
-        if event.Type == 'MouseExit' then
-            self._bg:SetTexture(self._bg._rest)
-            self._bg:SetAlpha(0.5)
-            return true
-        elseif event.Type == 'MouseEnter' then
-            self._bg:SetTexture(self._bg._over)
-            self._bg:SetAlpha(1)
-            return true
-        elseif event.Type == 'ButtonPress' then
-            self:OnClick(event.Modifiers, self._blueprint)
-            return true
-        end
-        return false
-    end,
-
-    -- overloadable
-    OnClick = function(self, modifiers, blueprint)
-
-    end
-
-}
