@@ -12,6 +12,8 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 local UIMain = import('/lua/ui/uimain.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
+local LazyVar = import('/lua/lazyvar.lua')
+local swapColor = LazyVar.Create("ff00ffff")
 
 local GUI
 function init()
@@ -137,7 +139,6 @@ function CreateUI(parent)
                 if modifiers.Left then
                     -- if IsDestroyed(self.menu) then
                     local menu = BlueprintSelector(self, self.bps:ToDictionary(), skin)
-                    LayoutHelpers.Below(menu, self)
                     menu.OnItemClick = function(control, bluprint)
                         self:SetBlueprint(bluprint)
                         control:Destroy()
@@ -196,7 +197,6 @@ function CreateUI(parent)
     return group
 end
 
-MAX_ITEMS = 5
 
 IScrollable = Class(Group) {
     --[[
@@ -266,10 +266,14 @@ IScrollable = Class(Group) {
     end
 }
 
+MAX_ITEMS = 7
+BPITEM_WIDTH = 192
+BPITEM_HEIGHT = 64
+
 BlueprintSelector = Class(IScrollable) {
     __init = function(self, parent, blueprintArray, skin, maxItems)
         IScrollable.__init(self, parent)
-        LayoutHelpers.DepthOverParent(self, parent, 10)
+        LayoutHelpers.DepthOverParent(self, parent, 20)
         self._topLine = 1
         self._blueprints = blueprintArray
         self._numLines = maxItems or MAX_ITEMS
@@ -285,7 +289,12 @@ BlueprintSelector = Class(IScrollable) {
                 self:Destroy()
             end
         end
-
+        LayoutHelpers.SetDimensions(self, BPITEM_WIDTH + 4, (BPITEM_HEIGHT + 2) * self._numLines + 2)
+        if parent.Bottom() + self.Height() > self._cover.Bottom() then
+            LayoutHelpers.Above(self, parent, 2)
+        else
+            LayoutHelpers.Below(self, parent, 2)
+        end
         self:CreateItems()
         self:CalcVisible()
     end,
@@ -298,8 +307,7 @@ BlueprintSelector = Class(IScrollable) {
         self._lineGroup = Bitmap(self)
         self._lineGroup:SetSolidColor('ff111111')
         self._lineGroup:DisableHitTest()
-
-        LayoutHelpers.AtLeftTopIn(self._lineGroup, self)
+        LayoutHelpers.FillParent(self._lineGroup, self)
         self._lineGroup._lines = {}
         local line
         local prev
@@ -318,8 +326,6 @@ BlueprintSelector = Class(IScrollable) {
             self._lineGroup._lines[index] = line
             prev = line
         end
-        LayoutHelpers.AtRightBottomIn(self._lineGroup, prev, -2, -2)
-        LayoutHelpers.AtRightBottomIn(self, self._lineGroup)
     end,
 
     -- overloadable
@@ -382,7 +388,7 @@ ConstructionScrollArea = Class(IScrollable) {
 
         group.indexText.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then -- swap logic for lines
-                if self._swapIndex and self._swapIndex~=group.id  then
+                if self._swapIndex and self._swapIndex ~= group.id then
                     local temp = self._data[group.id]
                     self._data[group.id] = self._data[self._swapIndex]
                     self._data[self._swapIndex] = temp
@@ -394,7 +400,11 @@ ConstructionScrollArea = Class(IScrollable) {
                 end
                 return false
             elseif event.Type == 'MouseExit' then
-                control:SetColor(UIUtil.fontOverColor)
+                if group.id == self._swapIndex then
+                    control:SetColor(swapColor)
+                else
+                    control:SetColor(UIUtil.fontOverColor)
+                end
                 return true
             elseif event.Type == 'MouseEnter' then
                 control:SetColor(UIUtil.highlightColor)
@@ -411,7 +421,6 @@ ConstructionScrollArea = Class(IScrollable) {
                 if modifiers.Left then
                     -- if IsDestroyed(self.menu) then
                     local menu = BlueprintSelector(control, control.bps:ToDictionary(), skin)
-                    LayoutHelpers.Below(menu, control)
                     menu.OnItemClick = function(item, bluprint)
                         control:SetBlueprint(bluprint)
                         self._data[control.id] = self._data[control.id] or {}
@@ -475,6 +484,11 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     RenderLine = function(self, lineIndex, scrollIndex)
+        if scrollIndex == self._swapIndex then
+            self._lineGroup._lines[lineIndex].indexText:SetColor(swapColor)
+        else
+            self._lineGroup._lines[lineIndex].indexText:SetColor(UIUtil.fontOverColor)
+        end
         self._lineGroup._lines[lineIndex].indexText:SetText(tostring(scrollIndex))
         self._lineGroup._lines[lineIndex].id = scrollIndex
         for skin, selector in self._lineGroup._lines[lineIndex].selectors do
@@ -496,7 +510,7 @@ ConstructionScrollArea = Class(IScrollable) {
 BlueprintItem = Class(Group) {
     __init = function(self, parent, skin)
         Group.__init(self, parent)
-        LayoutHelpers.SetDimensions(self, 192, 64)
+        LayoutHelpers.SetDimensions(self, BPITEM_WIDTH, BPITEM_HEIGHT)
 
         self._icon = Bitmap(self)
         self._icon:Hide()
@@ -508,7 +522,8 @@ BlueprintItem = Class(Group) {
 
         self._blueprint = false
 
-        self._blueprintText = UIUtil.CreateText(self, '', 10, UIUtil.disabledColor, true)
+        self._blueprintText = UIUtil.CreateText(self, '', 10, UIUtil.bodyFont, true)
+        self._blueprintText:SetColor(UIUtil.panelColor)
         LayoutHelpers.AtRightTopIn(self._blueprintText, self, 4, 3)
 
         self._bg = Bitmap(self)
@@ -517,6 +532,7 @@ BlueprintItem = Class(Group) {
         self._bg:SetTexture(self._bg._rest)
         self._bg:SetAlpha(0.5)
         LayoutHelpers.FillParent(self._bg, self)
+        
 
         self._icon:DisableHitTest()
         self._bg:DisableHitTest()
