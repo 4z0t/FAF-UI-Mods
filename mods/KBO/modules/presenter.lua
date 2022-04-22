@@ -15,6 +15,12 @@ function init()
     globalBPs = Model.globalBPs
 end
 
+function SaveActive(name)
+    if name ~= "" then
+        Model.SaveHotBuild(name, active)
+    end
+end
+
 function SetActive(name)
     name = name or "new"
     active = Model.FetchHotBuild(name)
