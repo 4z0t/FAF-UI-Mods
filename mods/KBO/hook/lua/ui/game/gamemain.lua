@@ -6,8 +6,8 @@ KeyMapper.SetUserKeyAction('kbo', {
     order = 404
 })
 
--- local originalCreateUI = CreateUI
--- function CreateUI(isReplay, parent)
---     originalCreateUI(isReplay)
---     import("/mods/KBO/modules/main.lua").init(isReplay)
--- end
+local originalCreateUI = CreateUI
+function CreateUI(isReplay, parent)
+    originalCreateUI(isReplay)
+    import("/mods/KBO/modules/main.lua").init(isReplay)
+end
