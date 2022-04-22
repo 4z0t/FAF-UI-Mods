@@ -91,6 +91,10 @@ function LoadHotBuilds()
     import('/lua/keymap/hotkeylabels.lua').ResetIdRelations()
 end
 
+function FetchHotBuildsKeys()
+    return From(hotBuilds):Keys():ToDictionary()
+end
+
 function SaveHotBuild(name, data)
     hotBuilds[name] = table.deepcopy(data)
     local compiled = Compile(data)
@@ -98,6 +102,13 @@ function SaveHotBuild(name, data)
     AddToUnitkeygroups(name, compiled)
     import('/lua/keymap/hotkeylabels.lua').ResetIdRelations()
     Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+end
+
+function DelHotBuild(name)
+    if name then 
+        hotBuilds[name] = nil
+        Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+    end
 end
 
 function Compile(data)
@@ -122,7 +133,7 @@ function AddToUnitkeygroups(name, compiled)
     import('/lua/keymap/unitkeygroups.lua').unitkeygroups[name] = compiled
     KeyMapper.SetUserKeyAction(string.lower(name), {
         action = string.format('UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("%s")', name),
-        category = 'hotbuilding',
+        category = 'HotBuild Overhaul',
         order = 2048
     })
 end
