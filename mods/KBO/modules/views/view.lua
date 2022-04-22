@@ -13,6 +13,7 @@ local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 local UIMain = import('/lua/ui/uimain.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
 local Edit = import('/lua/maui/edit.lua').Edit
+local Combo = import('/lua/ui/controls/combo.lua').Combo
 
 local LazyVar = import('/lua/lazyvar.lua')
 local IScrollable = import('IScrollable.lua').IScrollable
@@ -21,13 +22,6 @@ local BlueprintItem = BPItem.BlueprintItem
 local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
 local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
 local Presenter = import('/mods/KBO/modules/presenter.lua')
-
-local GUI
-function init()
-    if IsDestroyed(GUI) then
-        GUI = CreateUI(GetFrame(0))
-    end
-end
 
 local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
 
@@ -53,6 +47,13 @@ local divisions = {{
     any = {'BUILTBYQUANTUMGATE'}
 }}
 
+local GUI
+function init()
+    if IsDestroyed(GUI) then
+        GUI = CreateUI(GetFrame(0))
+    end
+end
+
 function CreateUI(parent)
     Presenter.SetActive()
     local group = Group(parent)
@@ -67,7 +68,7 @@ function CreateUI(parent)
     LayoutHelpers.AtTopIn(group.Title, group, 5)
 
     group.QuitButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
-    LayoutHelpers.AtHorizontalCenterIn(group.QuitButton, group, 100)
+    LayoutHelpers.AtHorizontalCenterIn(group.QuitButton, group, 150)
     LayoutHelpers.AtBottomIn(group.QuitButton, group, 5)
     LayoutHelpers.DepthOverParent(group.QuitButton, group)
 
@@ -76,22 +77,60 @@ function CreateUI(parent)
         group:Destroy()
     end
 
+    group.DelButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Delete>Delete"))
+    LayoutHelpers.AtHorizontalCenterIn(group.DelButton, group)
+    LayoutHelpers.AtBottomIn(group.DelButton, group, 5)
+    LayoutHelpers.DepthOverParent(group.DelButton, group)
+
+    group.DelButton.OnClick = function(control, modifiers)
+        Presenter.SaveActive()
+        Presenter.SetActive()
+        group.edit:ClearText()
+        group.combo:ClearItems()
+        group.combo:AddItems(Presenter.FetchHotBuilds(true), 1)
+        UpdateUI()
+    end
+
     group.SaveButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Save>Save"))
-    LayoutHelpers.AtHorizontalCenterIn(group.SaveButton, group, -100)
+    LayoutHelpers.AtHorizontalCenterIn(group.SaveButton, group, -150)
     LayoutHelpers.AtBottomIn(group.SaveButton, group, 5)
     LayoutHelpers.DepthOverParent(group.SaveButton, group)
 
     group.SaveButton.OnClick = function(control, modifiers)
-        Presenter.SaveActive(group.edit:GetText())
+        local text = group.edit:GetText()
+        Presenter.SaveActive(text)
+        group.combo:ClearItems()
+        local newItems = Presenter.FetchHotBuilds(true)
+        local index = 1
+        for k, v in newItems do
+            if v == text then
+                index = k
+                break
+            end
+        end
+        group.combo:AddItems(newItems, index)
     end
 
     group.edit = Edit(group)
-    LayoutHelpers.AtLeftTopIn(group.edit, group, 100, 20)
-    UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil, nil, 20)
+    LayoutHelpers.AtLeftTopIn(group.edit, group, 100, 40)
+    UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil,
+        nil, 20)
     LayoutHelpers.SetDimensions(group.edit, 200, 20)
     group.edit.OnEnterPressed = function(self, text)
         return true
     end
+
+    group.combo = Combo(group, 16, 10)
+    group.combo:AddItems(Presenter.FetchHotBuilds(true), 1)
+    group.combo.OnClick = function(self, index, text)
+        self:SetItem(index)
+        group.edit:SetText(text)
+        Presenter.SetActive(text)
+        UpdateUI()
+    end
+
+    LayoutHelpers.AtLeftTopIn(group.combo, group, 50, 20)
+    LayoutHelpers.SetWidth(group.combo, 200)
 
     group.construction = ConstructionScrollArea(group, Presenter.FetchConstructionBlueprints(), 5)
     LayoutHelpers.AtLeftTopIn(group.construction, group, 100, 100)
@@ -151,6 +190,17 @@ function CreateUI(parent)
     end)
 
     return group
+end
+
+function UpdateUI()
+    if not IsDestroyed(GUI) then
+        GUI.construction:CalcVisible()
+        for name, category in GUI.categories do
+            for faction, selector in category.selectors do
+                selector:SetBlueprint(Presenter.FetchBlueprint(name, faction))
+            end
+        end
+    end
 end
 
 local swapColor = LazyVar.Create("ff00ffff")

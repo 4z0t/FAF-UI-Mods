@@ -2,6 +2,7 @@ local Prefs = import('/lua/user/prefs.lua')
 local Model = import('model.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
 local active
+local activeName
 
 local prefixes = {
     ["aeon"] = {"ua", "xa", "da"},
@@ -16,14 +17,16 @@ function init()
 end
 
 function SaveActive(name)
-    if name ~= "" then
+    Model.DelHotBuild(activeName)
+    if name and name ~= "" then
         Model.SaveHotBuild(name, active)
+        activeName = name
     end
 end
 
 function SetActive(name)
-    name = name or "new"
-    active = Model.FetchHotBuild(name)
+    activeName = name or ""
+    active = Model.FetchHotBuild(activeName)
 end
 
 function AddConstructionBlueprints()
@@ -117,6 +120,14 @@ end
 
 function ClearConstructionBlueprints(index)
 
+end
+
+function FetchHotBuilds(new)
+    local hotbuilds = Model.FetchHotBuildsKeys()
+    if new then
+        table.insert(hotbuilds, 1, '')
+    end
+    return hotbuilds
 end
 
 function FetchConstructionBlueprint(index, faction)
