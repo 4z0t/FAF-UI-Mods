@@ -46,7 +46,13 @@ local divisions = {{
     name = 'Naval',
     all = {'NAVAL'},
     any = {'BUILTBYTIER3FACTORY'}
-}}
+},
+{
+    name = 'Gate',
+    all = {},
+    any = {'BUILTBYQUANTUMGATE'}
+}
+}
 
 local prefixes = {
     ["aeon"] = {"ua", "xa", "da"},
