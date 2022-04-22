@@ -12,6 +12,8 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 local UIMain = import('/lua/ui/uimain.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
+local Edit = import('/lua/maui/edit.lua').Edit
+
 local LazyVar = import('/lua/lazyvar.lua')
 local IScrollable = import('IScrollable.lua').IScrollable
 local BPItem = import('BlueprintItem.lua')
@@ -51,12 +53,6 @@ local divisions = {{
     any = {'BUILTBYQUANTUMGATE'}
 }}
 
-local prefixes = {
-    ["aeon"] = {"ua", "xa", "da"},
-    ["uef"] = {"ue", "xe", "de"},
-    ["cybran"] = {"ur", "xr", "dr"},
-    ["seraphim"] = {"xs", "us", "ds"}
-}
 function CreateUI(parent)
     Presenter.SetActive()
     local group = Group(parent)
@@ -80,14 +76,23 @@ function CreateUI(parent)
         group:Destroy()
     end
 
-    group.OkButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Ok>Ok"))
-    LayoutHelpers.AtHorizontalCenterIn(group.OkButton, group, -100)
-    LayoutHelpers.AtBottomIn(group.OkButton, group, 5)
-    LayoutHelpers.DepthOverParent(group.OkButton, group)
+    group.SaveButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Save>Save"))
+    LayoutHelpers.AtHorizontalCenterIn(group.SaveButton, group, -100)
+    LayoutHelpers.AtBottomIn(group.SaveButton, group, 5)
+    LayoutHelpers.DepthOverParent(group.SaveButton, group)
 
-    group.OkButton.OnClick = function(control, modifiers)
-
+    group.SaveButton.OnClick = function(control, modifiers)
+        Presenter.SaveActive(group.edit:GetText())
     end
+
+    group.edit = Edit(group)
+    LayoutHelpers.AtLeftTopIn(group.edit, group, 100, 20)
+    UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil, nil, 20)
+    LayoutHelpers.SetDimensions(group.edit, 200, 20)
+    group.edit.OnEnterPressed = function(self, text)
+        return true
+    end
+
     group.construction = ConstructionScrollArea(group, Presenter.FetchConstructionBlueprints(), 5)
     LayoutHelpers.AtLeftTopIn(group.construction, group, 100, 100)
     group.categories = {}
@@ -103,6 +108,7 @@ function CreateUI(parent)
         From(skins):Foreach(function(k, skin)
 
             local selector = BlueprintItem(group, skin)
+            selector:SetBlueprint(Presenter.FetchBlueprint(div.name, skin))
             selector.bps = Presenter.FetchBlueprints(div.name, skin)
             LayoutHelpers.AtLeftTopIn(selector, group, 100 + 200 * (k - 1), 200 + i * 80 + 20)
             selector.OnClick = function(self, modifiers, bluprint)

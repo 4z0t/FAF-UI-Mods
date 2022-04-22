@@ -1,5 +1,6 @@
 local Prefs = import('/lua/user/prefs.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
+local KeyMapper = import('/lua/keymap/keymapper.lua')
 
 local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
 
@@ -40,11 +41,12 @@ local sacu = {
 
 local strLen = string.len
 
-local hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
+local hotBuilds
 globalBPs = {}
 
 function init()
     FilterBlueprints()
+    LoadHotBuilds()
 end
 
 function FilterBlueprints()
@@ -78,6 +80,51 @@ function FilterBlueprints()
             end):ToDictionary()
         end)
     end)
+end
+
+function LoadHotBuilds()
+    hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
+    for name, hotbuild in hotBuilds do
+        local compiled = Compile(hotbuild)
+        AddToUnitkeygroups(name, compiled)
+    end
+    import('/lua/keymap/hotkeylabels.lua').ResetIdRelations()
+end
+
+function SaveHotBuild(name, data)
+    hotBuilds[name] = table.deepcopy(data)
+    local compiled = Compile(data)
+    import('/lua/keymap/hotbuild.lua').AddUnitKeyGroup(name, compiled)
+    AddToUnitkeygroups(name, compiled)
+    import('/lua/keymap/hotkeylabels.lua').ResetIdRelations()
+    Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+end
+
+function Compile(data)
+    local res = From()
+    for category, dat in data do
+        if category == 'Construction' then
+            for index, bps in dat do
+                for faction, bp in bps do
+                    res:AddValue(bp)
+                end
+            end
+        else
+            for faction, bp in dat do
+                res:AddValue(bp)
+            end
+        end
+    end
+    return res:ToDictionary()
+end
+
+function AddToUnitkeygroups(name, compiled)
+    import('/lua/keymap/unitkeygroups.lua').unitkeygroups[name] = compiled
+    KeyMapper.SetUserKeyAction(string.lower(name), {
+        action = string.format('UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("%s")', name),
+        category = 'hotbuilding',
+        order = 2048
+    })
 end
 
 function FetchHotBuild(id)
