@@ -39,7 +39,6 @@ IScrollable = Class(Group) {
     end,
 
     -- determines what controls should be visible or not
-    -- overload
     CalcVisible = function(self)
         local invIndex = 1
         local lineIndex = 1
@@ -49,6 +48,7 @@ IScrollable = Class(Group) {
         end
     end,
 
+    -- overload
     RenderLine = function(self, lineIndex, scrollIndex)
 
     end,
@@ -64,6 +64,7 @@ IScrollable = Class(Group) {
         return self:OnEvent(event)
     end,
 
+    -- overload
     OnEvent = function(self, event)
         return true
     end

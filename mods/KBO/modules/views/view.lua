@@ -18,8 +18,7 @@ local BPItem = import('BlueprintItem.lua')
 local BlueprintItem = BPItem.BlueprintItem
 local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
 local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
-
-
+local Presenter = import('/mods/KBO/modules/presenter.lua')
 
 local GUI
 function init()
@@ -46,13 +45,11 @@ local divisions = {{
     name = 'Naval',
     all = {'NAVAL'},
     any = {'BUILTBYTIER3FACTORY'}
-},
-{
+}, {
     name = 'Gate',
     all = {},
     any = {'BUILTBYQUANTUMGATE'}
-}
-}
+}}
 
 local prefixes = {
     ["aeon"] = {"ua", "xa", "da"},
@@ -61,6 +58,7 @@ local prefixes = {
     ["seraphim"] = {"xs", "us", "ds"}
 }
 function CreateUI(parent)
+    Presenter.SetActive()
     local group = Group(parent)
     LayoutHelpers.SetDimensions(group, 1000, 800)
     LayoutHelpers.AtCenterIn(group, parent)
@@ -90,37 +88,7 @@ function CreateUI(parent)
     group.OkButton.OnClick = function(control, modifiers)
 
     end
-
-    local strLen = string.len
-
-    local legalCategories = From({'BUILTBYTIER1FACTORY', 'BUILTBYTIER2FACTORY', 'BUILTBYTIER3FACTORY',
-                                  'BUILTBYTIER1ENGINEER', 'BUILTBYTIER2ENGINEER', 'BUILTBYTIER3ENGINEER',
-                                  'BUILTBYCOMMANDER', 'BUILTBYQUANTUMGATE', 'BUILTBYLANDTIER3FACTORY', -- special for sparky
-                                  'TRANSPORTBUILTBYTIER3FACTORY' -- all transports and mercy
-    })
-    local bps = From(__blueprints):Where(function(id, bp)
-        if strLen(id) == 7 then
-            return From(bp.Categories):Any(function(i, cat)
-                return legalCategories:Contains(cat)
-            end)
-        end
-        return false
-    end)
-    local constructionBPs = {}
-    From(skins):Foreach(function(k, skin)
-        local upperSkin = string.upper(skin)
-        constructionBPs[skin] = bps:Where(function(id, bp)
-            local categories = From(bp.Categories)
-            return categories:Contains(upperSkin) and From(divisions[1].all):All(function(_, cat)
-                return categories:Contains(cat)
-            end) and From(divisions[1].any):Any(function(_, cat)
-                return categories:Contains(cat)
-            end)
-        end):Keys():Sort(function(a, b)
-            return string.sub(a, 4) < string.sub(b, 4)
-        end):ToDictionary()
-    end)
-    group.construction = ConstructionScrollArea(group, constructionBPs, 5)
+    group.construction = ConstructionScrollArea(group, Presenter.FetchConstructionBlueprints(), 5)
     LayoutHelpers.AtLeftTopIn(group.construction, group, 100, 100)
     group.categories = {}
 
@@ -134,31 +102,23 @@ function CreateUI(parent)
         LayoutHelpers.AtLeftTopIn(name, group, 100, 200 + i * 80)
         From(skins):Foreach(function(k, skin)
 
-            local upperSkin = string.upper(skin)
             local selector = BlueprintItem(group, skin)
-            selector.bps = bps:Where(function(id, bp)
-                local categories = From(bp.Categories)
-                return categories:Contains(upperSkin) and From(div.all):All(function(_, cat)
-                    return categories:Contains(cat)
-                end) and From(div.any):Any(function(_, cat)
-                    return categories:Contains(cat)
-                end)
-            end):Keys():Sort(function(a, b)
-                return string.sub(a, 4) < string.sub(b, 4)
-            end)
+            selector.bps = Presenter.FetchBlueprints(div.name, skin)
             LayoutHelpers.AtLeftTopIn(selector, group, 100 + 200 * (k - 1), 200 + i * 80 + 20)
             selector.OnClick = function(self, modifiers, bluprint)
                 if modifiers.Left then
                     -- if IsDestroyed(self.menu) then
-                    local menu = BlueprintSelector(self, self.bps:ToDictionary(), skin)
+                    local menu = BlueprintSelector(self, self.bps, skin)
                     menu.OnItemClick = function(control, bluprint)
                         self:SetBlueprint(bluprint)
+                        Presenter.SetBlueprint(div.name, skin, bluprint)
                         control:Destroy()
                     end
                     self.menu = menu
                     -- end
                 elseif modifiers.Right then
                     self:SetBlueprint()
+                    Presenter.SetBlueprint(div.name, skin)
                 end
             end
             group.categories[div.name].selectors[skin] = selector
@@ -171,36 +131,14 @@ function CreateUI(parent)
         fillButton.OnClick = function(control, modifiers)
             -- logic for filling alias blueprints
             if modifiers.Left then
-                local bp
-                local skin
+                Presenter.FillBlueprints(div.name)
                 for selectorSkin, selector in group.categories[div.name].selectors do
-                    if selector:GetBlueprint() then
-                        if bp then
-                            return
-                        end
-                        bp = selector:GetBlueprint()
-                        skin = selectorSkin
-                    end
-                end
-                if bp then
-                    local suffix = string.sub(bp, 3)
-                    local pref = string.sub(bp, 1, 2)
-                    local prefixId = 1
-                    for id, prefix in prefixes[skin] do
-                        if pref == prefix then
-                            prefixId = id
-                            break
-                        end
-                    end
-                    for prefixSkin, prefix in prefixes do
-                        if group.categories[div.name].selectors[prefixSkin].bps:Contains(prefix[prefixId] .. suffix) then
-                            group.categories[div.name].selectors[prefixSkin]:SetBlueprint(prefix[prefixId] .. suffix)
-                        end
-                    end
+                    selector:SetBlueprint(Presenter.FetchBlueprint(div.name, selectorSkin))
                 end
             elseif modifiers.Right then
-                for _, selector in group.categories[div.name].selectors do
+                for selectorSkin, selector in group.categories[div.name].selectors do
                     selector:SetBlueprint()
+                    Presenter.SetBlueprint(div.name, selectorSkin)
                 end
             end
         end
@@ -209,12 +147,8 @@ function CreateUI(parent)
     return group
 end
 
-
-
-
 local swapColor = LazyVar.Create("ff00ffff")
 MAX_ITEMS = 7
-
 
 BlueprintSelector = Class(IScrollable) {
     __init = function(self, parent, blueprintArray, skin, maxItems)
@@ -289,7 +223,6 @@ ConstructionScrollArea = Class(IScrollable) {
 
         self._blueprints = blueprints
         self._topLine = 1
-        self._data = {}
         self._numLines = DEFAULT_CONSTRUCTION_ITEM_COUNT
         self._dataSize = itemCount or DEFAULT_CONSTRUCTION_ITEM_COUNT
         self._swapIndex = false
@@ -336,9 +269,7 @@ ConstructionScrollArea = Class(IScrollable) {
         group.indexText.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then -- swap logic for lines
                 if self._swapIndex and self._swapIndex ~= group.id then
-                    local temp = self._data[group.id]
-                    self._data[group.id] = self._data[self._swapIndex]
-                    self._data[self._swapIndex] = temp
+                    Presenter.Swap(self._swapIndex, group.id)
                     self._swapIndex = false
                     self:CalcVisible()
                     return true
@@ -370,15 +301,13 @@ ConstructionScrollArea = Class(IScrollable) {
                     local menu = BlueprintSelector(control, control.bps:ToDictionary(), skin)
                     menu.OnItemClick = function(item, bluprint)
                         control:SetBlueprint(bluprint)
-                        self._data[control.id] = self._data[control.id] or {}
-                        self._data[control.id][skin] = bluprint
+                        Presenter.SetConstructionBlueprint(control.id, skin, bluprint)
                         item:Destroy()
                     end
                     control.menu = menu
                     -- end
                 elseif modifiers.Right then
-                    self._data[control.id] = self._data[control.id] or {}
-                    self._data[control.id][skin] = nil
+                    Presenter.SetConstructionBlueprint(control.id, skin, false)
                     control:SetBlueprint()
                 end
             end
@@ -393,39 +322,14 @@ ConstructionScrollArea = Class(IScrollable) {
         fillButton.OnClick = function(control, modifiers)
             -- logic for filling alias blueprints
             if modifiers.Left then
-                local bp
-                local skin
-                for selectorSkin, selector in group.selectors do
-                    if selector:GetBlueprint() then
-                        if bp then
-                            return
-                        end
-                        bp = selector:GetBlueprint()
-                        skin = selectorSkin
-                    end
-                end
-                if bp then
-                    local suffix = string.sub(bp, 3)
-                    local pref = string.sub(bp, 1, 2)
-                    local prefixId = 1
-                    for id, prefix in prefixes[skin] do
-                        if pref == prefix then
-                            prefixId = id
-                            break
-                        end
-                    end
-                    for prefixSkin, prefix in prefixes do
-                        if group.selectors[prefixSkin].bps:Contains(prefix[prefixId] .. suffix) then
-                            group.selectors[prefixSkin]:SetBlueprint(prefix[prefixId] .. suffix)
-                            self._data[group.selectors[prefixSkin].id][prefixSkin] = prefix[prefixId] .. suffix
-                        end
-                    end
-                end
+                Presenter.FillConstructionBlueprints(group.id)
+                self:CalcVisible()
             elseif modifiers.Right then
                 for skin, selector in group.selectors do
                     selector:SetBlueprint()
-                    self._data[selector.id][skin] = false
+                    Presenter.SetConstructionBlueprint(selector.id, skin, false)
                 end
+                self:CalcVisible()
             end
         end
 
@@ -441,10 +345,7 @@ ConstructionScrollArea = Class(IScrollable) {
         self._lineGroup._lines[lineIndex].indexText:SetText(tostring(scrollIndex))
         self._lineGroup._lines[lineIndex].id = scrollIndex
         for skin, selector in self._lineGroup._lines[lineIndex].selectors do
-            local bp
-            if self._data[scrollIndex] then
-                bp = self._data[scrollIndex][skin]
-            end
+            local bp = Presenter.FetchConstructionBlueprint(scrollIndex, skin)
             selector.id = scrollIndex
             selector:SetBlueprint(bp)
         end
@@ -455,5 +356,4 @@ ConstructionScrollArea = Class(IScrollable) {
     end
 
 }
-
 
