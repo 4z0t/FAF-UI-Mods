@@ -83,6 +83,7 @@ function FilterBlueprints()
 end
 
 function LoadHotBuilds()
+    ClearHotBuildActions()
     hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
@@ -145,6 +146,15 @@ function FetchHotBuild(id)
     end
     return {}
 
+end
+function ClearHotBuildActions()
+    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
+    for name, action in actions do
+        if action.category == 'HotBuild Overhaul' then
+            actions[name] = nil
+        end
+    end
+    Prefs.SetToCurrentProfile("UserKeyActions", actions)
 end
 
 -- local ModifyBuildables = import('/lua/ui/notify/enhancementqueue.lua').ModifyBuildablesForACU

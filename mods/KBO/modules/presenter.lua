@@ -149,3 +149,8 @@ function FetchBlueprints(category, faction)
     return globalBPs[category][faction]
 end
 
+function IsEmpty(index)
+    active['Construction'] = active['Construction'] or {}
+    active['Construction'][index] = active['Construction'][index] or {}
+    return table.empty(active['Construction'][index])
+end
