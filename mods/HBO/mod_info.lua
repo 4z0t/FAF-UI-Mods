@@ -1,6 +1,6 @@
 name = "HotBuild Overhaul"
-uid = "hotbuild-overhaul-4z0t-v02"
-version = 2
+uid = "hotbuild-overhaul-4z0t-v03"
+version = 3
 copyright = ""
 description = [[Make your own hotbuild keybinds!
 (you can find editor in F1 menu)
