@@ -1,8 +1,10 @@
 name = "HotBuild Overhaul"
-uid = "hotbuild-overhaul-4z0t-v01"
-version = 1
+uid = "hotbuild-overhaul-4z0t-v02"
+version = 2
 copyright = ""
-description = [[]]
+description = [[Make your own hotbuild keybinds!
+(you can find editor in F1 menu)
+requires UI mod tools]]
 author = "4z0t"
 url = ""
 icon = "/mods/HBO/icon.png"
