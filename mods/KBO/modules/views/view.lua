@@ -327,6 +327,8 @@ ConstructionScrollArea = Class(IScrollable) {
                 if self._swapIndex and self._swapIndex ~= group.id then
                     Presenter.Swap(self._swapIndex, group.id)
                     self._swapIndex = false
+                    self:IncreaseSize()
+                    self:DecreaseSize()
                     self:CalcVisible()
                     return true
                 else
@@ -358,13 +360,15 @@ ConstructionScrollArea = Class(IScrollable) {
                     menu.OnItemClick = function(item, bluprint)
                         control:SetBlueprint(bluprint)
                         Presenter.SetConstructionBlueprint(control.id, skin, bluprint)
+                        self:IncreaseSize()
                         item:Destroy()
                     end
                     control.menu = menu
                     -- end
                 elseif modifiers.Right then
-                    Presenter.SetConstructionBlueprint(control.id, skin, false)
+                    Presenter.SetConstructionBlueprint(control.id, skin)
                     control:SetBlueprint()
+                    self:DecreaseSize()
                 end
             end
 
@@ -383,9 +387,9 @@ ConstructionScrollArea = Class(IScrollable) {
             elseif modifiers.Right then
                 for skin, selector in group.selectors do
                     selector:SetBlueprint()
-                    Presenter.SetConstructionBlueprint(selector.id, skin, false)
+                    Presenter.SetConstructionBlueprint(selector.id, skin)
                 end
-                self:CalcVisible()
+                self:DecreaseSize()
             end
         end
 
@@ -409,6 +413,22 @@ ConstructionScrollArea = Class(IScrollable) {
 
     OnEvent = function(self, event)
         return true
+    end,
+
+    IncreaseSize = function(self)
+        if not Presenter.IsEmpty(self._dataSize) then
+            self._dataSize = self._dataSize + 1
+        end
+        self:CalcVisible()
+    end,
+
+    DecreaseSize = function(self)
+        if Presenter.IsEmpty(self._dataSize) and Presenter.IsEmpty(self._dataSize - 1) and
+            (self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT) then
+            self._dataSize = self._dataSize - 1
+            self._topLine = math.max(math.min(self._dataSize - self._numLines + 1, self._topLine), 1)
+        end
+        self:CalcVisible()
     end
 
 }
