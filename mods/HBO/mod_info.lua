@@ -10,6 +10,7 @@ selectable = true
 enabled = true
 exclusive = false
 ui_only = true
+requires = {"ui-mod-tools-4z0t-v02"}
 requiresNames = {}
 conflicts = {}
 after = {}
