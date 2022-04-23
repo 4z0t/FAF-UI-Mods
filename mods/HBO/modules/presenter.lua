@@ -87,7 +87,7 @@ function ClearBlueprints(category)
 end
 
 function FetchConstructionCount()
-    return table.getn(active['Construction'])
+    return table.getn(active['Construction'] or {})
 end
 
 function FillConstructionBlueprints(index)

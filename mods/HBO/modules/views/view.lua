@@ -288,7 +288,11 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     SetSize = function(self, size)
-        self._dataSize = size
+        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then 
+            self._dataSize = size
+        else
+            self._dataSize = DEFAULT_CONSTRUCTION_ITEM_COUNT
+        end
     end,
 
     CreateItems = function(self, skin)
