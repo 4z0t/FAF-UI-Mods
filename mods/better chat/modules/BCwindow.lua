@@ -15,8 +15,7 @@ local BCLineModule = import("BCline.lua")
 local BCLine = BCLineModule.BCLine
 local Json = import("/lua/system/dkson.lua").json
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-local OptionsUtils = import('/mods/UMT/modules/OptionsWindow.lua')
-local OptionsWindow = OptionsUtils.OptionsWindow
+
 -- debug.listcode
 --[[
     {
@@ -654,20 +653,25 @@ BCWindow = Class(Window) {
 
     OnConfigClick = function(self)
         if IsDestroyed(self._ow) then
-            local OW = OptionsWindow(self:GetParent(), 'Better Chat options', 'bcoptions')
-            OW:ExtendColorSet({'ffffffff', 'ffffff00', 'ff00ffff', 'ffff0000', 'ffff8000'})
-            :AddTitle("Lines colors")
-            :AddColor('Message text color', 'messageTextColor', BCLineModule.messageTextColor)
-            :AddColor('Ping text color', 'pingTextColor', BCLineModule.pingTextColor)
-            :AddColor('Tree text color', 'treeTextColor', BCLineModule.treeTextColor)
-            :AddColor('On edit text color', 'editTextColor', BCLineModule.editTextColor)
-            :AddSplitter()
-            :AddTitle("Modifiers colors")
-            :AddColor('Default key color', 'defaultKeyColor', BCLineModule.defaultKeyColor)
-            :AddColor('Ctrl key color', 'ctrlKeyColor', BCLineModule.ctrlKeyColor)
-            :AddColor('Shift key color', 'shiftKeyColor', BCLineModule.shiftKeyColor)
-            :AddColor('Alt key color', 'altKeyColor', BCLineModule.altKeyColor)
-            self._ow = OW
+            if exists('/mods/UMT/modules/OptionsWindow.lua') then
+                local OptionsWindow = import('/mods/UMT/modules/OptionsWindow.lua').OptionsWindow
+                local OW = OptionsWindow(self:GetParent(), 'Better Chat options', 'bcoptions')
+                OW:ExtendColorSet({'ffffffff', 'ffffff00', 'ff00ffff', 'ffff0000', 'ffff8000'})
+                :AddTitle("Lines colors")
+                :AddColor('Message text color', 'messageTextColor', BCLineModule.messageTextColor)
+                :AddColor('Ping text color', 'pingTextColor', BCLineModule.pingTextColor)
+                :AddColor('Tree text color', 'treeTextColor', BCLineModule.treeTextColor)
+                :AddColor('On edit text color', 'editTextColor', BCLineModule.editTextColor)
+                :AddSplitter()
+                :AddTitle("Modifiers colors")
+                :AddColor('Default key color', 'defaultKeyColor', BCLineModule.defaultKeyColor)
+                :AddColor('Ctrl key color', 'ctrlKeyColor', BCLineModule.ctrlKeyColor)
+                :AddColor('Shift key color', 'shiftKeyColor', BCLineModule.shiftKeyColor)
+                :AddColor('Alt key color', 'altKeyColor', BCLineModule.altKeyColor)
+                self._ow = OW
+            else
+                print("Better Chat requires UI mod tools for more options!!!")  
+            end
         end
     end,
 
