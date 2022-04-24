@@ -1,6 +1,6 @@
 name = "Better chat"
-uid = "better-chat-4z0t-v13"
-version = 13
+uid = "better-chat-4z0t-v14"
+version = 14
 copyright = ""
 description = [[Provides advanced window for better chat communication
 requires UI mod tools]]
@@ -10,8 +10,8 @@ selectable = true
 enabled = true
 exclusive = false
 ui_only = true
-requires = {"ui-mod-tools-4z0t-v01"}
+requires = {}
 requiresNames = {}
 conflicts = {}
-before = {"ui-mod-tools-4z0t-v01"}
+before = {}
 after = {}
