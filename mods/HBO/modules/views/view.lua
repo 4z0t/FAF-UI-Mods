@@ -404,14 +404,15 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     RenderLine = function(self, lineIndex, scrollIndex)
+        local line = self._lineGroup._lines[lineIndex]
         if scrollIndex == self._swapIndex then
-            self._lineGroup._lines[lineIndex].indexText:SetColor(swapColor)
+            line.indexText:SetColor(swapColor)
         else
-            self._lineGroup._lines[lineIndex].indexText:SetColor(UIUtil.fontOverColor)
+            line.indexText:SetColor(UIUtil.fontOverColor)
         end
-        self._lineGroup._lines[lineIndex].indexText:SetText(tostring(scrollIndex))
-        self._lineGroup._lines[lineIndex].id = scrollIndex
-        for skin, selector in self._lineGroup._lines[lineIndex].selectors do
+        line.indexText:SetText(tostring(scrollIndex))
+        line.id = scrollIndex
+        for skin, selector in line.selectors do
             local bp = Presenter.FetchConstructionBlueprint(scrollIndex, skin)
             selector.id = scrollIndex
             selector:SetBlueprint(bp)
