@@ -4,12 +4,9 @@ local Exp = import('exp.lua')
 local Nuke = import('nuke.lua')
 local Smd = import('smd.lua')
 local Data = import('data.lua')
-local Units = import('/mods/common/units.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-local GlobalOptions = import('/mods/UMT/modules/GlobalOptions.lua')
-local OptionsUtils = import('/mods/UMT/modules/OptionsWindow.lua')
 local LazyVar = import('/lua/lazyvar.lua')
 
 local options = Prefs.GetFromCurrentProfile('TIS') or {
@@ -67,7 +64,7 @@ function AtCenterInOffset(control, parent)
                                   LayoutHelpers.ScaleNumber(control.offsetY())))
     end)
 end
-
+local Units
 local listeners = {}
 local function UpdateUnitsListeners()
     local units = Units.Get() -- dispose of Common mod tools dep
@@ -98,33 +95,45 @@ function Remove(id)
 end
 
 function init(isReplay)
-    if not isReplay then
-    end
-    Data.init(isReplay)
-    Exp.init(isReplay, expOptions)
-    Nuke.init(isReplay, siloOptions)
+    if not exists('/mods/UMT/modules/GlobalOptions.lua') or not exists('/mods/common/units.lua') then
+        ForkThread(function()
+            WaitSeconds(4)
+            for i = 1, 10 do
+                print("TeamInfo Share requires UI mod tools and Common Mod tools!!!")
+            end
+        end)
+        return
+    else
+        local GlobalOptions = import('/mods/UMT/modules/GlobalOptions.lua')
+        local OptionsUtils = import('/mods/UMT/modules/OptionsWindow.lua')
 
-    GlobalOptions.AddOptions('TIS', 'TeamInfo Share',
-        {OptionsUtils.Filter('Show exp ovelays', 'expOverlay', expOptions.overlay),
-         OptionsUtils.Filter('Show nukes and smds ovelays', 'siloOverlay', siloOptions.overlay),
-         OptionsUtils.Title('Nukes and smds', 18, nil, UIUtil.factionTextColor),
-         OptionsUtils.Title('Countdown', 12),
-         OptionsUtils.Slider('Vertical offset', 'NVOffsetCountdown', -20, 20, 1, siloOptions.eta.offsetY),
-         OptionsUtils.Slider('Horizonal offset', 'NHOffsetCountdown', -20, 20, 1, siloOptions.eta.offsetX),
-         OptionsUtils.Title('Progress', 12),
-         OptionsUtils.Slider('Vertical offset', 'NVOffsetProgress', -20, 20, 1, siloOptions.progress.offsetY),
-         OptionsUtils.Slider('Horizonal offset', 'NHOffsetProgress', -20, 20, 1, siloOptions.progress.offsetX),
-         OptionsUtils.Title('Silo count', 12),
-         OptionsUtils.Slider('Vertical offset', 'NVOffsetCount', -20, 20, 1, siloOptions.count.offsetY),
-         OptionsUtils.Slider('Horizonal offset', 'NHOffsetCount', -20, 20, 1, siloOptions.count.offsetX),
-         OptionsUtils.Title('EXPs', 18, nil, UIUtil.factionTextColor), 
-         OptionsUtils.Title('Countdown', 12),
-         OptionsUtils.Slider('Vertical offset', 'EVOffsetCountdown', -20, 20, 1, expOptions.eta.offsetY),
-         OptionsUtils.Slider('Horizonal offset', 'EHOffsetCountdown', -20, 20, 1, expOptions.eta.offsetX),
-         OptionsUtils.Title('Progress', 12),
-         OptionsUtils.Slider('Vertical offset', 'EVOffsetProgress', -20, 20, 1, expOptions.progress.offsetY),
-         OptionsUtils.Slider('Horizonal offset', 'EHOffsetProgress', -20, 20, 1, expOptions.progress.offsetX)})
-    -- Smd.init(isReplay)
-    AddBeatFunction(UpdateUnitsListeners, true)
+        if not isReplay then
+        end
+        Data.init(isReplay)
+        Exp.init(isReplay, expOptions)
+        Nuke.init(isReplay, siloOptions)
+        Units = import('/mods/common/units.lua')
+        GlobalOptions.AddOptions('TIS', 'TeamInfo Share',
+            {OptionsUtils.Filter('Show exp ovelays', 'expOverlay', expOptions.overlay),
+             OptionsUtils.Filter('Show nukes and smds ovelays', 'siloOverlay', siloOptions.overlay),
+             OptionsUtils.Title('Nukes and smds', 18, nil, UIUtil.factionTextColor),
+             OptionsUtils.Title('Countdown', 12),
+             OptionsUtils.Slider('Vertical offset', 'NVOffsetCountdown', -20, 20, 1, siloOptions.eta.offsetY),
+             OptionsUtils.Slider('Horizonal offset', 'NHOffsetCountdown', -20, 20, 1, siloOptions.eta.offsetX),
+             OptionsUtils.Title('Progress', 12),
+             OptionsUtils.Slider('Vertical offset', 'NVOffsetProgress', -20, 20, 1, siloOptions.progress.offsetY),
+             OptionsUtils.Slider('Horizonal offset', 'NHOffsetProgress', -20, 20, 1, siloOptions.progress.offsetX),
+             OptionsUtils.Title('Silo count', 12),
+             OptionsUtils.Slider('Vertical offset', 'NVOffsetCount', -20, 20, 1, siloOptions.count.offsetY),
+             OptionsUtils.Slider('Horizonal offset', 'NHOffsetCount', -20, 20, 1, siloOptions.count.offsetX),
+             OptionsUtils.Title('EXPs', 18, nil, UIUtil.factionTextColor), OptionsUtils.Title('Countdown', 12),
+             OptionsUtils.Slider('Vertical offset', 'EVOffsetCountdown', -20, 20, 1, expOptions.eta.offsetY),
+             OptionsUtils.Slider('Horizonal offset', 'EHOffsetCountdown', -20, 20, 1, expOptions.eta.offsetX),
+             OptionsUtils.Title('Progress', 12),
+             OptionsUtils.Slider('Vertical offset', 'EVOffsetProgress', -20, 20, 1, expOptions.progress.offsetY),
+             OptionsUtils.Slider('Horizonal offset', 'EHOffsetProgress', -20, 20, 1, expOptions.progress.offsetX)})
+        -- Smd.init(isReplay)
+        AddBeatFunction(UpdateUnitsListeners, true)
+    end
 
 end
