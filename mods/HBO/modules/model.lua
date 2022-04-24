@@ -96,8 +96,16 @@ function FetchHotBuildsKeys()
     return From(hotBuilds):Keys():ToDictionary()
 end
 
+function FilterEmptyTables(data)
+    local data = table.deepcopy(data)
+    data['Construction'] = From(data['Construction']):Where(function(i, bps)
+        return not table.empty(bps)
+    end):ToArray()
+    return data
+end
+
 function SaveHotBuild(name, data)
-    hotBuilds[name] = table.deepcopy(data)
+    hotBuilds[name] = FilterEmptyTables(data)
     local compiled = Compile(data)
     import('/lua/keymap/hotbuild.lua').AddUnitKeyGroup(name, compiled)
     AddToUnitkeygroups(name, compiled)
@@ -106,7 +114,7 @@ function SaveHotBuild(name, data)
 end
 
 function DelHotBuild(name)
-    if name then 
+    if name then
         hotBuilds[name] = nil
         Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
     end
