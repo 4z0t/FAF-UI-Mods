@@ -127,7 +127,7 @@ function Compile(data)
             end
         end
     end
-    return res:ToDictionary()
+    return res:Distinct():ToDictionary()
 end
 
 function AddToUnitkeygroups(name, compiled)
