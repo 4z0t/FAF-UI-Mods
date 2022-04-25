@@ -13,9 +13,18 @@ function LayouterMetaTable:Color(color)
     return self
 end
 
-
 function LayouterMetaTable:DropShadow(state)
     self.c:SetDropShadow(state)
+    return self
+end
+
+function LayouterMetaTable:SolidColor(color)
+    self.c:SetSolidColor(color)
+    return self
+end
+
+function LayouterMetaTable:Texture(texture)
+    self.c:SetTexture(texture)
     return self
 end
 
@@ -86,6 +95,11 @@ function LayouterMetaTable:Fill(parent)
     return self
 end
 
+function LayouterMetaTable:FillFixedBorder(parent, offset)
+    LayoutHelpers.FillParentFixedBorder(self.c, parent, offset)
+    return self
+end
+
 -- double-based positioning
 
 function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
@@ -108,8 +122,7 @@ function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
     return self
 end
 
-
---centered--
+-- centered--
 
 function LayouterMetaTable:CenteredLeftOf(parent, offset)
     LayoutHelpers.CenteredLeftOf(self.c, parent, offset)
@@ -145,7 +158,6 @@ function LayouterMetaTable:AtCenterIn(parent, vertOffset, horzOffset)
     LayoutHelpers.AtCenterIn(self.c, parent, vertOffset, horzOffset)
     return self
 end
-
 
 -- single-in positioning
 
@@ -203,8 +215,59 @@ function LayouterMetaTable:Under(parent, depth)
     return self
 end
 
+-- anchor--
 
+function LayouterMetaTable:AnchorToTop(parent, offset)
+    LayoutHelpers.AnchorToTop(self.c, parent, offset)
+    return self
+end
 
+function LayouterMetaTable:AnchorToLeft(parent, offset)
+    LayoutHelpers.AnchorToLeft(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AnchorToRight(parent, offset)
+    LayoutHelpers.AnchorToRight(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AnchorToBottom(parent, offset)
+    LayoutHelpers.AnchorToBottom(self.c, parent, offset)
+    return self
+end
+
+-- reset--
+
+function LayouterMetaTable:ResetLeft()
+    LayoutHelpers.ResetLeft(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetRight()
+    LayoutHelpers.ResetRight(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetBottom()
+    LayoutHelpers.ResetBottom(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetHeight()
+    LayoutHelpers.ResetHeight(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetTop()
+    LayoutHelpers.ResetTop(self.c)
+    return self
+end
+
+function LayouterMetaTable:ResetWidth()
+    LayoutHelpers.ResetWidth(self.c)
+    return self
+end
 
 function LayouterMetaTable:Get()
     return self.c
