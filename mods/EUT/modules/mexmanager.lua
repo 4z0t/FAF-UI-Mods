@@ -44,7 +44,7 @@ function SelectOnScreen(id)
     local mexesOnScreen = From(GetSelectedUnits())
     local result = mexes:Where(function(k, mex)
         return mexesOnScreen:Contains(mex)
-    end):ToDictionary()
+    end):ToArray()
     SelectUnits(result)
 end
 
