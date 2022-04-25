@@ -13,13 +13,23 @@ local mexCategories = import('mexcategories.lua').mexCategories
 local mexData = {}
 
 function PauseWorst(id)
-    local mexes = mexData[id].mexes
-    SetPaused({mexes[table.getn(mexes)]}, true)
+    local mData = mexData[id]
+    local mexes = mData.mexes
+    if table.empty(mexes) then
+        return
+    end
+    SetPaused({mexes[mData.currentWorst]}, true)
+    mData.currentWorst = mData.currentWorst - 1
 end
 
 function UnPauseBest(id)
-    local mexes = mexData[id].mexes
-    SetPaused({mexes[1]}, false)
+    local mData = mexData[id]
+    local mexes = mData.mexes
+    if table.empty(mexes) then
+        return
+    end
+    SetPaused({mexes[mData.currentBest]}, false)
+    mData.currentBest = mData.currentBest + 1
 end
 
 function SelectBest(id)
@@ -78,8 +88,8 @@ local function UpdateUI()
 
     for id, category in mexCategories do
         mexData[id] = {
-            mexes = {}
-
+            mexes = {},
+            currentBest = 1
         }
     end
 
@@ -118,6 +128,7 @@ local function UpdateUI()
             mexData[id].progress = sorted
 
             mexData[id].mexes = sortedMexes:ToDictionary()
+            mexData[id].currentWorst = table.getn(mexData[id].mexes)
         end
     end
 
