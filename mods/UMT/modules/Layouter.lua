@@ -284,3 +284,13 @@ function LayoutFor(control)
     setmetatable(result, LayouterMetaTable)
     return result
 end
+
+local layouter = {
+    c = false
+}
+setmetatable(layouter, LayouterMetaTable)
+
+function ReusedLayoutFor(control)
+    layouter.c = control
+    return layouter
+end
