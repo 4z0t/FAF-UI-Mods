@@ -477,10 +477,11 @@ BCWindow = Class(Window) {
 
     -- called when the scrollbar wants to set a new visible top line
     ScrollSetTop = function(self, axis, top)
+        top = math.floor(math.max(math.min(self._dataSize - self._numLines + 1, top), 1))
         if top == self._topLine then
             return
         end
-        self._topLine = math.max(math.min(self._dataSize - self._numLines + 1, top), 1)
+        self._topLine = top
         self:CalcVisible()
     end,
 
