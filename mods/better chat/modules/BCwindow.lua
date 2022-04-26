@@ -194,7 +194,6 @@ BCWindow = Class(Window) {
         LayoutHelpers.AtTopIn(self._hint, self.TitleGroup, 10)
         LayoutHelpers.DepthOverParent(self._hint, self.TitleGroup, 10)
         Tooltip.AddControlTooltip(self._hint, 'bc_hint')
-        self:SetNeedsFrameUpdate(true)
         self:RenderLines()
         self:AcquireKeyboard()
     end,
@@ -575,7 +574,6 @@ BCWindow = Class(Window) {
         self:SaveData()
         self:AbandonKeyboard()
         self:Hide()
-        self:SetNeedsFrameUpdate(false)
         if not IsDestroyed(self._ow) then
             self._ow:OnClose()
         end
