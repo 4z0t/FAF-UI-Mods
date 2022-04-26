@@ -13,6 +13,8 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
 local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 
+local LayoutFor = import('Layouter.lua').ReusedLayoutFor
+
 local colors = {'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42'}
 
 local splitterTable = {
@@ -102,15 +104,18 @@ OptionsWindow = Class(Window) {
             Bottom = 800
         }, windowTextures)
         self._optionsGroup = Group(self)
-        LayoutHelpers.FillParentFixedBorder(self._optionsGroup, self.ClientGroup, 5)
-        LayoutHelpers.SetHeight(self._optionsGroup, 10)
-        LayoutHelpers.ResetBottom(self._optionsGroup)
-        LayoutHelpers.DepthOverParent(self._optionsGroup, self.ClientGroup)
+        LayoutFor(self._optionsGroup)
+            :FillFixedBorder(self.ClientGroup, 5)
+            :Height(10)
+            :ResetBottom()
+            :Over(self.ClientGroup)
 
         local okBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Ok>', 16)
-        LayoutHelpers.Below(okBtn, self._optionsGroup, 4)
-        LayoutHelpers.AtLeftIn(okBtn, self._optionsGroup)
-        LayoutHelpers.DepthOverParent(okBtn, self._optionsGroup)
+        LayoutFor(okBtn)
+            :Below(self._optionsGroup, 4)
+            :AtLeftIn(self._optionsGroup)
+            :Over(self._optionsGroup)
+
         okBtn.OnClick = function(control)
             self:OnClose(true)
         end
@@ -118,10 +123,11 @@ OptionsWindow = Class(Window) {
         self._colors = colors
 
         local cancelBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Cancel>', 16)
-        LayoutHelpers.Below(cancelBtn, self._optionsGroup, 4)
-        LayoutHelpers.AtRightIn(cancelBtn, self._optionsGroup)
-        LayoutHelpers.ResetLeft(cancelBtn)
-        LayoutHelpers.DepthOverParent(cancelBtn, self._optionsGroup)
+        LayoutFor(cancelBtn)
+            :Below(self._optionsGroup, 4)
+            :AtRightIn(self._optionsGroup)
+            :ResetLeft()
+            :Over(self._optionsGroup)
 
         cancelBtn.OnClick = function(control)
             self:OnClose()
