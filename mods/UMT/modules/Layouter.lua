@@ -203,7 +203,7 @@ function LayouterMetaTable:LeftOf(parent, offset)
     return self
 end
 
--- depth
+-- depth--
 
 function LayouterMetaTable:Over(parent, depth)
     LayoutHelpers.DepthOverParent(self.c, parent, depth)
@@ -269,9 +269,13 @@ function LayouterMetaTable:ResetWidth()
     return self
 end
 
+-- get control --
+
 function LayouterMetaTable:Get()
     return self.c
 end
+
+
 
 function LayouterMetaTable:__newindex(key, value)
     error('attempt to set new index for a Layouter object')
