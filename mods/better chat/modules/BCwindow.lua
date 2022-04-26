@@ -29,7 +29,6 @@ local Tooltip = import('/lua/ui/game/tooltip.lua')
     }
 ]]
 
-local playersCache = nil
 local MINWIDTH = 200
 local MINHEIGHT = 100
 local focusTitleColor = 'ffffff00'
@@ -93,12 +92,6 @@ BCWindow = Class(Window) {
         self._route = {}
         -- self._prevLevel = nil
         self._curLevel = self._treeData
-        if playersCache then
-            LOG('loaded from prefs')
-        else
-            self:SetupPlayersLevel()
-            playersCache = true
-        end
 
         -- TODO:
         -- Tooltip.AddButtonTooltip(self._closeBtn, 'chat_close')
@@ -206,67 +199,6 @@ BCWindow = Class(Window) {
         self:AcquireKeyboard()
     end,
 
-    GetPlayersLevel = function(self)
-        for id, line in self._treeData.data do
-            if line.players then
-                return line
-            end
-        end
-
-        table.insert(self._treeData.data, {
-            key = '',
-            title = 'Players',
-            players = true,
-            unremovable = true,
-            data = {{
-                key = 'A',
-                title = 'Allies',
-                unremovable = true,
-                data = {}
-            }, {
-                key = 'E',
-                title = 'Enemies',
-                unremovable = true,
-                data = {}
-            }}
-        })
-        return self._treeData.data[table.getn(self._treeData.data)]
-    end,
-
-    SetupPlayersLevel = function(self)
-        LOG('creating new players table')
-        local focusArmy = GetFocusArmy()
-        local playersLevel = self:GetPlayersLevel()
-        local allyCount = 1
-        local enemyCount = 1
-        playersLevel.data[1].data = {}
-        playersLevel.data[2].data = {}
-        local armiesTable = GetArmiesTable().armiesTable
-        for id, army in armiesTable do
-            if not army.civilian then
-                if IsAlly(id, focusArmy) then
-                    table.insert(playersLevel.data[1].data, {
-                        key = tostring(allyCount),
-                        data = army.nickname,
-                        team = true,
-                        unremovable = true,
-                        send = false
-                    })
-                    allyCount = allyCount + 1
-                else
-                    table.insert(playersLevel.data[2].data, {
-                        key = tostring(enemyCount),
-                        data = army.nickname,
-                        team = true,
-                        unremovable = true,
-                        send = false
-                    })
-                    enemyCount = enemyCount + 1
-                end
-            end
-        end
-    end,
-
     GetLine = function(self, key, modifiers)
         for id, line in self._curLevel.data do
             if line.key == key and line.modifiers.Alt == modifiers.Alt and line.modifiers.Ctrl == modifiers.Ctrl and
@@ -310,9 +242,6 @@ BCWindow = Class(Window) {
     end,
 
     RemoveLine = function(self, id)
-        if self._curLevel.data[id].unremovable then
-            return
-        end
         table.remove(self._curLevel.data, id)
         self._dataSize = table.getn(self._curLevel.data)
         self:CalcVisible()
