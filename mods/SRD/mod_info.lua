@@ -1,0 +1,17 @@
+name = "Smart Ring Display"
+uid = "smart-ring-display-v01"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+icon = "/mods/SRD/icon.png"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
