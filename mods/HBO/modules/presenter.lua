@@ -1,14 +1,14 @@
-local Prefs = import('/lua/user/prefs.lua')
-local Model = import('model.lua')
-local From = import('/mods/UMT/modules/linq.lua').From
+local Prefs = import("/lua/user/prefs.lua")
+local Model = import("model.lua")
+local From = import("/mods/UMT/modules/linq.lua").From
 local active
 local activeName
 
 local prefixes = {
-    ["aeon"] = {"ua", "xa", "da"},
-    ["uef"] = {"ue", "xe", "de"},
-    ["cybran"] = {"ur", "xr", "dr"},
-    ["seraphim"] = {"xs", "us", "ds"}
+    ["aeon"] = {"ua", "xa", "da", "za"},
+    ["uef"] = {"ue", "xe", "de", "ze"},
+    ["cybran"] = {"ur", "xr", "dr", "zr"},
+    ["seraphim"] = {"xs", "us", "ds", "zs"}
 }
 local globalBPs
 
@@ -34,9 +34,9 @@ function AddConstructionBlueprints()
 end
 
 function SetConstructionBlueprint(index, faction, bp)
-    active['Construction'] = active['Construction'] or {}
-    active['Construction'][index] = active['Construction'][index] or {}
-    active['Construction'][index][faction] = bp
+    active["Construction"] = active["Construction"] or {}
+    active["Construction"][index] = active["Construction"][index] or {}
+    active["Construction"][index][faction] = bp
 end
 
 function SetBlueprint(category, faction, bp)
@@ -45,10 +45,10 @@ function SetBlueprint(category, faction, bp)
 end
 
 function Swap(i1, i2)
-    active['Construction'] = active['Construction'] or {}
-    local temp = active['Construction'][i1]
-    active['Construction'][i1] = active['Construction'][i2]
-    active['Construction'][i2] = temp
+    active["Construction"] = active["Construction"] or {}
+    local temp = active["Construction"][i1]
+    active["Construction"][i1] = active["Construction"][i2]
+    active["Construction"][i2] = temp
 end
 
 function FillBlueprints(category)
@@ -87,15 +87,15 @@ function ClearBlueprints(category)
 end
 
 function FetchConstructionCount()
-    return table.getn(active['Construction'] or {}) + 1
+    return table.getn(active["Construction"] or {}) + 1
 end
 
 function FillConstructionBlueprints(index)
     local activeBP
     local activeFaction
-    active['Construction'] = active['Construction'] or {}
-    active['Construction'][index] = active['Construction'][index] or {}
-    for faction, bp in active['Construction'][index] do
+    active["Construction"] = active["Construction"] or {}
+    active["Construction"][index] = active["Construction"][index] or {}
+    for faction, bp in active["Construction"][index] do
         if bp then
             if activeBP then
                 return
@@ -115,7 +115,7 @@ function FillConstructionBlueprints(index)
             end
         end
         for prefixSkin, prefix in prefixes do
-            if From(globalBPs['Construction'][prefixSkin]):Contains(prefix[prefixId] .. suffix) then
+            if From(globalBPs["Construction"][prefixSkin]):Contains(prefix[prefixId] .. suffix) then
                 SetConstructionBlueprint(index, prefixSkin, prefix[prefixId] .. suffix)
             end
         end
@@ -129,15 +129,15 @@ end
 function FetchHotBuilds(new)
     local hotbuilds = Model.FetchHotBuildsKeys()
     if new then
-        table.insert(hotbuilds, 1, '')
+        table.insert(hotbuilds, 1, "")
     end
     return hotbuilds
 end
 
 function FetchConstructionBlueprint(index, faction)
-    active['Construction'] = active['Construction'] or {}
-    active['Construction'][index] = active['Construction'][index] or {}
-    return active['Construction'][index][faction]
+    active["Construction"] = active["Construction"] or {}
+    active["Construction"][index] = active["Construction"][index] or {}
+    return active["Construction"][index][faction]
 end
 
 function FetchBlueprint(category, faction)
@@ -146,7 +146,7 @@ function FetchBlueprint(category, faction)
 end
 
 function FetchConstructionBlueprints()
-    return globalBPs['Construction']
+    return globalBPs["Construction"]
 end
 
 function FetchBlueprints(category, faction)
@@ -154,7 +154,7 @@ function FetchBlueprints(category, faction)
 end
 
 function IsEmpty(index)
-    active['Construction'] = active['Construction'] or {}
-    active['Construction'][index] = active['Construction'][index] or {}
-    return table.empty(active['Construction'][index])
+    active["Construction"] = active["Construction"] or {}
+    active["Construction"][index] = active["Construction"][index] or {}
+    return table.empty(active["Construction"][index])
 end
