@@ -1,4 +1,4 @@
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
@@ -8,7 +8,7 @@ function LayouterMetaTable:Disable()
     return self
 end
 
-function LayouterMetaTable:Color(color)
+function LayouterMetaTable:TextColor(color)
     self.c:SetColor(color)
     return self
 end
@@ -18,7 +18,7 @@ function LayouterMetaTable:DropShadow(state)
     return self
 end
 
-function LayouterMetaTable:SolidColor(color)
+function LayouterMetaTable:BitmapColor(color)
     self.c:SetSolidColor(color)
     return self
 end
@@ -30,7 +30,7 @@ end
 
 function LayouterMetaTable:HitTest(state)
     if state == nil then
-        error(':HitTest requires 1 positional argument "state"')
+        error(":HitTest requires 1 positional argument \"state\"")
     end
     if state then
         self.c:EnableHitTest()
@@ -181,6 +181,32 @@ function LayouterMetaTable:AtBottomIn(parent, offset)
     return self
 end
 
+-- center-in positioning
+
+function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
+    LayoutHelpers.AtLeftIn(self.c, parent, offset)
+    LayoutHelpers.AtVerticalCenterIn(self.c, parent, verticalOffset)
+    return self
+end
+
+function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
+    LayoutHelpers.AtRightIn(self.c, parent, offset)
+    LayoutHelpers.AtVerticalCenterIn(self.c, parent, verticalOffset)
+    return self
+end
+
+function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
+    LayoutHelpers.AtTopIn(self.c, parent, offset)
+    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, offset)
+    return self
+end
+
+function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
+    LayoutHelpers.AtBottomIn(self.c, parent, offset)
+    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, horizonalOffset)
+    return self
+end
+
 -- out-of positioning
 
 function LayouterMetaTable:Below(parent, offset)
@@ -275,10 +301,8 @@ function LayouterMetaTable:Get()
     return self.c
 end
 
-
-
 function LayouterMetaTable:__newindex(key, value)
-    error('attempt to set new index for a Layouter object')
+    error("attempt to set new index for a Layouter object")
 end
 
 function LayoutFor(control)

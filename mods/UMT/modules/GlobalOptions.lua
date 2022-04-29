@@ -169,7 +169,7 @@ function CreateOptionsSelector(parent)
 
             line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont, true)
             LayoutFor(line.name)
-                :Color('FFE9ECE9')
+                :TextColor('FFE9ECE9')
                 :HitTest(false)
                 :AtLeftIn(line, 5)
                 :AtVerticalCenterIn(line)
