@@ -144,7 +144,6 @@ end
 function FillConstructionBlueprints(index)
     local activeBP
     local activeFaction
-
     active["Construction"] = active["Construction"] or {}
     active["Construction"][index] = active["Construction"][index] or {}
     activeFaction, activeBP = SingleBlueprint(active["Construction"][index])
