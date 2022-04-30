@@ -51,11 +51,10 @@ function Swap(i1, i2)
     active["Construction"][i2] = temp
 end
 
-function FillBlueprints(category)
+local function SingleBlueprint(bps)
     local activeBP
     local activeFaction
-    active[category] = active[category] or {}
-    for faction, bp in active[category] do
+    for faction, bp in bps do
         if bp then
             if activeBP then
                 return
@@ -64,20 +63,72 @@ function FillBlueprints(category)
             activeFaction = faction
         end
     end
-    if activeBP then
-        local suffix = string.sub(activeBP, 3)
-        local pref = string.sub(activeBP, 1, 2)
-        local prefixId = 1
-        for id, prefix in prefixes[activeFaction] do
-            if pref == prefix then
-                prefixId = id
-                break
-            end
+    return activeFaction, activeBP
+end
+local similars = From({{
+    ["aeon"] = "xal0305",
+    ["uef"] = "xel0305",
+    ["cybran"] = "xrl0305",
+    ["seraphim"] = "xsl0305"
+}, -- Snipers/Armored assault bots
+{
+    ["aeon"] = "xaa0202",
+    ["uef"] = "dea0202",
+    ["cybran"] = "dra0202",
+    ["seraphim"] = "xsa0202"
+}, -- t2 aa/bombers
+{
+    ["aeon"] = "ual0307",
+    ["uef"] = "uel0307",
+    ["cybran"] = "url0306",
+    ["seraphim"] = "xsl0307"
+}, -- land suppport units
+{
+    ["aeon"] = "dalk003",
+    ["uef"] = "delk002",
+    ["cybran"] = "drlk001",
+    ["seraphim"] = "dslk004"
+}, -- T3 MAA
+{
+    ["aeon"] = "xaa0305",
+    ["uef"] = "uea0305",
+    ["cybran"] = "xra0305"
+} -- T3 gunships
+})
+
+local function FindSimilarBlueprints(faction, bp, category)
+    local suffix = string.sub(bp, 3)
+    local pref = string.sub(bp, 1, 2)
+    local prefixId = 1
+    for id, prefix in prefixes[faction] do
+        if pref == prefix then
+            prefixId = id
+            break
         end
+    end
+    local bps = similars:First(function(k, v)
+        return v[faction] == bp
+    end)
+    if not bps then
+        bps = {}
         for prefixSkin, prefix in prefixes do
             if From(globalBPs[category][prefixSkin]):Contains(prefix[prefixId] .. suffix) then
-                SetBlueprint(category, prefixSkin, prefix[prefixId] .. suffix)
+                bps[prefixSkin] = prefix[prefixId] .. suffix
             end
+        end
+    end
+    return bps
+end
+
+function FillBlueprints(category)
+    local activeBP
+    local activeFaction
+    active[category] = active[category] or {}
+    activeFaction, activeBP = SingleBlueprint(active[category])
+    if activeBP then
+        local bps = FindSimilarBlueprints(activeFaction, activeBP, category)
+        for faction, bp in bps do
+            SetBlueprint(category, faction, bp)
         end
     end
 end
@@ -93,31 +144,14 @@ end
 function FillConstructionBlueprints(index)
     local activeBP
     local activeFaction
+
     active["Construction"] = active["Construction"] or {}
     active["Construction"][index] = active["Construction"][index] or {}
-    for faction, bp in active["Construction"][index] do
-        if bp then
-            if activeBP then
-                return
-            end
-            activeBP = bp
-            activeFaction = faction
-        end
-    end
+    activeFaction, activeBP = SingleBlueprint(active["Construction"][index])
     if activeBP then
-        local suffix = string.sub(activeBP, 3)
-        local pref = string.sub(activeBP, 1, 2)
-        local prefixId = 1
-        for id, prefix in prefixes[activeFaction] do
-            if pref == prefix then
-                prefixId = id
-                break
-            end
-        end
-        for prefixSkin, prefix in prefixes do
-            if From(globalBPs["Construction"][prefixSkin]):Contains(prefix[prefixId] .. suffix) then
-                SetConstructionBlueprint(index, prefixSkin, prefix[prefixId] .. suffix)
-            end
+        local bps = FindSimilarBlueprints(activeFaction, activeBP, "Construction")
+        for faction, bp in bps do
+            SetConstructionBlueprint(index, faction, bp)
         end
     end
 end
