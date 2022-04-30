@@ -74,18 +74,18 @@ end
 
 function LayouterMetaTable:Width(width)
     if iscallable(width) then
-        self.c.Width:Set(width)
+        self.c.Width:SetFunction(width)
     else
-        self.c.Width:Set(LayoutHelpers.ScaleNumber(width))
+        self.c.Width:SetValue(LayoutHelpers.ScaleNumber(width))
     end
     return self
 end
 
 function LayouterMetaTable:Height(height)
     if iscallable(height) then
-        self.c.Height:Set(height)
+        self.c.Height:SetFunction(height)
     else
-        self.c.Height:Set(LayoutHelpers.ScaleNumber(height))
+        self.c.Height:SetValue(LayoutHelpers.ScaleNumber(height))
     end
     return self
 end
