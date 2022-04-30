@@ -8,6 +8,11 @@ function LayouterMetaTable:Disable()
     return self
 end
 
+function LayouterMetaTable:Hide()
+    self.c:Hide()
+    return self
+end
+
 function LayouterMetaTable:TextColor(color)
     self.c:SetColor(color)
     return self
