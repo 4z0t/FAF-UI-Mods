@@ -324,6 +324,6 @@ local layouter = {
 setmetatable(layouter, LayouterMetaTable)
 
 function ReusedLayoutFor(control)
-    layouter.c = control
+    layouter.c = control or false
     return layouter
 end
