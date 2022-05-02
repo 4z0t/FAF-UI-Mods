@@ -196,6 +196,9 @@ MexPanel = Class(Group) {
                             control.ProgressBars[i]:Show()
                             control.BackGroundBars[i]:Show()
                             control.ProgressBars[i].Width:Set(control.BackGroundBars[i].Width() * progress)
+                        else
+                            control.ProgressBars[i]:Hide()
+                            control.BackGroundBars[i]:Hide()
                         end
                     else
                         control.ProgressBars[i]:Hide()
