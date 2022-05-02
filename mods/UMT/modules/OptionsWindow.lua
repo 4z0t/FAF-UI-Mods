@@ -432,24 +432,24 @@ OptionsWindow = Class(Window) {
         return self:Add(Splitter())
     end,
 
-    AddColor = function(self, name, option, lazyVar)
-        return self:Add(Color(name, option, lazyVar))
+    AddColor = function(self, name, option, lazyVar, indent)
+        return self:Add(Color(name, option, lazyVar, indent))
     end,
 
-    AddTitle = function(self, name, fontSize, fontFamily, fontColor)
-        return self:Add(Title(name, fontSize, fontFamily, fontColor))
+    AddTitle = function(self, name, fontSize, fontFamily, fontColor, indent)
+        return self:Add(Title(name, fontSize, fontFamily, fontColor, indent))
     end,
 
-    AddSlider = function(self, name, option, min, max, inc, lazyVar)
-        return self:Add(Slider(name, option, min, max, inc, lazyVar))
+    AddSlider = function(self, name, option, min, max, inc, lazyVar, indent)
+        return self:Add(Slider(name, option, min, max, inc, lazyVar, indent))
     end,
 
-    AddFilter = function(self, name, option, lazyVar)
-        return self:Add(Filter(name, option, lazyVar))
+    AddFilter = function(self, name, option, lazyVar, indent)
+        return self:Add(Filter(name, option, lazyVar, indent))
     end,
 
-    AddColorSlider = function(self, name, option, lazyVar)
-        return self:Add(ColorSlider(name, option, lazyVar))
+    AddColorSlider = function(self, name, option, lazyVar, indent)
+        return self:Add(ColorSlider(name, option, lazyVar, indent))
     end,
 
     GetColorIndex = function(self, colorsTable, color)
