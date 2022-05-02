@@ -305,7 +305,7 @@ OptionsWindow = Class(Window) {
                 group.colorBitmap = Bitmap(group)
                 LayoutFor(group.colorBitmap)
                     :Below(group.name, 1)
-                    :Height(2)
+                    :Height(5)
                     :Right(group.Right)
                     :BitmapColor(group.colorValue)
 
