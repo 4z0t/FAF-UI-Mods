@@ -24,35 +24,38 @@ function Splitter()
     return splitterTable
 end
 
-function Title(name, fontSize, fontFamily, fontColor)
+function Title(name, fontSize, fontFamily, fontColor, indent)
     return {
         type = 'title',
         name = name,
         size = fontSize or 16,
         family = fontFamily or UIUtil.titleFont,
-        color = fontColor or UIUtil.highlightColor
+        color = fontColor or UIUtil.highlightColor,
+        indent = indent or 0
     }
 end
 
-function Color(name, option, lazyVar)
+function Color(name, option, lazyVar, indent)
     return {
         type = 'color',
         name = name,
         option = option,
-        lazyVar = lazyVar
+        lazyVar = lazyVar,
+        indent = indent or 0
     }
 end
 
-function Filter(name, option, lazyVar)
+function Filter(name, option, lazyVar, indent)
     return {
         type = 'filter',
         name = name,
         option = option,
-        lazyVar = lazyVar
+        lazyVar = lazyVar,
+        indent = indent or 0
     }
 end
 
-function Slider(name, option, min, max, inc, lazyVar)
+function Slider(name, option, min, max, inc, lazyVar, indent)
     return {
         type = 'slider',
         name = name,
@@ -60,18 +63,20 @@ function Slider(name, option, min, max, inc, lazyVar)
         lazyVar = lazyVar,
         min = min,
         max = max,
-        inc = inc
+        inc = inc,
+        indent = indent or 0
     }
 end
 
 
 -- TODO
-function TextEdit(name, option, lazyVar)
+function TextEdit(name, option, lazyVar, indent)
     return {
         type = 'edit',
         name = name,
         option = option,
-        lazyVar = lazyVar
+        lazyVar = lazyVar,
+        indent = indent or 0
     }
 end
 
@@ -165,10 +170,11 @@ OptionsWindow = Class(Window) {
     Add = function(self, data, passSizing)
         local function CreateSplitter()
             local splitter = Bitmap(self._optionsGroup)
-            splitter:SetSolidColor('ff000000')
-            splitter.Left:Set(self._optionsGroup.Left)
-            splitter.Right:Set(self._optionsGroup.Right)
-            splitter.Height:Set(2)
+            LayoutFor(splitter)
+                :BitmapColor('ff000000')
+                :Left(self._optionsGroup.Left)
+                :Right(self._optionsGroup.Right)
+                :Height(2)
             return splitter
         end
         local function CreateEntry(data)
@@ -242,7 +248,7 @@ OptionsWindow = Class(Window) {
         end
 
         local entry = CreateEntry(data)
-        self:_addEntry(entry, data.lazyVar, data.option)
+        self:_addEntry(entry, data.lazyVar, data.option, data.indent)
         if not passSizing then
             self._optionsGroup.Bottom:Set(self._previous.Bottom)
             self:SizeToContents()
@@ -250,11 +256,12 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
-    _addEntry = function(self, entry, lazyvar, option)
+    _addEntry = function(self, entry, lazyvar, optio, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
+            LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
         else
-            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup)
+            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup, indent)
         end
         LayoutHelpers.DepthOverParent(entry, self._optionsGroup)
         self._previous = entry
