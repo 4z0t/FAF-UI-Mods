@@ -11,6 +11,9 @@ local From = import('/mods/UMT/modules/linq.lua').From
 local MexManager = import('mexmanager.lua')
 
 local mexPanel
+local upgradeTexture = '/mods/EUT/textures/upgrade.dds'
+local pausedTexture = '/textures/ui/common/game/strategicicons/pause_rest.dds'
+
 function init()
     if not IsDestroyed(mexPanel) then
         mexPanel:Destroy()
@@ -107,8 +110,7 @@ MexPanel = Class(Group) {
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
             group.pauseIcon:DisableHitTest()
-            local iconName = '/textures/ui/common/game/strategicicons/pause_rest.dds'
-            group.pauseIcon:SetTexture(iconName)
+            group.pauseIcon:SetTexture(pausedTexture)
             LayoutHelpers.SetDimensions(group.pauseIcon, 24, 24)
             group.pauseIcon:SetAlpha(0.3)
             LayoutHelpers.AtHorizontalCenterIn(group.pauseIcon, group)
@@ -118,8 +120,7 @@ MexPanel = Class(Group) {
         if category.isUpgrading then
             group.upgrIcon = Bitmap(group)
             group.upgrIcon:DisableHitTest()
-            local iconName = '/mods/EUT/textures/upgrade.dds'
-            group.upgrIcon:SetTexture(iconName)
+            group.upgrIcon:SetTexture(upgradeTexture)
             LayoutHelpers.SetDimensions(group.upgrIcon, 8, 8)
             group.upgrIcon:SetAlpha(0.3)
             LayoutHelpers.AtHorizontalCenterIn(group.upgrIcon, group, 5)
