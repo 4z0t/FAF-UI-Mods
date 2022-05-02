@@ -284,6 +284,15 @@ OptionsWindow = Class(Window) {
                 group.slider:SetValue(self._optionsTable[data.option] or 1)
                 LayoutHelpers.SetWidth(group, 200)
             elseif data.type == 'colorslider' then
+
+                local function IntColorSlider()
+                   return IntegerSlider(group, false, 0, 255, 1,
+                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                end
+
                 group.key = data.option
                 group.colorValue = LazyVar.Create(self._optionsTable[data.option] or 'ffffffff')
                 group.colorValue.OnDirty = function(var)
@@ -300,32 +309,35 @@ OptionsWindow = Class(Window) {
                     :Right(group.Right)
                     :BitmapColor(group.colorValue)
 
-                group.alphaSlider = IntegerSlider(group, false, 0, 255, 1,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
-                
-                group.redSlider = IntegerSlider(group, false, 0, 255, 1,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
-                group.greenSlider = IntegerSlider(group, false, 0, 255, 1,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
-                group.blueSlider = IntegerSlider(group, false, 0, 255, 1,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
-                LayoutHelpers.Below(group.alphaSlider, group.colorBitmap, 1)
-                LayoutHelpers.Below(group.redSlider, group.alphaSlider, 1)
-                LayoutHelpers.Below(group.greenSlider, group.redSlider, 1)
-                LayoutHelpers.Below(group.blueSlider, group.greenSlider, 1)
+                group.alphaText = UIUtil.CreateText(group, 'A', 14, "Arial")
+                group.redText = UIUtil.CreateText(group, 'R', 14, "Arial")
+                group.greenText = UIUtil.CreateText(group, 'G', 14, "Arial")
+                group.blueText = UIUtil.CreateText(group, 'B', 14, "Arial")
 
+                group.alphaText:SetColor('white')
+                group.redText:SetColor('red')
+                group.greenText:SetColor('green')
+                group.blueText:SetColor('blue')
+
+                LayoutHelpers.Below(group.alphaText, group.colorBitmap, 1)
+                LayoutHelpers.Below(group.redText, group.alphaText, 1)
+                LayoutHelpers.Below(group.greenText, group.redText, 1)
+                LayoutHelpers.Below(group.blueText, group.greenText, 1)
+
+                group.alphaSlider = IntColorSlider()
+                group.redSlider = IntColorSlider()
+                group.greenSlider = IntColorSlider()
+                group.blueSlider = IntColorSlider()
+                
+                LayoutHelpers.RightOf(group.alphaSlider, group.alphaText, 1)
+                LayoutHelpers.RightOf(group.redSlider, group.redText, 1)
+                LayoutHelpers.RightOf(group.greenSlider, group.greenText, 1)
+                LayoutHelpers.RightOf(group.blueSlider, group.blueText, 1)
+
+                LayoutHelpers.AtLeftIn(group.alphaSlider, group, 15)
+                LayoutHelpers.AtLeftIn(group.redSlider, group, 15)
+                LayoutHelpers.AtLeftIn(group.greenSlider, group, 15)
+                LayoutHelpers.AtLeftIn(group.blueSlider, group, 15)
 
                 group.alphaSlider.OnValueSet = function(control, newValue)
                     group.colorValue:Set(setAlpha(group.colorValue(), newValue))
@@ -339,6 +351,9 @@ OptionsWindow = Class(Window) {
                 group.blueSlider.OnValueSet = function(control, newValue)
                     group.colorValue:Set(setBlue(group.colorValue(), newValue))
                 end
+
+
+
                 group.alphaValue = UIUtil.CreateText(group, 'A', 14, "Arial")
                 group.redValue = UIUtil.CreateText(group, 'R', 14, "Arial")
                 group.greenValue = UIUtil.CreateText(group, 'G', 14, "Arial")
@@ -365,12 +380,7 @@ OptionsWindow = Class(Window) {
                 end
 
                 group.Height:Set(function()
-                return group.name.Height() +
-                        group.colorBitmap.Height() +
-                        group.alphaSlider.Height() +
-                        group.redSlider.Height() +
-                        group.greenSlider.Height() +
-                        group.blueSlider.Height()
+                    return group.blueSlider.Bottom() - group.name.Top()
                 end)
 
 
