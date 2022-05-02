@@ -12,6 +12,7 @@ local Control = import('/lua/maui/control.lua').Control
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
+local LazyVar = import('/lua/lazyvar.lua')
 
 local LayoutFor = import('Layouter.lua').ReusedLayoutFor
 
@@ -80,10 +81,52 @@ function TextEdit(name, option, lazyVar, indent)
     }
 end
 
+function ColorSlider(name, option, lazyVar, indent)
+    return {
+        type = 'colorslider',
+        name = name,
+        option = option,
+        lazyVar = lazyVar,
+        indent = indent or 0
+    }
+end
+
 -- extend group for options 
 -- TODO:
 function Extend()
     return nil
+end
+
+
+local function norm(s)
+    if string.len(s) == 1 then
+        return '0' .. s
+    end
+    return s
+end
+
+local function setRed(color, red)
+    return string.sub(color, 1, 2) .. norm(STR_itox(red)) .. string.sub(color, 5)
+end
+
+local function setGreen(color, green)
+    return string.sub(color, 1, 4) .. norm(STR_itox(green)) .. string.sub(color, 7)
+end
+
+local function setBlue(color, blue)
+    return string.sub(color, 1, 6) .. norm(STR_itox(blue))
+end
+
+local function getRed(color)
+    return STR_xtoi(string.sub(color, 3, 4))
+end
+
+local function getGreen(color)
+    return STR_xtoi(string.sub(color, 5, 6))
+end
+
+local function getBlue(color)
+    return STR_xtoi(string.sub(color, 7, 8))
 end
 
 
@@ -232,6 +275,82 @@ OptionsWindow = Class(Window) {
                 end
                 group.slider:SetValue(self._optionsTable[data.option] or 1)
                 LayoutHelpers.SetWidth(group, 200)
+            elseif data.type == 'colorslider' then
+                group.key = data.option
+                group.colorValue = LazyVar.Create(self._optionsTable[data.option] or 'ffffffff')
+                group.colorValue.OnDirty = function(var)
+                    self:SetOption(group.key, var())
+                end
+
+                group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
+                LayoutHelpers.AtLeftTopIn(group.name, group)
+
+                group.colorBitmap = Bitmap(group)
+                LayoutFor(group.colorBitmap)
+                    :Below(group.name, 1)
+                    :Height(2)
+                    :Right(group.Right)
+                    :BitmapColor(group.colorValue)
+
+                
+                group.redSlider = IntegerSlider(group, false, 0, 255, 1,
+                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                group.greenSlider = IntegerSlider(group, false, 0, 255, 1,
+                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                group.blueSlider = IntegerSlider(group, false, 0, 255, 1,
+                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                LayoutHelpers.Below(group.redSlider, group.colorBitmap, 1)
+                LayoutHelpers.Below(group.greenSlider, group.redSlider, 1)
+                LayoutHelpers.Below(group.blueSlider, group.greenSlider, 1)
+
+
+                group.redValue.OnValueSet = function(control, newValue)
+                    group.colorValue:Set(setRed(group.colorValue(), newValue))
+                end
+                group.greenValue.OnValueSet = function(control, newValue)
+                    group.colorValue:Set(setGreen(group.colorValue(), newValue))
+                end
+                group.blueValue.OnValueSet = function(control, newValue)
+                    group.colorValue:Set(setBlue(group.colorValue(), newValue))
+                end
+
+                group.redValue = UIUtil.CreateText(group, '', 14, "Arial")
+                group.greenValue = UIUtil.CreateText(group, '', 14, "Arial")
+                group.blueValue = UIUtil.CreateText(group, '', 14, "Arial")
+                LayoutHelpers.RightOf(group.redValue, group.redSlider)
+                LayoutHelpers.RightOf(group.greenValue, group.greenSlider)
+                LayoutHelpers.RightOf(group.blueValue, group.blueSlider)
+
+                group.redSlider.OnValueChanged = function(self, newValue)
+                    group.redValue:SetText(string.format('%3d', newValue))
+                end
+
+                group.greenSlider.OnValueChanged = function(self, newValue)
+                    group.greenValue:SetText(string.format("%3d", newValue))
+                end
+
+                group.blueSlider.OnValueChanged = function(self, newValue)
+                    group.blueValue:SetText(string.format("%3d", newValue))
+                end
+
+                group.Height:Set(function()
+                    return group.name.Height() + group.colorBitmap.Height() + group.redSlider.Height() + group.greenSlider.Height() + group.blueSlider.Height()
+                end)
+
+                group.redSlider:SetValue(getRed(group.colorValue()))
+                group.greenSlider:SetValue(getGreen(group.colorValue()))
+                group.blueSlider:SetValue(getBlue(group.colorValue()))
+
+                LayoutHelpers.SetWidth(group, 200)
             elseif data.type == 'title' then
                 group.name = UIUtil.CreateText(group, data.name, data.size, data.family)
                 group.name:SetColor(data.color)
@@ -256,7 +375,7 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
-    _addEntry = function(self, entry, lazyvar, optio, indent)
+    _addEntry = function(self, entry, lazyvar, option, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
             LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
@@ -288,6 +407,10 @@ OptionsWindow = Class(Window) {
 
     AddFilter = function(self, name, option, lazyVar)
         return self:Add(Filter(name, option, lazyVar))
+    end,
+
+    AddColorSlider = function(self, name, option, lazyVar)
+        return self:Add(ColorSlider(name, option, lazyVar))
     end,
 
     GetColorIndex = function(self, colorsTable, color)
