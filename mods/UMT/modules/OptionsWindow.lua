@@ -323,9 +323,9 @@ OptionsWindow = Class(Window) {
                     group.colorValue:Set(setBlue(group.colorValue(), newValue))
                 end
 
-                group.redValue = UIUtil.CreateText(group, '', 14, "Arial")
-                group.greenValue = UIUtil.CreateText(group, '', 14, "Arial")
-                group.blueValue = UIUtil.CreateText(group, '', 14, "Arial")
+                group.redValue = UIUtil.CreateText(group, 'R', 14, "Arial")
+                group.greenValue = UIUtil.CreateText(group, 'G', 14, "Arial")
+                group.blueValue = UIUtil.CreateText(group, 'B', 14, "Arial")
                 LayoutHelpers.RightOf(group.redValue, group.redSlider)
                 LayoutHelpers.RightOf(group.greenValue, group.greenSlider)
                 LayoutHelpers.RightOf(group.blueValue, group.blueSlider)
