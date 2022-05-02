@@ -105,6 +105,10 @@ local function norm(s)
     return s
 end
 
+local function setAlpha(color, alpha)
+    return norm(STR_itox(alpha)) .. string.sub(color, 3)
+end
+
 local function setRed(color, red)
     return string.sub(color, 1, 2) .. norm(STR_itox(red)) .. string.sub(color, 5)
 end
@@ -115,6 +119,10 @@ end
 
 local function setBlue(color, blue)
     return string.sub(color, 1, 6) .. norm(STR_itox(blue))
+end
+
+local function getAlpha(color)
+    return STR_xtoi(string.sub(color, 1, 2))
 end
 
 local function getRed(color)
@@ -292,6 +300,11 @@ OptionsWindow = Class(Window) {
                     :Right(group.Right)
                     :BitmapColor(group.colorValue)
 
+                group.alphaSlider = IntegerSlider(group, false, 0, 255, 1,
+                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
+                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
+                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
                 
                 group.redSlider = IntegerSlider(group, false, 0, 255, 1,
                     UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
@@ -308,27 +321,36 @@ OptionsWindow = Class(Window) {
                     UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
                     UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
                     UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
-                LayoutHelpers.Below(group.redSlider, group.colorBitmap, 1)
+                LayoutHelpers.Below(group.alphaSlider, group.colorBitmap, 1)
+                LayoutHelpers.Below(group.redSlider, group.alphaSlider, 1)
                 LayoutHelpers.Below(group.greenSlider, group.redSlider, 1)
                 LayoutHelpers.Below(group.blueSlider, group.greenSlider, 1)
 
 
-                group.redValue.OnValueSet = function(control, newValue)
+                group.alphaSlider.OnValueSet = function(control, newValue)
+                    group.colorValue:Set(setAlpha(group.colorValue(), newValue))
+                end
+                group.redSlider.OnValueSet = function(control, newValue)
                     group.colorValue:Set(setRed(group.colorValue(), newValue))
                 end
-                group.greenValue.OnValueSet = function(control, newValue)
+                group.greenSlider.OnValueSet = function(control, newValue)
                     group.colorValue:Set(setGreen(group.colorValue(), newValue))
                 end
-                group.blueValue.OnValueSet = function(control, newValue)
+                group.blueSlider.OnValueSet = function(control, newValue)
                     group.colorValue:Set(setBlue(group.colorValue(), newValue))
                 end
-
+                group.alphaValue = UIUtil.CreateText(group, 'A', 14, "Arial")
                 group.redValue = UIUtil.CreateText(group, 'R', 14, "Arial")
                 group.greenValue = UIUtil.CreateText(group, 'G', 14, "Arial")
                 group.blueValue = UIUtil.CreateText(group, 'B', 14, "Arial")
+                LayoutHelpers.RightOf(group.alphaValue, group.alphaSlider)
                 LayoutHelpers.RightOf(group.redValue, group.redSlider)
                 LayoutHelpers.RightOf(group.greenValue, group.greenSlider)
                 LayoutHelpers.RightOf(group.blueValue, group.blueSlider)
+
+                group.alphaSlider.OnValueChanged = function(self, newValue)
+                    group.alphaValue:SetText(string.format('%3d', newValue))
+                end
 
                 group.redSlider.OnValueChanged = function(self, newValue)
                     group.redValue:SetText(string.format('%3d', newValue))
@@ -343,9 +365,16 @@ OptionsWindow = Class(Window) {
                 end
 
                 group.Height:Set(function()
-                    return group.name.Height() + group.colorBitmap.Height() + group.redSlider.Height() + group.greenSlider.Height() + group.blueSlider.Height()
+                return group.name.Height() +
+                        group.colorBitmap.Height() +
+                        group.alphaSlider.Height() +
+                        group.redSlider.Height() +
+                        group.greenSlider.Height() +
+                        group.blueSlider.Height()
                 end)
 
+
+                group.alphaSlider:SetValue(getAlpha(group.colorValue()))
                 group.redSlider:SetValue(getRed(group.colorValue()))
                 group.greenSlider:SetValue(getGreen(group.colorValue()))
                 group.blueSlider:SetValue(getBlue(group.colorValue()))
