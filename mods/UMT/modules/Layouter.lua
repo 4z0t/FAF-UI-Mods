@@ -310,6 +310,20 @@ function LayouterMetaTable:__newindex(key, value)
     error("attempt to set new index for a Layouter object")
 end
 
+function LayouterMetaTable:End()
+    if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
+        WARN("incorrect layout for Top-Height-Bottom")
+        WARN(debug.traceback())
+    end
+
+    if not pcall(self.c.Left) or not pcall(self.c.Right) or not pcall(self.c.Width)  then
+        WARN("incorrect layout for Left-Width-Right")
+        WARN(debug.traceback())
+    end
+
+    return self.c
+end
+
 function LayoutFor(control)
     local result = {
         c = control
