@@ -45,6 +45,7 @@ function CreateOptionsSelector(parent)
         :Height(500)
         :Width(500)
         :AtCenterIn(parent)
+        :End()
 
     group.popup = Popup(parent, group)
     LayoutFor(group):Over(group.popup, 10)
@@ -56,16 +57,19 @@ function CreateOptionsSelector(parent)
     LayoutFor(group.Title)
         :AtHorizontalCenterIn(group)
         :AtTopIn(group, 5)
+        :End()
 
     group.scroll = UIUtil.CreateLobbyVertScrollbar(group, -20, 10, 25) -- scroller
     LayoutFor(group.scroll)
         :Over(group, 10)
+        :End()
 
     group.QuitButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
     LayoutFor(group.QuitButton)
         :AtHorizontalCenterIn(group)
         :AtBottomIn(group, 5)
         :Over(group, 20)
+        :End()
     
 
     group.QuitButton.OnClick = function(self)
@@ -147,6 +151,7 @@ function CreateOptionsSelector(parent)
         :AtTopIn(group, 25)
         :AtBottomIn(group, 5)
         :Over(group, 10)
+        :End()
 
     group.LineGroup.Lines = {}
 
@@ -203,12 +208,14 @@ function CreateOptionsSelector(parent)
         LayoutFor(parent)
             :AtLeftTopIn(group.LineGroup, 5, 5)
             :AtRightIn(group.LineGroup, 5)
+            :End()
         while group.LineGroup.Bottom() - parent.Bottom() > 85 do
             index = index + 1
             group.LineGroup.Lines[index] = CreateOptionsSelectorLine()
             LayoutFor(group.LineGroup.Lines[index])
                 :Below(parent, 5)
                 :AtRightIn(parent)
+                :End()
             parent = group.LineGroup.Lines[index]
         end
         group.numLines = index

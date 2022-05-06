@@ -165,12 +165,14 @@ OptionsWindow = Class(Window) {
             :Height(10)
             :ResetBottom()
             :Over(self.ClientGroup)
+            :End()
 
         local okBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Ok>', 16)
         LayoutFor(okBtn)
             :Below(self._optionsGroup, 4)
             :AtLeftIn(self._optionsGroup)
             :Over(self._optionsGroup)
+            :End()
 
         okBtn.OnClick = function(control)
             self:OnClose(true)
@@ -184,6 +186,7 @@ OptionsWindow = Class(Window) {
             :AtRightIn(self._optionsGroup)
             :ResetLeft()
             :Over(self._optionsGroup)
+            :End()
 
         cancelBtn.OnClick = function(control)
             self:OnClose()

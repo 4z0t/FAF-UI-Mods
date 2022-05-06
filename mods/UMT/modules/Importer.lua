@@ -17,7 +17,7 @@ function ImportMetaTable:__call()
 end
 
 function ImportMetaTable:__newindex(key, value)
-    error("attempt to set new index for a Import object")
+    error("attempt to set new index for an Import object")
 end
 
 _G.require = Require()
