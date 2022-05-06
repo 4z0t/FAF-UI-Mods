@@ -139,20 +139,20 @@ end
 
 
 
+local windowTextures = {
+    tl = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
+    tr = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),
+    tm = UIUtil.SkinnableFile('/game/panel/panel_brd_horz_um.dds'),
+    ml = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_l.dds'),
+    m = UIUtil.SkinnableFile('/game/panel/panel_brd_m.dds'),
+    mr = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_r.dds'),
+    bl = UIUtil.SkinnableFile('/game/panel/panel_brd_ll.dds'),
+    bm = UIUtil.SkinnableFile('/game/panel/panel_brd_lm.dds'),
+    br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
+    borderColor = '00415055'
+}
 OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
-        local windowTextures = {
-            tl = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
-            tr = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),
-            tm = UIUtil.SkinnableFile('/game/panel/panel_brd_horz_um.dds'),
-            ml = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_l.dds'),
-            m = UIUtil.SkinnableFile('/game/panel/panel_brd_m.dds'),
-            mr = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_r.dds'),
-            bl = UIUtil.SkinnableFile('/game/panel/panel_brd_ll.dds'),
-            bm = UIUtil.SkinnableFile('/game/panel/panel_brd_lm.dds'),
-            br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
-            borderColor = '00415055'
-        }
         Window.__init(self, parent, title, nil, false, false, true, false, options .. 'window', {
             Left = 100,
             Right = 600,
