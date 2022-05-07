@@ -22,6 +22,8 @@ function LayouterMetaTable:Color(color)
         self.c:SetSolidColor(color)
     elseif self.c.SetColor then
         self.c:SetColor(color)
+    else
+        error("Unable to set color for control")
     end
     return self
 end
