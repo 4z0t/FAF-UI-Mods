@@ -1,7 +1,14 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
+local pcall = pcall
+
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
+
+function LayouterMetaTable:Name(debugName)
+    self.c:SetName(debugName)
+    return self
+end
 
 function LayouterMetaTable:Disable()
     self.c:Disable()
@@ -325,17 +332,26 @@ function LayouterMetaTable:__newindex(key, value)
     error("attempt to set new index for a Layouter object")
 end
 
-function LayouterMetaTable:End()
-    if not pcall(self.c.Top) or not pcall(self.c.Bottom) or not pcall(self.c.Height) then
-        WARN("incorrect layout for Top-Height-Bottom")
-        WARN(debug.traceback())
-    end
+local function CheckLayout(self, checkChildren)
+    if checkChildren then
+        self:ApplyFunction(function(control)
+            CheckLayout(control, checkChildren and self ~= control)
+        end)
+    else
+        if not pcall(self.Top) or not pcall(self.Bottom) then
+            WARN(string.format("incorrect layout for \"%s\" Top-Height-Bottom", self:GetName()))
+            --WARN(debug.traceback())
+        end
 
-    if not pcall(self.c.Left) or not pcall(self.c.Right) or not pcall(self.c.Width) then
-        WARN("incorrect layout for Left-Width-Right")
-        WARN(debug.traceback())
+        if not pcall(self.Left) or not pcall(self.Right)  then
+            WARN(string.format("incorrect layout for \"%s\" Left-Width-Right", self:GetName()))
+            --WARN(debug.traceback())
+        end
     end
+end
 
+function LayouterMetaTable:End(checkChildren)
+    CheckLayout(self.c, checkChildren)
     return self.c
 end
 

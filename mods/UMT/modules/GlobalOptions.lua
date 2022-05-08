@@ -206,6 +206,7 @@ function CreateOptionsSelector(parent)
         group.LineGroup.Lines[index] = CreateOptionsSelectorLine()
         local parent = group.LineGroup.Lines[index]
         LayoutFor(parent)
+            :Name("line ".. index)
             :AtLeftTopIn(group.LineGroup, 5, 5)
             :AtRightIn(group.LineGroup, 5)
             :End()
@@ -213,6 +214,7 @@ function CreateOptionsSelector(parent)
             index = index + 1
             group.LineGroup.Lines[index] = CreateOptionsSelectorLine()
             LayoutFor(group.LineGroup.Lines[index])
+                :Name("line ".. index)
                 :Below(parent, 5)
                 :AtRightIn(parent)
                 :End()
@@ -222,6 +224,8 @@ function CreateOptionsSelector(parent)
     end
     CreateOptionsSelectorLines()
     group:CalcVisible()
+    LayoutFor(group)
+        :End(true)
     return group
 end
 
