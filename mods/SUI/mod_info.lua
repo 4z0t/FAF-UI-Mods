@@ -1,0 +1,10 @@
+name = "Selected Units Info"
+version = 1
+copyright = ""
+description = ""
+author = "4z0t"
+url = ""
+uid = "selected-units-info-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
