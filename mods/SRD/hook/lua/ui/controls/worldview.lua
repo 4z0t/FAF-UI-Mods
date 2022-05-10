@@ -65,6 +65,10 @@ WorldView = Class(oldWorldView) {
         local info = GetRolloverInfo()
         if info and info.blueprintId ~= "unknown" then
             local type, range = getBPInfo(__blueprints[info.blueprintId])
+            if not type then
+                self:Clear()
+                return
+            end
             if self.ActiveDecal then
                 if self.ActiveDecal.type ~= type then
                     self.ActiveDecal:SetTexture(textureTypes[type])
@@ -89,6 +93,13 @@ WorldView = Class(oldWorldView) {
             end
             self.IsClear = true
         end
+    end,
+
+    OnDestroy = function(self)
+        if self.ActiveDecal then
+            self.ActiveDecal:Destroy()
+        end
+        oldWorldView.OnDestroy(self)
     end
 
 }
