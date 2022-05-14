@@ -31,13 +31,13 @@ end
 local oldWorldView = WorldView
 WorldView = Class(oldWorldView) {
 
-    previewKey = "SHIFT",
+    PreviewKey = "SHIFT",
     IsClear = false,
     ActiveDecal = false,
 
     OnUpdateCursor = function(self)
 
-        if not CM.GetCommandMode()[2] and IsKeyDown(self.previewKey) then
+        if IsKeyDown(self.PreviewKey) and not CM.GetCommandMode()[2] then
             self:Update()
         else
             self:Clear()
@@ -52,7 +52,7 @@ WorldView = Class(oldWorldView) {
         if type then
             local ring = Decal(self)
             ring:SetTexture(textureTypes[type])
-            ring:SetScale({math.floor(2.05 * (range)), 0, math.floor(2.05 * (range))})
+            ring:SetScale({math.floor(2.03 * (range)), 0, math.floor(2.03 * (range))})
             ring:SetPosition(GetMouseWorldPos())
             ring.type = type
             ring.range = range
