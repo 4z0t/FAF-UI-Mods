@@ -1,10 +1,10 @@
 function init(isReplay)
     if exists('/mods/UMT/modules/linq.lua') then
-        local Presenter = import('presenter.lua')
+        local ViewModel = import('viewmodel.lua')
         local Model = import('model.lua')
         local View = import("/mods/HBO/modules/views/view.lua")
         Model.init()
-        Presenter.init()
+        ViewModel.init()
     else
         ForkThread(function()
             WaitSeconds(4)
