@@ -51,7 +51,7 @@ SelectionInfo = Class(Bitmap) {
             local offX = event.MouseX - self.Left()
             drag.OnMove = function(dragself, x, y)
                 self.Left:Set(x - offX)
-                GetCursor():SetTexture(UIUtil.GetCursor('MOVE_WINDOW'))
+                GetCursor():SetTexture(UIUtil.GetCursor('W_E'))
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
