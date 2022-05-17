@@ -40,7 +40,7 @@ local function UpgradeMexes(mexes)
 end
 
 function UpgradeAll(id)
-    UpgradeAndPause(mexData[id].mexes)
+    UpgradeMexes(mexData[id].mexes)
 end
 
 function UpgradeOnScreen(id)
