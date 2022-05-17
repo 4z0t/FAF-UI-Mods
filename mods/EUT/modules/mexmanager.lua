@@ -4,13 +4,57 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
 
-local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
-local GetUnits = import('/mods/common/units.lua').Get
-local From = import('/mods/UMT/modules/linq.lua').From
-local UpdateMexPanel = import('mexpanel.lua').Update
+local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
+local GetUnits = import("/mods/common/units.lua").Get
+local From = import("/mods/UMT/modules/linq.lua").From
+local UpdateMexPanel = import("mexpanel.lua").Update
+local Select = import("/mods/UMT/modules/select.lua")
 
-local mexCategories = import('mexcategories.lua').mexCategories
+local mexCategories = import("mexcategories.lua").mexCategories
 local mexData = {}
+
+local toBePaused = {}
+
+local function UpgradeMexes(mexes)
+
+    local upgrades = {}
+
+    for _, m in mexes do
+        toBePaused[m:GetEntityId()] = true
+        local bp = m:GetBlueprint()
+        local upgrades_to = bp.General.UpgradesTo
+
+        upgrades[upgrades_to] = upgrades[upgrades_to] or {}
+
+        table.insert(upgrades[upgrades_to], m)
+    end
+
+    if not table.empty(upgrades) then
+        Select.Hidden(function()
+            for upgrades_to, up_mexes in upgrades do
+                SelectUnits(up_mexes)
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgrades_to, 1, false)
+            end
+        end)
+    end
+end
+
+function UpgradeAll(id)
+    UpgradeAndPause(mexData[id].mexes)
+end
+
+function UpgradeOnScreen(id)
+    Select.Hidden(function()
+        local mexes = mexData[id].mexes
+        mexes = From(mexes)
+        UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
+        local mexesOnScreen = From(GetSelectedUnits())
+        local result = mexes:Where(function(k, mex)
+            return mexesOnScreen:Contains(mex)
+        end):ToArray()
+        UpgradeMexes(result)
+    end)
+end
 
 function PauseWorst(id)
     local mData = mexData[id]
@@ -96,6 +140,10 @@ local function UpdateUI()
     for _, mex in mexes do
         mex.isUpgraded = false
         mex.isUpgrader = false
+        if toBePaused[mex:GetEntityId()] then
+            toBePaused[mex:GetEntityId()] = nil
+            SetPaused({mex}, true)
+        end
     end
     for _, mex in mexes do
         local f = mex:GetFocus()

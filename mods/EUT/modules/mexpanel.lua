@@ -1,18 +1,18 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Dragger = import('/lua/maui/dragger.lua').Dragger
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-local mexCategories = import('mexcategories.lua').mexCategories
-local From = import('/mods/UMT/modules/linq.lua').From
-local MexManager = import('mexmanager.lua')
+local mexCategories = import("mexcategories.lua").mexCategories
+local From = import("/mods/UMT/modules/linq.lua").From
+local MexManager = import("mexmanager.lua")
 
 local mexPanel
-local upgradeTexture = '/mods/EUT/textures/upgrade.dds'
-local pausedTexture = '/textures/ui/common/game/strategicicons/pause_rest.dds'
+local upgradeTexture = "/mods/EUT/textures/upgrade.dds"
+local pausedTexture = "/textures/ui/common/game/strategicicons/pause_rest.dds"
 
 function init()
     if not IsDestroyed(mexPanel) then
@@ -23,7 +23,7 @@ end
 
 local function MexPanelHandleEvent(control, event, category)
     local id = control.id
-    if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+    if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
         if event.Modifiers.Right then
             if category.isPaused ~= nil then
                 if event.Modifiers.Ctrl then
@@ -36,13 +36,25 @@ local function MexPanelHandleEvent(control, event, category)
                     MexManager.SetPausedAll(id, not category.isPaused)
                 end
             else
-                MexManager.SelectOnScreen(id)
+                if event.Modifiers.Ctrl then
+                    MexManager.UpgradeOnScreen(id)
+                else
+                    MexManager.SelectOnScreen(id)
+                end
             end
         elseif event.Modifiers.Left then
-            if event.Modifiers.Ctrl then
-                MexManager.SelectBest(id)
+            if category.isPaused ~= nil then
+                if event.Modifiers.Ctrl then
+                    MexManager.SelectBest(id)
+                else
+                    MexManager.SelectAll(id)
+                end
             else
-                MexManager.SelectAll(id)
+                if event.Modifiers.Ctrl then
+                    MexManager.UpgradeAll(id)
+                else
+                    MexManager.SelectAll(id)
+                end
             end
         else
             -- middle mouse button
@@ -95,13 +107,13 @@ MexPanel = Class(Group) {
     CreateMexCategoryPanel = function(self, parent, category)
         local group = Bitmap(parent)
         group:EnableHitTest()
-        group:SetSolidColor('aa000000')
+        group:SetSolidColor("aa000000")
         LayoutHelpers.SetDimensions(group, 22, 50)
         group.category = category
 
         group.stratIcon = Bitmap(group)
         group.stratIcon:DisableHitTest()
-        local iconName = '/textures/ui/common/game/strategicicons/' .. category.icon .. '_rest.dds'
+        local iconName = "/textures/ui/common/game/strategicicons/" .. category.icon .. "_rest.dds"
         group.stratIcon:SetTexture(iconName)
         group.stratIcon:SetAlpha(0.3)
         LayoutHelpers.AtHorizontalCenterIn(group.stratIcon, group)
@@ -128,7 +140,7 @@ MexPanel = Class(Group) {
         end
 
         group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
-        group.countLabel:SetNewColor('ffaaaaaa')
+        group.countLabel:SetNewColor("ffaaaaaa")
         group.countLabel:DisableHitTest()
         LayoutHelpers.AtHorizontalCenterIn(group.countLabel, group)
         LayoutHelpers.AtTopIn(group.countLabel, group, 1)
@@ -140,7 +152,7 @@ MexPanel = Class(Group) {
 
                 local progress = Bitmap(group)
                 progress:DisableHitTest()
-                progress:SetSolidColor('3300ff00')
+                progress:SetSolidColor("3300ff00")
                 progress.Width:Set(group.Width)
                 LayoutHelpers.SetHeight(progress, 2)
                 LayoutHelpers.AtLeftBottomIn(progress, group, 0, i * 2)
@@ -148,7 +160,7 @@ MexPanel = Class(Group) {
 
                 local bg = Bitmap(group)
                 bg:DisableHitTest()
-                bg:SetSolidColor('1100ff00')
+                bg:SetSolidColor("1100ff00")
                 bg.Width:Set(group.Width)
                 LayoutHelpers.SetHeight(bg, 2)
                 LayoutHelpers.AtLeftBottomIn(bg, group, 0, i * 2)
@@ -160,10 +172,10 @@ MexPanel = Class(Group) {
         end
 
         group.HandleEvent = function(control, event)
-            if event.Type == 'MouseExit' then
-                control:SetSolidColor('aa000000')
-            elseif event.Type == 'MouseEnter' then
-                control:SetSolidColor('11ffffff')
+            if event.Type == "MouseExit" then
+                control:SetSolidColor("aa000000")
+            elseif event.Type == "MouseEnter" then
+                control:SetSolidColor("11ffffff")
             else
                 return MexPanelHandleEvent(control, event, control.category)
             end
@@ -217,14 +229,14 @@ MexPanel = Class(Group) {
     end,
 
     HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
+        if event.Type == "ButtonPress" then
             local drag = Dragger()
             local offX = event.MouseX - self.Left()
             local offY = event.MouseY - self.Top()
             drag.OnMove = function(dragself, x, y)
                 self.Left:Set(x - offX)
                 self.Top:Set(y - offY)
-                GetCursor():SetTexture(UIUtil.GetCursor('MOVE_WINDOW'))
+                GetCursor():SetTexture(UIUtil.GetCursor("MOVE_WINDOW"))
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
@@ -236,7 +248,7 @@ MexPanel = Class(Group) {
     end,
 
     _LoadPosition = function(self)
-        return Prefs.GetFromCurrentProfile('EUTpos') or {
+        return Prefs.GetFromCurrentProfile("EUTpos") or {
             left = 100,
             top = 50
         }
