@@ -11,7 +11,9 @@ function OptionVarMetaTable:__call()
 end
 
 function OptionVarMetaTable:Set(value)
-    self._prev = self._lv()
+    if self._prev == nil then
+        self._prev = self._lv()
+    end
     self._lv:Set(value)
     self:OnChange()
 end
