@@ -4,8 +4,6 @@ local Prefs = import("/lua/user/prefs.lua")
 local OptionVarMetaTable = {}
 OptionVarMetaTable.__index = OptionVarMetaTable
 
-
-
 function OptionVarMetaTable:__call()
     return self._lv()
 end
@@ -33,10 +31,10 @@ function OptionVarMetaTable:Save()
 end
 
 function Create(modOptionName, subOption, default)
-
-    local val = Prefs.GetFromCurrentProfile(modOptionName) and Prefs.GetFromCurrentProfile(modOptionName)[subOption]
+    local modOptionsTable = Prefs.GetFromCurrentProfile(modOptionName)
+    local val = modOptionsTable and modOptionsTable[subOption]
     if val == nil then
-        Prefs.SetToCurrentProfile(modOptionName, table.merged(Prefs.GetFromCurrentProfile(modOptionName) or {}, {
+        Prefs.SetToCurrentProfile(modOptionName, table.merged(modOptionsTable, {
             [subOption] = default
         }))
     end
