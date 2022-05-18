@@ -140,16 +140,16 @@ local function UpdateUI()
     for _, mex in mexes do
         mex.isUpgraded = false
         mex.isUpgrader = false
-        if toBePaused[mex:GetEntityId()] then
-            toBePaused[mex:GetEntityId()] = nil
-            SetPaused({mex}, true)
-        end
     end
     for _, mex in mexes do
         local f = mex:GetFocus()
         if f ~= nil and f:IsInCategory("STRUCTURE") then
             mex.isUpgrader = true
             f.isUpgraded = true
+            if toBePaused[mex:GetEntityId()] then
+                toBePaused[mex:GetEntityId()] = nil
+                SetPaused({mex}, true)
+            end
         end
     end
 
