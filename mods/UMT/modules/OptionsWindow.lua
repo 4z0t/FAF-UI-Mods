@@ -36,31 +36,28 @@ function Title(name, fontSize, fontFamily, fontColor, indent)
     }
 end
 
-function Color(name, option, optionVar, indent)
+function Color(name, optionVar, indent)
     return {
         type = "color",
         name = name,
-        option = option,
         optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function Filter(name, option, optionVar, indent)
+function Filter(name, optionVar, indent)
     return {
         type = "filter",
         name = name,
-        option = option,
         optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function Slider(name, option, min, max, inc, optionVar, indent)
+function Slider(name, min, max, inc, optionVar, indent)
     return {
         type = "slider",
         name = name,
-        option = option,
         optionVar = optionVar,
         min = min,
         max = max,
@@ -70,21 +67,19 @@ function Slider(name, option, min, max, inc, optionVar, indent)
 end
 
 -- TODO
-function TextEdit(name, option, optionVar, indent)
+function TextEdit(name, optionVar, indent)
     return {
         type = "edit",
         name = name,
-        option = option,
         optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function ColorSlider(name, option, optionVar, indent)
+function ColorSlider(name, optionVar, indent)
     return {
         type = "colorslider",
         name = name,
-        option = option,
         optionVar = optionVar,
         indent = indent or 0
     }
@@ -204,6 +199,11 @@ OptionsWindow = Class(Window) {
     end,
 
     Add = function(self, data, passSizing)
+        local option
+        if data.optionVar then
+            option = data.optionVar:Option()
+            self._optionVars[option] = data.optionVar
+        end
         local function CreateSplitter()
             local splitter = Bitmap(self._optionsGroup)
             LayoutFor(splitter):BitmapColor("ff000000"):Left(self._optionsGroup.Left):Right(self._optionsGroup.Right)
@@ -215,7 +215,7 @@ OptionsWindow = Class(Window) {
             if data.type == "filter" then
                 group.check = UIUtil.CreateCheckbox(group, "/dialogs/check-box_btn/", data.name, true)
                 LayoutHelpers.AtLeftTopIn(group.check, group)
-                group.check.key = data.option
+                group.check.key = option
                 group.Height:Set(group.check.Height)
                 group.Width:Set(group.check.Width)
                 group.check.OnCheck = function(control, checked)
@@ -225,18 +225,18 @@ OptionsWindow = Class(Window) {
                         self:SetOption(control.key, 0)
                     end
                 end
-                group.check:SetCheck(self:GetOption(data.option) ~= 0 or false, true)
+                group.check:SetCheck(self:GetOption(option) ~= 0 or false, true)
             elseif data.type == "color" then
                 group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
                 group.color = BitmapCombo(group, self._colors,
-                    self:GetColorIndex(self._colors, self:GetOption(data.option)) or 1, true, nil,
+                    self:GetColorIndex(self._colors, self:GetOption(option)) or 1, true, nil,
                     "UI_Tab_Rollover_01", "UI_Tab_Click_01")
                 LayoutHelpers.AtLeftTopIn(group.color, group)
                 LayoutHelpers.RightOf(group.name, group.color, 5)
                 LayoutHelpers.AtVerticalCenterIn(group.name, group.color)
                 LayoutHelpers.SetWidth(group.color, 55)
                 LayoutHelpers.DepthOverParent(group.color, group)
-                group.color.key = data.option
+                group.color.key = option
                 group.Height:Set(group.color.Height)
                 group.Width:Set(group.color.Width)
                 group.color.OnClick = function(control, index)
@@ -251,7 +251,7 @@ OptionsWindow = Class(Window) {
                     UIUtil.SkinnableFile("/slider02/slider_btn_down.dds"),
                     UIUtil.SkinnableFile("/dialogs/options-02/slider-back_bmp.dds"))
                 LayoutHelpers.Below(group.slider, group.name)
-                group.slider.key = data.option
+                group.slider.key = option
                 group.Height:Set(function()
                     return group.name.Height() + group.slider.Height()
                 end)
@@ -263,7 +263,7 @@ OptionsWindow = Class(Window) {
                 group.slider.OnValueChanged = function(self, newValue)
                     group.value:SetText(string.format("%3d", newValue))
                 end
-                group.slider:SetValue(self:GetOption(data.option) or 1)
+                group.slider:SetValue(self:GetOption(option) or 1)
                 LayoutHelpers.SetWidth(group, 200)
             elseif data.type == "colorslider" then
 
@@ -274,8 +274,8 @@ OptionsWindow = Class(Window) {
                         UIUtil.SkinnableFile("/dialogs/options-02/slider-back_bmp.dds"))
                 end
 
-                group.key = data.option
-                group.colorValue = LazyVar.Create(self:GetOption(data.option) or "ffffffff")
+                group.key = option
+                group.colorValue = LazyVar.Create(self:GetOption(option) or "ffffffff")
                 group.colorValue.OnDirty = function(var)
                     self:SetOption(group.key, var())
                 end
@@ -381,7 +381,7 @@ OptionsWindow = Class(Window) {
         end
 
         local entry = CreateEntry(data)
-        self:_addEntry(entry, data.optionVar, data.option, data.indent)
+        self:_addEntry(entry, data.indent)
         if not passSizing then
             self._optionsGroup.Bottom:Set(self._previous.Bottom)
             self:SizeToContents()
@@ -389,7 +389,7 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
-    _addEntry = function(self, entry, optionVar, option, indent)
+    _addEntry = function(self, entry, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
             LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
@@ -398,31 +398,30 @@ OptionsWindow = Class(Window) {
         end
         LayoutHelpers.DepthOverParent(entry, self._optionsGroup)
         self._previous = entry
-        self._optionVars[option] = optionVar
     end,
 
     AddSplitter = function(self)
         return self:Add(Splitter())
     end,
 
-    AddColor = function(self, name, option, optionVar, indent)
-        return self:Add(Color(name, option, optionVar, indent))
+    AddColor = function(self, name, optionVar, indent)
+        return self:Add(Color(name, optionVar, indent))
     end,
 
     AddTitle = function(self, name, fontSize, fontFamily, fontColor, indent)
         return self:Add(Title(name, fontSize, fontFamily, fontColor, indent))
     end,
 
-    AddSlider = function(self, name, option, min, max, inc, optionVar, indent)
-        return self:Add(Slider(name, option, min, max, inc, optionVar, indent))
+    AddSlider = function(self, name, min, max, inc, optionVar, indent)
+        return self:Add(Slider(name, min, max, inc, optionVar, indent))
     end,
 
-    AddFilter = function(self, name, option, optionVar, indent)
-        return self:Add(Filter(name, option, optionVar, indent))
+    AddFilter = function(self, name, optionVar, indent)
+        return self:Add(Filter(name, optionVar, indent))
     end,
 
-    AddColorSlider = function(self, name, option, optionVar, indent)
-        return self:Add(ColorSlider(name, option, optionVar, indent))
+    AddColorSlider = function(self, name, optionVar, indent)
+        return self:Add(ColorSlider(name, optionVar, indent))
     end,
 
     GetColorIndex = function(self, colorsTable, color)

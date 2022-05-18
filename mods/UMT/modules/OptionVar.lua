@@ -30,6 +30,15 @@ function OptionVarMetaTable:Save()
     self._prev = nil
 end
 
+function OptionVarMetaTable:Option()
+    return self._o
+end
+
+function OptionVarMetaTable:Raw()
+    return self._lv
+end
+
+
 function Create(modOptionName, subOption, default)
     local modOptionsTable = Prefs.GetFromCurrentProfile(modOptionName)
     local val = modOptionsTable and modOptionsTable[subOption]
