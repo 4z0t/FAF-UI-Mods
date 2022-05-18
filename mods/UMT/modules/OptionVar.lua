@@ -4,7 +4,9 @@ local Prefs = import("/lua/user/prefs.lua")
 local OptionVarMetaTable = {}
 OptionVarMetaTable.__index = OptionVarMetaTable
 
-function OptionVarMetaTable:Get()
+
+
+function OptionVarMetaTable:__call()
     return self._lv()
 end
 
@@ -36,7 +38,7 @@ function Create(modOptionName, subOption, default)
             [subOption] = default
         }))
     end
-    
+
     local result = {
         _m = modOptionName,
         _o = subOption,
