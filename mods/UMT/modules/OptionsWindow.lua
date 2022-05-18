@@ -1,25 +1,25 @@
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Prefs = import('/lua/user/prefs.lua')
-local Window = import('/lua/maui/window.lua').Window
-local Edit = import('/lua/maui/edit.lua').Edit
-local Text = import('/lua/maui/text.lua').Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local UIUtil = import('/lua/ui/uiutil.lua')
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Control = import('/lua/maui/control.lua').Control
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local BitmapCombo = import('/lua/ui/controls/combo.lua').BitmapCombo
-local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
-local LazyVar = import('/lua/lazyvar.lua')
+local Dragger = import("/lua/maui/dragger.lua").Dragger
+local Prefs = import("/lua/user/prefs.lua")
+local Window = import("/lua/maui/window.lua").Window
+local Edit = import("/lua/maui/edit.lua").Edit
+local Text = import("/lua/maui/text.lua").Text
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local UIUtil = import("/lua/ui/uiutil.lua")
+local Group = import("/lua/maui/group.lua").Group
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Button = import("/lua/maui/button.lua").Button
+local Control = import("/lua/maui/control.lua").Control
+local Tooltip = import("/lua/ui/game/tooltip.lua")
+local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
+local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
+local LazyVar = import("/lua/lazyvar.lua")
 
-local LayoutFor = import('Layouter.lua').ReusedLayoutFor
+local LayoutFor = import("Layouter.lua").ReusedLayoutFor
 
-local colors = {'ffffffff', 'ffff4242', 'ffefff42', 'ff4fff42', 'ff42fff8', 'ff424fff', 'ffff42eb', 'ffff9f42'}
+local colors = {"ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42"}
 
 local splitterTable = {
-    type = 'splitter'
+    type = "splitter"
 }
 function Splitter()
     return splitterTable
@@ -27,7 +27,7 @@ end
 
 function Title(name, fontSize, fontFamily, fontColor, indent)
     return {
-        type = 'title',
+        type = "title",
         name = name,
         size = fontSize or 16,
         family = fontFamily or UIUtil.titleFont,
@@ -36,32 +36,32 @@ function Title(name, fontSize, fontFamily, fontColor, indent)
     }
 end
 
-function Color(name, option, lazyVar, indent)
+function Color(name, option, optionVar, indent)
     return {
-        type = 'color',
+        type = "color",
         name = name,
         option = option,
-        lazyVar = lazyVar,
+        optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function Filter(name, option, lazyVar, indent)
+function Filter(name, option, optionVar, indent)
     return {
-        type = 'filter',
+        type = "filter",
         name = name,
         option = option,
-        lazyVar = lazyVar,
+        optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function Slider(name, option, min, max, inc, lazyVar, indent)
+function Slider(name, option, min, max, inc, optionVar, indent)
     return {
-        type = 'slider',
+        type = "slider",
         name = name,
         option = option,
-        lazyVar = lazyVar,
+        optionVar = optionVar,
         min = min,
         max = max,
         inc = inc,
@@ -69,24 +69,23 @@ function Slider(name, option, min, max, inc, lazyVar, indent)
     }
 end
 
-
 -- TODO
-function TextEdit(name, option, lazyVar, indent)
+function TextEdit(name, option, optionVar, indent)
     return {
-        type = 'edit',
+        type = "edit",
         name = name,
         option = option,
-        lazyVar = lazyVar,
+        optionVar = optionVar,
         indent = indent or 0
     }
 end
 
-function ColorSlider(name, option, lazyVar, indent)
+function ColorSlider(name, option, optionVar, indent)
     return {
-        type = 'colorslider',
+        type = "colorslider",
         name = name,
         option = option,
-        lazyVar = lazyVar,
+        optionVar = optionVar,
         indent = indent or 0
     }
 end
@@ -97,10 +96,9 @@ function Extend()
     return nil
 end
 
-
 local function norm(s)
     if string.len(s) == 1 then
-        return '0' .. s
+        return "0" .. s
     end
     return s
 end
@@ -137,42 +135,32 @@ local function getBlue(color)
     return STR_xtoi(string.sub(color, 7, 8))
 end
 
-
-
 local windowTextures = {
-    tl = UIUtil.SkinnableFile('/game/panel/panel_brd_ul.dds'),
-    tr = UIUtil.SkinnableFile('/game/panel/panel_brd_ur.dds'),
-    tm = UIUtil.SkinnableFile('/game/panel/panel_brd_horz_um.dds'),
-    ml = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_l.dds'),
-    m = UIUtil.SkinnableFile('/game/panel/panel_brd_m.dds'),
-    mr = UIUtil.SkinnableFile('/game/panel/panel_brd_vert_r.dds'),
-    bl = UIUtil.SkinnableFile('/game/panel/panel_brd_ll.dds'),
-    bm = UIUtil.SkinnableFile('/game/panel/panel_brd_lm.dds'),
-    br = UIUtil.SkinnableFile('/game/panel/panel_brd_lr.dds'),
-    borderColor = '00415055'
+    tl = UIUtil.SkinnableFile("/game/panel/panel_brd_ul.dds"),
+    tr = UIUtil.SkinnableFile("/game/panel/panel_brd_ur.dds"),
+    tm = UIUtil.SkinnableFile("/game/panel/panel_brd_horz_um.dds"),
+    ml = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_l.dds"),
+    m = UIUtil.SkinnableFile("/game/panel/panel_brd_m.dds"),
+    mr = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_r.dds"),
+    bl = UIUtil.SkinnableFile("/game/panel/panel_brd_ll.dds"),
+    bm = UIUtil.SkinnableFile("/game/panel/panel_brd_lm.dds"),
+    br = UIUtil.SkinnableFile("/game/panel/panel_brd_lr.dds"),
+    borderColor = "00415055"
 }
 OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
-        Window.__init(self, parent, title, nil, false, false, true, false, options .. 'window', {
+        Window.__init(self, parent, title, nil, false, false, true, false, options .. "window", {
             Left = 100,
             Right = 600,
             Top = 100,
             Bottom = 800
         }, windowTextures)
         self._optionsGroup = Group(self)
-        LayoutFor(self._optionsGroup)
-            :FillFixedBorder(self.ClientGroup, 5)
-            :Height(10)
-            :ResetBottom()
-            :Over(self.ClientGroup)
-            :End()
+        LayoutFor(self._optionsGroup):FillFixedBorder(self.ClientGroup, 5):Height(10):ResetBottom():Over(
+            self.ClientGroup):End()
 
-        local okBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Ok>', 16)
-        LayoutFor(okBtn)
-            :Below(self._optionsGroup, 4)
-            :AtLeftIn(self._optionsGroup)
-            :Over(self._optionsGroup)
-            :End()
+        local okBtn = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC _Ok>", 16)
+        LayoutFor(okBtn):Below(self._optionsGroup, 4):AtLeftIn(self._optionsGroup):Over(self._optionsGroup):End()
 
         okBtn.OnClick = function(control)
             self:OnClose(true)
@@ -180,21 +168,15 @@ OptionsWindow = Class(Window) {
         self._okBtn = okBtn
         self._colors = colors
 
-        local cancelBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Cancel>', 16)
-        LayoutFor(cancelBtn)
-            :Below(self._optionsGroup, 4)
-            :AtRightIn(self._optionsGroup)
-            :ResetLeft()
-            :Over(self._optionsGroup)
-            :End()
+        local cancelBtn = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC _Cancel>", 16)
+        LayoutFor(cancelBtn):Below(self._optionsGroup, 4):AtRightIn(self._optionsGroup):ResetLeft():Over(
+            self._optionsGroup):End()
 
         cancelBtn.OnClick = function(control)
             self:OnClose()
         end
-        self._tempOptions = {}
-        self._lazyVars = {}
+        self._optionVars = {}
         self._options = options
-        self._optionsTable = Prefs.GetFromCurrentProfile(options)
         self._previous = false
         if buildTable then
             for _, entry in buildTable do
@@ -224,17 +206,14 @@ OptionsWindow = Class(Window) {
     Add = function(self, data, passSizing)
         local function CreateSplitter()
             local splitter = Bitmap(self._optionsGroup)
-            LayoutFor(splitter)
-                :BitmapColor('ff000000')
-                :Left(self._optionsGroup.Left)
-                :Right(self._optionsGroup.Right)
+            LayoutFor(splitter):BitmapColor("ff000000"):Left(self._optionsGroup.Left):Right(self._optionsGroup.Right)
                 :Height(2)
             return splitter
         end
         local function CreateEntry(data)
             local group = Group(self._optionsGroup)
-            if data.type == 'filter' then
-                group.check = UIUtil.CreateCheckbox(group, '/dialogs/check-box_btn/', data.name, true)
+            if data.type == "filter" then
+                group.check = UIUtil.CreateCheckbox(group, "/dialogs/check-box_btn/", data.name, true)
                 LayoutHelpers.AtLeftTopIn(group.check, group)
                 group.check.key = data.option
                 group.Height:Set(group.check.Height)
@@ -242,15 +221,15 @@ OptionsWindow = Class(Window) {
                 group.check.OnCheck = function(control, checked)
                     if checked then
                         self:SetOption(control.key, 1)
-                    else 
+                    else
                         self:SetOption(control.key, 0)
                     end
                 end
-                group.check:SetCheck(self._optionsTable[data.option] ~= 0 or false, true)
-            elseif data.type == 'color' then
+                group.check:SetCheck(self:GetOption(data.option) ~= 0 or false, true)
+            elseif data.type == "color" then
                 group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
                 group.color = BitmapCombo(group, self._colors,
-                    self:GetColorIndex(self._colors, self._optionsTable[data.option]) or 1, true, nil,
+                    self:GetColorIndex(self._colors, self:GetOption(data.option)) or 1, true, nil,
                     "UI_Tab_Rollover_01", "UI_Tab_Click_01")
                 LayoutHelpers.AtLeftTopIn(group.color, group)
                 LayoutHelpers.RightOf(group.name, group.color, 5)
@@ -263,14 +242,14 @@ OptionsWindow = Class(Window) {
                 group.color.OnClick = function(control, index)
                     self:SetOption(control.key, self._colors[index])
                 end
-            elseif data.type == 'slider' then
+            elseif data.type == "slider" then
                 group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
                 LayoutHelpers.AtLeftTopIn(group.name, group)
                 group.slider = IntegerSlider(group, false, data.min, data.max, data.inc,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                    UIUtil.SkinnableFile("/slider02/slider_btn_up.dds"),
+                    UIUtil.SkinnableFile("/slider02/slider_btn_over.dds"),
+                    UIUtil.SkinnableFile("/slider02/slider_btn_down.dds"),
+                    UIUtil.SkinnableFile("/dialogs/options-02/slider-back_bmp.dds"))
                 LayoutHelpers.Below(group.slider, group.name)
                 group.slider.key = data.option
                 group.Height:Set(function()
@@ -279,25 +258,24 @@ OptionsWindow = Class(Window) {
                 group.slider.OnValueSet = function(control, newValue)
                     self:SetOption(control.key, newValue)
                 end
-                group.value = UIUtil.CreateText(group, '', 14, "Arial")
+                group.value = UIUtil.CreateText(group, "", 14, "Arial")
                 LayoutHelpers.RightOf(group.value, group.slider)
                 group.slider.OnValueChanged = function(self, newValue)
-                    group.value:SetText(string.format('%3d', newValue))
+                    group.value:SetText(string.format("%3d", newValue))
                 end
-                group.slider:SetValue(self._optionsTable[data.option] or 1)
+                group.slider:SetValue(self:GetOption(data.option) or 1)
                 LayoutHelpers.SetWidth(group, 200)
-            elseif data.type == 'colorslider' then
+            elseif data.type == "colorslider" then
 
                 local function IntColorSlider()
-                   return IntegerSlider(group, false, 0, 255, 1,
-                    UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-                    UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-                    UIUtil.SkinnableFile('/dialogs/options-02/slider-back_bmp.dds'))
+                    return IntegerSlider(group, false, 0, 255, 1, UIUtil.SkinnableFile("/slider02/slider_btn_up.dds"),
+                        UIUtil.SkinnableFile("/slider02/slider_btn_over.dds"),
+                        UIUtil.SkinnableFile("/slider02/slider_btn_down.dds"),
+                        UIUtil.SkinnableFile("/dialogs/options-02/slider-back_bmp.dds"))
                 end
 
                 group.key = data.option
-                group.colorValue = LazyVar.Create(self._optionsTable[data.option] or 'ffffffff')
+                group.colorValue = LazyVar.Create(self:GetOption(data.option) or "ffffffff")
                 group.colorValue.OnDirty = function(var)
                     self:SetOption(group.key, var())
                 end
@@ -306,21 +284,18 @@ OptionsWindow = Class(Window) {
                 LayoutHelpers.AtLeftTopIn(group.name, group)
 
                 group.colorBitmap = Bitmap(group)
-                LayoutFor(group.colorBitmap)
-                    :Below(group.name, 1)
-                    :Height(5)
-                    :Right(group.Right)
-                    :BitmapColor(group.colorValue)
+                LayoutFor(group.colorBitmap):Below(group.name, 1):Height(5):Right(group.Right):BitmapColor(
+                    group.colorValue)
 
-                group.alphaText = UIUtil.CreateText(group, 'A', 14, "Arial")
-                group.redText = UIUtil.CreateText(group, 'R', 14, "Arial")
-                group.greenText = UIUtil.CreateText(group, 'G', 14, "Arial")
-                group.blueText = UIUtil.CreateText(group, 'B', 14, "Arial")
+                group.alphaText = UIUtil.CreateText(group, "A", 14, "Arial")
+                group.redText = UIUtil.CreateText(group, "R", 14, "Arial")
+                group.greenText = UIUtil.CreateText(group, "G", 14, "Arial")
+                group.blueText = UIUtil.CreateText(group, "B", 14, "Arial")
 
-                group.alphaText:SetColor('white')
-                group.redText:SetColor('red')
-                group.greenText:SetColor('green')
-                group.blueText:SetColor('blue')
+                group.alphaText:SetColor("white")
+                group.redText:SetColor("red")
+                group.greenText:SetColor("green")
+                group.blueText:SetColor("blue")
 
                 LayoutHelpers.Below(group.alphaText, group.colorBitmap, 1)
                 LayoutHelpers.Below(group.redText, group.alphaText, 1)
@@ -331,7 +306,7 @@ OptionsWindow = Class(Window) {
                 group.redSlider = IntColorSlider()
                 group.greenSlider = IntColorSlider()
                 group.blueSlider = IntColorSlider()
-                
+
                 LayoutHelpers.RightOf(group.alphaSlider, group.alphaText, 1)
                 LayoutHelpers.RightOf(group.redSlider, group.redText, 1)
                 LayoutHelpers.RightOf(group.greenSlider, group.greenText, 1)
@@ -355,23 +330,21 @@ OptionsWindow = Class(Window) {
                     group.colorValue:Set(setBlue(group.colorValue(), newValue))
                 end
 
-
-
-                group.alphaValue = UIUtil.CreateText(group, 'A', 14, "Arial")
-                group.redValue = UIUtil.CreateText(group, 'R', 14, "Arial")
-                group.greenValue = UIUtil.CreateText(group, 'G', 14, "Arial")
-                group.blueValue = UIUtil.CreateText(group, 'B', 14, "Arial")
+                group.alphaValue = UIUtil.CreateText(group, "A", 14, "Arial")
+                group.redValue = UIUtil.CreateText(group, "R", 14, "Arial")
+                group.greenValue = UIUtil.CreateText(group, "G", 14, "Arial")
+                group.blueValue = UIUtil.CreateText(group, "B", 14, "Arial")
                 LayoutHelpers.RightOf(group.alphaValue, group.alphaSlider)
                 LayoutHelpers.RightOf(group.redValue, group.redSlider)
                 LayoutHelpers.RightOf(group.greenValue, group.greenSlider)
                 LayoutHelpers.RightOf(group.blueValue, group.blueSlider)
 
                 group.alphaSlider.OnValueChanged = function(self, newValue)
-                    group.alphaValue:SetText(string.format('%3d', newValue))
+                    group.alphaValue:SetText(string.format("%3d", newValue))
                 end
 
                 group.redSlider.OnValueChanged = function(self, newValue)
-                    group.redValue:SetText(string.format('%3d', newValue))
+                    group.redValue:SetText(string.format("%3d", newValue))
                 end
 
                 group.greenSlider.OnValueChanged = function(self, newValue)
@@ -386,20 +359,19 @@ OptionsWindow = Class(Window) {
                     return group.blueSlider.Bottom() - group.name.Top()
                 end)
 
-
                 group.alphaSlider:SetValue(getAlpha(group.colorValue()))
                 group.redSlider:SetValue(getRed(group.colorValue()))
                 group.greenSlider:SetValue(getGreen(group.colorValue()))
                 group.blueSlider:SetValue(getBlue(group.colorValue()))
 
                 LayoutHelpers.SetWidth(group, 200)
-            elseif data.type == 'title' then
+            elseif data.type == "title" then
                 group.name = UIUtil.CreateText(group, data.name, data.size, data.family)
                 group.name:SetColor(data.color)
                 LayoutHelpers.AtLeftTopIn(group.name, group)
                 LayoutHelpers.SetWidth(group, 200)
                 group.Height:Set(group.name.Height)
-            elseif data.type == 'splitter' then
+            elseif data.type == "splitter" then
                 group.split = CreateSplitter()
                 LayoutHelpers.AtTopIn(group.split, group)
                 group.Width:Set(group.split.Width)
@@ -409,7 +381,7 @@ OptionsWindow = Class(Window) {
         end
 
         local entry = CreateEntry(data)
-        self:_addEntry(entry, data.lazyVar, data.option, data.indent)
+        self:_addEntry(entry, data.optionVar, data.option, data.indent)
         if not passSizing then
             self._optionsGroup.Bottom:Set(self._previous.Bottom)
             self:SizeToContents()
@@ -417,7 +389,7 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
-    _addEntry = function(self, entry, lazyvar, option, indent)
+    _addEntry = function(self, entry, optionVar, option, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
             LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
@@ -426,33 +398,31 @@ OptionsWindow = Class(Window) {
         end
         LayoutHelpers.DepthOverParent(entry, self._optionsGroup)
         self._previous = entry
-        if lazyvar then
-            self._lazyVars[option] = lazyvar
-        end
+        self._optionVars[option] = optionVar
     end,
 
     AddSplitter = function(self)
         return self:Add(Splitter())
     end,
 
-    AddColor = function(self, name, option, lazyVar, indent)
-        return self:Add(Color(name, option, lazyVar, indent))
+    AddColor = function(self, name, option, optionVar, indent)
+        return self:Add(Color(name, option, optionVar, indent))
     end,
 
     AddTitle = function(self, name, fontSize, fontFamily, fontColor, indent)
         return self:Add(Title(name, fontSize, fontFamily, fontColor, indent))
     end,
 
-    AddSlider = function(self, name, option, min, max, inc, lazyVar, indent)
-        return self:Add(Slider(name, option, min, max, inc, lazyVar, indent))
+    AddSlider = function(self, name, option, min, max, inc, optionVar, indent)
+        return self:Add(Slider(name, option, min, max, inc, optionVar, indent))
     end,
 
-    AddFilter = function(self, name, option, lazyVar, indent)
-        return self:Add(Filter(name, option, lazyVar, indent))
+    AddFilter = function(self, name, option, optionVar, indent)
+        return self:Add(Filter(name, option, optionVar, indent))
     end,
 
-    AddColorSlider = function(self, name, option, lazyVar, indent)
-        return self:Add(ColorSlider(name, option, lazyVar, indent))
+    AddColorSlider = function(self, name, option, optionVar, indent)
+        return self:Add(ColorSlider(name, option, optionVar, indent))
     end,
 
     GetColorIndex = function(self, colorsTable, color)
@@ -463,21 +433,23 @@ OptionsWindow = Class(Window) {
         end
     end,
 
+    GetOption = function(self, option)
+        return self._optionVars[option]()
+    end,
+
     SetOption = function(self, option, value)
-        self._tempOptions[option] = value
-        self._lazyVars[option]:Set(value)
+        self._optionVars[option]:Set(value)
     end,
 
     SaveOptions = function(self)
-        self._optionsTable = table.merged(self._optionsTable, self._tempOptions)
-        Prefs.SetToCurrentProfile(self._options, self._optionsTable)
+        for _, optionVar in self._optionVars do
+            optionVar:Save()
+        end
     end,
 
     RestoreOptions = function(self)
-        for id, var in self._lazyVars do
-            if self._optionsTable[id] then
-                var:Set(self._optionsTable[id])
-            end
+        for id, var in self._optionVars do
+            var:Reset()
         end
     end,
 
@@ -487,12 +459,12 @@ OptionsWindow = Class(Window) {
         else
             self:RestoreOptions()
         end
-        self._manually_destroyed = true
+        self._manuallyDestroyed = true
         self:Destroy()
     end,
 
     OnDestroy = function(self)
-        if not self._manually_destroyed then
+        if not self._manuallyDestroyed then
             self:RestoreOptions()
         end
         Window.OnDestroy(self)
