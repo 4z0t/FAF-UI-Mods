@@ -24,9 +24,9 @@ function OptionVarMetaTable:Reset()
 end
 
 function OptionVarMetaTable:Save()
-    Prefs.SetToCurrentProfile(self._m, table.merged(Prefs.GetFromCurrentProfile(self._m), {
-        [self._o] = self._lv()
-    }))
+    local modOptionsTable = Prefs.GetFromCurrentProfile(self._m)
+    modOptionsTable[self._o] = self._lv()
+    Prefs.SetToCurrentProfile(self._m, modOptionsTable)
     self._prev = nil
 end
 
@@ -43,9 +43,9 @@ function Create(modOptionName, subOption, default)
     local modOptionsTable = Prefs.GetFromCurrentProfile(modOptionName)
     local val = modOptionsTable and modOptionsTable[subOption]
     if val == nil then
-        Prefs.SetToCurrentProfile(modOptionName, table.merged(modOptionsTable, {
-            [subOption] = default
-        }))
+        modOptionsTable = modOptionsTable or {}
+        modOptionsTable[subOption] = default
+        Prefs.SetToCurrentProfile(modOptionName, modOptionsTable)
     end
 
     local result = {
