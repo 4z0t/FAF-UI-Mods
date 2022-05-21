@@ -55,9 +55,14 @@ function CreateUnitOverlayControl(unit)
     end)
     overlay:SetNeedsFrameUpdate(true)
     overlay.Update = function(self)
-        local pos = worldView:Project(self.unit:GetPosition())
-        self.PosX:Set(pos.x)
-        self.PosY:Set(pos.y)
+        local pos = worldView:GetScreenPos(self.unit)
+        if pos then
+            self:Show()
+            self.PosX:Set(pos.x)
+            self.PosY:Set(pos.y)
+        else
+            self:Hide()
+        end
     end
     return overlay
 end
@@ -83,7 +88,6 @@ end
 function OnFrameEngineer(self, delta)
     if (not self.unit:IsDead()) and engineersOverlay ~= 0 then
         if (self.unit:IsIdle()) then
-            self:Show()
             self:Update()
         else
             self:Hide()
@@ -113,17 +117,14 @@ end
 function OnFrameFactory(self, delta)
     if (not self.unit:IsDead()) and factoriesOverlay ~= 0 then
         if (self.unit:IsIdle()) then
-            self:Show()
             self:SetFrame(1)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
         elseif (self.unit:IsRepeatQueue()) then
-            self:Show()
             self:SetFrame(0)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
         elseif self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("FACTORY") then
-            self:Show()
             self:SetFrame(2)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
@@ -154,7 +155,6 @@ function OnFrameSilo(self, delta)
     if (not self.unit:IsDead()) and tacticalNukesOverlay ~= 0 then
         local mi = self.unit:GetMissileInfo()
         if (mi.nukeSiloStorageCount > 0) or (mi.tacticalSiloStorageCount > 0) then
-            self:Show()
             self:Update()
         else
             self:Hide()
@@ -179,7 +179,6 @@ end
 function OnFrameMex(self, delta)
     if (not self.unit:IsDead()) and massExtractorsOverlay ~= 0 then
         if self.unit:GetWorkProgress() > 0 then
-            self:Show()
             self:Update()
         else
             self:Hide()
