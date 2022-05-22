@@ -127,8 +127,7 @@ local function MatchCategory(category, unit)
 end
 
 local function UpdateUI()
-    local mexes = GetUnits()
-    mexes = EntityCategoryFilterDown(categoryMex, mexes)
+    local mexes = GetUnits(categoryMex)
 
     for id, category in mexCategories do
         mexData[id] = {
