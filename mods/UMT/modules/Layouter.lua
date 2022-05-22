@@ -43,8 +43,8 @@ function LayouterMetaTable:DropShadow(state)
     return self
 end
 
-function LayouterMetaTable:Texture(texture)
-    self.c:SetTexture(texture)
+function LayouterMetaTable:Texture(texture, border)
+    self.c:SetTexture(texture, border)
     return self
 end
 
