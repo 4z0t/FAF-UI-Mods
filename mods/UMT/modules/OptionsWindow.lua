@@ -219,13 +219,9 @@ OptionsWindow = Class(Window) {
                 group.Height:Set(group.check.Height)
                 group.Width:Set(group.check.Width)
                 group.check.OnCheck = function(control, checked)
-                    if checked then
-                        self:SetOption(control.key, 1)
-                    else
-                        self:SetOption(control.key, 0)
-                    end
+                    self:SetOption(control.key, checked)
                 end
-                group.check:SetCheck(self:GetOption(option) ~= 0 or false, true)
+                group.check:SetCheck(self:GetOption(option), true)
             elseif data.type == "color" then
                 group.name = UIUtil.CreateText(group, data.name, 14, "Arial")
                 group.color = BitmapCombo(group, self._colors,
