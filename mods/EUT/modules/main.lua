@@ -8,7 +8,9 @@ function main()
     else
         local MexManager = import("mexmanager.lua")
         local MexPanel = import("mexpanel.lua")
+        local MexOverlay = import("mexoverlay.lua")
         MexManager.init()
         MexPanel.init()
+        MexOverlay.init()
     end
 end

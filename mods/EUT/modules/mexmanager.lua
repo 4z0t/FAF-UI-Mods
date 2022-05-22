@@ -8,6 +8,7 @@ local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local GetUnits = import("/mods/common/units.lua").Get
 local From = import("/mods/UMT/modules/linq.lua").From
 local UpdateMexPanel = import("mexpanel.lua").Update
+local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local Select = import("/mods/UMT/modules/select.lua")
 
 local mexCategories = import("mexcategories.lua").mexCategories
@@ -180,7 +181,7 @@ local function UpdateUI()
     end
 
     UpdateMexPanel(mexData)
-
+    UpdateMexOverlays(mexes)
 end
 
 function init()
