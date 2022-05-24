@@ -12,5 +12,5 @@ enabled = true
 exclusive = false
 ui_only = true
 requiresNames = {}
-conflicts = {}
+conflicts = {"zcbf6277-24e3-437a-b968-Common-v1"}
 after = {}
