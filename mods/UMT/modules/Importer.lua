@@ -13,7 +13,11 @@ function ImportMetaTable:__index(key)
 end
 
 function ImportMetaTable:__call()
-    return import(self.__p .. ".lua")
+    local s = string.sub(self.__p, 2)
+    if string.find(s, '/') then
+        return import(self.__p .. ".lua")
+    end
+    return import(s .. ".lua")
 end
 
 function ImportMetaTable:__newindex(key, value)
