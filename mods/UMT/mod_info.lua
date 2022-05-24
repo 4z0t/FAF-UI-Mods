@@ -6,7 +6,6 @@ description = [[Tools for UI modding
 docs coming soon...]]
 author = "4z0t"
 url = ""
-icon = "/mods/UMT/icon.png"
 selectable = true
 enabled = true
 exclusive = false
