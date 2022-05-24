@@ -1,6 +1,7 @@
 local Prefs = import("/lua/user/prefs.lua")
-local Model = import("model.lua")
 local From = import("/mods/UMT/modules/linq.lua").From
+
+local Model = import("model.lua")
 local active
 local activeName
 

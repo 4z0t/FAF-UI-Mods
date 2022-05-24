@@ -21,7 +21,7 @@ local BPItem = import('BlueprintItem.lua')
 local BlueprintItem = BPItem.BlueprintItem
 local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
 local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
-local ViewModel = import('/mods/HBO/modules/viewmodel.lua')
+local ViewModel = import('../viewmodel.lua')
 
 local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
 
