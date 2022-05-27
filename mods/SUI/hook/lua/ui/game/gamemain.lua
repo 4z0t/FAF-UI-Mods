@@ -4,6 +4,7 @@ local OldCreateUI = CreateUI
 function CreateUI(isReplay)
     OldCreateUI(isReplay)
     controls.selectionInfo = import('/mods/SUI/modules/SelectionInfo.lua').SelectionInfo(controls.status)
+    controls.selectionInfo:Hide()
 end
 
 local originalOnSelectionChanged = OnSelectionChanged
