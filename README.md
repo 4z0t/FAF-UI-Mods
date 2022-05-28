@@ -4,9 +4,9 @@ Ecosystem of UI mods for [FAF](https://www.faforever.com/)
 
 ## UI Revolution Project
 
-The goal of project is to utilize old UI mods and create new ones.
+The goal of project is to utilize old UI mods and create new ones. New mods must be customizable in order for user to be able to enable/disable things user needs/doesn't need. Code base must be extendable for further development and be performant as well, so, user won't have issues with lagging game.
 
-Here are already mods having much more comfortable and customizable tools to work with.
+Here are already mods having more comfortable and customizable tools to work with.
 
 ### TeamInfo Share
 
@@ -50,7 +50,7 @@ Current functions:
   * select all
   * select all on screen
 * T1/T2 upgrading mexes
-  * pause all[]
+  * pause all
   * pause one with lowest progress
   * select all
   * select all on screen
@@ -114,7 +114,7 @@ The library of tools for UI modding. Docs are coming with 4th (mb 5th) version.
 * Options for UI mods
 * Query wrapper to work with tables
 * Unit functions
-* Layouter for layouting UI
+* Layouter for UI
 
 ## What's next?
 
@@ -124,6 +124,7 @@ Let's look through mod vault and select the most popular:
 ### Supreme Score Board
 
 Legendary mod, I appreciate work been done by HUSSAR. It is one of the mods I really like. However it obsoleted. Code base is poor, so, you can't add, you can't remove. It takes a lot of space in UI making user with smaller screens struggle using it.
+In addition, It doesn't match factions' skins and doesn't hide with whole UI (Ctrl+Shift+F1).
 
 ### Idle Engineers 1/2/reloaded
 
@@ -145,8 +146,8 @@ Cool, hah? But who am I to decide? Well, you decide to believe me or not.
 Since I am doing this alone I can't even think about revolution and that's why I want your help.
 I need:
 
-* Devs: Very specific, but if you really want ask me
+* Devs: Very nspecific, but if you really want, ask me
 * Testers: I can't test all things I do
-* Promoters: Spread our goal around others and blame listed mods :P
+* Promoters: Spread our goal around others ad blame listed mods :P
 
 Keep in mind that I also participate in FAF development and this extends to FA UI as well, there are tons of issues to be fixed.
