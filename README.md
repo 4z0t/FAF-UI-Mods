@@ -11,6 +11,7 @@ Here are already mods having much more comfortable and customizable tools to wor
 ### TeamInfo Share
 
 Provides with UI and communication with teammates about nukes, smds and experimentals.
+
 Current functions:
 
 * timer
@@ -27,6 +28,7 @@ Upcoming functions:
 ### Idle Engineers Light
 
 Provides with UI info about idle engineers, idle factories, upgrading mexes and loaded tmls/smls displayed as icons on worldview.
+
 Current functions:
 
 * toggable display of icons
@@ -39,6 +41,7 @@ Upcoming functions:
 ### ECO UI Tools
 
 Provides with mexes panel with functional buttons and info about mexes. Displays upgrading mexes with icons on worldview.
+
 Current functions:
 
 * T1/T2 mexes
