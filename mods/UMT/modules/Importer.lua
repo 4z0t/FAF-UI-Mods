@@ -9,15 +9,25 @@ local function Require(initPath)
 end
 
 function ImportMetaTable:__index(key)
+    if key == "_" then
+        return Require(self.__p .. "/..")
+    end
     return Require(self.__p .. "/" .. string.lower(key))
 end
 
 function ImportMetaTable:__call()
     local s = string.sub(self.__p, 2)
-    if string.find(s, '/') then
-        return import(self.__p .. ".lua")
+
+    local okl, localImport = pcall(import, s .. ".lua")
+    if okl then
+        return localImport
     end
-    return import(s .. ".lua")
+    local okg, globalImport = pcall(import, self.__p .. ".lua")
+    if okg then
+        return globalImport
+    end
+    error(string.format("Can't import file '%s'", s .. ".lua"))
+
 end
 
 function ImportMetaTable:__newindex(key, value)

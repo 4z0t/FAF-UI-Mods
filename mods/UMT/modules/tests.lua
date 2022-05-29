@@ -1,8 +1,9 @@
-local From = import('linq.lua').from
-local Range = import('linq.lua').range
+local From = import("linq.lua").from
+local Range = import("linq.lua").range
 
 function main()
-    local a, b = pcall(function()
+    local a, b
+    a, b = pcall(function()
         local r = Range(1, 10):Foreach(function(k, v)
             print(v)
         end):Dump()
@@ -11,6 +12,15 @@ function main()
 
     end)
     LOG(a)
-    LOG(b)
+    WARN(b)
+
+    a, b = pcall(function()
+        local c = require.lua.maui.bitmap()
+        local d = require._.modules.linq()
+        local e = require.a()
+
+    end)
+    LOG(a)
+    WARN(b)
 
 end
