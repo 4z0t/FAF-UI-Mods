@@ -217,7 +217,7 @@ end
 
 function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
     LayoutHelpers.AtTopIn(self.c, parent, offset)
-    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, offset)
+    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, horizonalOffset)
     return self
 end
 
