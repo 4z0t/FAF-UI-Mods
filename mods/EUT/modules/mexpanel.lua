@@ -7,7 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 local From = import("/mods/UMT/modules/linq.lua").From
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").LayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")
@@ -79,15 +79,19 @@ MexPanel = Class(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:EnableHitTest()
-        LayoutHelpers.DepthOverParent(self, parent, 100)
-        LayoutHelpers.SetDimensions(self, 170, 60)
-        self.contents = Group(self)
-        LayoutHelpers.SetDimensions(self.contents, 168, 50)
-        LayoutHelpers.AtCenterIn(self.contents, self)
-        self:InitMexPanels(self.contents)
         local pos = self:_LoadPosition()
-        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
+        LayoutFor(self)
+            :Width(170)
+            :Height(60)
+            :AtLeftTopIn(parent, pos.left, pos.top)
+            :HitTest(true)
+            :Over(parent, 100)
+        self.contents = Group(self)
+        LayoutFor(self.contents)
+            :Width(168)
+            :Height(50)
+            :AtCenterIn(self)
+        self:InitMexPanels(self.contents)
     end,
 
     InitMexPanels = function(self, parent)
@@ -108,44 +112,53 @@ MexPanel = Class(Group) {
 
     CreateMexCategoryPanel = function(self, parent, category)
         local group = Bitmap(parent)
-        group:EnableHitTest()
-        group:SetSolidColor("aa000000")
-        LayoutHelpers.SetDimensions(group, 22, 50)
+        
+        LayoutFor(group)
+            :HitTest(true)
+            :Color("aa000000")
+            :Width(22)
+            :Height(50)
+
+        
         group.category = category
+        local iconName = "/textures/ui/common/game/strategicicons/" .. category.icon .. "_rest.dds"
 
         group.stratIcon = Bitmap(group)
-        group.stratIcon:DisableHitTest()
-        local iconName = "/textures/ui/common/game/strategicicons/" .. category.icon .. "_rest.dds"
-        group.stratIcon:SetTexture(iconName)
-        group.stratIcon:SetAlpha(0.3)
-        LayoutHelpers.AtHorizontalCenterIn(group.stratIcon, group)
-        LayoutHelpers.AtTopIn(group.stratIcon, group, 11)
 
+        LayoutFor(group.stratIcon)
+            :HitTest(false)
+            :Texture(iconName)
+            :Alpha(0.3)
+            :AtTopCenterIn(group, 11)
+        
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
-            group.pauseIcon:DisableHitTest()
-            group.pauseIcon:SetTexture(pausedTexture)
-            LayoutHelpers.SetDimensions(group.pauseIcon, 24, 24)
-            group.pauseIcon:SetAlpha(0.3)
-            LayoutHelpers.AtHorizontalCenterIn(group.pauseIcon, group)
-            LayoutHelpers.AtTopIn(group.pauseIcon, group, 8)
+            LayoutFor(group.pauseIcon)
+                :HitTest(false)
+                :Texture(pausedTexture)
+                :Width(24)
+                :Height(24)
+                :Alpha(0.3)
+                :AtTopCenterIn(group, 8)
         end
 
         if category.isUpgrading then
             group.upgrIcon = Bitmap(group)
-            group.upgrIcon:DisableHitTest()
-            group.upgrIcon:SetTexture(upgradeTexture)
-            LayoutHelpers.SetDimensions(group.upgrIcon, 8, 8)
-            group.upgrIcon:SetAlpha(0.3)
-            LayoutHelpers.AtHorizontalCenterIn(group.upgrIcon, group, 5)
-            LayoutHelpers.AtTopIn(group.upgrIcon, group, 20)
+
+            LayoutFor(group.upgrIcon)
+                :HitTest(false)
+                :Texture(upgradeTexture)
+                :Width(8)
+                :Height(8)
+                :Alpha(0.3)
+                :AtTopCenterIn(group, 20, 5)
         end
 
         group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
-        group.countLabel:SetNewColor("ffaaaaaa")
-        group.countLabel:DisableHitTest()
-        LayoutHelpers.AtHorizontalCenterIn(group.countLabel, group)
-        LayoutHelpers.AtTopIn(group.countLabel, group, 1)
+        LayoutFor(group.countLabel)
+            :Color("ffaaaaaa")
+            :HitTest(false)
+            :AtTopCenterIn(group, 1)
 
         if category.isUpgrading then
             group.ProgressBars = {}
@@ -153,20 +166,23 @@ MexPanel = Class(Group) {
             for i = 0, 9 do
 
                 local progress = Bitmap(group)
-                progress:DisableHitTest()
-                progress:SetSolidColor("3300ff00")
-                progress.Width:Set(group.Width)
-                LayoutHelpers.SetHeight(progress, 2)
-                LayoutHelpers.AtLeftBottomIn(progress, group, 0, i * 2)
-                progress:Hide()
+                LayoutFor(progress)
+                    :HitTest(false)
+                    :Color("3300ff00")
+                    :Width(group.Width)
+                    :Height(2)
+                    :AtLeftBottomIn(group, 0, i * 2)
+                    :Hide()
 
                 local bg = Bitmap(group)
-                bg:DisableHitTest()
-                bg:SetSolidColor("1100ff00")
-                bg.Width:Set(group.Width)
-                LayoutHelpers.SetHeight(bg, 2)
-                LayoutHelpers.AtLeftBottomIn(bg, group, 0, i * 2)
-                bg:Hide()
+
+                LayoutFor(bg)
+                    :HitTest(false)
+                    :Color("1100ff00")
+                    :Width(group.Width)
+                    :Height(2)
+                    :AtLeftBottomIn(group, 0, i * 2)
+                    :Hide()
 
                 table.insert(group.ProgressBars, progress)
                 table.insert(group.BackGroundBars, bg)
