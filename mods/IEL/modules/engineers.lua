@@ -1,4 +1,3 @@
-local getUnits = import('/mods/common/units.lua').Get
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
@@ -6,10 +5,12 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Prefs = import('/lua/user/prefs.lua')
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
 local worldView = import('/lua/ui/game/worldview.lua').viewLeft
+local LazyVar = import('/lua/lazyvar.lua')
 
+
+local GetUnits = import('/mods/UMT/modules/units.lua').Get
 local GlobalOptions = import('/mods/UMT/modules/GlobalOptions.lua')
 local OptionsUtils = import('/mods/UMT/modules/OptionsWindow.lua')
-local LazyVar = import('/lua/lazyvar.lua')
 
 local options = Prefs.GetFromCurrentProfile('IEL') or {
     engineersOverlay = 1,
@@ -197,7 +198,7 @@ function VerifyWV()
 end
 
 function CreateUnitOverlays()
-    local allunits = getUnits()
+    local allunits = GetUnits()
     VerifyWV()
     for _, unit in allunits do
         if (not unit:IsDead()) and not overlays[unit:GetEntityId()] then
@@ -231,7 +232,7 @@ function initOverlayGroup()
     -- prepare for updating overlays
 end
 
-function init(isReplay, parent)
+function init(isReplay)
     
 
     initOverlayGroup()
