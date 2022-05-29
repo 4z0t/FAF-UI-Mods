@@ -16,11 +16,11 @@ local mexPanel
 local upgradeTexture = "/mods/EUT/textures/upgrade.dds"
 local pausedTexture = "/textures/ui/common/game/strategicicons/pause_rest.dds"
 
-function init()
+function init(parent)
     if not IsDestroyed(mexPanel) then
         mexPanel:Destroy()
     end
-    mexPanel = MexPanel(GetFrame(0))
+    mexPanel = MexPanel(parent)
 end
 
 local function MexPanelHandleEvent(control, event, category)
@@ -225,6 +225,9 @@ MexPanel = Class(Group) {
     end,
 
     UpdateMexPanels = function(self, data)
+        if self:IsHidden() then
+            return
+        end
         for i, d in data do
             self.contents.panels[i]:Update(d)
         end
