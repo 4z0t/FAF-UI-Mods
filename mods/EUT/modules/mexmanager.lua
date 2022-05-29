@@ -5,11 +5,13 @@ local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
 
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
-local GetUnits = import("/mods/common/units.lua").Get
-local From = import("/mods/UMT/modules/linq.lua").From
-local UpdateMexPanel = import("mexpanel.lua").Update
-local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
+
 local Select = import("/mods/UMT/modules/select.lua")
+local GetUnits = import("/mods/UMT/modules/units.lua").Get
+local From = import("/mods/UMT/modules/linq.lua").From
+
+local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
+local UpdateMexPanel = import("mexpanel.lua").Update
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local mexData = {}
