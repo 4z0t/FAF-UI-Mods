@@ -48,14 +48,25 @@ function LayouterMetaTable:Texture(texture, border)
     return self
 end
 
-function LayouterMetaTable:HitTest(state)
+
+function LayouterMetaTable:EnableHitTest(recursive)
+    self.c:EnableHitTest(recursive)
+    return self
+end
+
+function LayouterMetaTable:DisableHitTest(recursive)
+    self.c:DisableHitTest(recursive)
+    return self
+end
+
+function LayouterMetaTable:HitTest(state, recursive)
     if state == nil then
         error(":HitTest requires 1 positional argument \"state\"")
     end
     if state then
-        self.c:EnableHitTest()
+        self.c:EnableHitTest(recursive)
     else
-        self.c:DisableHitTest()
+        self.c:DisableHitTest(recursive)
     end
     return self
 end
