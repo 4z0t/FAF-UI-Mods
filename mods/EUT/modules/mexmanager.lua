@@ -42,69 +42,6 @@ local function UpgradeMexes(mexes)
     end
 end
 
-function UpgradeAll(id)
-    UpgradeMexes(mexData[id].mexes)
-end
-
-function UpgradeOnScreen(id)
-    Select.Hidden(function()
-        local mexes = mexData[id].mexes
-        mexes = From(mexes)
-        UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
-        local mexesOnScreen = From(GetSelectedUnits())
-        local result = mexes:Where(function(k, mex)
-            return mexesOnScreen:Contains(mex)
-        end):ToArray()
-        UpgradeMexes(result)
-    end)
-end
-
-function PauseWorst(id)
-    local mData = mexData[id]
-    local mexes = mData.mexes
-    if table.empty(mexes) then
-        return
-    end
-    SetPaused({mexes[mData.currentWorst]}, true)
-    mData.currentWorst = mData.currentWorst - 1
-end
-
-function UnPauseBest(id)
-    local mData = mexData[id]
-    local mexes = mData.mexes
-    if table.empty(mexes) then
-        return
-    end
-    SetPaused({mexes[mData.currentBest]}, false)
-    mData.currentBest = mData.currentBest + 1
-end
-
-function SelectBest(id)
-    local mexes = mexData[id].mexes
-    SelectUnits({mexes[1]})
-end
-
-function SelectAll(id)
-    local mexes = mexData[id].mexes
-    SelectUnits(mexes)
-end
-
-function SetPausedAll(id, state)
-    local mexes = mexData[id].mexes
-    SetPaused(mexes, state)
-end
-
-function SelectOnScreen(id)
-    local mexes = mexData[id].mexes
-    mexes = From(mexes)
-    UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
-    local mexesOnScreen = From(GetSelectedUnits())
-    local result = mexes:Where(function(k, mex)
-        return mexesOnScreen:Contains(mex)
-    end):ToArray()
-    SelectUnits(result)
-end
-
 local function MatchCategory(category, unit)
     -- local isUpgrading = unit:GetWorkProgress() > 0
 
@@ -135,7 +72,6 @@ local function UpdateUI()
     for id, category in mexCategories do
         mexData[id] = {
             mexes = {},
-            currentBest = 1
         }
     end
 
@@ -178,12 +114,73 @@ local function UpdateUI()
             mexData[id].progress = sorted
 
             mexData[id].mexes = sortedMexes:ToDictionary()
-            mexData[id].currentWorst = table.getn(mexData[id].mexes)
         end
     end
 
     UpdateMexPanel(mexData)
     UpdateMexOverlays(mexes)
+end
+
+function UpgradeAll(id)
+    UpgradeMexes(mexData[id].mexes)
+end
+
+function UpgradeOnScreen(id)
+    Select.Hidden(function()
+        local mexes = mexData[id].mexes
+        mexes = From(mexes)
+        UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
+        local mexesOnScreen = From(GetSelectedUnits())
+        local result = mexes:Where(function(k, mex)
+            return mexesOnScreen:Contains(mex)
+        end):ToArray()
+        UpgradeMexes(result)
+    end)
+end
+
+function PauseWorst(id)
+    local mexes = mexData[id].mexes
+    if table.empty(mexes) then
+        return
+    end
+    SetPaused({mexes[table.getn(mexes)]}, true)
+    UpdateUI()
+end
+
+function UnPauseBest(id)
+    local mexes = mexData[id].mexes
+    if table.empty(mexes) then
+        return
+    end
+    SetPaused({mexes[1]}, false)
+    UpdateUI()
+end
+
+function SelectBest(id)
+    local mexes = mexData[id].mexes
+    SelectUnits({mexes[1]})
+end
+
+function SelectAll(id)
+    local mexes = mexData[id].mexes
+    SelectUnits(mexes)
+end
+
+function SetPausedAll(id, state)
+    local mexes = mexData[id].mexes
+    SetPaused(mexes, state)
+    UpdateUI()
+end
+
+function SelectOnScreen(id)
+    local mexes = mexData[id].mexes
+    mexes = From(mexes)
+    UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
+    local mexesOnScreen = From(GetSelectedUnits())
+    local result = mexes:Where(function(k, mex)
+        return mexesOnScreen:Contains(mex)
+    end):ToArray()
+    SelectUnits(result)
 end
 
 function init()
