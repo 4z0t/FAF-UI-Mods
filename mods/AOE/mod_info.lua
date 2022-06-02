@@ -1,0 +1,10 @@
+name = "Additional Orders Extension"
+version = 1
+copyright = ""
+description = ""
+author = "4z0t"
+url = ""
+uid = "additional-orders-extension-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
