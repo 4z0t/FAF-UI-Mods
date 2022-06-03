@@ -3,7 +3,7 @@ local ShowReclaim = import("/lua/ui/game/Reclaim.lua").ShowReclaim
 
 local oldWorldView = WorldView
 WorldView = Class(oldWorldView) {
-
+    EnabledWithReclaimMode = false,
     OnUpdateCursor = function(self)
         local order = CM.GetCommandMode()[2] and CM.GetCommandMode()[2].name
         if order == "RULEUCC_Reclaim" then
@@ -12,6 +12,7 @@ WorldView = Class(oldWorldView) {
             else
                 self.ShowingReclaim = true
             end
+            self.EnabledWithReclaimMode = true
         elseif order == "RULEUCC_Move" then
             -- skip
         else
@@ -20,6 +21,7 @@ WorldView = Class(oldWorldView) {
             else
                 self.ShowingReclaim = false
             end
+            self.EnabledWithReclaimMode = false
         end
 
         return oldWorldView.OnUpdateCursor(self)
