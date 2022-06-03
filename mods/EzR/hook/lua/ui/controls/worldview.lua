@@ -13,9 +13,7 @@ WorldView = Class(oldWorldView) {
                 self.ShowingReclaim = true
             end
             self.EnabledWithReclaimMode = true
-        elseif order == "RULEUCC_Move" then
-            -- skip
-        elseif self.EnabledWithReclaimMode then
+        elseif order ~= "RULEUCC_Move" and self.EnabledWithReclaimMode then
             if not self.ReclaimThread then
                 ShowReclaim(false)
             else
