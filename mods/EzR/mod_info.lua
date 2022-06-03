@@ -1,0 +1,10 @@
+name = "Ez Reclaim"
+version = 1
+copyright = ""
+description = ""
+author = "4z0t"
+url = ""
+uid = "Ez-Reclaim-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
