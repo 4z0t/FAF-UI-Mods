@@ -1,11 +1,11 @@
-local CM = import("/lua/ui/game/commandmode.lua")
+local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
 local ShowReclaim = import("/lua/ui/game/Reclaim.lua").ShowReclaim
 
 local oldWorldView = WorldView
 WorldView = Class(oldWorldView) {
     EnabledWithReclaimMode = false,
     OnUpdateCursor = function(self)
-        local order = CM.GetCommandMode()[2] and CM.GetCommandMode()[2].name
+        local order = GetCommandMode()[2] and GetCommandMode()[2].name
         if order == "RULEUCC_Reclaim" then
             if not self.ReclaimThread then
                 ShowReclaim(true)
