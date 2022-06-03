@@ -1,7 +1,7 @@
 name = "Ez Reclaim"
 version = 1
 copyright = ""
-description = ""
+description = "Shows reclaim labels in reclaim mode"
 author = "4z0t"
 url = ""
 uid = "Ez-Reclaim-v01"

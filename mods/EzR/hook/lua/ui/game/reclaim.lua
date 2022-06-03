@@ -1,4 +1,4 @@
--- the reason of conflicts is line 12: have to check for reclaim mode state
+-- the reason of conflicts is line 13: have to check for reclaim mode state
 -- Wanna have no conflict? add this line to other mods and remove from conflics UIDs
 function OnCommandGraphShow(bool)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
