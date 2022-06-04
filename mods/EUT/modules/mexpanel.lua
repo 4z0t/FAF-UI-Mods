@@ -277,8 +277,8 @@ MexPanel = Class(Group) {
 
     _SavePosition = function(self)
         Prefs.SetToCurrentProfile("EUTpos", {
-            left = self.Left(),
-            top = self.Top()
+            left = LayoutHelpers.InvScaleNumber(self.Left()),
+            top = LayoutHelpers.InvScaleNumber(self.Top())
         })
     end
 
