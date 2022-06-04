@@ -1,3 +1,4 @@
+local TableInsert = table.insert
 
 local CM = import("/lua/ui/game/commandmode.lua")
 local Decal = import("/lua/user/userdecal.lua").UserDecal
@@ -10,22 +11,23 @@ local textureTypes = {
     ["tmd"] = texturePath .. "tmd.dds"
 }
 
-local function getBPInfo(bp)
+local function GetBPInfo(bp)
     if bp.Weapon ~= nil then
+        local weapons = {}
         for _wIndex, w in bp.Weapon do
             local radius = w.MaxRadius;
             if w.RangeCategory == "UWRC_DirectFire" then
-                return "direct", radius
+                TableInsert(weapons, {"direct", radius})
             elseif w.RangeCategory == "UWRC_IndirectFire" then
-                return "nondirect", radius
+                TableInsert(weapons, {"nondirect", radius})
             elseif w.RangeCategory == "UWRC_AntiAir" then
-                return "antiair", radius
+                TableInsert(weapons, {"antiair", radius})
             elseif w.RangeCategory == "UWRC_Countermeasure" then
-                return "smd", radius
+                TableInsert(weapons, {"smd", radius})
             end
         end
+        return weapons
     end
-    return nil, nil
 end
 
 local oldWorldView = WorldView
@@ -33,7 +35,7 @@ WorldView = Class(oldWorldView) {
 
     PreviewKey = "SHIFT",
     IsClear = false,
-    ActiveDecal = false,
+    ActiveDecals = {},
 
     OnUpdateCursor = function(self)
 
@@ -46,39 +48,62 @@ WorldView = Class(oldWorldView) {
         return oldWorldView.OnUpdateCursor(self)
     end,
 
-    CreateRingDecal = function(self, info)
-        
-        local type, range = getBPInfo(__blueprints[info.blueprintId])
-        if type then
-            local ring = Decal(self)
-            ring:SetTexture(textureTypes[type])
-            ring:SetScale({math.floor(2.03 * (range)), 0, math.floor(2.03 * (range))})
-            ring:SetPosition(GetMouseWorldPos())
-            ring.type = type
-            ring.range = range
-            self.ActiveDecal = ring
-            self.IsClear = false
+    CreateRingDecal = function(self, type, range)
+        local ring = Decal(self)
+        ring:SetTexture(textureTypes[type])
+        ring:SetScale({math.floor(2.03 * (range)), 0, math.floor(2.03 * (range))})
+        ring:SetPosition(GetMouseWorldPos())
+        ring.type = type
+        ring.range = range
+        return ring
+    end,
+
+    UpdateDecal = function(decal,  type, range)
+        if decal.type ~= type then
+            decal:SetTexture(textureTypes[type])
+            decal.type = type
         end
+        if decal.range ~= range then
+            decal:SetScale({math.floor(2.05 * (range)), 0, math.floor(2.05 * (range))})
+            decal.range = range
+        end
+        decal:SetPosition(GetMouseWorldPos())
     end,
 
     Update = function(self)
+
         local info = GetRolloverInfo()
         if info and info.blueprintId ~= "unknown" then
-            local type, range = getBPInfo(__blueprints[info.blueprintId])
-            if not type then
+            local weapons = GetBPInfo(__blueprints[info.blueprintId])
+            if table.empty(weapons) then
                 self:Clear()
-                return
-            end
-            if self.ActiveDecal then
-                if self.ActiveDecal.type ~= type then
-                    self.ActiveDecal:SetTexture(textureTypes[type])
-                end
-                if self.ActiveDecal.range ~= range then
-                    self.ActiveDecal:SetScale({math.floor(2.05 * (range)), 0, math.floor(2.05 * (range))})
-                end
-                self.ActiveDecal:SetPosition(GetMouseWorldPos())
             else
-                self:CreateRingDecal(info)
+                local ActiveDecals = self.ActiveDecals
+
+                self.IsClear = false
+                
+                if table.getn(weapons) > table.getn(ActiveDecals) then
+                    local decal
+                    for i, weapon in weapons do
+                        decal = ActiveDecals[i]
+                        if decal then
+                            self.UpdateDecal(decal, unpack(weapon))
+                        else
+                            ActiveDecals[i] = self:CreateRingDecal(unpack(weapon))
+                        end
+                    end
+                else
+                    local weapon
+                    for i, decal in ActiveDecals do
+                        weapon = weapons[i]
+                        if weapon then
+                            self.UpdateDecal(decal, unpack(weapon))
+                        else
+                            decal:Destroy()
+                            ActiveDecals[i] = nil
+                        end
+                    end
+                end
             end
         else
             self:Clear()
@@ -86,10 +111,11 @@ WorldView = Class(oldWorldView) {
     end,
 
     Clear = function(self)
+
         if not self.IsClear then
-            if self.ActiveDecal then
-                self.ActiveDecal:Destroy()
-                self.ActiveDecal = false
+            for i, decal in self.ActiveDecals do
+                decal:Destroy()
+                self.ActiveDecals[i] = nil
             end
             self.IsClear = true
         end
