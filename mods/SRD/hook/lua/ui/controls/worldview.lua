@@ -48,8 +48,8 @@ WorldView = Class(oldWorldView) {
         return oldWorldView.OnUpdateCursor(self)
     end,
 
-    CreateRingDecal = function(self, type, range)
-        local ring = Decal(self)
+    CreateRingDecal = function(type, range)
+        local ring = Decal()
         ring:SetTexture(textureTypes[type])
         ring:SetScale({math.floor(2.03 * (range)), 0, math.floor(2.03 * (range))})
         ring:SetPosition(GetMouseWorldPos())
@@ -89,7 +89,7 @@ WorldView = Class(oldWorldView) {
                         if decal then
                             self.UpdateDecal(decal, unpack(weapon))
                         else
-                            ActiveDecals[i] = self:CreateRingDecal(unpack(weapon))
+                            ActiveDecals[i] = self.CreateRingDecal(unpack(weapon))
                         end
                     end
                 else
@@ -122,9 +122,8 @@ WorldView = Class(oldWorldView) {
     end,
 
     OnDestroy = function(self)
-        if self.ActiveDecal then
-            self.ActiveDecal:Destroy()
-        end
+        self:Clear()
+        self.ActiveDecals = nil
         oldWorldView.OnDestroy(self)
     end
 
