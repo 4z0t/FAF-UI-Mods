@@ -69,19 +69,19 @@ function CreateEngineerOverlay(unit)
     local id = unit:GetEntityId()
     overlays[id] = CreateUnitOverlayControl(unit)
     local overlay = overlays[id]
-    if (unit:IsInCategory("TECH1")) then
+    if unit:IsInCategory("TECH1") then
         overlay:SetTexture("/mods/IEL/textures/t1_idle_bold.dds", 0)
-    elseif (unit:IsInCategory("TECH2")) then
+    elseif unit:IsInCategory("TECH2") then
         overlay:SetTexture("/mods/IEL/textures/t2_idle_bold.dds", 0)
-    elseif (unit:IsInCategory("TECH3")) then
+    elseif unit:IsInCategory("TECH3") then
         overlay:SetTexture("/mods/IEL/textures/t3_idle_bold.dds", 0)
     end
     overlay.OnFrame = OnFrameEngineer
 end
 
 function OnFrameEngineer(self, delta)
-    if (not self.unit:IsDead()) and engineersOverlay then
-        if (self.unit:IsIdle()) then
+    if not self.unit:IsDead() and engineersOverlay then
+        if self.unit:IsIdle() then
             self:Update()
         else
             self:Hide()
@@ -109,8 +109,8 @@ function CreateFactoryOverlay(unit)
     overlay.OnFrame = OnFrameFactory
 end
 function OnFrameFactory(self, delta)
-    if (not self.unit:IsDead()) and factoriesOverlay then
-        if (self.unit:IsIdle()) then
+    if not self.unit:IsDead() and factoriesOverlay then
+        if self.unit:IsIdle() then
             self:SetFrame(1)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
@@ -146,7 +146,7 @@ function CreateSiloOverlay(unit)
 end
 
 function OnFrameSilo(self, delta)
-    if (not self.unit:IsDead()) and tacticalNukesOverlay then
+    if not self.unit:IsDead() and tacticalNukesOverlay then
         local mi = self.unit:GetMissileInfo()
         if (mi.nukeSiloStorageCount > 0) or (mi.tacticalSiloStorageCount > 0) then
             self:Update()
@@ -171,7 +171,7 @@ function CreateMexOverlay(unit)
 end
 
 function OnFrameMex(self, delta)
-    if (not self.unit:IsDead()) and massExtractorsOverlay then
+    if not self.unit:IsDead() and massExtractorsOverlay then
         if self.unit:GetWorkProgress() > 0 then
             self:Update()
         else
@@ -194,16 +194,17 @@ function CreateUnitOverlays()
     local allunits = GetUnits()
     VerifyWV()
     for _, unit in allunits do
-        if (not unit:IsDead()) and not overlays[unit:GetEntityId()] then
-            if engineersOverlay and unit:IsInCategory("ENGINEER") then
+        if not overlays[unit:GetEntityId()] then
+            if supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
+                
+            elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
                 CreateEngineerOverlay(unit)
             elseif factoriesOverlay ~= 0 and unit:IsInCategory("FACTORY") then
                 CreateFactoryOverlay(unit)
-            elseif supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
 
             elseif tacticalNukesOverlay and unit:IsInCategory("SILO") then
                 CreateSiloOverlay(unit)
-            elseif massExtractorsOverlay and unit:IsInCategory("MASSEXTRACTION") and (unit:IsInCategory("STRUCTURE")) then
+            elseif massExtractorsOverlay and unit:IsInCategory("MASSEXTRACTION") and unit:IsInCategory("STRUCTURE") then
                 CreateMexOverlay(unit)
             end
         end
@@ -225,7 +226,7 @@ end
 
 function init(isReplay)
 
-    initOverlayGroup()
+    --initOverlayGroup()
     AddBeatFunction(CreateUnitOverlays, true)
     engineersOption.OnChange = function(self)
         engineersOverlay = self()
