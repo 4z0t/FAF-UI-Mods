@@ -6,17 +6,17 @@ local function CreateReclaimLabel(view, recl)
     label.mass = Bitmap(label)
     label.oldMass = 0 -- fix compare bug
     label.mass:SetTexture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-    LayoutHelpers.AtLeftIn(label.mass, label)
-    LayoutHelpers.AtVerticalCenterIn(label.mass, label)
-    --  LayoutHelpers.SetDimensions(label, 10, 10)
     label.mass.Height:Set(10)
     label.mass.Width:Set(10)
+    LayoutHelpers.AtCenterIn(label.mass, label)
+
 
     label.text = UIUtil.CreateText(label, "", 10, UIUtil.bodyFont)
     label.text:SetColor('ffc7ff8f')
     label.text:SetDropShadow(true)
-    LayoutHelpers.AtLeftIn(label.text, label, 16)
-    LayoutHelpers.AtVerticalCenterIn(label.text, label)
+    LayoutHelpers.Above(label.text, label.mass, 2)
+    LayoutHelpers.AtHorizontalCenterIn(label.text, label)
+
 
     label:DisableHitTest(true)
     label.OnHide = function(self, hidden)
@@ -34,43 +34,44 @@ local function CreateReclaimLabel(view, recl)
     end)
     label.Update = function(self)
         local proj = self.parent.view:Project(self.position)
-        label.PosX:Set(proj.x)
-        label.PosY:Set(proj.y)
+        self.PosX:Set(proj.x)
+        self.PosY:Set(proj.y)
         if self.istexthidden then
             self.text:Hide()
         end
     end
 
-    label.SetText = function(self,value)
+    label.SetText = function(self, value)
 
         local function ComputeLabelProperties(mass)
-            if mass < 10 then 
+            if mass < 10 then
                 return nil, nil
             end
             -- change color according to mass value
-            if mass < 100 then 
+            if mass < 100 then
                 return 'ffc7ff8f', 10
             end
-        
-            if mass < 300 then 
+
+            if mass < 300 then
                 return 'ffd7ff05', 12
             end
-        
-            if mass < 600 then 
+
+            if mass < 600 then
                 return 'ffffeb23', 17
             end
-        
-            if mass < 1000 then 
+
+            if mass < 1000 then
                 return 'ffff9d23', 20
             end
-        
-            if mass < 2000 then 
+
+            if mass < 2000 then
                 return 'ffff7212', 22
             end
-        
+
             -- > 2000
             return 'fffb0303', 25
         end
+
         local color, size = ComputeLabelProperties(value)
         if color then
             self.text:SetFont(UIUtil.bodyFont, size) -- r.mass > 2000
@@ -144,6 +145,7 @@ function UpdateLabels()
         r.max = math.max(r1.max or r1.mass, r2.mass)
         return r
     end
+
     for _, r in onScreenReclaims do
         local proj = view:Project(r.position)
         if (not (proj.x < 0 or proj.y < 0 or proj.y > view.Height() or proj.x > view.Width())) then
@@ -223,8 +225,6 @@ function UpdateLabels()
         end
     end
 end
-
-
 
 -- the reason of conflicts is line 13: have to check for reclaim mode state
 -- Wanna have no conflict? add this line to other mods and remove from conflics UIDs
