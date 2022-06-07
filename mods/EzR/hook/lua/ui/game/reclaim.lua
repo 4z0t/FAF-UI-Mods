@@ -1,4 +1,8 @@
+local MathFloor = math.floor
+
 local LazyVar = import("/lua/lazyvar.lua")
+
+
 
 local function CreateReclaimLabel(view, recl)
     local label = WorldLabel(view, Vector(0, 0, 0))
@@ -108,53 +112,50 @@ end
 local ReclaimTotal
 local LabelRes = LayoutHelpers.ScaleNumber(30)
 
+local function SumReclaim(r1, r2)
+    local massSum = r1.mass + r2.mass
+
+    local r = {
+        mass = massSum,
+        count = r1.count + (r2.count or 1),
+        position = Vector((r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum, r1.position[2],
+            (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum),
+        max = math.max(r1.max or r1.mass, r2.mass)
+    }
+    return r
+end
+
+local function CompareMass(a, b)
+    return a.mass > b.mass
+end
+
 function UpdateLabels()
     local view = import('/lua/ui/game/worldview.lua').viewLeft -- Left screen's camera
-    local heightRes = math.floor(view.Height() / LabelRes)
+    local heightRes = MathFloor(view.Height() / LabelRes)
     local reclaimMatrix = {}
     local secondPassMatrix
     local onScreenReclaimIndex = 1
     local onScreenReclaims = {}
     local onScreenMassTotal = 0
 
-    -- One might be tempted to use a binary insert; however, tests have shown that it takes about 140x more time
     for _, r in Reclaim do
-        -- r.onScreen = OnScreen(view, r.position)
-        --LOG(repr(r))
         if r.mass >= MinAmount then
-
             onScreenReclaims[onScreenReclaimIndex] = r
             onScreenReclaimIndex = onScreenReclaimIndex + 1
         end
     end
 
-    table.sort(onScreenReclaims, function(a, b)
-        return a.mass > b.mass
-    end)
-
-    -- Create/Update as many reclaim labels as we need
-    local function sumReclaim(r1, r2)
-        local massSum = r1.mass + r2.mass
-
-        local r = {
-            mass = massSum,
-            count = r1.count + (r2.count or 1)
-        }
-        r.position = Vector((r1.mass * r1.position[1] + r2.mass * r2.position[1]) / massSum, r1.position[2],
-            (r1.mass * r1.position[3] + r2.mass * r2.position[3]) / massSum)
-        r.max = math.max(r1.max or r1.mass, r2.mass)
-        return r
-    end
-
+    table.sort(onScreenReclaims, CompareMass)
+    
     for _, r in onScreenReclaims do
         local proj = view:Project(r.position)
         if (not (proj.x < 0 or proj.y < 0 or proj.y > view.Height() or proj.x > view.Width())) then
             onScreenMassTotal = onScreenMassTotal + r.mass
-            local rx = math.floor(proj.x / LabelRes)
-            local ry = math.floor(proj.y / LabelRes)
+            local rx = MathFloor(proj.x / LabelRes)
+            local ry = MathFloor(proj.y / LabelRes)
             if reclaimMatrix[ry] then
                 if reclaimMatrix[ry][rx] then
-                    reclaimMatrix[ry][rx] = sumReclaim(reclaimMatrix[ry][rx], r)
+                    reclaimMatrix[ry][rx] = SumReclaim(reclaimMatrix[ry][rx], r)
                 else
                     reclaimMatrix[ry][rx] = {
                         mass = r.mass,
