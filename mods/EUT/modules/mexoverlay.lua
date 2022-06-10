@@ -1,4 +1,3 @@
-local getUnits = import("/mods/common/units.lua").Get
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
@@ -7,7 +6,15 @@ local Prefs = import("/lua/user/prefs.lua")
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 local LazyVar = import("/lua/lazyvar.lua")
 
+local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
+
+local Options = import("/mods/UMT/modules/OptionsWindow.lua")
+
 local overlays = {}
+
+local overlayOption = import("/mods/UMT/modules/OptionVar.lua").Create("EUT", "MexOverlay", true)
+
+local showOverlay = overlayOption()
 
 local function Remove(id)
     overlays[id]:Destroy()
@@ -16,6 +23,13 @@ end
 
 function init()
 
+    overlayOption.OnChange = function (var)
+        showOverlay = var()
+    end
+
+    GlobalOptions.AddOptions("EUT", "ECO UI Tools", {
+        Options.Filter("Show mex overlay", overlayOption)
+    })
 end
 
 local function CreateOverlay(mex)
@@ -50,7 +64,7 @@ local function CreateOverlay(mex)
     end
 
     overlay.OnFrame = function(self, delta)
-        if (not self.mex:IsDead()) then
+        if not self.mex:IsDead() and showOverlay then
             if self.mex:GetWorkProgress() > 0 then
                 self:Update()
             else
@@ -74,11 +88,12 @@ local function VerifyWV()
 end
 
 function UpdateOverlays(mexes)
-    VerifyWV()
-    for _, mex in mexes do
-        if not overlays[mex:GetEntityId()] then
-            overlays[mex:GetEntityId()] = CreateOverlay(mex)
+    if showOverlay then
+        VerifyWV()
+        for _, mex in mexes do
+            if not overlays[mex:GetEntityId()] then
+                overlays[mex:GetEntityId()] = CreateOverlay(mex)
+            end
         end
     end
 end
-
