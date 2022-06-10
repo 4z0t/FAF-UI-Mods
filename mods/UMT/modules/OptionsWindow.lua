@@ -151,11 +151,19 @@ OptionsWindow = Class(Window) {
             Bottom = 800
         }, windowTextures)
         self._optionsGroup = Group(self)
-        LayoutFor(self._optionsGroup):FillFixedBorder(self.ClientGroup, 5):Height(10):ResetBottom():Over(
-            self.ClientGroup):End()
+        LayoutFor(self._optionsGroup)
+            :FillFixedBorder(self.ClientGroup, 5)
+            :Height(10)
+            :ResetBottom()
+            :Over(self.ClientGroup)
+            :End()
 
-        local okBtn = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC _Ok>", 16)
-        LayoutFor(okBtn):Below(self._optionsGroup, 4):AtLeftIn(self._optionsGroup):Over(self._optionsGroup):End()
+        local okBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Ok>', 16)
+        LayoutFor(okBtn)
+            :Below(self._optionsGroup, 4)
+            :AtLeftIn(self._optionsGroup)
+            :Over(self._optionsGroup)
+            :End()
 
         okBtn.OnClick = function(control)
             self:OnClose(true)
@@ -163,9 +171,13 @@ OptionsWindow = Class(Window) {
         self._okBtn = okBtn
         self._colors = colors
 
-        local cancelBtn = UIUtil.CreateButtonStd(self, "/widgets02/small", "<LOC _Cancel>", 16)
-        LayoutFor(cancelBtn):Below(self._optionsGroup, 4):AtRightIn(self._optionsGroup):ResetLeft():Over(
-            self._optionsGroup):End()
+        local cancelBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Cancel>', 16)
+        LayoutFor(cancelBtn)
+            :Below(self._optionsGroup, 4)
+            :AtRightIn(self._optionsGroup)
+            :ResetLeft()
+            :Over(self._optionsGroup)
+            :End()
 
         cancelBtn.OnClick = function(control)
             self:OnClose()
