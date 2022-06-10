@@ -1,6 +1,6 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Main = import('main.lua')
+local Update = import('update.lua')
 local Data = import('data.lua')
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -23,7 +23,7 @@ local function Remove(id)
         overlays[id]:Destroy()
         overlays[id] = nil
     end
-    Main.Remove(id)
+    Update.Remove(id)
     Data.SendData({
         nuke = true,
         remove = true,
@@ -151,7 +151,7 @@ end
 function init(isReplay, options)
     siloOptions = options
     showOverlay = siloOptions.overlay()
-    siloOptions.overlay.OnDirty = function(self)
+    siloOptions.overlay.OnChange = function(self)
         showOverlay = self()
     end
     AddBeatFunction(UpdateListeners, true)
@@ -241,7 +241,7 @@ function CreateUnitOverlay(unit, id)
     overlay.eta:SetDropShadow(true)
     overlay.eta.offsetX = siloOptions.eta.offsetX
     overlay.eta.offsetY = siloOptions.eta.offsetY
-    Main.AtCenterInOffset(overlay.eta, overlay)
+    Update.AtCenterInOffset(overlay.eta, overlay)
 
     overlay.progress = UIUtil.CreateText(overlay, '0%', 9, UIUtil.bodyFont)
     overlay.progress:DisableHitTest()
@@ -250,7 +250,7 @@ function CreateUnitOverlay(unit, id)
 
     overlay.progress.offsetX = siloOptions.progress.offsetX
     overlay.progress.offsetY = siloOptions.progress.offsetY
-    Main.AtCenterInOffset(overlay.progress, overlay)
+    Update.AtCenterInOffset(overlay.progress, overlay)
 
     overlay.count = UIUtil.CreateText(overlay, '0', 14, "Arial Black")
     overlay.count:DisableHitTest()
@@ -259,7 +259,7 @@ function CreateUnitOverlay(unit, id)
 
     overlay.count.offsetX = siloOptions.count.offsetX
     overlay.count.offsetY = siloOptions.count.offsetY
-    Main.AtCenterInOffset(overlay.count, overlay)
+    Update.AtCenterInOffset(overlay.count, overlay)
 
     return overlay
 end
