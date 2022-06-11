@@ -1,0 +1,10 @@
+name = "4z0t's Score Board"
+version = 1
+copyright = ""
+description = ""
+author = "4z0t"
+url = ""
+uid = "4z0ts-score-board-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
