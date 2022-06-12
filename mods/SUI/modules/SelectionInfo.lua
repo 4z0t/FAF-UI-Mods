@@ -87,7 +87,7 @@ SelectionInfo = Class(Bitmap) {
                     energyRate = energyRate - econData["energyRequested"] + econData["energyProduced"]
 
                     local br = 0
-                    if unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") then
+                    if unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") or unit:IsInCategory("SILO") then
                         br = bp.Economy.BuildRate
                     end
                     if unit:IsInCategory("COMMAND") then
