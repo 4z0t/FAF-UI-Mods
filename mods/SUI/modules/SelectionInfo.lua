@@ -5,6 +5,8 @@ local Prefs = import('/lua/user/prefs.lua')
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
+local GetEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements
+
 local VERTICAL_OFFSET = 10
 
 
@@ -79,21 +81,37 @@ SelectionInfo = Class(Bitmap) {
             for index, unit in self._units do
                 if not unit:IsDead() then
                     local econData = unit:GetEconData()
+                    local bp = unit:GetBlueprint()
 
                     massRate = massRate - econData["massRequested"] + econData["massProduced"]
                     energyRate = energyRate - econData["energyRequested"] + econData["energyProduced"]
 
                     local br = 0
                     if unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") then
-                        br = unit:GetBlueprint().Economy.BuildRate
+                        br = bp.Economy.BuildRate
                     end
                     if unit:IsInCategory("COMMAND") then
                         br = unit:GetBuildRate()
                     end
+
+                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
+                        local enhancements = GetEnhancements(unit:GetEntityId())
+                        if enhancements then
+                            for _, ench in enhancements do
+                                if not bp.CategoriesHash[ench] then
+                                    local enhancementBp = bp.Enhancements[ench]
+                                    massCost = massCost + enhancementBp.BuildCostMass
+                                    energyCost = energyCost + enhancementBp.BuildCostEnergy
+                                end
+                            end
+                        end
+                    end
+
                     totalbr = totalbr + br
+
                     if not unit:IsInCategory("COMMAND") then
-                        massCost = massCost + unit:GetBlueprint().Economy.BuildCostMass
-                        energyCost = energyCost + unit:GetBlueprint().Economy.BuildCostEnergy
+                        massCost = massCost + bp.Economy.BuildCostMass
+                        energyCost = energyCost + bp.Economy.BuildCostEnergy
                     end
                 end
             end
