@@ -58,6 +58,8 @@ function SelectAirScoutBuildIntel()
     end
 end
 
+
+
 KeyMapper.SetUserKeyAction("Remove last ququed unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
     category = "orders",
