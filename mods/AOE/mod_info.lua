@@ -1,5 +1,5 @@
 name = "Additional Orders Extension"
-version = 1
+version = 2
 copyright = ""
 description = [[Additional orders combining selection and action and some QoL ones
 * Select ACU / goto ACU / OC mode
@@ -9,7 +9,7 @@ description = [[Additional orders combining selection and action and some QoL on
 * Select All IDLE engineers on screen not ACU]]
 author = "4z0t"
 url = ""
-uid = "additional-orders-extension-v01"
+uid = "additional-orders-extension-v02"
 exclusive = false
 ui_only = true
 conflicts = {}
