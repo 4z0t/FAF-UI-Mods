@@ -3,14 +3,13 @@ local KeyMapper = import("/lua/keymap/keymapper.lua")
 
 -- Select ACU / goto ACU / OC mode
 local lastACUSelectionTime = 0
-local EnterOverchargeMode = import("/lua/ui/game/orders.lua").EnterOverchargeMode
 function ACUSelectOCCG()
     local curTime = GetSystemTimeSeconds()
     local diffTime = curTime - lastACUSelectionTime
     if diffTime > 1.0 then
         local selection = GetSelectedUnits()
         if not table.empty(selection) and table.getn(selection) == 1 and selection[1]:IsInCategory "COMMAND" then
-            EnterOverchargeMode()
+            import("/lua/ui/game/orders.lua").EnterOverchargeMode()
         else
             ConExecute "UI_SelectByCategory +nearest COMMAND"
         end
@@ -48,11 +47,10 @@ function RemoveLastItem()
 end
 
 -- Select nearest air scout / build sensors
-local BuildAction = import("/lua/keymap/hotbuild.lua").buildAction
 function SelectAirScoutBuildIntel()
     local selectedUnits = GetSelectedUnits()
     if selectedUnits then
-        BuildAction "Sensors"
+        import("/lua/keymap/hotbuild.lua").buildAction "Sensors"
     else
         ConExecute "UI_SelectByCategory +nearest AIR INTELLIGENCE"
     end
