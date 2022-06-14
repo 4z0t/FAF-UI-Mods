@@ -1,14 +1,18 @@
 local Prefs = import("/lua/user/prefs.lua")
-local Model = import("model.lua")
 local From = import("/mods/UMT/modules/linq.lua").From
+
+local View = import("views/view.lua")
+local Model = import("model.lua")
+local Share = import("share.lua")
+
 local active
 local activeName
 
 local prefixes = {
-    ["aeon"] = {"ua", "xa", "da", "za"},
-    ["uef"] = {"ue", "xe", "de", "ze"},
-    ["cybran"] = {"ur", "xr", "dr", "zr"},
-    ["seraphim"] = {"xs", "us", "ds", "zs"}
+    ["aeon"] = { "ua", "xa", "da", "za" },
+    ["uef"] = { "ue", "xe", "de", "ze" },
+    ["cybran"] = { "ur", "xr", "dr", "zr" },
+    ["seraphim"] = { "xs", "us", "ds", "zs" }
 }
 local globalBPs
 
@@ -21,6 +25,26 @@ function SaveActive(name)
     if name and name ~= "" then
         Model.SaveHotBuild(name, active)
         activeName = name
+    end
+end
+
+function SaveReceived(name, data)
+    local hotbuilds = From(Model.FetchHotBuildsKeys())
+    local newName = name
+    local index = 1
+
+    while hotbuilds:Contains(newName) do
+        newName = string.format("%s (%d)", name, index)
+        index = index + 1
+    end
+
+    Model.SaveHotBuild(newName, data)
+    View.UpdateItems()
+end
+
+function SendActiveBuildTable()
+    if activeName ~= "" then
+        Share.SendBuildTable(nil, activeName, active)
     end
 end
 
@@ -65,7 +89,8 @@ local function SingleBlueprint(bps)
     end
     return activeFaction, activeBP
 end
-local similars = From({{
+
+local similars = From({ {
     ["aeon"] = "xal0305",
     ["uef"] = "xel0305",
     ["cybran"] = "xrl0305",

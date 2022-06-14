@@ -21,11 +21,11 @@ local BPItem = import('BlueprintItem.lua')
 local BlueprintItem = BPItem.BlueprintItem
 local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
 local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
-local Presenter = import('/mods/HBO/modules/presenter.lua')
+local ViewModel = import('../viewmodel.lua')
 
-local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
+local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
-local singleCategories = {'Land', 'Air', 'Naval', 'Gate'}
+local singleCategories = { 'Land', 'Air', 'Naval', 'Gate' }
 
 local GUI
 function init()
@@ -34,8 +34,12 @@ function init()
     end
 end
 
+function IsActiveUI()
+    return not IsDestroyed(GUI)
+end
+
 function CreateUI(parent)
-    Presenter.SetActive()
+    ViewModel.SetActive()
     local group = Group(parent)
     LayoutHelpers.SetDimensions(group, 1300, 900)
     LayoutHelpers.AtCenterIn(group, parent)
@@ -63,11 +67,11 @@ function CreateUI(parent)
     LayoutHelpers.DepthOverParent(group.DelButton, group)
 
     group.DelButton.OnClick = function(control, modifiers)
-        Presenter.SaveActive()
-        Presenter.SetActive()
+        ViewModel.SaveActive()
+        ViewModel.SetActive()
         group.edit:ClearText()
         group.combo:ClearItems()
-        group.combo:AddItems(Presenter.FetchHotBuilds(true), 1)
+        group.combo:AddItems(ViewModel.FetchHotBuilds(true), 1)
         UpdateUI()
     end
 
@@ -78,17 +82,18 @@ function CreateUI(parent)
 
     group.SaveButton.OnClick = function(control, modifiers)
         local text = group.edit:GetText()
-        Presenter.SaveActive(text)
-        group.combo:ClearItems()
-        local newItems = Presenter.FetchHotBuilds(true)
-        local index = 1
-        for k, v in newItems do
-            if v == text then
-                index = k
-                break
-            end
-        end
-        group.combo:AddItems(newItems, index)
+        ViewModel.SaveActive(text)
+        UpdateItems(text)
+    end
+
+
+    group.ShareButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Share>Share"))
+    LayoutHelpers.AtHorizontalCenterIn(group.ShareButton, group, -300)
+    LayoutHelpers.AtBottomIn(group.ShareButton, group, 5)
+    LayoutHelpers.DepthOverParent(group.ShareButton, group)
+
+    group.ShareButton.OnClick = function(control, modifiers)
+        ViewModel.SendActiveBuildTable()
     end
 
     group.edit = Edit(group)
@@ -101,18 +106,18 @@ function CreateUI(parent)
     end
 
     group.combo = Combo(group, 16, 10)
-    group.combo:AddItems(Presenter.FetchHotBuilds(true), 1)
+    group.combo:AddItems(ViewModel.FetchHotBuilds(true), 1)
     group.combo.OnClick = function(self, index, text)
         self:SetItem(index)
         group.edit:SetText(text)
-        Presenter.SetActive(text)
+        ViewModel.SetActive(text)
         UpdateUI()
     end
 
     LayoutHelpers.AtLeftTopIn(group.combo, group, 50, 20)
     LayoutHelpers.SetWidth(group.combo, 200)
 
-    group.construction = ConstructionScrollArea(group, Presenter.FetchConstructionBlueprints(), 5)
+    group.construction = ConstructionScrollArea(group, ViewModel.FetchConstructionBlueprints(), 5)
     LayoutHelpers.AtLeftTopIn(group.construction, group, 100, 100)
     group.categories = {}
     group.single = Group(group)
@@ -120,18 +125,18 @@ function CreateUI(parent)
     LayoutHelpers.SetHeight(group.single, 500)
     group.single.Width:Set(group.construction.Width)
 
-  local  function CreateSingleCategory(category, catParent)
+    local function CreateSingleCategory(category, catParent)
         local categoryGroup = Group(catParent)
         local name = UIUtil.CreateText(categoryGroup, category, 20, UIUtil.titleFont, true)
         LayoutHelpers.SetDimensions(categoryGroup, 1000, 80)
-        LayoutHelpers.AtLeftTopIn(name, categoryGroup, 0,-15)
-        
+        LayoutHelpers.AtLeftTopIn(name, categoryGroup, 0, -15)
+
         categoryGroup.selectors = {}
         From(skins):Foreach(function(k, skin)
 
             local selector = BlueprintItem(categoryGroup, skin)
-            selector:SetBlueprint(Presenter.FetchBlueprint(category, skin))
-            selector.bps = Presenter.FetchBlueprints(category, skin)
+            selector:SetBlueprint(ViewModel.FetchBlueprint(category, skin))
+            selector.bps = ViewModel.FetchBlueprints(category, skin)
             LayoutHelpers.AtLeftTopIn(selector, categoryGroup, 50 + 200 * (k - 1), 10)
             selector.OnClick = function(self, modifiers, bluprint)
                 if modifiers.Left then
@@ -139,14 +144,14 @@ function CreateUI(parent)
                     local menu = BlueprintSelector(self, self.bps, skin)
                     menu.OnItemClick = function(control, bluprint)
                         self:SetBlueprint(bluprint)
-                        Presenter.SetBlueprint(category, skin, bluprint)
+                        ViewModel.SetBlueprint(category, skin, bluprint)
                         control:Destroy()
                     end
                     self.menu = menu
                     -- end
                 elseif modifiers.Right then
                     self:SetBlueprint()
-                    Presenter.SetBlueprint(category, skin)
+                    ViewModel.SetBlueprint(category, skin)
                 end
             end
             categoryGroup.selectors[skin] = selector
@@ -161,26 +166,27 @@ function CreateUI(parent)
         fillButton.OnClick = function(control, modifiers)
             -- logic for filling alias blueprints
             if modifiers.Left then
-                Presenter.FillBlueprints(category)
+                ViewModel.FillBlueprints(category)
                 for selectorSkin, selector in categoryGroup.selectors do
-                    selector:SetBlueprint(Presenter.FetchBlueprint(category, selectorSkin))
+                    selector:SetBlueprint(ViewModel.FetchBlueprint(category, selectorSkin))
                 end
             elseif modifiers.Right then
                 for selectorSkin, selector in categoryGroup.selectors do
                     selector:SetBlueprint()
-                    Presenter.SetBlueprint(category, selectorSkin)
+                    ViewModel.SetBlueprint(category, selectorSkin)
                 end
             end
         end
         return categoryGroup
     end
+
     local prev
     From(singleCategories):Foreach(function(i, category)
         local categoryGroup = CreateSingleCategory(category, group.single)
         if prev then
             LayoutHelpers.Below(categoryGroup, prev, 10)
         else
-            LayoutHelpers.AtLeftTopIn(categoryGroup, group.single,0, 10)
+            LayoutHelpers.AtLeftTopIn(categoryGroup, group.single, 0, 10)
         end
         group.categories[category] = categoryGroup
         prev = categoryGroup
@@ -191,13 +197,37 @@ end
 
 function UpdateUI()
     if not IsDestroyed(GUI) then
-        GUI.construction:SetSize(Presenter.FetchConstructionCount())
+        GUI.construction:SetSize(ViewModel.FetchConstructionCount())
         GUI.construction:CalcVisible()
         for name, category in GUI.categories do
             for faction, selector in category.selectors do
-                selector:SetBlueprint(Presenter.FetchBlueprint(name, faction))
+                selector:SetBlueprint(ViewModel.FetchBlueprint(name, faction))
             end
         end
+    end
+end
+
+function UpdateItems(item)
+    if not IsDestroyed(GUI) then
+        
+        local curItem
+        if item then
+            curItem = item
+        else
+            _, curItem = GUI.combo:GetItem()
+        end
+        GUI.combo:ClearItems()
+        local items = ViewModel.FetchHotBuilds(true)
+        local index = 1
+        for k, v in items do
+            if v == curItem then
+                index = k
+                break
+            end
+        end
+        
+        GUI.combo:AddItems(items, index)
+
     end
 end
 
@@ -288,7 +318,7 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     SetSize = function(self, size)
-        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then 
+        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then
             self._dataSize = size
         else
             self._dataSize = DEFAULT_CONSTRUCTION_ITEM_COUNT
@@ -331,7 +361,7 @@ ConstructionScrollArea = Class(IScrollable) {
         group.indexText.HandleEvent = function(control, event)
             if event.Type == 'ButtonPress' then -- swap logic for lines
                 if self._swapIndex and self._swapIndex ~= group.id then
-                    Presenter.Swap(self._swapIndex, group.id)
+                    ViewModel.Swap(self._swapIndex, group.id)
                     self._swapIndex = false
                     self:IncreaseSize()
                     self:DecreaseSize()
@@ -365,14 +395,14 @@ ConstructionScrollArea = Class(IScrollable) {
                     local menu = BlueprintSelector(control, control.bps:ToDictionary(), skin)
                     menu.OnItemClick = function(item, bluprint)
                         control:SetBlueprint(bluprint)
-                        Presenter.SetConstructionBlueprint(control.id, skin, bluprint)
+                        ViewModel.SetConstructionBlueprint(control.id, skin, bluprint)
                         self:IncreaseSize()
                         item:Destroy()
                     end
                     control.menu = menu
                     -- end
                 elseif modifiers.Right then
-                    Presenter.SetConstructionBlueprint(control.id, skin)
+                    ViewModel.SetConstructionBlueprint(control.id, skin)
                     control:SetBlueprint()
                     self:DecreaseSize()
                 end
@@ -389,12 +419,12 @@ ConstructionScrollArea = Class(IScrollable) {
         fillButton.OnClick = function(control, modifiers)
             -- logic for filling alias blueprints
             if modifiers.Left then
-                Presenter.FillConstructionBlueprints(group.id)
+                ViewModel.FillConstructionBlueprints(group.id)
                 self:CalcVisible()
             elseif modifiers.Right then
                 for skin, selector in group.selectors do
                     selector:SetBlueprint()
-                    Presenter.SetConstructionBlueprint(selector.id, skin)
+                    ViewModel.SetConstructionBlueprint(selector.id, skin)
                 end
                 self:DecreaseSize()
             end
@@ -413,7 +443,7 @@ ConstructionScrollArea = Class(IScrollable) {
         line.indexText:SetText(tostring(scrollIndex))
         line.id = scrollIndex
         for skin, selector in line.selectors do
-            local bp = Presenter.FetchConstructionBlueprint(scrollIndex, skin)
+            local bp = ViewModel.FetchConstructionBlueprint(scrollIndex, skin)
             selector.id = scrollIndex
             selector:SetBlueprint(bp)
         end
@@ -424,14 +454,14 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     IncreaseSize = function(self)
-        if not Presenter.IsEmpty(self._dataSize) then
+        if not ViewModel.IsEmpty(self._dataSize) then
             self._dataSize = self._dataSize + 1
         end
         self:CalcVisible()
     end,
 
     DecreaseSize = function(self)
-        if Presenter.IsEmpty(self._dataSize) and Presenter.IsEmpty(self._dataSize - 1) and
+        if ViewModel.IsEmpty(self._dataSize) and ViewModel.IsEmpty(self._dataSize - 1) and
             (self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT) then
             self._dataSize = self._dataSize - 1
             self._topLine = math.max(math.min(self._dataSize - self._numLines + 1, self._topLine), 1)
@@ -440,4 +470,3 @@ ConstructionScrollArea = Class(IScrollable) {
     end
 
 }
-
