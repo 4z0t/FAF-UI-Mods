@@ -1,5 +1,5 @@
 function init(isReplay)
-    if exists('/mods/UMT/modules/linq.lua') then
+    if exists("/mods/UMT/mod_info.lua") and import("/mods/UMT/mod_info.lua").version >= 4 then
         local ViewModel = import('viewmodel.lua')
         local Model = import('model.lua')
         local View = import("views/view.lua")
@@ -10,9 +10,7 @@ function init(isReplay)
     else
         ForkThread(function()
             WaitSeconds(4)
-            for i = 1, 10 do
-                print("HotBuild Overhaul requires UI mod tools!!!")
-            end
+            print("HotBuild Overhaul requires UI mod tools!!!")
         end)
     end
 end
