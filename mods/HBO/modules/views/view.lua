@@ -23,15 +23,19 @@ local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
 local BPITEM_HEIGHT = BPItem.BPITEM_HEIGHT
 local ViewModel = import('../viewmodel.lua')
 
-local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
+local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
-local singleCategories = {'Land', 'Air', 'Naval', 'Gate'}
+local singleCategories = { 'Land', 'Air', 'Naval', 'Gate' }
 
 local GUI
 function init()
     if IsDestroyed(GUI) then
         GUI = CreateUI(GetFrame(0))
     end
+end
+
+function IsActiveUI()
+    return not IsDestroyed(GUI)
 end
 
 function CreateUI(parent)
@@ -79,16 +83,17 @@ function CreateUI(parent)
     group.SaveButton.OnClick = function(control, modifiers)
         local text = group.edit:GetText()
         ViewModel.SaveActive(text)
-        group.combo:ClearItems()
-        local newItems = ViewModel.FetchHotBuilds(true)
-        local index = 1
-        for k, v in newItems do
-            if v == text then
-                index = k
-                break
-            end
-        end
-        group.combo:AddItems(newItems, index)
+        UpdateItems(text)
+    end
+
+
+    group.ShareButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Share>Share"))
+    LayoutHelpers.AtHorizontalCenterIn(group.ShareButton, group, -300)
+    LayoutHelpers.AtBottomIn(group.ShareButton, group, 5)
+    LayoutHelpers.DepthOverParent(group.ShareButton, group)
+
+    group.ShareButton.OnClick = function(control, modifiers)
+        ViewModel.SendActiveBuildTable()
     end
 
     group.edit = Edit(group)
@@ -120,12 +125,12 @@ function CreateUI(parent)
     LayoutHelpers.SetHeight(group.single, 500)
     group.single.Width:Set(group.construction.Width)
 
-  local  function CreateSingleCategory(category, catParent)
+    local function CreateSingleCategory(category, catParent)
         local categoryGroup = Group(catParent)
         local name = UIUtil.CreateText(categoryGroup, category, 20, UIUtil.titleFont, true)
         LayoutHelpers.SetDimensions(categoryGroup, 1000, 80)
-        LayoutHelpers.AtLeftTopIn(name, categoryGroup, 0,-15)
-        
+        LayoutHelpers.AtLeftTopIn(name, categoryGroup, 0, -15)
+
         categoryGroup.selectors = {}
         From(skins):Foreach(function(k, skin)
 
@@ -174,13 +179,14 @@ function CreateUI(parent)
         end
         return categoryGroup
     end
+
     local prev
     From(singleCategories):Foreach(function(i, category)
         local categoryGroup = CreateSingleCategory(category, group.single)
         if prev then
             LayoutHelpers.Below(categoryGroup, prev, 10)
         else
-            LayoutHelpers.AtLeftTopIn(categoryGroup, group.single,0, 10)
+            LayoutHelpers.AtLeftTopIn(categoryGroup, group.single, 0, 10)
         end
         group.categories[category] = categoryGroup
         prev = categoryGroup
@@ -198,6 +204,30 @@ function UpdateUI()
                 selector:SetBlueprint(ViewModel.FetchBlueprint(name, faction))
             end
         end
+    end
+end
+
+function UpdateItems(item)
+    if not IsDestroyed(GUI) then
+        
+        local curItem
+        if item then
+            curItem = item
+        else
+            _, curItem = GUI.combo:GetItem()
+        end
+        GUI.combo:ClearItems()
+        local items = ViewModel.FetchHotBuilds(true)
+        local index = 1
+        for k, v in items do
+            if v == curItem then
+                index = k
+                break
+            end
+        end
+        
+        GUI.combo:AddItems(items, index)
+
     end
 end
 
@@ -288,7 +318,7 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     SetSize = function(self, size)
-        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then 
+        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then
             self._dataSize = size
         else
             self._dataSize = DEFAULT_CONSTRUCTION_ITEM_COUNT
@@ -440,4 +470,3 @@ ConstructionScrollArea = Class(IScrollable) {
     end
 
 }
-
