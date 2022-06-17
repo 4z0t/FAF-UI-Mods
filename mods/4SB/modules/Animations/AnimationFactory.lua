@@ -5,6 +5,8 @@
 -- blink
 -- etc
 
+local emptyFunc = function() end
+
 local Animation = import("Animation.lua")
 
 local BaseFactory = Class
@@ -21,12 +23,12 @@ local BaseFactory = Class
     end,
 
     OnStart = function(self, func)
-        self._onStart = func
+        self._onStart = func or emptyFunc
         return self
     end,
 
     OnFinish = function(self, func)
-        self._onFinish = func
+        self._onFinish = func or emptyFunc
         return self
     end,
 
@@ -58,6 +60,4 @@ function AnimationFactory()
     return baseFactory
 end
 
-
 Init()
-

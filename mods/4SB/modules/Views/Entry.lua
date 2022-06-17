@@ -1,12 +1,44 @@
-local Slidable = import("Slidable.lua").Slidable
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = import('/lua/maui/group.lua').Group
 
-Entry = Class(Slidable)
+
+local animationFactory = import("../Animations/AnimationFactory.lua").AnimationFactory()
+
+local animationSpeed = 300
+
+local slideForward = animationFactory
+    :OnStart()
+    :OnFrame(function(control, delta)
+        if control.Right() < control.parent.Right() then
+            return true
+        end
+        control.Right:Set(control.Right() - delta * animationSpeed)
+    end)
+    :OnFinish(function(control)
+        control.Right:Set(control.parent.Right)
+    end)
+    :Create()
+
+local slideBackWards = animationFactory
+    :OnStart()
+    :OnFrame(function(control, delta)
+        if control.Right() - control.parent.Right() > 50 then
+            return true
+        end
+        control.Right:Set(control.Right() + delta * animationSpeed)
+    end)
+    :OnFinish(function(control)
+        LayoutHelpers.AtRightIn(control, control.parent, -50)
+    end)
+    :Create()
+
+
+Entry = Class(Group)
 {
     __init = function(self, parent)
-        Slidable.__init(self, parent)
-
+        Group.__init(self, parent)
+        self.parent = parent
         self._speed = 300
         self._bg = Bitmap(self)
         self._bg:SetSolidColor("ff000000")
@@ -14,22 +46,14 @@ Entry = Class(Slidable)
         LayoutHelpers.SetDimensions(self, 100, 20)
     end,
 
-    --- returns true if reached one of the positions, false if not
-    StopAnimation = function(self)
-        if self._direction == 1 and self.Right() < self.parent.Right() then
-            self.Right:Set(self.parent.Right)
+    HandleEvent = function(self, event)
+        if event.Type == 'MouseExit' then
+            slideBackWards:Apply(self)
             return true
-        end
-        if self._direction == -1 and self.Right() - self.parent.Right() > 50 then
-            LayoutHelpers.AtRightIn(self, self.parent, -50)
+        elseif event.Type == 'MouseEnter' then
+            slideForward:Apply(self)
             return true
         end
         return false
     end,
-
-    OnAnimation = function(self, delta)
-        self.Right:Set(self.Right() - self._direction * delta * self._speed)
-    end,
-
-
 }

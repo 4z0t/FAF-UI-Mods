@@ -5,6 +5,7 @@ local Animator = import("Animator.lua")
 ---@field OnFrame fun(control : Control, delta : number) : boolean if returns true then animation is finished
 ---@field OnFinish fun(control : Control)
 local AnimationMetaTable = {}
+AnimationMetaTable.__index = AnimationMetaTable
 
 
 function AnimationMetaTable:Apply(control)
