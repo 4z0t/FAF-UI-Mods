@@ -3,10 +3,14 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Entry = import("Views/Entry.lua").Entry
 
 
+local Animator = import("Animations/Animator.lua")
+local AnimationFactory = import("Animations/AnimationFactory.lua")
+
 local controls
 
 
 function Main(isReplay)
+
     controls = Group(GetFrame(0))
     controls.Depth:Set(1000)
     LayoutHelpers.SetDimensions(controls, 200, 220)
