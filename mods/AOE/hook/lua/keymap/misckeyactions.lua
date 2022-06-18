@@ -57,6 +57,15 @@ function SelectAirScoutBuildIntel()
 end
 
 
+function SelectNearestIdleTransportOrTransport()
+    local selectedUnits = GetSelectedUnits()
+    if selectedUnits then
+        ConExecute "StartCommandMode order RULEUCC_Transport"
+    else
+        ConExecute "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION"
+    end
+end
+
 
 KeyMapper.SetUserKeyAction("Remove last ququed unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
@@ -64,7 +73,7 @@ KeyMapper.SetUserKeyAction("Remove last ququed unit in factory", {
     order = 17
 })
 
-KeyMapper.SetUserKeyAction("Remove last ququed unit in factory shift", {
+KeyMapper.SetUserKeyAction("Shift Remove last ququed unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
     category = "orders",
     order = 18
@@ -88,7 +97,7 @@ KeyMapper.SetUserKeyAction("Select Nearest IDLE T1 engineer / enter reclaim mode
     order = 21
 })
 
-KeyMapper.SetUserKeyAction("SHIFT Select Nearest IDLE T1 engineer / enter reclaim mode", {
+KeyMapper.SetUserKeyAction("Shift Select Nearest IDLE T1 engineer / enter reclaim mode", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").ReclaimSelectIDLENearestT1()",
     category = "selection",
     order = 22
@@ -101,8 +110,20 @@ KeyMapper.SetUserKeyAction("Select nearest air scout / build sensors", {
     order = 23
 })
 
-KeyMapper.SetUserKeyAction("SHIFT Select nearest air scout / build sensors", {
+KeyMapper.SetUserKeyAction("Shift Select nearest air scout / build sensors", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectAirScoutBuildIntel()",
     category = "selection",
     order = 24
+})
+
+KeyMapper.SetUserKeyAction("Select nearest idle transport / transport order", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectNearestIdleTransportOrTransport()",
+    category = "selection",
+    order = 25
+})
+
+KeyMapper.SetUserKeyAction("Shift Select nearest idle transport / transport order", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectNearestIdleTransportOrTransport()",
+    category = "selection",
+    order = 26
 })
