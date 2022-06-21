@@ -54,6 +54,7 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
 {
     StartWith = function(self, startAlpha)
         self._startAlpha = math.clamp(startAlpha, 0., 1.)
+        self._isStart = true
         return self
     end,
 
@@ -86,8 +87,13 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
     end,
 
     Create = function(self)
-        if not (self._endAlpha and self._startAlpha and self._direction and self._duration) then
+        if not (self._endAlpha and self._direction and self._duration) then
             error("Not complete Alpha animation")
+        end
+        if self._direction == 1 then
+            self._startAlpha = self._startAlpha or 0
+        else
+            self._startAlpha = self._startAlpha or 1
         end
 
         if (self._endAlpha - self._startAlpha) * self._direction <= 0 then
@@ -100,6 +106,7 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         local duration = self._duration
         local diff = endAlpha - startAlpha
         local applyToChildren = self._children
+
 
         if direction == 1 then
             self._onFrame = function(control, delta)
@@ -117,8 +124,12 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
             end
         end
 
-        self._onStart = function(control)
-            control:SetAlpha(startAlpha, applyToChildren)
+        if self._isStart then
+            self._onStart = function(control)
+                control:SetAlpha(startAlpha, applyToChildren)
+            end
+        else
+            self:OnStart()
         end
         self._onFinish = function(control)
             control:SetAlpha(endAlpha, applyToChildren)
@@ -129,6 +140,7 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         self._direction = false
         self._duration = false
         self._children = false
+        self._isStart = false
         return BaseAnimationFactory.Create(self)
     end
 }
