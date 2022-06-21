@@ -1,12 +1,12 @@
 local Group = import('/lua/maui/group.lua').Group
 
 ---@class Animator : Control
+---@field _controls table<Control, Animation>
 Animator = Class(Group)
 {
-    _controls = {},
-
     __init = function(self, parent)
         Group.__init(self, parent)
+        self._controls = {}
         self.Left:Set(0)
         self.Top:Set(0)
         self.Width:Set(0)
@@ -73,5 +73,6 @@ function StopAnimation(control)
         animator:Remove(control)
     end
 end
+
 
 Init()
