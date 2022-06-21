@@ -80,6 +80,11 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         return self
     end,
 
+    ApplyToChildren = function(self)
+        self._children = true
+        return self
+    end,
+
     Create = function(self)
         if not (self._endAlpha and self._startAlpha and self._direction and self._duration) then
             error("Not complete Alpha animation")
@@ -94,34 +99,36 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         local direction = self._direction
         local duration = self._duration
         local diff = endAlpha - startAlpha
+        local applyToChildren = self._children
 
         if direction == 1 then
             self._onFrame = function(control, delta)
                 if control:GetAlpha() >= endAlpha then
                     return true
                 end
-                control:SetAlpha(math.clamp(control:GetAlpha() + delta * diff / duration, 0., 1.))
+                control:SetAlpha(math.clamp(control:GetAlpha() + delta * diff / duration, 0., 1.), applyToChildren)
             end
         else
             self._onFrame = function(control, delta)
                 if control:GetAlpha() <= endAlpha then
                     return true
                 end
-                control:SetAlpha(math.clamp(control:GetAlpha() + delta * diff / duration, 0., 1.))
+                control:SetAlpha(math.clamp(control:GetAlpha() + delta * diff / duration, 0., 1.), applyToChildren)
             end
         end
 
         self._onStart = function(control)
-            control:SetAlpha(startAlpha)
+            control:SetAlpha(startAlpha, applyToChildren)
         end
         self._onFinish = function(control)
-            control:SetAlpha(endAlpha)
+            control:SetAlpha(endAlpha, applyToChildren)
         end
 
         self._startAlpha = false
         self._endAlpha = false
         self._direction = false
         self._duration = false
+        self._children = false
         return BaseAnimationFactory.Create(self)
     end
 }
