@@ -5,8 +5,22 @@ local Entry = import("Views/Entry.lua").Entry
 
 local Animator = import("Animations/Animator.lua")
 local AnimationFactory = import("Animations/AnimationFactory.lua")
+local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
 
 local controls
+
+local slideBackWards = AnimationFactory.GetAnimationFactory()
+    :OnStart()
+    :OnFrame(function(control, delta)
+        if control.Right() - control.parent.Right() > 50 then
+            return true
+        end
+        control.Right:Set(control.Right() + delta * 300)
+    end)
+    :OnFinish(function(control)
+        LayoutHelpers.AtRightIn(control, control.parent, -50)
+    end)
+    :Create()
 
 
 function Main(isReplay)
@@ -26,6 +40,8 @@ function Main(isReplay)
             LayoutHelpers.AtRightIn(controls.entries[i], controls)
         end
     end
+    local sa = SequentialAnimation(slideBackWards, 0.1)
+    sa:Apply(controls.entries)
 
 
 
