@@ -35,8 +35,11 @@ Animator = Class(Group)
     end,
 
     Remove = function(self, control)
-        self._controls[control].OnFinish(control)
-        self._controls[control] = nil
+        local animation = self._controls[control]
+        if animation then
+            animation.OnFinish(control)
+            self._controls[control] = nil
+        end
         if table.empty(self._controls) and self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(false)
         end
@@ -61,6 +64,14 @@ function ApplyAnimation(control, animation)
     end
 end
 
-
+---comment
+---@param control Control
+function StopAnimation(control)
+    if IsDestroyed(animator) then
+        error("There is no animator to stop animation")
+    else
+        animator:Remove(control)
+    end
+end
 
 Init()
