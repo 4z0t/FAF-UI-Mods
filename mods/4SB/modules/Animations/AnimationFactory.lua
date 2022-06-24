@@ -115,17 +115,33 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
                 control:SetAlpha(math.clamp(control:GetAlpha() + delta * diff / duration, 0., 1.), applyToChildren)
             end
         end
-
-        if self._isStart then
+        if self._onStart then
+            local OnStart = self._onStart
             self._onStart = function(control)
                 control:SetAlpha(startAlpha, applyToChildren)
+                OnStart(control)
             end
         else
-            self:OnStart()
+            if self._isStart then
+                self._onStart = function(control)
+                    control:SetAlpha(startAlpha, applyToChildren)
+                end
+            else
+                self:OnStart()
+            end
         end
-        self._onFinish = function(control)
-            control:SetAlpha(endAlpha, applyToChildren)
+        if self._onFinish then
+            local OnFinish = self._onFinish
+            self._onFinish = function(control)
+                control:SetAlpha(endAlpha, applyToChildren)
+                OnFinish(control)
+            end
+        else
+            self._onFinish = function(control)
+                control:SetAlpha(endAlpha, applyToChildren)
+            end
         end
+
 
         self._startAlpha = false
         self._endAlpha = false
@@ -136,6 +152,8 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         return BaseAnimationFactory.Create(self)
     end
 }
+
+
 
 local baseFactory
 local alphaAnimationFactory

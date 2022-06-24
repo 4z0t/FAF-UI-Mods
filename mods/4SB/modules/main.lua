@@ -1,11 +1,15 @@
 local Group = import('/lua/maui/group.lua').Group
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Entry = import("Views/Entry.lua").Entry
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local UIUtil = import('/lua/ui/uiutil.lua')
 
+local Entry = import("Views/Entry.lua").Entry
+local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 
 local Animator = import("Animations/Animator.lua")
 local AnimationFactory = import("Animations/AnimationFactory.lua")
 local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
+
 
 local controls
 
@@ -33,11 +37,11 @@ local colors = {
 }
 
 function Main(isReplay)
-
-    controls = Group(GetFrame(0))
+    local parent = GetFrame(0)
+    controls = Group(parent)
     controls.Depth:Set(1000)
     LayoutHelpers.SetDimensions(controls, 200, 220)
-    LayoutHelpers.AtLeftTopIn(controls, GetFrame(0), 200, 200)
+    LayoutHelpers.AtLeftTopIn(controls, parent, 200, 200)
     controls.entries = {}
     for i = 1, 7 do
         controls.entries[i] = Entry(controls)
@@ -56,6 +60,26 @@ function Main(isReplay)
     local sa = SequentialAnimation(slideBackWards, 0.1, 1)
     sa:Apply(controls.entries)
 
+    local eg = ExpandableGroup(parent, 200, 40)
+    eg._bg = Bitmap(eg)
+    eg._bg:SetSolidColor("77000000")
+    LayoutHelpers.FillParent(eg._bg, eg._expand)
+    LayoutHelpers.AtLeftTopIn(eg, parent, 600, 200)
+    eg:AddControls({
+        UIUtil.CreateText(eg, "text 1", 16),
+        UIUtil.CreateText(eg, "text 2", 16),
+        UIUtil.CreateText(eg, "text 3", 16) })
+    eg:EnableHitTest()
+    eg.HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            if self._isExpanded then
+                self:Contract()
+            else
+                self:Expand()
+            end
+        end
+    end
+    eg.Depth:Set(1000)
 
 
 
