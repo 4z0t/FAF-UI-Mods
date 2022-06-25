@@ -7,19 +7,17 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 
-local expandSpeed = 300
+local expandSpeed = 1000
 
 local expandAnimation = animationFactory
-    :OnStart(function(control)
-        control._animationIndex = 1
-    end)
+    :OnStart()
     :OnFrame(function(control, delta)
-        local n = table.getn(control._controls)
+        local n = table.getn(control._controls) + 1
         local height = control.Height()
         local expandHeight = control._expand.Height()
         if (control._animationIndex + 1) * height < expandHeight then
-            control._animationIndex = control._animationIndex + 1
             control:OnExpandControl()
+            control._animationIndex = control._animationIndex + 1
         end
 
         if n * height < expandHeight then
@@ -28,7 +26,7 @@ local expandAnimation = animationFactory
         control._expand.Height:Set(expandHeight + delta * expandSpeed)
     end)
     :OnFinish(function(control)
-        local n = table.getn(control._controls)
+        local n = table.getn(control._controls) + 1
         local height = control.Height()
         control._expand.Height:Set(n * height)
         control._isExpanded = true
@@ -36,16 +34,14 @@ local expandAnimation = animationFactory
     :Create()
 
 local contractAnimation = animationFactory
-    :OnStart(function(control)
-
-    end)
+    :OnStart()
     :OnFrame(function(control, delta)
         local n = table.getn(control._controls)
         local height = control.Height()
         local expandHeight = control._expand.Height()
         if (control._animationIndex - 1) * height > expandHeight then
-            control:OnContractControl()
             control._animationIndex = control._animationIndex - 1
+            control:OnContractControl()
         end
 
         if height > expandHeight then
@@ -61,7 +57,7 @@ local contractAnimation = animationFactory
     end)
     :Create()
 
-local duration = 0.2
+local duration = 0.05
 
 local appearAnimation = alphaAnimationFactory
     :StartWith(0)
@@ -82,6 +78,7 @@ local fadeAnimation = alphaAnimationFactory
     :ApplyToChildren()
     :OnFinish(function(control)
         LayoutHelpers.AtCenterIn(control, control:GetParent())
+        control:Hide()
     end)
     :Create()
 
@@ -95,7 +92,7 @@ ExpandableGroup = Class(Group)
         LayoutHelpers.AtLeftTopIn(self._expand, self)
         LayoutHelpers.SetDimensions(self._expand, width, height)
         self._controls       = {}
-        self._current        = 1
+        self._active         = false
         self._animationIndex = 1
         self._isExpanded     = false
     end,
@@ -105,8 +102,9 @@ ExpandableGroup = Class(Group)
 
         self._controls = {}
         for i, control in controls do
+            LayoutHelpers.DepthOverParent(control, self, 5)
             if i == default then
-                table.insert(self._controls, 1, control)
+                self._active = control
                 control:Show()
             else
                 table.insert(self._controls, control)
@@ -136,10 +134,10 @@ ExpandableGroup = Class(Group)
     OnExpandControl = function(self)
         local index = self._animationIndex
         local control = self._controls[index]
-        local indexOffset = (index - 0.5)
+        local indexOffset = (index + 0.5)
         LayoutHelpers.AtHorizontalCenterIn(control, self)
-        control:Show()
         control.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * control.Height() end)
+        control:Show()
         appearAnimation:Apply(control)
     end,
 
