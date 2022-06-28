@@ -68,7 +68,7 @@ function Main(isReplay)
     LayoutHelpers.AtLeftTopIn(eg, parent, 600, 200)
     eg:AddControls((function()
         local t = {}
-        for i = 1, 10 do
+        for i = 1, 3 do
             table.insert(t, UIUtil.CreateText(eg, "text " .. i, 16))
         end
         return t

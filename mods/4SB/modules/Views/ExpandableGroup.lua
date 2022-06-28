@@ -36,7 +36,6 @@ local expandAnimation = animationFactory
 local contractAnimation = animationFactory
     :OnStart()
     :OnFrame(function(control, delta)
-        local n = table.getn(control._controls)
         local height = control.Height()
         local expandHeight = control._expand.Height()
         if (control._animationIndex - 1) * height > expandHeight then

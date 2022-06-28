@@ -37,7 +37,7 @@ ExpandableSelectionGroup = Class(ExpandableGroup)
         if index == self._active._id then
             return
         end
-        
+
         local newActive
         for i, control in self._controls do
             if control._id == index then
@@ -51,11 +51,17 @@ ExpandableSelectionGroup = Class(ExpandableGroup)
         self._controls[index] = oldActive
         self._active = newActive
         local indexOffset = (index + 0.5)
-        
-        LayoutHelpers.AtCenterIn(newActive, self)
-        LayoutHelpers.AtHorizontalCenterIn(oldActive, self)
-        oldActive.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * oldActive.Height() end)
 
+        if self._isExpanded then
+            LayoutHelpers.AtCenterIn(newActive, self)
+            LayoutHelpers.AtHorizontalCenterIn(oldActive, self)
+            oldActive.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * oldActive.Height() end)
+        else
+            newActive:Show()
+            oldActive:Hide()
+        end
+
+        return newActive, oldActive
     end
 
 }
