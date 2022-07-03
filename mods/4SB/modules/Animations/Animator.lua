@@ -19,7 +19,9 @@ Animator = Class(Group)
     OnFrame = function(self, delta)
         local controlsStates = self._controlsStates
         for control, animation in self._controls do
-            if animation.OnFrame(control, delta, controlsStates[control]) then
+            if IsDestroyed(control) then
+                self:Remove(control, true)
+            elseif animation.OnFrame(control, delta, controlsStates[control]) then
                 self:Remove(control)
             end
         end
@@ -37,7 +39,12 @@ Animator = Class(Group)
         end
     end,
 
-    Remove = function(self, control)
+    Remove = function(self, control, skip)
+        if skip then
+            self._controls[control] = nil
+            self._controlsStates[control] = nil
+            return
+        end
         local animation = self._controls[control]
         if animation then
             animation.OnFinish(control, self._controlsStates[control])
