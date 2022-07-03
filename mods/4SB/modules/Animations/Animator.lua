@@ -2,11 +2,13 @@ local Group = import('/lua/maui/group.lua').Group
 
 ---@class Animator : Control
 ---@field _controls table<Control, Animation>
+---@field _controlsStates table<Control, ControlState>
 Animator = Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
         self._controls = {}
+        self._controlsStates = {}
         self.Left:Set(0)
         self.Top:Set(0)
         self.Width:Set(0)
@@ -15,8 +17,9 @@ Animator = Class(Group)
     end,
 
     OnFrame = function(self, delta)
+        local controlsStates = self._controlsStates
         for control, animation in self._controls do
-            if animation.OnFrame(control, delta) then
+            if animation.OnFrame(control, delta, controlsStates[control]) then
                 self:Remove(control)
             end
         end
@@ -28,7 +31,7 @@ Animator = Class(Group)
     ---@param animation Animation
     Add = function(self, control, animation)
         self._controls[control] = animation
-        animation.OnStart(control)
+        self._controlsStates[control] = animation.OnStart(control, self._controlsStates[control])
         if not self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(true)
         end
@@ -37,8 +40,9 @@ Animator = Class(Group)
     Remove = function(self, control)
         local animation = self._controls[control]
         if animation then
-            animation.OnFinish(control)
+            animation.OnFinish(control, self._controlsStates[control])
             self._controls[control] = nil
+            self._controlsStates[control] = nil
         end
         if table.empty(self._controls) and self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(false)
@@ -73,6 +77,5 @@ function StopAnimation(control)
         animator:Remove(control)
     end
 end
-
 
 Init()
