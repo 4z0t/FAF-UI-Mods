@@ -29,9 +29,9 @@ Animator = Class(Group)
     ---@param self Animator
     ---@param control Control
     ---@param animation Animation
-    Add = function(self, control, animation)
+    Add = function(self, control, animation, ...)
         self._controls[control] = animation
-        self._controlsStates[control] = animation.OnStart(control, self._controlsStates[control])
+        self._controlsStates[control] = animation.OnStart(control, self._controlsStates[control], unpack(arg))
         if not self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(true)
         end
@@ -60,11 +60,11 @@ end
 ---comment
 ---@param control Control
 ---@param animation Animation
-function ApplyAnimation(control, animation)
+function ApplyAnimation(control, animation, ...)
     if IsDestroyed(animator) then
         error("There is no animator to animate controls")
     else
-        animator:Add(control, animation)
+        animator:Add(control, animation, unpack(arg))
     end
 end
 
