@@ -10,8 +10,8 @@ local AnimationMetaTable = {}
 AnimationMetaTable.__index = AnimationMetaTable
 
 
-function AnimationMetaTable:Apply(control)
-    Animator.ApplyAnimation(control, self)
+function AnimationMetaTable:Apply(control, ...)
+    Animator.ApplyAnimation(control, self, unpack(arg))
 end
 
 function Create(onStart,
