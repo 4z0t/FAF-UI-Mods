@@ -10,6 +10,10 @@ local AnimationMetaTable = {}
 AnimationMetaTable.__index = AnimationMetaTable
 
 
+
+---applies animation to given control
+---@param control Control
+---@param ... any
 function AnimationMetaTable:Apply(control, ...)
     Animator.ApplyAnimation(control, self, unpack(arg))
 end

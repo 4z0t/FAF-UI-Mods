@@ -40,17 +40,16 @@ Animator = Class(Group)
     end,
 
     Remove = function(self, control, skip)
-        if skip then
-            self._controls[control] = nil
-            self._controlsStates[control] = nil
-            return
+        if not skip then
+            local animation = self._controls[control]
+            if animation then
+                animation.OnFinish(control, self._controlsStates[control])
+            end
         end
-        local animation = self._controls[control]
-        if animation then
-            animation.OnFinish(control, self._controlsStates[control])
-            self._controls[control] = nil
-            self._controlsStates[control] = nil
-        end
+
+        self._controls[control] = nil
+        self._controlsStates[control] = nil
+        
         if table.empty(self._controls) and self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(false)
         end
@@ -64,9 +63,10 @@ function Init()
     animator = Animator(GetFrame(0))
 end
 
----comment
+---global animator applies animation to control with additional args
 ---@param control Control
 ---@param animation Animation
+---@param ... any
 function ApplyAnimation(control, animation, ...)
     if IsDestroyed(animator) then
         error("There is no animator to animate controls")
