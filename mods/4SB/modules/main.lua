@@ -10,6 +10,9 @@ local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").Ex
 local Animator = import("Animations/Animator.lua")
 local AnimationFactory = import("Animations/AnimationFactory.lua")
 local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
+local Utils = import("Utils.lua")
+
+local ScoreBoard = import("ScoreBoard.lua").ScoreBoard
 
 
 local controls
@@ -92,5 +95,6 @@ function Main(isReplay)
     eg.Depth:Set(1000)
 
 
-
+    Utils.GetArmiesFormattedTable()
+    local sb = ScoreBoard(GetFrame(0))
 end
