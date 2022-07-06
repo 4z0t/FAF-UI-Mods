@@ -77,11 +77,11 @@ end
 
 ---comment
 ---@param control Control
-function StopAnimation(control)
+function StopAnimation(control, skip)
     if IsDestroyed(animator) then
         error("There is no animator to stop animation")
     else
-        animator:Remove(control)
+        animator:Remove(control, skip)
     end
 end
 

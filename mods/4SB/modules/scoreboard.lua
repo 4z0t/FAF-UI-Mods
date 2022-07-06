@@ -19,6 +19,7 @@ ScoreBoard = Class(Group)
             :Height(100)
             :Over(GetFrame(0), 1000)
             :AtRightTopIn(GetFrame(0), 0, 20)
+            :DisableHitTest()
     end,
 
     _InitArmyViews = function(self)
@@ -27,16 +28,29 @@ ScoreBoard = Class(Group)
 
         -- sorting for better look
         table.sort(armiesData, function(a, b)
+            if a.isAlly and b.isAlly then
+                return a.id < b.id
+            end
+            if a.isAlly then
+                return true
+            end
+            if b.isAlly then
+                return false
+            end
             if a.teamId ~= b.teamId then
                 return a.teamId < b.teamId
             end
             return a.id < b.id
-            --return a.teamId * 16 + a.id > b.teamId * 16 + b.id
         end)
 
-
+        local last
         for i, armyData in armiesData do
-            local armyView = ArmyViews.ArmyView(self)
+            local armyView
+            if armyData.isAlly then
+                armyView = ArmyViews.AllyView(self)
+            else
+                armyView = ArmyViews.ArmyView(self)
+            end
             armyView:SetStaticData(
                 armyData.id,
                 armyData.name,
@@ -49,10 +63,14 @@ ScoreBoard = Class(Group)
                     :AtRightTopIn(self)
             else
                 LayoutFor(armyView)
-                    :AnchorToBottom(self._lines[i - 1])
+                    :AnchorToBottom(self._lines[i - 1], 2)
                     :Right(self.Right)
             end
+            last = armyView
             self._lines[i] = armyView
+        end
+        if last then
+            self.Bottom:Set(last.Bottom)
         end
     end,
 

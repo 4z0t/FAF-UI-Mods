@@ -96,5 +96,5 @@ function Main(isReplay)
 
 
     Utils.GetArmiesFormattedTable()
-    local sb = ScoreBoard(GetFrame(0))
+    --local sb = ScoreBoard(GetFrame(0))
 end
