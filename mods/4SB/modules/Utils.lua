@@ -2,7 +2,6 @@ local isReplay = import("/lua/ui/game/gamemain.lua").GetReplayState()
 local sessionInfo = SessionGetScenarioInfo()
 
 local armiesFormattedTable
-local teams
 
 function GetSmallFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].SmallIcon
@@ -14,7 +13,6 @@ function GetArmiesFormattedTable()
         if isReplay then
 
         else
-            reprsl(sessionInfo)
             local focusArmy = GetFocusArmy()
             for armyIndex, armyData in GetArmiesTable().armiesTable do
                 if not armyData.civilian and armyData.showScore then
@@ -23,10 +21,11 @@ function GetArmiesFormattedTable()
                     local name     = nickname
                     if clanTag ~= "" then
                         name = string.format("[%s] %s", clanTag, nickname)
-                    end 
+                    end
                     local data = {
                         faction = armyData.faction,
                         name = name,
+                        nickname = armyData.nickname,
                         color = armyData.color,
                         isAlly = IsAlly(focusArmy, armyIndex),
                         id = armyIndex,
@@ -36,12 +35,12 @@ function GetArmiesFormattedTable()
                 end
             end
 
-            teams = {}
+            local teams = {}
             for _, armyData in armiesFormattedTable do
                 if table.empty(teams) then
                     armyData.teamColor = armyData.color
                     armyData.teamId = armyData.id
-                    table.insert(teams, {armyData})
+                    table.insert(teams, { armyData })
                 else
                     for _, team in teams do
                         if IsAlly(team[1].id, armyData.id) then
@@ -54,16 +53,23 @@ function GetArmiesFormattedTable()
                     if not armyData.teamColor then
                         armyData.teamColor = armyData.color
                         armyData.teamId = armyData.id
-                        table.insert(teams, {armyData})
+                        table.insert(teams, { armyData })
                     end
                 end
             end
-
-            reprsl(teams)
-            reprsl(armiesFormattedTable)
         end
     end
     return armiesFormattedTable
 end
 
-
+function FormatNumber(n)
+    if (math.abs(n) < 1000) then
+        return string.format("%01.0f", n)
+    elseif (math.abs(n) < 10000) then
+        return string.format("%01.1fk", n / 1000)
+    elseif (math.abs(n) < 1000000) then
+        return string.format("%01.0fk", n / 1000)
+    else
+        return string.format("%01.1fm", n / 1000000)
+    end
+end

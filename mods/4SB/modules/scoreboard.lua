@@ -24,6 +24,7 @@ ScoreBoard = Class(Group)
 
     _InitArmyViews = function(self)
         self._lines = {}
+        self._armyViews = {}
         local armiesData = Utils.GetArmiesFormattedTable()
 
         -- sorting for better look
@@ -68,6 +69,7 @@ ScoreBoard = Class(Group)
             end
             last = armyView
             self._lines[i] = armyView
+            self._armyViews[armyData.id] = armyView
         end
         if last then
             self.Bottom:Set(last.Bottom)
@@ -75,7 +77,16 @@ ScoreBoard = Class(Group)
     end,
 
     Update = function(self, data)
-
+        if data then
+            for i, armyView in  self._armyViews do
+                armyView:Update(data[i].resources)
+            end
+            -- for i, armyData in data do
+            --     if self._armyViews[i] then
+            --         self._armyViews[i]:Update(armyData.resources)
+            --     end
+            -- end
+        end
     end
 }
 

@@ -9,6 +9,7 @@ local Animator = import("../Animations/Animator.lua")
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local Utils = import("../Utils.lua")
+local FormatNumber = Utils.FormatNumber
 
 local Border = import("Border.lua").Border
 
@@ -58,8 +59,9 @@ ArmyView = Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
-
         self.parent = parent
+        
+        self.id = -1
 
         self._bg = Bitmap(self)
 
@@ -122,7 +124,7 @@ ArmyView = Class(Group)
     end,
 
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor)
-        self._id = armyId
+        self.id = armyId
 
         self._color:SetSolidColor(armyColor)
 
@@ -139,6 +141,10 @@ ArmyView = Class(Group)
         self._name:SetFont(armyViewTextFont, armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
+    end,
+
+    Update = function(self, data)
+
     end
 }
 
@@ -249,7 +255,26 @@ AllyView = Class(ArmyView)
         end
 
         return false
+    end,
+
+    Update = function(self, data)
+        if self.id == GetFocusArmy() then
+            -- self._energy:Hide()
+            -- self._mass:Hide()
+
+        else
+        end
+        if data then
+            self._energy:SetText(FormatNumber(data.energyin.rate * 10))
+            self._mass:SetText(FormatNumber(data.massin.rate * 10))
+
+        else
+            self._energy:SetText("")
+            self._mass:SetText("")
+        end
+
     end
+
 
 
 }
