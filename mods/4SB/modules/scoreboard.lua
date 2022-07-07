@@ -45,9 +45,10 @@ ScoreBoard = Class(Group)
         end)
 
         local last
+        local isObserver = IsObserver()
         for i, armyData in armiesData do
             local armyView
-            if armyData.isAlly then
+            if armyData.isAlly or isObserver then
                 armyView = ArmyViews.AllyView(self)
             else
                 armyView = ArmyViews.ArmyView(self)
@@ -96,7 +97,7 @@ ReplayScoreBoard = Class(ScoreBoard)
         ScoreBoard.__init(self, parent)
     end,
 
-    Update = function(self, data)
+    -- Update = function(self, data)
 
-    end
+    -- end
 }

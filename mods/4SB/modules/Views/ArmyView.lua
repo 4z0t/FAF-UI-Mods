@@ -10,8 +10,9 @@ local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimati
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local Utils = import("../Utils.lua")
 local FormatNumber = Utils.FormatNumber
-
 local Border = import("Border.lua").Border
+local ShareManager = import("../ShareManager.lua")
+
 
 local bgColor = UIUtil.disabledColor
 local bgColor = 'ff000000'
@@ -60,7 +61,7 @@ ArmyView = Class(Group)
     __init = function(self, parent)
         Group.__init(self, parent)
         self.parent = parent
-        
+
         self.id = -1
 
         self._bg = Bitmap(self)
@@ -166,27 +167,41 @@ AllyView = Class(ArmyView)
         self._energy:SetText("0")
 
 
-        -- self._massBtn.HandleEvent = function(control, event)
-        --     if event.Type == "MouseEnter" then
-        --         --Animator.StopAnimation(self, true)
-        --         return false
-        --     end
-        --     return true
-        -- end
-        -- self._energyBtn.HandleEvent = function(control, event)
-        --     if event.Type == "MouseEnter" then
-        --         --Animator.StopAnimation(self, true)
-        --         return false
-        --     end
-        --     return true
-        -- end
-        -- self._unitsBtn.HandleEvent = function(control, event)
-        --     if event.Type == "MouseEnter" then
-        --         --Animator.StopAnimation(self, true)
-        --         return false
-        --     end
-        --     return true
-        -- end
+        self._massBtn.HandleEvent = function(control, event)
+            if event.Type == "ButtonPress" then
+                if event.Modifiers.Left then
+                    ShareManager.GiveMassToPlayer(self.id)
+                elseif event.Modifiers.Right then
+                    ShareManager.RequestMassFromPlayer(self.id)
+                else
+
+                end
+                return true
+            end
+        end
+        self._energyBtn.HandleEvent = function(control, event)
+            if event.Type == "ButtonPress" then
+                if event.Modifiers.Left then
+                    ShareManager.GiveEnergyToPlayer(self.id)
+                elseif event.Modifiers.Right then
+                    ShareManager.RequestEnergyFromPlayer(self.id)
+                else
+                end
+                return true
+            end
+        end
+        self._unitsBtn.HandleEvent = function(control, event)
+            if event.Type == "ButtonPress" then
+                if event.Modifiers.Left then
+                    ShareManager.GiveUnitsToPlayer(self.id)
+                elseif event.Modifiers.Right then
+                    ShareManager.RequestUnitFromPlayer(self.id)
+                else
+                end
+                return true
+            end
+
+        end
     end,
 
     _Layout = function(self)
