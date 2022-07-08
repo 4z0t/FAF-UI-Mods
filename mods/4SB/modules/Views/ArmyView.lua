@@ -91,7 +91,7 @@ ArmyView = Class(Group)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
-            :Alpha(0.9)
+            --:Alpha(0.9)
             :Width(3)
             :DisableHitTest()
 
@@ -279,9 +279,10 @@ AllyView = Class(ArmyView)
 
         else
         end
-        if data then
-            self._energy:SetText(FormatNumber(data.energyin.rate * 10))
-            self._mass:SetText(FormatNumber(data.massin.rate * 10))
+        local resources = data.resources
+        if resources then
+            self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
+            self._mass:SetText(FormatNumber(resources.massin.rate * 10))
 
         else
             self._energy:SetText("")
@@ -292,4 +293,16 @@ AllyView = Class(ArmyView)
 
 
 
+}
+
+
+ReplayArmyView = Class(ArmyView)
+{
+    __init = function (self, parent)
+        ArmyView.__init(self, parent)
+    end,
+
+    Update = function (self, data)
+        
+    end
 }

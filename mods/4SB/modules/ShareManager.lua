@@ -2,12 +2,23 @@ local FindClients = import('/lua/ui/game/chat.lua').FindClients
 local armiesTable = GetArmiesTable().armiesTable
 local FormatNumber = import("Utils.lua").FormatNumber
 
+local function SendMessage(text, to)
+    to = to or "allies"
+
+    SessionSendChatMessage(FindClients(),
+        {
+            from = GetArmiesTable().armiesTable[GetFocusArmy()].nickname,
+            to = to,
+            Chat = true,
+            text = text
+        })
+end
+
 local function GiveResourcesToPlayer(resourceType, id)
-    local GetScoreCache = import("/lua/ui/game/score.lua").GetScoreCache
     if GetFocusArmy() == id then
         return
     end
-    local scoresCache = GetScoreCache()
+    local scoresCache = import("/lua/ui/game/score.lua").GetScoreCache()
     local armyScore = scoresCache[id]
 
     if not armyScore.resources then return end
@@ -32,19 +43,11 @@ local function GiveResourcesToPlayer(resourceType, id)
     })
 
     armyScore.resources.storage['stored' .. resourceType] = armyScore.resources.storage['stored' .. resourceType] + sentValue
-    SessionSendChatMessage(FindClients(),
-        {
-            from = scoresCache[GetFocusArmy()].name,
-            to = 'allies',
-            Chat = true,
-            text = 'Sent ' .. resourceType .. ' ' .. FormatNumber(sentValue) .. ' to ' .. scoresCache[id].name
-        })
+    SendMessage(string.format("Sent %s %s to %s", FormatNumber(sentValue), resourceType, scoresCache[id].name))
 end
 
 function GiveMassToPlayer(id)
     GiveResourcesToPlayer("Mass", id)
-
-
 end
 
 function GiveEnergyToPlayer(id)
@@ -52,41 +55,30 @@ function GiveEnergyToPlayer(id)
 end
 
 function GiveUnitsToPlayer(id)
-    SimCallback(
-        {
-            Func = "GiveUnitsToPlayer",
-            Args = {
-                From = GetFocusArmy(),
-                To = id
+    if GetFocusArmy() == id then
+        return
+    end
+    local selectedUnits = GetSelectedUnits()
+    if not table.empty(selectedUnits) then
+        SimCallback(
+            {
+                Func = "GiveUnitsToPlayer",
+                Args = {
+                    From = GetFocusArmy(),
+                    To = id
+                },
             },
-        },
-        true)
-    SessionSendChatMessage(FindClients(),
-        {
-            from = armiesTable[GetFocusArmy()].nickname,
-            to = 'allies',
-            Chat = true,
-            text = 'Sent units to ' .. armiesTable[id].nickname
-        })
+            true)
+
+        SendMessage(string.format("Sent units to %s", armiesTable[id].nickname))
+    end
 end
 
 local function RequestResourceFromPlayer(resourceType, id)
     if GetFocusArmy() == id then
-        SessionSendChatMessage(FindClients(),
-            {
-                from = armiesTable[GetFocusArmy()].nickname,
-                to = 'allies',
-                Chat = true,
-                text = 'Give me ' .. resourceType
-            })
+        SendMessage(string.format("Give me %s", resourceType))
     else
-        SessionSendChatMessage(FindClients(),
-            {
-                from = armiesTable[GetFocusArmy()].nickname,
-                to = 'allies',
-                Chat = true,
-                text = armiesTable[id].nickname .. ' give me ' .. resourceType
-            })
+        SendMessage(string.format("%s, give me %s", armiesTable[id].nickname, resourceType))
     end
 end
 
@@ -100,6 +92,8 @@ end
 
 function RequestUnitFromPlayer(id)
     if GetFocusArmy() == id then
+        SendMessage("Give me T3 engineer")
     else
+        SendMessage(string.format("%s, give me an engineer", armiesTable[id].nickname))
     end
 end

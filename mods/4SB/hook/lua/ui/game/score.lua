@@ -11,7 +11,7 @@ function CreateScoreUI()
     if isReplay then
         controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0))
     else
-        controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0))
+        controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
     end
 
 
@@ -54,7 +54,10 @@ function InitialAnimation(state)
 end
 
 function NoteGameSpeedChanged(newSpeed)
-
+    gameSpeed = newSpeed
+    if controls.scoreBoard then
+        controls.scoreBoard:UpdateGameSpeed(newSpeed)
+    end
 end
 
 function ArmyAnnounce(army, text)

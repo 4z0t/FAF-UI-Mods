@@ -5,14 +5,24 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local TitlePanel = import("TitlePanel.lua").TitlePanel
 
 ScoreBoard = Class(Group)
 {
-    __init = function(self, parent)
+    __init = function(self, parent, isTitle)
         Group.__init(self, parent)
+
+        if isTitle then
+            self._title = TitlePanel(self)
+            self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
+        end
     end,
 
     __post_init = function(self)
+        if self._title then
+            LayoutFor(self._title)
+                :AtRightTopIn(self)
+        end
         self:_InitArmyViews()
         LayoutFor(self)
             :Width(100)
@@ -61,8 +71,14 @@ ScoreBoard = Class(Group)
                 armyData.color,
                 armyData.teamColor)
             if i == 1 then
-                LayoutFor(armyView)
-                    :AtRightTopIn(self)
+                if self._title then
+                    LayoutFor(armyView)
+                        :AnchorToBottom(self._title, 2)
+                        :Right(self.Right)
+                else
+                    LayoutFor(armyView)
+                        :AtRightTopIn(self)
+                end
             else
                 LayoutFor(armyView)
                     :AnchorToBottom(self._lines[i - 1], 2)
@@ -78,9 +94,12 @@ ScoreBoard = Class(Group)
     end,
 
     Update = function(self, data)
+        if self._title then
+            self._title:Update(data)
+        end
         if data then
-            for i, armyView in  self._armyViews do
-                armyView:Update(data[i].resources)
+            for i, armyView in self._armyViews do
+                armyView:Update(data[i])
             end
             -- for i, armyData in data do
             --     if self._armyViews[i] then
@@ -88,7 +107,15 @@ ScoreBoard = Class(Group)
             --     end
             -- end
         end
+    end,
+
+
+    UpdateGameSpeed = function(self, gameSpeed)
+        if self._title then
+            self._title:Update(false, gameSpeed)
+        end
     end
+
 }
 
 ReplayScoreBoard = Class(ScoreBoard)
