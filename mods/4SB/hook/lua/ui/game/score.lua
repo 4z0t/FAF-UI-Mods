@@ -9,7 +9,7 @@ function CreateScoreUI()
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
     local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
     if isReplay then
-        controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0))
+        controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
     else
         controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
     end
@@ -17,6 +17,10 @@ function CreateScoreUI()
 
     SetLayout()
     GameMain.AddBeatFunction(_OnBeat, true)
+
+    controls.scoreBoard.OnDestroy = function(self)
+        GameMain.RemoveBeatFunction(_OnBeat)
+    end
 end
 
 function SetLayout()
@@ -46,6 +50,20 @@ function _OnBeat()
 
 end
 
+function Contract()
+    if IsDestroyed(controls.scoreBoard) then
+        return
+    end
+    controls.scoreBoard:Hide()
+end
+
+function Expand()
+    if IsDestroyed(controls.scoreBoard) then
+        return
+    end
+    controls.scoreBoard:Show()
+end
+
 function ToggleScoreControl(state)
 end
 
@@ -55,13 +73,14 @@ end
 
 function NoteGameSpeedChanged(newSpeed)
     gameSpeed = newSpeed
-    if controls.scoreBoard then
+    if not IsDestroyed(controls.scoreBoard) then
         controls.scoreBoard:UpdateGameSpeed(newSpeed)
     end
 end
 
 function ArmyAnnounce(army, text)
-
+    LOG(army)
+    LOG(text)
 end
 
 function GetScoreCache()

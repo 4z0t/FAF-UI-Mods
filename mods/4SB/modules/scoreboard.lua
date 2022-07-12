@@ -24,12 +24,37 @@ ScoreBoard = Class(Group)
                 :AtRightTopIn(self)
         end
         self:_InitArmyViews()
+        self:_Layout()
         LayoutFor(self)
             :Width(100)
             :Height(100)
             :Over(GetFrame(0), 1000)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
+    end,
+
+    _Layout = function(self)
+        local last
+        for i, armyView in self._lines do
+            if i == 1 then
+                if self._title then
+                    LayoutFor(armyView)
+                        :AnchorToBottom(self._title)
+                        :Right(self.Right)
+                else
+                    LayoutFor(armyView)
+                        :AtRightTopIn(self)
+                end
+            else
+                LayoutFor(armyView)
+                    :AnchorToBottom(self._lines[i - 1])
+                    :Right(self.Right)
+            end
+            last = armyView
+        end
+        if last then
+            self.Bottom:Set(last.Bottom)
+        end
     end,
 
     _InitArmyViews = function(self)
@@ -54,7 +79,7 @@ ScoreBoard = Class(Group)
             return a.id < b.id
         end)
 
-        local last
+
         local isObserver = IsObserver()
         for i, armyData in armiesData do
             local armyView
@@ -70,27 +95,11 @@ ScoreBoard = Class(Group)
                 armyData.faction,
                 armyData.color,
                 armyData.teamColor)
-            if i == 1 then
-                if self._title then
-                    LayoutFor(armyView)
-                        :AnchorToBottom(self._title, 2)
-                        :Right(self.Right)
-                else
-                    LayoutFor(armyView)
-                        :AtRightTopIn(self)
-                end
-            else
-                LayoutFor(armyView)
-                    :AnchorToBottom(self._lines[i - 1], 2)
-                    :Right(self.Right)
-            end
-            last = armyView
+        
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
         end
-        if last then
-            self.Bottom:Set(last.Bottom)
-        end
+
     end,
 
     Update = function(self, data)
@@ -120,10 +129,40 @@ ScoreBoard = Class(Group)
 
 ReplayScoreBoard = Class(ScoreBoard)
 {
-    __init = function(self, parent)
-        ScoreBoard.__init(self, parent)
+    __init = function(self, parent, isTitle)
+        ScoreBoard.__init(self, parent, isTitle)
     end,
+    
+    _InitArmyViews = function(self)
+        self._lines = {}
+        self._armyViews = {}
+        local armiesData = Utils.GetArmiesFormattedTable()
 
+        -- sorting for better look
+        table.sort(armiesData, function(a, b)
+            if a.teamId ~= b.teamId then
+                return a.teamId < b.teamId
+            end
+            return a.id < b.id
+        end)
+
+
+        for i, armyData in armiesData do
+            local armyView = ArmyViews.ReplayArmyView(self)
+
+            armyView:SetStaticData(
+                armyData.id,
+                armyData.name,
+                armyData.rating,
+                armyData.faction,
+                armyData.color,
+                armyData.teamColor)
+        
+            self._lines[i] = armyView
+            self._armyViews[armyData.id] = armyView
+        end
+
+    end,
     -- Update = function(self, data)
 
     -- end

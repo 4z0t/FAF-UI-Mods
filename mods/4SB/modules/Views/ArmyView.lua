@@ -28,6 +28,8 @@ local armyViewHeight = 20
 
 local animationSpeed = 250
 
+local outOfGameColor = "ffa0a0a0"
+
 local slideForward = animationFactory
     :OnStart()
     :OnFrame(function(control, delta)
@@ -63,10 +65,10 @@ ArmyView = Class(Group)
         self.parent = parent
 
         self.id = -1
+        self.isOutOfGame = false
 
         self._bg = Bitmap(self)
 
-        self._border = Border(self)
 
         self._color = Bitmap(self)
         self._faction = Bitmap(self)
@@ -101,22 +103,18 @@ ArmyView = Class(Group)
             :Over(self, 5)
             :DisableHitTest()
 
-        LayoutFor(self._border)
-            :Fill(self._faction)
-            :Alpha(0.5)
-            :DisableHitTest(true)
-        --:FillFixedBorder(self._faction, 1)
-
 
         LayoutFor(self._rating)
             :AtVerticalCenterIn(self)
             :Right(function() return self.Left() + 60 end)
             :DisableHitTest()
+            :DropShadow(true)
 
         LayoutFor(self._name)
             :AtVerticalCenterIn(self)
             :RightOf(self._rating, 7)
             :DisableHitTest()
+            :DropShadow(true)
 
         LayoutFor(self)
             :Width(armyViewWidth)
@@ -127,14 +125,9 @@ ArmyView = Class(Group)
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor)
         self.id = armyId
 
-        self._color:SetSolidColor(armyColor)
+        self._color:SetSolidColor(teamColor)
 
-        self._border:SetColor(teamColor)
-        -- self._border._leftBitmap:Hide()
-        -- self._border._rightBitmap:Hide()
-        self._border:Hide()
-
-        self._rating:SetColor(teamColor)
+        self._rating:SetColor(armyColor)
         self._rating:SetText(rating)
         self._rating:SetFont(armyViewTextFont, armyViewTextPointSize)
 
@@ -145,7 +138,10 @@ ArmyView = Class(Group)
     end,
 
     Update = function(self, data)
-
+        if not self.isOutOfGame and data.Defeated then
+            self.isOutOfGame = true
+            self._name:SetColor(outOfGameColor)
+        end
     end
 }
 
@@ -279,11 +275,13 @@ AllyView = Class(ArmyView)
 
         else
         end
+
+
+        ArmyView.Update(self, data)
         local resources = data.resources
-        if resources then
+        if resources and not self.isOutOfGame then
             self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
             self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-
         else
             self._energy:SetText("")
             self._mass:SetText("")
@@ -298,11 +296,17 @@ AllyView = Class(ArmyView)
 
 ReplayArmyView = Class(ArmyView)
 {
-    __init = function (self, parent)
+    __init = function(self, parent)
         ArmyView.__init(self, parent)
     end,
 
-    Update = function (self, data)
-        
+    Update = function(self, data)
+        ArmyView.Update(self, data)
+    end,
+
+    HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
+            ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
+        end
     end
 }
