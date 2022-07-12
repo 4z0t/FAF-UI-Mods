@@ -1,3 +1,5 @@
+local Text = import("/lua/maui/text.lua").Text
+
 local isReplay = import("/lua/ui/game/gamemain.lua").GetReplayState()
 local sessionInfo = SessionGetScenarioInfo()
 
@@ -72,4 +74,14 @@ function FormatNumber(n)
     else
         return string.format("%01.1fm", n / 1000000)
     end
+end
+
+function TextWidth(str, font, size)
+    local dummy = Text(GetFrame(0))
+    dummy:Hide()
+    dummy:SetFont(font, size)
+    dummy:SetText(str)
+    local width = dummy.Width()
+    dummy:Destroy()
+    return width
 end

@@ -4,12 +4,14 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local LazyVar = import('/lua/lazyvar.lua').Create
 
 local Animator = import("../Animations/Animator.lua")
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local Utils = import("../Utils.lua")
 local FormatNumber = Utils.FormatNumber
+local TextWidth = Utils.TextWidth
 local Border = import("Border.lua").Border
 local ShareManager = import("../ShareManager.lua")
 
@@ -20,6 +22,10 @@ local bgColor = 'ff000000'
 local armyViewTextPointSize = 12
 
 local armyViewTextFont = "Zeroes Three"
+local focusArmyTextFont = 'Arial Bold'
+
+local nameWidth = LazyVar(20)
+
 
 local armyViewWidth = 250
 local allyViewWidth = 350
@@ -113,7 +119,7 @@ ArmyView = Class(Group)
         LayoutFor(self._name)
             :AtVerticalCenterIn(self)
             :RightOf(self._rating, 7)
-            :DisableHitTest()
+            --:DisableHitTest()
             :DropShadow(true)
 
         LayoutFor(self)
@@ -132,6 +138,9 @@ ArmyView = Class(Group)
         self._rating:SetFont(armyViewTextFont, armyViewTextPointSize)
 
         self._name:SetText(name)
+        self._name:SetClipToWidth(true)
+        self._name.Width:Set(nameWidth)
+        nameWidth:Set(math.max(nameWidth(), TextWidth(name, armyViewTextFont, armyViewTextPointSize)))
         self._name:SetFont(armyViewTextFont, armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)

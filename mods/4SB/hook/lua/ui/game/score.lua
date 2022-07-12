@@ -3,7 +3,7 @@ local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
 
 
 function CreateScoreUI()
-    if controls.scoreBoard then
+    if not IsDestroyed(controls.scoreBoard) then
         return
     end
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
@@ -16,10 +16,10 @@ function CreateScoreUI()
 
 
     SetLayout()
-    GameMain.AddBeatFunction(_OnBeat, true)
+    GameMain.AddBeatFunction(Update, true)
 
     controls.scoreBoard.OnDestroy = function(self)
-        GameMain.RemoveBeatFunction(_OnBeat)
+        GameMain.RemoveBeatFunction(Update)
     end
 end
 
@@ -37,7 +37,7 @@ function SetLayout()
     end
 end
 
-function _OnBeat()
+function Update()
     if IsDestroyed(controls.scoreBoard) then
         return
     end
