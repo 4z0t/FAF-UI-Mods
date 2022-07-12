@@ -30,6 +30,8 @@ local nameWidth = LazyVar(20)
 local armyViewWidth = 250
 local allyViewWidth = 350
 
+
+
 local armyViewHeight = 20
 
 local animationSpeed = 250
@@ -94,6 +96,23 @@ ArmyView = Class(Group)
             :Alpha(0.4)
             :DisableHitTest()
 
+        LayoutFor(self._name)
+            :AtVerticalCenterIn(self)
+            :AtRightIn(self, 20)
+            :DisableHitTest()
+            :DropShadow(true)
+
+        LayoutFor(self._rating)
+            :AtVerticalCenterIn(self)
+            :LeftOf(self._name, 7)
+            :DisableHitTest()
+            :DropShadow(true)
+
+        LayoutFor(self._faction)
+            :AtVerticalCenterIn(self)
+            :AtRightIn(self._rating, 30)
+            :Over(self, 5)
+            :DisableHitTest()
 
         LayoutFor(self._color)
             :Top(self.Top)
@@ -103,27 +122,8 @@ ArmyView = Class(Group)
             :Width(3)
             :DisableHitTest()
 
-        LayoutFor(self._faction)
-            :AtVerticalCenterIn(self)
-            :AtLeftIn(self, 5)
-            :Over(self, 5)
-            :DisableHitTest()
-
-
-        LayoutFor(self._rating)
-            :AtVerticalCenterIn(self)
-            :Right(function() return self.Left() + 60 end)
-            :DisableHitTest()
-            :DropShadow(true)
-
-        LayoutFor(self._name)
-            :AtVerticalCenterIn(self)
-            :RightOf(self._rating, 7)
-            --:DisableHitTest()
-            :DropShadow(true)
-
         LayoutFor(self)
-            :Width(armyViewWidth)
+            :AtLeftIn(self._faction, -5)
             :Height(armyViewHeight)
 
     end,
@@ -256,11 +256,9 @@ AllyView = Class(ArmyView)
             :DisableHitTest()
         self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
 
+        LayoutFor(self._name)
+            :LeftOf(self._massBtn, 75)
 
-        LayoutFor(self)
-            :Width(allyViewWidth)
-            :Height(armyViewHeight)
-            :EnableHitTest()
 
 
     end,
@@ -302,15 +300,55 @@ AllyView = Class(ArmyView)
 
 }
 
+local dataTextOffSet = 30
 
 ReplayArmyView = Class(ArmyView)
 {
     __init = function(self, parent)
         ArmyView.__init(self, parent)
+
+        self._data = {}
+        for i = 1, 5 do
+            self._data[i] = Text(self)
+        end
     end,
+
+   
+
+    _Layout = function(self)
+        ArmyView._Layout(self)
+
+
+        local dataSize = table.getn(self._data)
+        for i = 1, dataSize do
+            if i == 1 then
+                LayoutFor(self._name)
+                    :AtRightIn(self._data[i], dataTextOffSet)
+                LayoutFor(self._data[i])
+                    :AtRightIn(self._data[i + 1], dataTextOffSet)
+                    :AtVerticalCenterIn(self)
+                    :DisableHitTest()
+            elseif i == dataSize then
+                LayoutFor(self._data[i])
+                    :AtRightIn(self, dataTextOffSet)
+                    :AtVerticalCenterIn(self)
+                    :DisableHitTest()
+            else
+                LayoutFor(self._data[i])
+                    :AtRightIn(self._data[i + 1], dataTextOffSet)
+                    :AtVerticalCenterIn(self)
+                    :DisableHitTest()
+            end
+            self._data[i]:SetFont(armyViewTextFont, armyViewTextPointSize)
+            self._data[i]:SetText("0")
+        end
+
+    end,
+
 
     Update = function(self, data)
         ArmyView.Update(self, data)
+
     end,
 
     HandleEvent = function(self, event)
