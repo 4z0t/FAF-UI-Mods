@@ -28,6 +28,7 @@ TitlePanel = Class(Group)
 
         self._bg = Bitmap(self)
         self._time = Text(self)
+        self._speed = Text(self)
         self._quality = Text(self)
         self._unitCap = Text(self)
 
@@ -51,8 +52,14 @@ TitlePanel = Class(Group)
             :DisableHitTest()
         self._time:SetFont(timeTextFont, timeTextSize)
 
+
+        LayoutFor(self._speed)
+            :AtCenterIn(self, 0, -30)
+            :DisableHitTest()
+        self._speed:SetFont(qualityTextFont, qualityTextSize)
+
         LayoutFor(self._quality)
-            :AtCenterIn(self)
+            :AtCenterIn(self, 0, 30)
             :DisableHitTest()
         self._quality:SetFont(qualityTextFont, qualityTextSize)
 
@@ -79,9 +86,9 @@ TitlePanel = Class(Group)
         if gameSpeed then
             self._gameSpeed = gameSpeed
         end
-        
-        self._time:SetText(string.format("%s (%+d / %+d)", GetGameTime(), self._gameSpeed, GetSimRate()))
-        
+        self._speed:SetText(string.format("%+d / %+d", self._gameSpeed, GetSimRate()))
+        self._time:SetText(GetGameTime())
+
         if data then
             local scoreData = data[GetFocusArmy()]
             if scoreData.general.currentcap then
