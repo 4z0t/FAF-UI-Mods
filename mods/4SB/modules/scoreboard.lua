@@ -6,6 +6,8 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local TitlePanel = import("TitlePanel.lua").TitlePanel
+local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
+
 
 ScoreBoard = Class(Group)
 {
@@ -95,7 +97,7 @@ ScoreBoard = Class(Group)
                 armyData.faction,
                 armyData.color,
                 armyData.teamColor)
-        
+
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
         end
@@ -131,8 +133,10 @@ ReplayScoreBoard = Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
+
+        self._obs = ObserverPanel(self)
     end,
-    
+
     _InitArmyViews = function(self)
         self._lines = {}
         self._armyViews = {}
@@ -157,12 +161,25 @@ ReplayScoreBoard = Class(ScoreBoard)
                 armyData.faction,
                 armyData.color,
                 armyData.teamColor)
-        
+
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
         end
 
     end,
+
+    _Layout = function(self)
+        ScoreBoard._Layout(self)
+        LayoutFor(self._obs)
+            :Right(self.Right)
+            :Top(self.Bottom)
+    end,
+
+    UpdateGameSpeed = function(self, gameSpeed)
+        ScoreBoard.UpdateGameSpeed(self, gameSpeed)
+        self._obs:SetGameSpeed(gameSpeed)
+    end
+
     -- Update = function(self, data)
 
     -- end
