@@ -9,6 +9,7 @@ local emptyFunc = function() end
 
 local Animation = import("Animation.lua")
 
+---@class BaseAnimationFactory
 local BaseAnimationFactory = ClassSimple
 {
     __init = function(self)
@@ -17,21 +18,35 @@ local BaseAnimationFactory = ClassSimple
         self._onFinish = false
     end,
 
+    ---comment
+    ---@param self BaseAnimationFactory
+    ---@param func fun(control : Control, delta : number, state: ControlState) : boolean # if returns true then animation is finished
+    ---@return BaseAnimationFactory
     OnFrame = function(self, func)
         self._onFrame = func
         return self
     end,
-
+    ---comment
+    ---@param self BaseAnimationFactory
+    ---@param func? fun(control : Control, state: ControlState, ...) : nil | ControlState
+    ---@return BaseAnimationFactory
     OnStart = function(self, func)
         self._onStart = func or emptyFunc
         return self
     end,
 
+    ---comment
+    ---@param self BaseAnimationFactory
+    ---@param func? fun(control : Control, state: ControlState)
+    ---@return BaseAnimationFactory
     OnFinish = function(self, func)
         self._onFinish = func or emptyFunc
         return self
     end,
 
+    ---comment
+    ---@param self BaseAnimationFactory
+    ---@return Animation
     Create = function(self)
         assert(self._onStart and self._onFrame and self._onFinish, "Not complete animation")
 

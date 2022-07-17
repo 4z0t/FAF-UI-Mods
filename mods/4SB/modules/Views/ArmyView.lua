@@ -6,9 +6,15 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
+---@class Animator
 local Animator = import("../Animations/Animator.lua")
+
+---@class BaseAnimationFactory
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
+
+
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
+
 local Utils = import("../Utils.lua")
 local FormatNumber = Utils.FormatNumber
 local TextWidth = Utils.TextWidth
@@ -302,6 +308,41 @@ AllyView = Class(ArmyView)
 
 local dataTextOffSet = 30
 
+local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
+
+
+local contractDataAnimation = animationFactory
+    :OnStart(function(control, state, nextControl)
+        return state or { nextControl = nextControl }
+    end)
+    :OnFrame(function(control, delta, state)
+        if control.Right() >= state.nextControl.Right() then
+            return true
+        end
+        control.Right:Set(control.Right() + delta * animationSpeed)
+    end)
+    :OnFinish(function(control, state)
+        control.Right:Set(state.nextControl.Right)
+        control._contracted = true
+    end)
+    :Create()
+
+local expandDataAnimation = animationFactory
+    :OnStart(function(control, state, nextControl)
+        return state or { nextControl = nextControl }
+    end)
+    :OnFrame(function(control, delta, state)
+        if control.Right() <= state.nextControl.Right() - dataTextOffSetScaled then
+            return true
+        end
+        control.Right:Set(control.Right() - delta * animationSpeed)
+    end)
+    :OnFinish(function(control, state)
+        LayoutHelpers.AtRightIn(control, state.nextControl, dataTextOffSet)
+        control._contracted = false
+    end)
+    :Create()
+
 ReplayArmyView = Class(ArmyView)
 {
     __init = function(self, parent)
@@ -312,8 +353,6 @@ ReplayArmyView = Class(ArmyView)
             self._data[i] = Text(self)
         end
     end,
-
-   
 
     _Layout = function(self)
         ArmyView._Layout(self)
@@ -341,6 +380,7 @@ ReplayArmyView = Class(ArmyView)
             end
             self._data[i]:SetFont(armyViewTextFont, armyViewTextPointSize)
             self._data[i]:SetText("0")
+            self._data[i]._contracted = false
         end
 
     end,
@@ -355,5 +395,39 @@ ReplayArmyView = Class(ArmyView)
         if event.Type == 'ButtonPress' and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
         end
+    end,
+
+    ContractData = function(self, id)
+        assert(table.getn(self._data) >= id, "pain")
+
+        if table.getn(self._data) == id then
+            local nextControl = self
+            local control = self._data[id]
+
+            contractDataAnimation:Apply(control, nextControl)
+        else
+            local nextControl = self._data[id + 1]
+            local control = self._data[id]
+
+            contractDataAnimation:Apply(control, nextControl)
+        end
+
+    end,
+
+    ExpandData = function(self, id)
+        assert(table.getn(self._data) >= id, "pain")
+
+        if table.getn(self._data) == id then
+            local nextControl = self
+            local control = self._data[id]
+
+            expandDataAnimation:Apply(control, nextControl)
+        else
+            local nextControl = self._data[id + 1]
+            local control = self._data[id]
+
+            expandDataAnimation:Apply(control, nextControl)
+        end
+
     end
 }
