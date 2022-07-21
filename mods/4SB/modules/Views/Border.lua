@@ -24,7 +24,7 @@ Border = Class(Group)
             self._bottomBitmap:SetSolidColor(color)
         end
         if color then
-            self._color:Set(color)
+            self:SetColor(color)
         end
 
         LayoutFor(self._leftBitmap)
@@ -32,24 +32,28 @@ Border = Class(Group)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Width(borderWidth)
+            :DisableHitTest()
 
         LayoutFor(self._topBitmap)
             :Left(self.Left)
             :Top(self.Top)
             :Right(self.Right)
             :Height(borderWidth)
+            :DisableHitTest()
 
         LayoutFor(self._rightBitmap)
             :Right(self.Right)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Width(borderWidth)
+            :DisableHitTest()
 
         LayoutFor(self._bottomBitmap)
             :Left(self.Left)
             :Bottom(self.Bottom)
             :Right(self.Right)
             :Height(borderWidth)
+            :DisableHitTest()
     end,
 
     SetColor = function(self, color)
@@ -62,5 +66,12 @@ Border = Class(Group)
         self._topBitmap:SetAlpha(alpha, applyToChildren)
         self._rightBitmap:SetAlpha(alpha, applyToChildren)
         self._bottomBitmap:SetAlpha(alpha, applyToChildren)
+    end,
+
+    
+    
+    OnDestroy = function(self)
+        self._color:Destroy()
+        self._color = nil
     end
 }

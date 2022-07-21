@@ -310,36 +310,37 @@ local dataTextOffSet = 30
 
 local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
 
+local dataAnimationSpeed = 150
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
+        control._contracted = true
         return state or { nextControl = nextControl }
     end)
     :OnFrame(function(control, delta, state)
         if control.Right() >= state.nextControl.Right() then
             return true
         end
-        control.Right:Set(control.Right() + delta * animationSpeed)
+        control.Right:Set(control.Right() + delta * dataAnimationSpeed)
     end)
     :OnFinish(function(control, state)
         control.Right:Set(state.nextControl.Right)
-        control._contracted = true
     end)
     :Create()
 
 local expandDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
+        control._contracted = false
         return state or { nextControl = nextControl }
     end)
     :OnFrame(function(control, delta, state)
         if control.Right() <= state.nextControl.Right() - dataTextOffSetScaled then
             return true
         end
-        control.Right:Set(control.Right() - delta * animationSpeed)
+        control.Right:Set(control.Right() - delta * dataAnimationSpeed)
     end)
     :OnFinish(function(control, state)
         LayoutHelpers.AtRightIn(control, state.nextControl, dataTextOffSet)
-        control._contracted = false
     end)
     :Create()
 
@@ -392,9 +393,24 @@ ReplayArmyView = Class(ArmyView)
     end,
 
     HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
+
+        if event.Type == 'ButtonPress' and event.Modifiers.Left and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
         end
+        if event.Type == 'ButtonPress' and event.Modifiers.Right then
+            for i = 1, 5 do
+
+                if IsKeyDown(i + 48) then
+                    if self._data[i]._contracted then
+                        self:ExpandData(i)
+                    else
+                        self:ContractData(i)
+                    end
+                    break
+                end
+            end
+        end
+
     end,
 
     ContractData = function(self, id)
