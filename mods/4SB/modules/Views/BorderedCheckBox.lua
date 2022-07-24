@@ -8,98 +8,118 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 
 
-BorderedButton = Class(BorderedText)
+BorderedCheckBox = Class(BorderedText)
 {
-    __init = function(self, parent, normal, active, highlight, disabled, clickCue, rolloverCue, borderWidth)
-        BorderedText.__init(self, parent, normal, borderWidth)
+    __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked, clickCue, rolloverCue, borderWidth)
+        BorderedText.__init(self, parent, normalUnchecked, borderWidth)
 
-        self._normal = normal
-        self._active = active
-        self._highlight = highlight
-        self._disabled = disabled
+        self._states = {
+            normal = {
+                checked=normalChecked,
+                unchecked=normalUnchecked
+            },
+            over = {
+                checked=overChecked or normalChecked,
+                unchecked=overUnchecked or normalUnchecked
+            },
+            disabled={
+                checked=disabledChecked or normalChecked,
+                unchecked=disabledUnchecked or normalUnchecked
+            }
+        }
 
-        self._clickCue = clickCue
         self._rolloverCue = rolloverCue
+        self._clickCue = clickCue
+
+        self._checkState = "unchecked"
+        self._controlState =  "normal"
     end,
 
-    SetNewColors = function(self, normal, active, highlight, disabled)
-        self._normal = normal
-        self._active = active
-        self._highlight = highlight
-        self._disabled = disabled
+    SetNewColors = function(self, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked, disabledChecked)
+        self._states.normal.checked = normalChecked
+        self._states.normal.unchecked = normalUnchecked
+        self._states.over.checked = overChecked or normalChecked
+        self._states.over.unchecked = overUnchecked or normalUnchecked
+        self._states.disabled.checked = disabledChecked or normalChecked
+        self._states.disabled.unchecked = disabledUnchecked or normalUnchecked
+        -- update current color
+        self:SetColor(self._states[self._controlState][self._checkState])
     end,
 
-    ApplyColors = function(self)
-        if self._isDisabled and self._disabled then
-            self:SetColor(self._disabled)
-        elseif self._normal then
-            self:SetColor(self._normal)
+    SetCheck = function(self, isChecked, skipEvent)
+        if isChecked == true then
+            self._checkState = "checked"
+        else
+            self._checkState = "unchecked"
         end
+        self:SetColor(self._states[self._controlState][self._checkState])
+        if not skipEvent then
+            self:OnCheck(isChecked)
+        end
+    end,
+
+    ToggleCheck = function(self)
+        if self._checkState == "checked" then
+            self:SetCheck(false)
+        else
+            self:SetCheck(true)
+        end
+    end,
+
+    IsChecked = function(self)
+        return (self._checkState == "checked")
     end,
 
     OnDisable = function(self)
-        self:ApplyColors()
+        if self._controlState != "disabled" then
+            self._controlState = "disabled"
+            self:SetColor(self._states[self._controlState][self._checkState])
+        end
     end,
 
     OnEnable = function(self)
-        self:ApplyColors()
+        if self._controlState != "enabled" then
+            self._controlState = "normal"
+            self:SetColor(self._states[self._controlState][self._checkState])
+        end
     end,
 
     HandleEvent = function(self, event)
-        if self._isDisabled then
-            return true
-        end
-
         if event.Type == 'MouseEnter' then
-            if self._dragger then
-                self:SetColor(self._active)
-                self:OnRolloverEvent('enter')
-            else
-                self:SetColor(self._highlight)
-                self:OnRolloverEvent('enter')
-                if self._rolloverCue then
-                    PlaySound(Sound { Cue = self._rolloverCue, Bank = "Interface" })
+            if self._controlState != "disabled" then
+                self._controlState = "over"
+                self:SetColor(self._states[self._controlState][self._checkState])
+                if self._rolloverCue != "NO_SOUND" then
+                    if self._rolloverCue then
+                        PlaySound(Sound{Cue = self._rolloverCue, Bank = "Interface",})
+                    end
                 end
+                return true
             end
-            self._mouseOver = true
-            return true
         elseif event.Type == 'MouseExit' then
-            self:SetColor(self._normal)
-            self:OnRolloverEvent('exit')
-            self._mouseOver = false
-            return true
+            if self._controlState != "disabled" then
+                self._controlState = "normal"
+                self:SetColor(self._states[self._controlState][self._checkState])
+                return true
+            end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-            local dragger = Dragger()
-            dragger.OnRelease = function(dragger, x, y)
-                dragger:Destroy()
-                self._dragger = nil
-                if self._mouseOver then
-                    self:SetTexture(self._highlight)
-                    self:OnRolloverEvent('exit')
-                    self:OnClick(event.Modifiers)
+            self:OnClick(event.Modifiers)
+            if self._clickCue != "NO_SOUND" then
+                if self._clickCue then
+                    PlaySound(Sound{Cue = self._clickCue, Bank = "Interface",})
                 end
             end
-            dragger.OnCancel = function(dragger)
-                if self._mouseOver then
-                    self:SetColor(self._highlight)
-                end
-                dragger:Destroy()
-                self._dragger = nil
-            end
-            self._dragger = dragger
-            if self._clickCue then
-                PlaySound(Sound { Cue = self._clickCue, Bank = "Interface", })
-            end
-            self:SetColor(self._active)
-            self:OnRolloverEvent('down')
-            PostDragger(self:GetRootFrame(), event.KeyCode, dragger)
             return true
         end
 
         return false
     end,
 
-    OnRolloverEvent = function(self, state) end,
+    -- override this method to handle checks
+    OnCheck = function(self, checked) end,
 
-    OnClick = function(self, modifiers) end
+    -- override this method to handle clicks differently than default (which is ToggleCheck)
+    OnClick = function(self, modifiers)
+        self:ToggleCheck()
+    end,
 }
