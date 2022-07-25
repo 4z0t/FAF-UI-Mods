@@ -6,15 +6,11 @@ local Prefs = import("/lua/user/prefs.lua")
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 local LazyVar = import("/lua/lazyvar.lua")
 
-local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
-
-local Options = import("/mods/UMT/modules/OptionsWindow.lua")
-
 local overlays = {}
 
-local overlayOption = import("/mods/UMT/modules/OptionVar.lua").Create("EUT", "MexOverlay", true)
+local Options = import("options.lua")
 
-local showOverlay = overlayOption()
+local showOverlay = Options.overlayOption()
 
 local function Remove(id)
     overlays[id]:Destroy()
@@ -23,13 +19,11 @@ end
 
 function init()
 
-    overlayOption.OnChange = function (var)
+    Options.overlayOption.OnChange = function (var)
         showOverlay = var()
     end
 
-    GlobalOptions.AddOptions("EUT", "ECO UI Tools", {
-        Options.Filter("Show mex overlay", overlayOption)
-    })
+    
 end
 
 local function CreateOverlay(mex)
