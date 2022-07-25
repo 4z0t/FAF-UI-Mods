@@ -5,7 +5,9 @@ local Prefs = import('/lua/user/prefs.lua')
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
+
 local GetEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements
+
 
 local VERTICAL_OFFSET = 10
 
@@ -17,6 +19,7 @@ SelectionInfo = Class(Bitmap) {
         LayoutHelpers.DepthOverParent(self, parent, 500)
         self:SetSolidColor('33000000')
         local pos = self:_LoadPosition()
+
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, VERTICAL_OFFSET)
 
         self._massCost = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
@@ -24,11 +27,14 @@ SelectionInfo = Class(Bitmap) {
         LayoutHelpers.AtRightTopIn(self._massCost, self, 2, 2)
         self._massCost:DisableHitTest(true)
 
+
+
         self._energyCost = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
         self._energyCost:SetColor("FFF8C000")
         LayoutHelpers.AnchorToBottom(self._energyCost, self._massCost, 2)
         LayoutHelpers.AtRightIn(self._energyCost, self._massCost)
         self._energyCost:DisableHitTest(true)
+
 
         self._massRate = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
         self._massRate:SetColor("FFB8F400")
@@ -39,6 +45,7 @@ SelectionInfo = Class(Bitmap) {
         self._energyRate:SetColor("FFF8C000")
         LayoutHelpers.Below(self._energyRate, self._massRate, 2)
         self._energyRate:DisableHitTest(true)
+
 
         self._buildRate = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont, true)
         self._buildRate:SetColor("FFFFFF00")
@@ -53,7 +60,9 @@ SelectionInfo = Class(Bitmap) {
             local offX = event.MouseX - self.Left()
             drag.OnMove = function(dragself, x, y)
                 self.Left:Set(x - offX)
+
                 GetCursor():SetTexture(UIUtil.GetCursor('W_E'))
+
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
@@ -67,8 +76,10 @@ SelectionInfo = Class(Bitmap) {
     end,
 
     Update = function(self, units)
+
         self._units = units or self._units
         if table.empty(self._units) then
+
             self:Hide()
         else
             self:Show()
@@ -89,10 +100,12 @@ SelectionInfo = Class(Bitmap) {
                     local br = 0
                     if unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") or unit:IsInCategory("SILO") then
                         br = bp.Economy.BuildRate
+
                     end
                     if unit:IsInCategory("COMMAND") then
                         br = unit:GetBuildRate()
                     end
+
 
                     if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
                         local enhancements = GetEnhancements(unit:GetEntityId())
@@ -112,6 +125,7 @@ SelectionInfo = Class(Bitmap) {
                     if not unit:IsInCategory("COMMAND") then
                         massCost = massCost + bp.Economy.BuildCostMass
                         energyCost = energyCost + bp.Economy.BuildCostEnergy
+
                     end
                 end
             end
@@ -134,8 +148,10 @@ SelectionInfo = Class(Bitmap) {
                 self._energyRate:SetColor("FFF8C000")
             end
 
+
             if totalbr ~= 0 then
                 self._buildRate:SetText(string.format("%d", totalbr))
+
             else
                 self._buildRate:Hide()
             end
@@ -153,4 +169,6 @@ SelectionInfo = Class(Bitmap) {
             left = self.Left(),
         })
     end
+
 }
+

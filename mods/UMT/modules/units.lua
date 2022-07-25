@@ -1,80 +1,100 @@
--- local Select = import('select.lua')
+local TableInsert = table.insert
+local GetFocusArmy = GetFocusArmy
+local GameTick = GameTick
 
--- local current_army = nil
--- local units = {}
--- local assisting = {}
--- local cached = {}
+local SelectHidden = import("select.lua").Hidden
 
--- local last_reset = 0
--- local last_cached = 0
+local currentArmy = false
+local units = {}
+local assisting = {}
+local cached = {}
 
--- function UpdateUnits()
---     Select.Hidden(function()
---         units = {}
---         UISelectionByCategory("ALLUNITS", false, false, false, false)
---         for _, u in GetSelectedUnits() or {} do
---             units[u:GetEntityId()] = u
---         end
---     end)
--- end
+local prevReset = 0
+local prevCache = 0
 
--- local function UpdateCache()
---     cached = {}
---     assisting = {}
+local function ProcessAllUnits()
+    units = {}
+    UISelectionByCategory("ALLUNITS", false, false, false, false)
+    for _, unit in GetSelectedUnits() or {} do
+        units[unit:GetEntityId()] = unit
+    end
+end
 
---     for id, u in units do
---         if not u:IsDead() then
---             table.insert(cached, u)
+local function UpdateAllUnits()
+    SelectHidden(ProcessAllUnits)
+end
 
---             local focus = u:GetFocus()
---             if focus and not focus:IsDead() then
---                 local focus_id = focus:GetEntityId()
---                 local focus_id = focus:GetEntityId()
---                 if not units[focus_id] then
---                     units[focus_id] = focus
---                     table.insert(cached, focus)
---                 end
+local function UpdateCache()
+    cached = {}
+    assisting = {}
 
---                 if EntityCategoryContains(categories.ENGINEER, u) then
---                     if not assisting[focus_id] then
---                         assisting[focus_id] = {
---                             engineers = {},
---                             build_rate = 0
---                         }
---                     end
+    for id, unit in units do
+        if not unit:IsDead() then
+            TableInsert(cached, unit)
+            local focus = unit:GetFocus()
+            if focus and not focus:IsDead() then
+                local focusId = focus:GetEntityId()
+                if not units[focusId] then
+                    units[focusId] = focus
+                    TableInsert(cached, focus)
+                end
+                -- if EntityCategoryContains(categories.ENGINEER, unit) then
+                --     if not assisting[focusId] then
+                --         assisting[focusId] = {
+                --             engineers = {},
+                --             build_rate = 0
+                --         }
+                --     end
 
---                     table.insert(assisting[focus_id]['engineers'], u)
---                     assisting[focus_id]['build_rate'] = assisting[focus_id]['build_rate'] + u:GetBuildRate()
---                 end
---             end
---         end
---     end
--- end
+                --     TableInsert(assisting[focusId]['engineers'], unit)
+                --     assisting[focusId]['build_rate'] = assisting[focusId]['build_rate'] + u:GetBuildRate()
+                -- end
+            end
+        end
+    end
+end
 
--- local function CheckCache()
---     local current_tick = GameTick()
---     local army = GetFocusArmy()
+local changedArmyCallbacks = {}
 
---     if army ~= current_army then
---         last_cached = 0
---         last_reset = 0
---         current_army = army
---         cached = {}
---     end
+function AddOnArmyChanged(callback)
+    TableInsert(changedArmyCallbacks, callback)
+end
 
---     if army ~= -1 and current_tick - 10 >= last_cached then
---         local score = Score.Get()
---         local n = score[army].general.currentunits.count
+local function OnArmyChanged()
+    for _, callback in changedArmyCallbacks do
+        if callback then
+            callback()
+        end
+    end
+end
 
---         if current_tick - 50 > last_reset and (not n or n > table.getsize(cached)) then
---             UpdateUnits()
---             last_reset = current_tick
---         end
+local function CheckCache()
+    local currentTick = GameTick()
+    local army = GetFocusArmy()
 
---         UpdateCache()
---         last_cached = current_tick
---     end
--- end
+    if army ~= currentArmy then
+        prevReset = 0
+        prevCache = 0
+        currentArmy = army
+        cached = {}
+        OnArmyChanged()
+    end
+
+    if army ~= -1 and currentTick - 10 >= prevCache then
+        -- local score = Score.Get()
+        -- local n = score[army].general.currentunits.count
+
+        if currentTick - 50 > prevReset
+         --and (not n or n > table.getsize(cached)) 
+         then
+            UpdateAllUnits()
+            prevReset = currentTick
+        end
+
+        UpdateCache()
+        prevCache = currentTick
+    end
+end
 
 -- function Data(unit)
 --     local bp = unit:GetBlueprint()
@@ -107,16 +127,16 @@
 --     return data
 -- end
 
--- function Get(filter)
---     CheckCache()
---     cached = ValidateUnitsList(cached)
+function Get(filter)
+    CheckCache()
+    cached = ValidateUnitsList(cached)
 
---     if filter then
---         return EntityCategoryFilterDown(filter, cached) or {}
---     else
---         return cached
---     end
--- end
+    if filter then
+        return EntityCategoryFilterDown(filter, cached) or {}
+    else
+        return cached
+    end
+end
 
 -- local current_tick = 0
 -- local prev_tick = 0

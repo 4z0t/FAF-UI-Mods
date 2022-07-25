@@ -10,9 +10,11 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Button = import('/lua/maui/button.lua').Button
 local Control = import('/lua/maui/control.lua').Control
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
+
+local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
+local LayoutFor = import('Layouter.lua').ReusedLayoutFor
 
 local globalOptions = {}
 local optionsSelector = nil
@@ -33,32 +35,42 @@ local function CreateUI(parent)
     end
 end
 
-function main() 
+function main()
     CreateUI(GetFrame(0))
 end
 
 function CreateOptionsSelector(parent)
     local group = Group(parent)
-    LayoutHelpers.SetDimensions(group, 500, 500)
-    LayoutHelpers.AtCenterIn(group, parent)
+    LayoutFor(group)
+        :Height(500)
+        :Width(500)
+        :AtCenterIn(parent)
+        :End()
 
     group.popup = Popup(parent, group)
-    LayoutHelpers.DepthOverParent(group, group.popup, 10)
+    LayoutFor(group):Over(group.popup, 10)
 
     group.TopLine = 1
     group.SizeLine = table.getsize(globalOptions)
 
     group.Title = UIUtil.CreateText(group, 'UI Mods Options', 16, UIUtil.titleFont, true)
-    LayoutHelpers.AtHorizontalCenterIn(group.Title, group)
-    LayoutHelpers.AtTopIn(group.Title, group, 5)
+    LayoutFor(group.Title)
+        :AtHorizontalCenterIn(group)
+        :AtTopIn(group, 5)
+        :End()
 
     group.scroll = UIUtil.CreateLobbyVertScrollbar(group, -20, 10, 25) -- scroller
-    LayoutHelpers.DepthOverParent(group.scroll, group, 10)
+    LayoutFor(group.scroll)
+        :Over(group, 10)
+        :End()
 
     group.QuitButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
-    LayoutHelpers.AtHorizontalCenterIn(group.QuitButton, group, 0)
-    LayoutHelpers.AtBottomIn(group.QuitButton, group, 5)
-    LayoutHelpers.DepthOverParent(group.QuitButton, group, 50)
+    LayoutFor(group.QuitButton)
+        :AtHorizontalCenterIn(group)
+        :AtBottomIn(group, 5)
+        :Over(group, 20)
+        :End()
+    
 
     group.QuitButton.OnClick = function(self)
         group.popup:Destroy()
@@ -133,31 +145,39 @@ function CreateOptionsSelector(parent)
     end
 
     group.LineGroup = Group(group) -- group that contains opt data lines
-    LayoutHelpers.AtLeftIn(group.LineGroup, group, 5)
-    LayoutHelpers.LeftOf(group.LineGroup, group.scroll, 5)
-    LayoutHelpers.AtTopIn(group.LineGroup, group, 25)
-    LayoutHelpers.AtBottomIn(group.LineGroup, group, 5)
-    LayoutHelpers.DepthOverParent(group.LineGroup, group, 10)
+    LayoutFor(group.LineGroup)
+        :AtLeftIn(group, 5)
+        :LeftOf(group.scroll, 5)
+        :AtTopIn(group, 25)
+        :AtBottomIn(group, 5)
+        :Over(group, 10)
+        :End()
+
     group.LineGroup.Lines = {}
 
     local function CreateOptionsSelectorLines()
         local function CreateOptionsSelectorLine()
             local line = Group(group.LineGroup)
-            LayoutHelpers.DepthOverParent(line, group.LineGroup, 1)
+            LayoutFor(line)
+                :Width(80)
+                :Height(30)
+                :Over(group.LineGroup)
+
             line.bg = CheckBox(line, UIUtil.SkinnableFile('/MODS/blank.dds'), UIUtil.SkinnableFile('/MODS/single.dds'),
                 UIUtil.SkinnableFile('/MODS/single.dds'), UIUtil.SkinnableFile('/MODS/double.dds'),
                 UIUtil.SkinnableFile('/MODS/disabled.dds'), UIUtil.SkinnableFile('/MODS/disabled.dds'),
                 'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
-            LayoutHelpers.SetDimensions(line, 80, 30)
-            LayoutHelpers.FillParent(line.bg, line)
-            LayoutHelpers.DepthOverParent(line.bg, line, 1)
-            line.bg:Disable()
+            LayoutFor(line.bg)
+                :Fill(line)
+                :Over(line)
+                :Disable()
 
             line.name = UIUtil.CreateText(line, '', 14, UIUtil.bodyFont, true)
-            line.name:SetColor('FFE9ECE9')
-            line.name:DisableHitTest()
-            LayoutHelpers.AtLeftIn(line.name, line, 5)
-            LayoutHelpers.AtVerticalCenterIn(line.name, line)
+            LayoutFor(line.name)
+                :TextColor('FFE9ECE9')
+                :HitTest(false)
+                :AtLeftIn(line, 5)
+                :AtVerticalCenterIn(line)
 
             line.render = function(self, data, id)
                 if data then
@@ -185,13 +205,17 @@ function CreateOptionsSelector(parent)
         local index = 1
         group.LineGroup.Lines[index] = CreateOptionsSelectorLine()
         local parent = group.LineGroup.Lines[index]
-        LayoutHelpers.AtLeftTopIn(parent, group.LineGroup, 5, 5)
-        LayoutHelpers.AtRightIn(parent, group.LineGroup, 5)
+        LayoutFor(parent)
+            :AtLeftTopIn(group.LineGroup, 5, 5)
+            :AtRightIn(group.LineGroup, 5)
+            :End()
         while group.LineGroup.Bottom() - parent.Bottom() > 85 do
             index = index + 1
             group.LineGroup.Lines[index] = CreateOptionsSelectorLine()
-            LayoutHelpers.Below(group.LineGroup.Lines[index], parent, 5)
-            LayoutHelpers.AtRightIn(group.LineGroup.Lines[index], parent)
+            LayoutFor(group.LineGroup.Lines[index])
+                :Below(parent, 5)
+                :AtRightIn(parent)
+                :End()
             parent = group.LineGroup.Lines[index]
         end
         group.numLines = index
