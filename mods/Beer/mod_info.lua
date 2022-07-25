@@ -1,0 +1,14 @@
+name = "Beer"
+uid = "beer-beer-beer-v01"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requiresNames = {}
+conflicts = {}
+after = {}
