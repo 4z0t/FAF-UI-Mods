@@ -17,7 +17,7 @@ local function PlayOpenSound()
     end
 end
 
-local function PlayPoursound()
+local function PlayPourSound()
     if math.random(1, 2) == 1 then
         PlaySound(Sound { Bank = 'Beer', Cue = 'Soda_Pour_' .. tostring(math.random(1, sodaPour)) })
     else
@@ -53,7 +53,7 @@ local function Update()
     for _, mex in mexes do
         if mex.wasUpgradedBeer and not mex.isUpgradedBeer then
             --print("mex completed upgrade")
-            PlayPoursound()
+            PlayPourSound()
         end
     end
 end
