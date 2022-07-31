@@ -2,6 +2,7 @@ local Group = import('/lua/maui/group.lua').Group
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
+local LayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 
 local Entry = import("Views/Entry.lua").Entry
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
@@ -13,6 +14,9 @@ local SequentialAnimation = import("Animations/SequentialAnimation.lua").Sequent
 local Utils = import("Utils.lua")
 
 local ScoreBoard = import("ScoreBoard.lua").ScoreBoard
+
+
+local BorderedCheckBox = import("Views/BorderedCheckBox.lua").BorderedCheckBox
 
 
 local controls
@@ -96,5 +100,36 @@ function Main(isReplay)
 
 
     Utils.GetArmiesFormattedTable()
-    --local sb = ScoreBoard(GetFrame(0))
+
+    local function RGBA(color)
+        if string.len(color) == 9 then -- #rrggbbaa -- > aarrggbb
+            return string.sub(color, 8) .. string.sub(color, 2, 7)
+        elseif string.len(color) == 7 then -- #rrggbb -- > rrggbb
+            return 'ff' .. string.sub(color, 2)
+        else
+            return -- no color
+        end
+    end
+
+    local normalEnergyColor = RGBA '#f7c70f'
+    local overEnergyColor = RGBA "#faf202"
+
+
+
+    local normalUncheckedColor = RGBA "#3f3f3f"
+    local overUncheckedColor = RGBA "#555555"
+
+    local cb = BorderedCheckBox(parent,
+        normalUncheckedColor,
+        normalEnergyColor,
+        overUncheckedColor,
+        overEnergyColor,nil, nil, nil, nil, 2)
+    cb:SetText("Test")
+    cb:SetFont(UIUtil.bodyFont, 16)
+    LayoutFor(cb)
+        :AtLeftTopIn(parent, 600, 400)
+        :Width(50)
+        :Height(20)
+    cb:SetCheck(true)
+    cb.Depth:Set(1100)
 end

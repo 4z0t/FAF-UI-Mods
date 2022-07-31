@@ -24,7 +24,7 @@ Border = Class(Group)
             self._bottomBitmap:SetSolidColor(color)
         end
         if color then
-            self:SetColor(color)
+            self._color:Set(color)
         end
 
         LayoutFor(self._leftBitmap)
@@ -60,6 +60,10 @@ Border = Class(Group)
         self._color:Set(color)
     end,
 
+    GetColor = function(self)
+        return self._color()
+    end,
+
     SetAlpha = function(self, alpha, applyToChildren)
         Group.SetAlpha(self, alpha, applyToChildren)
         self._leftBitmap:SetAlpha(alpha, applyToChildren)
@@ -68,8 +72,8 @@ Border = Class(Group)
         self._bottomBitmap:SetAlpha(alpha, applyToChildren)
     end,
 
-    
-    
+
+
     OnDestroy = function(self)
         self._color:Destroy()
         self._color = nil

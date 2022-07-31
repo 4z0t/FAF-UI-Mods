@@ -6,7 +6,11 @@ local LayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 local Text = import("/lua/maui/text.lua").Text
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
+local colorAnimationFactory= import("../Animations/AnimationFactory.lua").GetColorAnimationFactory()
 
+local colorAnimation = colorAnimationFactory
+    :For(0.5)
+    :Create()
 
 BorderedCheckBox = Class(BorderedText)
 {
@@ -52,18 +56,15 @@ BorderedCheckBox = Class(BorderedText)
         else
             self._checkState = "unchecked"
         end
-        self:SetColor(self._states[self._controlState][self._checkState])
+        colorAnimation:Apply(self,self._states[self._controlState][self._checkState])
+        --self:SetColor(self._states[self._controlState][self._checkState])
         if not skipEvent then
             self:OnCheck(isChecked)
         end
     end,
 
     ToggleCheck = function(self)
-        if self._checkState == "checked" then
-            self:SetCheck(false)
-        else
-            self:SetCheck(true)
-        end
+        self:SetCheck(self._checkState ~= "checked")
     end,
 
     IsChecked = function(self)
@@ -88,7 +89,8 @@ BorderedCheckBox = Class(BorderedText)
         if event.Type == 'MouseEnter' then
             if self._controlState != "disabled" then
                 self._controlState = "over"
-                self:SetColor(self._states[self._controlState][self._checkState])
+                colorAnimation:Apply(self, self._states[self._controlState][self._checkState])
+                --self:SetColor(self._states[self._controlState][self._checkState])
                 if self._rolloverCue != "NO_SOUND" then
                     if self._rolloverCue then
                         PlaySound(Sound{Cue = self._rolloverCue, Bank = "Interface",})
@@ -99,7 +101,8 @@ BorderedCheckBox = Class(BorderedText)
         elseif event.Type == 'MouseExit' then
             if self._controlState != "disabled" then
                 self._controlState = "normal"
-                self:SetColor(self._states[self._controlState][self._checkState])
+                colorAnimation:Apply(self, self._states[self._controlState][self._checkState])
+                --self:SetColor(self._states[self._controlState][self._checkState])
                 return true
             end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
