@@ -8,6 +8,7 @@
 local emptyFunc = function() end
 
 local Animation = import("Animation.lua")
+local ColorUtils = import("../ColorUtils.lua")
 
 ---@class BaseAnimationFactory
 local BaseAnimationFactory = ClassSimple
@@ -169,44 +170,6 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
     end
 }
 
-local function norm(s)
-    if string.len(s) == 1 then
-        return "0" .. s
-    end
-    return s
-end
-
-local function setAlpha(color, alpha)
-    return norm(STR_itox(alpha)) .. string.sub(color, 3)
-end
-
-local function setRed(color, red)
-    return string.sub(color, 1, 2) .. norm(STR_itox(red)) .. string.sub(color, 5)
-end
-
-local function setGreen(color, green)
-    return string.sub(color, 1, 4) .. norm(STR_itox(green)) .. string.sub(color, 7)
-end
-
-local function setBlue(color, blue)
-    return string.sub(color, 1, 6) .. norm(STR_itox(blue))
-end
-
-local function getAlpha(color)
-    return STR_xtoi(string.sub(color, 1, 2))
-end
-
-local function getRed(color)
-    return STR_xtoi(string.sub(color, 3, 4))
-end
-
-local function getGreen(color)
-    return STR_xtoi(string.sub(color, 5, 6))
-end
-
-local function getBlue(color)
-    return STR_xtoi(string.sub(color, 7, 8))
-end
 
 local ColorAnimationFactory = Class(BaseAnimationFactory)
 {
@@ -237,7 +200,7 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
 
 
     Create = function(self)
-
+        local duration = self._duration
 
         self._onStart = function(control, state, endColor)
             local color = string.upper(control:GetColor())
@@ -245,26 +208,29 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
 
             state = {
                 startColor = color,
+
                 alpha = 'FF',
-                sr = getRed(color),
-                sg = getGreen(color),
-                sb = getBlue(color),
 
-                r = getRed(color),
-                g = getGreen(color),
-                b = getBlue(color),
+                sr = ColorUtils.GetRed(color),
+                sg = ColorUtils.GetGreen(color),
+                sb = ColorUtils.GetBlue(color),
 
-                er = getRed(endColor),
-                eg = getGreen(endColor),
-                eb = getBlue(endColor),
+                r = ColorUtils.GetRed(color),
+                g = ColorUtils.GetGreen(color),
+                b = ColorUtils.GetBlue(color),
+
+                er = ColorUtils.GetRed(endColor),
+                eg = ColorUtils.GetGreen(endColor),
+                eb = ColorUtils.GetBlue(endColor),
+
                 endColor = endColor,
 
-                duration = self._duration
+                duration = duration
             }
 
-            state.ir = (state.er - state.sr) / self._duration
-            state.ig = (state.eg - state.sg) / self._duration
-            state.ib = (state.eb - state.sb) / self._duration
+            state.ir = (state.er - state.sr) / duration
+            state.ig = (state.eg - state.sg) / duration
+            state.ib = (state.eb - state.sb) / duration
 
             return state
         end
@@ -272,11 +238,8 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
             state.r = math.clamp(state.r + state.ir * delta, math.min(state.sr, state.er), math.max(state.sr, state.er))
             state.g = math.clamp(state.g + state.ig * delta, math.min(state.sg, state.eg), math.max(state.sg, state.eg))
             state.b = math.clamp(state.b + state.ib * delta, math.min(state.sb, state.eb), math.max(state.sb, state.eb))
-            local color = state.alpha ..
-                norm(STR_itox(math.floor(state.r))) ..
-                norm(STR_itox(math.floor(state.g))) ..
-                norm(STR_itox(math.floor(state.b)))
-            LOG(color)
+
+            local color = ColorUtils.ColorRGBA(math.floor(state.r), math.floor(state.g), math.floor(state.b))
             if color == state.endColor then
                 return true
             end

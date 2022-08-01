@@ -1,3 +1,6 @@
+local ColorUtils = import("ColorUtils.lua")
+
+
 local function RGBA(color)
     if string.len(color) == 9 then -- #rrggbbaa -- > aarrggbb
         return string.sub(color, 8) .. string.sub(color, 2, 7)
@@ -18,6 +21,10 @@ local overEnergyColor = RGBA "#faf202"
 
 local normalUncheckedColor = RGBA "#3f3f3f"
 local overUncheckedColor = RGBA "#555555"
+
+
+
+
 --[[
 -- local categoriesToCollect = {
 --     land = categories.LAND,
@@ -112,6 +119,9 @@ local overUncheckedColor = RGBA "#555555"
     -- GetData = function (armyScore) return 0 end
     
 ]]
+
+
+
 checkboxes = {
     scores = {
         {
@@ -138,9 +148,9 @@ checkboxes = {
             tooltip = "score-points",
             text = "S",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = RGBA "#e0e0e0",
             ou = RGBA "",
-            oc = RGBA "",
+            oc = RGBA "#f0f0f0",
             du = RGBA "",
             dc = RGBA "",
         }
@@ -150,9 +160,9 @@ checkboxes = {
             tooltip = "mass-total",
             text = "T",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
         },
@@ -160,9 +170,9 @@ checkboxes = {
             tooltip = "mass-reclaim",
             text = "R",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
         },
@@ -170,9 +180,9 @@ checkboxes = {
             tooltip = "mass-income",
             text = "M",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
         }
@@ -182,9 +192,9 @@ checkboxes = {
             tooltip = "energy-total",
             text = "T",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalEnergyColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
         },
@@ -192,9 +202,9 @@ checkboxes = {
             tooltip = "energy-reclaim",
             text = "R",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalEnergyColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
         },
@@ -202,9 +212,9 @@ checkboxes = {
             tooltip = "energy-income",
             text = "E",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalEnergyColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
         }
@@ -289,7 +299,8 @@ for name, category in checkboxes do
     for i, checkbox in category do
         checkbox.nu = checkbox.nu or normalUncheckedColor
         checkbox.ou = checkbox.ou or overUncheckedColor
-        checkbox.GetData = checkbox.GetData or function (armyScore) return 0 end
-        
+        checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
+        checkbox.du = checkbox.du or ColorUtils.ColorMult(checkbox.nu, 0.8)
+        checkbox.dc = checkbox.dc or ColorUtils.ColorMult(checkbox.nc or RGBA "#ffffff", 0.8)
     end
 end

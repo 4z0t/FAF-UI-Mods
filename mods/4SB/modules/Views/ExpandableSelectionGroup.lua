@@ -57,7 +57,9 @@ ExpandableSelectionGroup = Class(ExpandableGroup)
             LayoutHelpers.AtHorizontalCenterIn(oldActive, self)
             oldActive.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * oldActive.Height() end)
         else
+            newActive:Enable()
             newActive:Show()
+            oldActive:Disable()
             oldActive:Hide()
         end
 

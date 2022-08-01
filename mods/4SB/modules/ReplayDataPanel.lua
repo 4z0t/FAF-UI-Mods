@@ -3,6 +3,14 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
+local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
+
+
+local CheckBoxDropDown = Class(ExpandableSelectionGroup)
+{
+
+}
+
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 
 local textFont = "Zeroes Three"

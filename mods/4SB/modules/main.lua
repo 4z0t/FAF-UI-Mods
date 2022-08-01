@@ -16,8 +16,9 @@ local Utils = import("Utils.lua")
 local ScoreBoard = import("ScoreBoard.lua").ScoreBoard
 
 
-local BorderedCheckBox = import("Views/BorderedCheckBox.lua").BorderedCheckBox
+local BorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
 
+local ColorUtils = import("ColorUtils.lua")
 
 local controls
 
@@ -44,6 +45,48 @@ local colors = {
     "ff" .. "9400D3",
 }
 
+local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
+local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
+
+local CheckBoxDropDown = Class(ExpandableSelectionGroup)
+{
+    AddControls = function(self, controls)
+        ExpandableGroup.AddControls(self, controls)
+        local function CheckBoxOnClick(control, modifiers)
+            if modifiers.Left then
+                if self._isExpanded then
+                    self:SetActiveControl(control._id)
+                    self:Contract()
+                else
+                    self:Expand()
+                end
+            elseif modifiers.Right then
+                control:ToggleCheck()
+            end
+        end
+
+        local function CheckBoxSetState(control, state, check)
+            if state == "disabled" then
+                self:SetColor(self._states[state][check])
+            else
+                BorderedCheckBox.SetState(control, state, check)
+            end
+        end
+
+        self._active._id = 0
+        self._active.OnClick = CheckBoxOnClick
+        self._active.SetState = CheckBoxSetState
+
+        for i, control in self._controls do
+            control._id = i
+            control.OnClick = CheckBoxOnClick
+            control.SetState = CheckBoxSetState
+        end
+    end,
+}
+
+local checkboxesData = import("DataPanelConfig.lua").checkboxes
+
 function Main(isReplay)
     local parent = GetFrame(0)
     controls = Group(parent)
@@ -68,35 +111,35 @@ function Main(isReplay)
     local sa = SequentialAnimation(slideBackWards, 0.1, 1)
     sa:Apply(controls.entries)
 
-    local eg = ExpandableSelectionGroup(parent, 200, 40)
-    eg._bg = Bitmap(eg)
-    eg._bg:SetSolidColor("77000000")
-    LayoutHelpers.FillParent(eg._bg, eg._expand)
-    LayoutHelpers.AtLeftTopIn(eg, parent, 600, 200)
-    eg:AddControls((function()
-        local t = {}
-        for i = 1, 10 do
-            table.insert(t, UIUtil.CreateText(eg, "text " .. i, 16))
-        end
-        return t
-    end)()
-    -- {
-    --     UIUtil.CreateText(eg, "text 1", 16),
-    --     UIUtil.CreateText(eg, "text 2", 16),
-    --     UIUtil.CreateText(eg, "text 3", 16)
-    --}
-    )
-    --eg:EnableHitTest()
-    -- eg.HandleEvent = function(self, event)
-    --     if event.Type == 'ButtonPress' then
-    --         if self._isExpanded then
-    --             self:Contract()
-    --         else
-    --             self:Expand()
-    --         end
+    -- local eg = ExpandableSelectionGroup(parent, 200, 40)
+    -- eg._bg = Bitmap(eg)
+    -- eg._bg:SetSolidColor("77000000")
+    -- LayoutHelpers.FillParent(eg._bg, eg._expand)
+    -- LayoutHelpers.AtLeftTopIn(eg, parent, 600, 200)
+    -- eg:AddControls((function()
+    --     local t = {}
+    --     for i = 1, 10 do
+    --         table.insert(t, UIUtil.CreateText(eg, "text " .. i, 16))
     --     end
-    -- end
-    eg.Depth:Set(1000)
+    --     return t
+    -- end)()
+    -- -- {
+    -- --     UIUtil.CreateText(eg, "text 1", 16),
+    -- --     UIUtil.CreateText(eg, "text 2", 16),
+    -- --     UIUtil.CreateText(eg, "text 3", 16)
+    -- --}
+    -- )
+    -- --eg:EnableHitTest()
+    -- -- eg.HandleEvent = function(self, event)
+    -- --     if event.Type == 'ButtonPress' then
+    -- --         if self._isExpanded then
+    -- --             self:Contract()
+    -- --         else
+    -- --             self:Expand()
+    -- --         end
+    -- --     end
+    -- -- end
+    -- eg.Depth:Set(1000)
 
 
     Utils.GetArmiesFormattedTable()
@@ -112,7 +155,8 @@ function Main(isReplay)
     end
 
     local normalEnergyColor = RGBA '#f7c70f'
-    local overEnergyColor = RGBA "#faf202"
+    --local overEnergyColor = RGBA "#faf202"
+    local overEnergyColor = ColorUtils.ColorMult(normalEnergyColor, 1.5)
 
 
 
@@ -123,7 +167,11 @@ function Main(isReplay)
         normalUncheckedColor,
         normalEnergyColor,
         overUncheckedColor,
-        overEnergyColor,nil, nil, nil, nil, 2)
+        overEnergyColor,
+        ColorUtils.ColorMult(normalUncheckedColor, 0.8),
+        ColorUtils.ColorMult(normalEnergyColor, 0.8),
+        nil,
+        nil, 2)
     cb:SetText("Test")
     cb:SetFont(UIUtil.bodyFont, 16)
     LayoutFor(cb)
@@ -132,4 +180,60 @@ function Main(isReplay)
         :Height(20)
     cb:SetCheck(true)
     cb.Depth:Set(1100)
+    cb.OnClick = function(self, modifiers)
+        if modifiers.Left then
+
+            self:ToggleCheck()
+        elseif modifiers.Right then
+            self:Disable()
+        end
+    end
+
+
+
+
+    local eg = CheckBoxDropDown(parent, 25, 25)
+    eg._bg = Bitmap(eg)
+    eg._bg:SetSolidColor("77000000")
+    LayoutHelpers.FillParent(eg._bg, eg._expand)
+    LayoutHelpers.AtLeftTopIn(eg, parent, 600, 200)
+    eg:AddControls((function()
+
+        local t = {}
+        for i, checkbox in checkboxesData.scores do
+
+
+            local _cb = BorderedCheckBox(eg,
+                checkbox.nu,
+                checkbox.nc,
+                checkbox.ou,
+                checkbox.oc,
+                checkbox.du,
+                checkbox.dc,
+                nil, nil, 2
+            )
+            LayoutFor(_cb)
+                :Width(20)
+                :Height(20)
+            _cb:SetText(checkbox.text)
+            _cb:SetFont(UIUtil.bodyFont, 16)
+            _cb:SetCheck(true)
+
+            table.insert(t, _cb)
+        end
+        return t
+    end)()
+    )
+    --eg:EnableHitTest()
+    -- eg.HandleEvent = function(self, event)
+    --     if event.Type == 'ButtonPress' then
+    --         if self._isExpanded then
+    --             self:Contract()
+    --         else
+    --             self:Expand()
+    --         end
+    --     end
+    -- end
+    eg.Depth:Set(1000)
+
 end
