@@ -1,3 +1,4 @@
+---@module "ColorUtils"
 local ColorUtils = import("ColorUtils.lua")
 
 

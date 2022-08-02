@@ -1,3 +1,4 @@
+---@module "Animations/AnimationFactory"
 -- move
 -- fade in
 -- fade out
@@ -6,8 +7,9 @@
 -- etc
 
 local emptyFunc = function() end
-
+---@module "Animations/Animation"
 local Animation = import("Animation.lua")
+---@module "ColorUtils"
 local ColorUtils = import("../ColorUtils.lua")
 
 ---@class BaseAnimationFactory
@@ -21,7 +23,7 @@ local BaseAnimationFactory = ClassSimple
 
     ---comment
     ---@param self BaseAnimationFactory
-    ---@param func fun(control : Control, delta : number, state: ControlState) : boolean # if returns true then animation is finished
+    ---@param func animationOnFrameFunc
     ---@return BaseAnimationFactory
     OnFrame = function(self, func)
         self._onFrame = func
@@ -29,7 +31,7 @@ local BaseAnimationFactory = ClassSimple
     end,
     ---comment
     ---@param self BaseAnimationFactory
-    ---@param func? fun(control : Control, state: ControlState, ...) : nil | ControlState
+    ---@param func? animationOnStartFunc
     ---@return BaseAnimationFactory
     OnStart = function(self, func)
         self._onStart = func or emptyFunc
@@ -38,7 +40,7 @@ local BaseAnimationFactory = ClassSimple
 
     ---comment
     ---@param self BaseAnimationFactory
-    ---@param func? fun(control : Control, state: ControlState)
+    ---@param func? animationOnFinishFunc
     ---@return BaseAnimationFactory
     OnFinish = function(self, func)
         self._onFinish = func or emptyFunc

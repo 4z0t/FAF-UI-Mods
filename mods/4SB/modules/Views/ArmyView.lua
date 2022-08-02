@@ -6,7 +6,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
----@class Animator
+---@module "Animations/Animator"
 local Animator = import("../Animations/Animator.lua")
 
 ---@class BaseAnimationFactory
@@ -15,6 +15,7 @@ local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimati
 
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 
+---@module "4SBUtils"
 local Utils = import("../Utils.lua")
 local FormatNumber = Utils.FormatNumber
 local TextWidth = Utils.TextWidth

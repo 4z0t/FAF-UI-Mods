@@ -1,3 +1,6 @@
+---@module "Animations/Animator"
+
+
 local Group = import('/lua/maui/group.lua').Group
 
 ---@class Animator : Control

@@ -1,3 +1,5 @@
+---@module "4SBUtils"
+
 local Text = import("/lua/maui/text.lua").Text
 
 local isReplay = import("/lua/ui/game/gamemain.lua").GetReplayState()
@@ -5,10 +7,15 @@ local sessionInfo = SessionGetScenarioInfo()
 
 local armiesFormattedTable
 
+---comment
+---@param factionIndex any
+---@return unknown
 function GetSmallFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].SmallIcon
 end
 
+---comment
+---@return table|unknown
 function GetArmiesFormattedTable()
     if not armiesFormattedTable then
         armiesFormattedTable = {}
@@ -64,6 +71,9 @@ function GetArmiesFormattedTable()
     return armiesFormattedTable
 end
 
+---comment
+---@param n any
+---@return string
 function FormatNumber(n)
     if (math.abs(n) < 1000) then
         return string.format("%01.0f", n)
@@ -76,6 +86,11 @@ function FormatNumber(n)
     end
 end
 
+---comment
+---@param str any
+---@param font any
+---@param size any
+---@return unknown
 function TextWidth(str, font, size)
     local dummy = Text(GetFrame(0))
     dummy:Hide()
