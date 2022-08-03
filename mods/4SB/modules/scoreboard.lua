@@ -7,6 +7,8 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
+local DataPanel = import("ReplayDataPanel.lua").DataPanel
+
 
 
 ScoreBoard = Class(Group)
@@ -108,15 +110,13 @@ ScoreBoard = Class(Group)
         if self._title then
             self._title:Update(data)
         end
+        self:UpdateArmiesData(data)
+    end,
+    UpdateArmiesData = function(self, data)
         if data then
             for i, armyView in self._armyViews do
                 armyView:Update(data[i])
             end
-            -- for i, armyData in data do
-            --     if self._armyViews[i] then
-            --         self._armyViews[i]:Update(armyData.resources)
-            --     end
-            -- end
         end
     end,
 
@@ -134,7 +134,10 @@ ReplayScoreBoard = Class(ScoreBoard)
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
 
+        self._dataSetup = { 1, 1, 1, 1, 1 }
+
         self._obs = ObserverPanel(self)
+        self._dataPanel = DataPanel(self)
     end,
 
     _InitArmyViews = function(self)
@@ -173,14 +176,48 @@ ReplayScoreBoard = Class(ScoreBoard)
         LayoutFor(self._obs)
             :Right(self.Right)
             :Top(self.Bottom)
+
+        LayoutFor(self._dataPanel)
+            :Right(self.Right)
+            :Top(self._obs.Bottom)
     end,
 
     UpdateGameSpeed = function(self, gameSpeed)
         ScoreBoard.UpdateGameSpeed(self, gameSpeed)
         self._obs:SetGameSpeed(gameSpeed)
-    end
+    end,
 
-    -- Update = function(self, data)
+    UpdateArmiesData = function(self, data)
+        if data and self._armyViews then
+            for i, armyView in self._armyViews do
+                armyView:Update(data[i], self._dataSetup)
+            end
+        end
+    end,
 
-    -- end
+    SortArmies = function(self, func)
+
+    end,
+
+    SetDataSetup = function(self, setup)
+        local GetScoreCache = import("/lua/ui/game/score.lua").GetScoreCache
+        self._dataSetup = setup
+        self:UpdateArmiesData(GetScoreCache())
+    end,
+
+    Expand = function(self, id)
+        for _, armyView in self._armyViews do
+            armyView:ExpandData(id)
+        end
+    end,
+
+    Contract = function(self, id)
+        for _, armyView in self._armyViews do
+            armyView:ContractData(id)
+        end
+    end,
+
+
+
+
 }

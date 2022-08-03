@@ -75,6 +75,9 @@ end
 ---@param n any
 ---@return string
 function FormatNumber(n)
+    if n == nil then
+        return ""
+    end
     if (math.abs(n) < 1000) then
         return string.format("%01.0f", n)
     elseif (math.abs(n) < 10000) then

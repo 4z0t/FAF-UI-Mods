@@ -6,14 +6,28 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
+
 ---@module "Animations/Animator"
 local Animator = import("../Animations/Animator.lua")
+local alphaAnimator = Animator.Animator(GetFrame(0))
+
 
 ---@class BaseAnimationFactory
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
 
 
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
+local appearAnimation = alphaAnimationFactory
+    :ToAppear()
+    :For(0.2)
+    :EndWith(1)
+    :Create(alphaAnimator)
+
+local fadeAnimation = alphaAnimationFactory
+    :ToFade()
+    :For(0.2)
+    :EndWith(0)
+    :Create(alphaAnimator)
 
 ---@module "4SBUtils"
 local Utils = import("../Utils.lua")
@@ -22,6 +36,7 @@ local TextWidth = Utils.TextWidth
 local Border = import("Border.lua").Border
 local ShareManager = import("../ShareManager.lua")
 
+local checkboxes = import("../DataPanelConfig.lua").checkboxes
 
 local bgColor = UIUtil.disabledColor
 local bgColor = 'ff000000'
@@ -292,22 +307,23 @@ AllyView = Class(ArmyView)
 
 
         ArmyView.Update(self, data)
-        local resources = data.resources
-        if resources and not self.isOutOfGame then
-            self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
-            self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-        else
-            self._energy:SetText("")
-            self._mass:SetText("")
+        if not self.isOutOfGame then
+            local resources = data.resources
+            if resources then
+                self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
+                self._mass:SetText(FormatNumber(resources.massin.rate * 10))
+            else
+                self._energy:SetText("")
+                self._mass:SetText("")
+            end
         end
-
     end
 
 
 
 }
 
-local dataTextOffSet = 30
+local dataTextOffSet = 40
 
 local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
 
@@ -315,6 +331,7 @@ local dataAnimationSpeed = 150
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
+        fadeAnimation:Apply(control)
         control._contracted = true
         return state or { nextControl = nextControl }
     end)
@@ -331,6 +348,7 @@ local contractDataAnimation = animationFactory
 
 local expandDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
+        appearAnimation:Apply(control)
         control._contracted = false
         return state or { nextControl = nextControl }
     end)
@@ -351,7 +369,7 @@ ReplayArmyView = Class(ArmyView)
         ArmyView.__init(self, parent)
 
         self._data = {}
-        for i = 1, 5 do
+        for i = 1, table.getn(checkboxes) do
             self._data[i] = Text(self)
         end
     end,
@@ -388,28 +406,22 @@ ReplayArmyView = Class(ArmyView)
     end,
 
 
-    Update = function(self, data)
+    Update = function(self, data, setup)
         ArmyView.Update(self, data)
-
+        for i, dataText in self._data do
+            local checkboxData = checkboxes[i][ setup[i] ]
+            local color = checkboxData.nc
+            local text = FormatNumber(checkboxData.GetData(data))
+            dataText:SetText(text)
+            dataText:SetColor(color)
+        end
     end,
 
     HandleEvent = function(self, event)
 
-        if event.Type == 'ButtonPress' and event.Modifiers.Left and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
+        if event.Type == 'ButtonPress' and event.Modifiers.Left and not event.Modifiers.Shift and
+            not event.Modifiers.Ctrl then
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
-        end
-        if event.Type == 'ButtonPress' and event.Modifiers.Right then
-            for i = 1, 5 do
-
-                if IsKeyDown(i + 48) then
-                    if self._data[i]._contracted then
-                        self:ExpandData(i)
-                    else
-                        self:ContractData(i)
-                    end
-                    break
-                end
-            end
         end
 
     end,
@@ -446,5 +458,5 @@ ReplayArmyView = Class(ArmyView)
             expandDataAnimation:Apply(control, nextControl)
         end
 
-    end
+    end,
 }

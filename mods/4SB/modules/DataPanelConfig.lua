@@ -128,7 +128,7 @@ local overCheckedColor = ColorUtils.ColorMult(normalCheckedColor, 1.4)
 
 
 checkboxes = {
-    scores = {
+    { --scores
         {
             tooltip = "kills-built-ratio",
             text = "B",
@@ -138,6 +138,9 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.general.kills.mass / score.general.built.mass
+            end
         },
         {
             tooltip = "kills-loses-ratio",
@@ -148,6 +151,9 @@ checkboxes = {
             oc = RGBA "#ff2222",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.general.kills.mass / score.general.lost.mass
+            end
         },
         {
             tooltip = "score-points",
@@ -158,9 +164,12 @@ checkboxes = {
             oc = RGBA "#f0f0f0",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.general.score
+            end
         }
     },
-    mass = {
+    { --mass
         {
             tooltip = "mass-total",
             text = "T",
@@ -170,6 +179,9 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.massin.total
+            end
         },
         {
             tooltip = "mass-reclaim",
@@ -180,6 +192,9 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.massin.reclaimed
+            end
         },
         {
             tooltip = "mass-income",
@@ -190,9 +205,12 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.massin.rate * 10
+            end
         }
     },
-    energy = {
+    { --energy
         {
             tooltip = "energy-total",
             text = "T",
@@ -202,6 +220,9 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.energyin.total
+            end
         },
         {
             tooltip = "energy-reclaim",
@@ -212,6 +233,9 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.energyin.reclaimed
+            end
         },
         {
             tooltip = "energy-income",
@@ -222,9 +246,12 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.energyin.rate * 10
+            end
         }
     },
-    total = {
+    { --total
         {
             tooltip = "total-mass-in",
             text = "T",
@@ -256,7 +283,7 @@ checkboxes = {
             dc = RGBA "",
         }
     },
-    units = {
+    { --units
         {
             tooltip = "naval-units",
             text = "N",
