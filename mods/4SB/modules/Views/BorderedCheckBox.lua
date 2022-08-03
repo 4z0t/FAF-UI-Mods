@@ -8,11 +8,6 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 local colorAnimationFactory = import("../Animations/AnimationFactory.lua").GetColorAnimationFactory()
 
-local colorAnimation = colorAnimationFactory
-    :For(0.5)
-    :Create()
-
-
 
 BorderedCheckBox = Class(BorderedText)
 {
@@ -105,7 +100,6 @@ BorderedCheckBox = Class(BorderedText)
             if self._controlState ~= "disabled" then
                 self._controlState = "normal"
                 self:SetState(self._controlState, self._checkState)
-                colorAnimation:Apply(self, self._states[self._controlState][self._checkState])
                 return true
             end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
@@ -133,6 +127,12 @@ BorderedCheckBox = Class(BorderedText)
         self:ToggleCheck()
     end,
 }
+
+---@type Animator
+local colorAnimator = import("../Animations/Animator.lua").Animator(GetFrame(0))
+local colorAnimation = colorAnimationFactory
+    :For(0.5)
+    :Create(colorAnimator)
 
 
 AnimatedBorderedCheckBox = Class(BorderedCheckBox)
