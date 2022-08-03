@@ -56,7 +56,7 @@ BorderedCheckBox = Class(BorderedText)
         else
             self._checkState = "unchecked"
         end
-        self:SetState(self._controlState, self._checkState)
+        self:OnStateChange()
         if not skipEvent then
             self:OnCheck(isChecked)
         end
@@ -67,20 +67,20 @@ BorderedCheckBox = Class(BorderedText)
     end,
 
     IsChecked = function(self)
-        return (self._checkState == "checked")
+        return self._checkState == "checked"
     end,
 
     OnDisable = function(self)
         if self._controlState ~= "disabled" then
             self._controlState = "disabled"
-            self:SetState(self._controlState, self._checkState)
+            self:OnStateChange()
         end
     end,
 
     OnEnable = function(self)
         if self._controlState ~= "enabled" then
             self._controlState = "normal"
-            self:SetState(self._controlState, self._checkState)
+            self:OnStateChange()
         end
     end,
 
@@ -88,7 +88,7 @@ BorderedCheckBox = Class(BorderedText)
         if event.Type == 'MouseEnter' then
             if self._controlState ~= "disabled" then
                 self._controlState = "over"
-                self:SetState(self._controlState, self._checkState)
+                self:OnStateChange()
                 if self._rolloverCue ~= "NO_SOUND" then
                     if self._rolloverCue then
                         PlaySound(Sound { Cue = self._rolloverCue, Bank = "Interface", })
@@ -99,7 +99,7 @@ BorderedCheckBox = Class(BorderedText)
         elseif event.Type == 'MouseExit' then
             if self._controlState ~= "disabled" then
                 self._controlState = "normal"
-                self:SetState(self._controlState, self._checkState)
+                self:OnStateChange()
                 return true
             end
         elseif event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
@@ -115,8 +115,8 @@ BorderedCheckBox = Class(BorderedText)
         return false
     end,
 
-    SetState = function(self, state, check)
-        self:SetColor(self._states[state][check])
+    OnStateChange = function(self)
+        self:SetColor(self._states[self._controlState][self._checkState])
     end,
 
     -- override this method to handle checks
@@ -131,13 +131,13 @@ BorderedCheckBox = Class(BorderedText)
 ---@type Animator
 local colorAnimator = import("../Animations/Animator.lua").Animator(GetFrame(0))
 local colorAnimation = colorAnimationFactory
-    :For(0.5)
+    :For(0.3)
     :Create(colorAnimator)
 
 
 AnimatedBorderedCheckBox = Class(BorderedCheckBox)
 {
-    SetState = function(self, state, check)
-        colorAnimation:Apply(self, self._states[state][check])
+    OnStateChange = function(self)
+        colorAnimation:Apply(self, self._states[self._controlState][self._checkState])
     end,
 }
