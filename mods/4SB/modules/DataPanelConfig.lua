@@ -23,6 +23,10 @@ local overEnergyColor = RGBA "#faf202"
 local normalUncheckedColor = RGBA "#3f3f3f"
 local overUncheckedColor = RGBA "#555555"
 
+local normalCheckedColor = ColorUtils.ColorMult(overUncheckedColor, 2)
+local overCheckedColor = ColorUtils.ColorMult(normalCheckedColor, 1.4)
+
+
 
 
 
@@ -298,10 +302,15 @@ checkboxes = {
 
 for name, category in checkboxes do
     for i, checkbox in category do
+        checkbox.nc = checkbox.nc or normalCheckedColor
+        checkbox.oc = checkbox.oc or overCheckedColor
+
         checkbox.nu = checkbox.nu or normalUncheckedColor
         checkbox.ou = checkbox.ou or overUncheckedColor
-        checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
+
         checkbox.du = checkbox.du or ColorUtils.ColorMult(checkbox.nu, 0.8)
         checkbox.dc = checkbox.dc or ColorUtils.ColorMult(checkbox.nc or RGBA "#ffffff", 0.8)
+
+        checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
     end
 end

@@ -3,6 +3,7 @@ local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
 local LayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 
+---@class BorderColored : Group
 Border = Class(Group)
 {
     __init = function(self, parent, color, borderWidth)

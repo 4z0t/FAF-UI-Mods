@@ -8,11 +8,21 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 local colorAnimationFactory = import("../Animations/AnimationFactory.lua").GetColorAnimationFactory()
 
-
+---@class BorderedCheckBox : BorderedText
 BorderedCheckBox = Class(BorderedText)
 {
-    __init = function(self, parent, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked,
-                      disabledChecked, clickCue, rolloverCue, borderWidth)
+    __init = function(self,
+                      parent,
+                      normalUnchecked,
+                      normalChecked,
+                      overUnchecked,
+                      overChecked,
+                      disabledUnchecked,
+                      disabledChecked,
+                      clickCue,
+                      rolloverCue,
+                      borderWidth)
+
         BorderedText.__init(self, parent, normalUnchecked, borderWidth)
 
         self._states = {
@@ -37,8 +47,14 @@ BorderedCheckBox = Class(BorderedText)
         self._controlState = "normal"
     end,
 
-    SetNewColors = function(self, normalUnchecked, normalChecked, overUnchecked, overChecked, disabledUnchecked,
+    SetNewColors = function(self,
+                            normalUnchecked,
+                            normalChecked,
+                            overUnchecked,
+                            overChecked,
+                            disabledUnchecked,
                             disabledChecked)
+
         self._states.normal.checked = normalChecked
         self._states.normal.unchecked = normalUnchecked
         self._states.over.checked = overChecked or normalChecked
@@ -134,7 +150,7 @@ local colorAnimation = colorAnimationFactory
     :For(0.3)
     :Create(colorAnimator)
 
-
+---@class AnimatedBorderedCheckBox : BorderedCheckBox
 AnimatedBorderedCheckBox = Class(BorderedCheckBox)
 {
     OnStateChange = function(self)

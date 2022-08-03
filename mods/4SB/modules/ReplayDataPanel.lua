@@ -4,14 +4,16 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
+local LayoutFor = LayoutHelpers.ReusedLayoutFor
 
 
-local CheckBoxDropDown = Class(ExpandableSelectionGroup)
+local CheckboxDropDown = Class(ExpandableSelectionGroup)
 {
 
 }
 
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local checkboxes = import("DataPanelConfig.lua").checkboxes
+
 
 local textFont = "Zeroes Three"
 local textSize = 12

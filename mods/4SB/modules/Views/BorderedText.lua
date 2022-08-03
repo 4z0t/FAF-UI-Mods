@@ -3,7 +3,7 @@ local LayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
 local Text = import("/lua/maui/text.lua").Text
 
 
-
+---@class BorderedText : BorderColored
 BorderedText = Class(Border)
 {
     __init = function(self, parent, color, borderWidth)

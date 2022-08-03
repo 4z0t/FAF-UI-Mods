@@ -173,7 +173,7 @@ function Main(isReplay)
         nil,
         nil, 2)
     cb:SetText("Test")
-    cb:SetFont(UIUtil.bodyFont, 16)
+    cb:SetFont("Zeroes Three", 16)
     LayoutFor(cb)
         :AtLeftTopIn(parent, 600, 400)
         :Width(50)
@@ -200,9 +200,9 @@ function Main(isReplay)
     eg:AddControls((function()
 
         local t = {}
-        for i, checkbox in checkboxesData.scores do
+        for i, checkbox in checkboxesData.units do
 
-
+            ---@type AnimatedBorderedCheckBox
             local _cb = BorderedCheckBox(eg,
                 checkbox.nu,
                 checkbox.nc,
@@ -216,7 +216,7 @@ function Main(isReplay)
                 :Width(20)
                 :Height(20)
             _cb:SetText(checkbox.text)
-            _cb:SetFont(UIUtil.bodyFont, 16)
+            _cb:SetFont("Zeroes Three", 14)
             _cb:SetCheck(true)
 
             table.insert(t, _cb)
