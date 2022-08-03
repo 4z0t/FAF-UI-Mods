@@ -4,7 +4,7 @@ local Animator = import("Animator.lua")
 
 ---@alias animationOnStartFunc fun(control : Control, state: ControlState, ...) : nil | ControlState
 ---@alias animationOnFrameFunc fun(control : Control, delta : number, state: ControlState) : boolean # if returns true then animation is finished
----@alias animationOnFinishFunc  fun(control : Control, state: ControlState)
+---@alias animationOnFinishFunc fun(control : Control, state: ControlState)
 
 
 ---@class ControlState: table
@@ -13,6 +13,7 @@ local Animator = import("Animator.lua")
 ---@field OnStart animationOnStartFunc
 ---@field OnFrame animationOnFrameFunc
 ---@field OnFinish animationOnFinishFunc
+---@field _animator Animator
 local AnimationMetaTable = {}
 AnimationMetaTable.__index = AnimationMetaTable
 
@@ -22,18 +23,25 @@ AnimationMetaTable.__index = AnimationMetaTable
 ---@param control Control
 ---@param ... any
 function AnimationMetaTable:Apply(control, ...)
-    Animator.ApplyAnimation(control, self, unpack(arg))
+    if IsDestroyed(self._animator) then
+        Animator.ApplyAnimation(control, self, unpack(arg))
+    else
+        self._animator:Add(control, self, unpack(arg))
+    end
 end
 
 ---comment
 ---@param onStart animationOnStartFunc
 ---@param onFrame animationOnFrameFunc
 ---@param onFinish animationOnFinishFunc
+---@param animator? Animator
 ---@return Animation
-function Create(onStart, onFrame, onFinish)
+function Create(onStart, onFrame, onFinish, animator)
 
     return setmetatable(
         { OnStart = onStart,
             OnFrame = onFrame,
-            OnFinish = onFinish }, AnimationMetaTable)
+            OnFinish = onFinish,
+            _animator = animator
+        }, AnimationMetaTable)
 end

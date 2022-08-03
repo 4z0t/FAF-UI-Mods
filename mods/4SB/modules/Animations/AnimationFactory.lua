@@ -49,11 +49,12 @@ local BaseAnimationFactory = ClassSimple
 
     ---comment
     ---@param self BaseAnimationFactory
+    ---@param animator? Animator
     ---@return Animation
-    Create = function(self)
+    Create = function(self, animator)
         assert(self._onStart and self._onFrame and self._onFinish, "Not complete animation")
 
-        local animation = Animation.Create(self._onStart, self._onFrame, self._onFinish)
+        local animation = Animation.Create(self._onStart, self._onFrame, self._onFinish, animator)
 
         self._onStart = false
         self._onFrame = false
@@ -63,7 +64,7 @@ local BaseAnimationFactory = ClassSimple
 
     end
 }
-
+---@class AlphaAnimationFactory : BaseAnimationFactory
 local AlphaAnimationFactory = Class(BaseAnimationFactory)
 {
     StartWith = function(self, startAlpha)
@@ -99,7 +100,11 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         return self
     end,
 
-    Create = function(self)
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@param animator? Animator
+    ---@return Animation
+    Create = function(self, animator)
         assert(self._endAlpha and self._direction and self._duration, "Not complete Alpha animation")
 
         if self._direction == 1 then
@@ -168,11 +173,11 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         self._duration = false
         self._children = false
         self._isStart = false
-        return BaseAnimationFactory.Create(self)
+        return BaseAnimationFactory.Create(self, animator)
     end
 }
 
-
+---@class ColorAnimationFactory : BaseAnimationFactory
 local ColorAnimationFactory = Class(BaseAnimationFactory)
 {
     StartWith = function(self, color)
@@ -201,7 +206,11 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
     end,
 
 
-    Create = function(self)
+    ---comment
+    ---@param self ColorAnimationFactory
+    ---@param animator? Animator
+    ---@return Animation
+    Create = function(self, animator)
         local duration = self._duration
 
         self._onStart = function(control, state, endColor)
@@ -253,7 +262,7 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
         self._startColor = false
         self._endColor = false
         self._isStart = false
-        return BaseAnimationFactory.Create(self)
+        return BaseAnimationFactory.Create(self, animator)
     end
 }
 

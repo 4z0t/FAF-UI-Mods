@@ -52,18 +52,23 @@ Animator = Class(Group)
 
         self._controls[control] = nil
         self._controlsStates[control] = nil
-        
+
         if table.empty(self._controls) and self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(false)
         end
+    end,
+
+    OnDestroy = function(self)
+        self._controls = nil
+        self._controlsStates = nil
     end
 }
 
 ---@type Animator
-local animator
+local globalAnimator
 
 function Init()
-    animator = Animator(GetFrame(0))
+    globalAnimator = Animator(GetFrame(0))
 end
 
 ---global animator applies animation to control with additional args
@@ -71,20 +76,20 @@ end
 ---@param animation Animation
 ---@param ... any
 function ApplyAnimation(control, animation, ...)
-    if IsDestroyed(animator) then
+    if IsDestroyed(globalAnimator) then
         error("There is no animator to animate controls")
     else
-        animator:Add(control, animation, unpack(arg))
+        globalAnimator:Add(control, animation, unpack(arg))
     end
 end
 
 ---comment
 ---@param control Control
 function StopAnimation(control, skip)
-    if IsDestroyed(animator) then
+    if IsDestroyed(globalAnimator) then
         error("There is no animator to stop animation")
     else
-        animator:Remove(control, skip)
+        globalAnimator:Remove(control, skip)
     end
 end
 
