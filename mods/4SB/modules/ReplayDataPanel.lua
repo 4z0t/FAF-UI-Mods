@@ -20,6 +20,18 @@ local checkboxHeight = 18
 
 local bgColor = "ff000000"
 
+local Chechbox = Class(AnimatedBorderedCheckBox)
+{
+    -- OnHide = function(self, hidden)
+    --     if not hidden then
+    --         local dropdown = self:GetParent()
+    --         if not dropdown._isExpanded and self ~= dropdown._active then
+    --             self:Hide()
+    --         end
+    --     end
+    -- end
+}
+
 local CheckboxDropDown = Class(ExpandableSelectionGroup)
 {
     __init = function(self, parent, width, height)
@@ -27,12 +39,15 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
         self._bg = Bitmap(self)
         LayoutFor(self._bg)
             :Color(bgColor)
+            :Alpha(0.4)
             :Fill(self._expand)
             :Top(self.Bottom)
     end,
 
     AddControls = function(self, controls)
         ExpandableGroup.AddControls(self, controls)
+
+
         local function CheckBoxOnClick(control, modifiers)
             local dropdown = control:GetParent()
             local datePanel = dropdown:GetParent()
@@ -54,12 +69,15 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             end
         end
 
+
         self._active._id = 0
         self._active.OnClick = CheckBoxOnClick
+        self._active:SetAlpha(1)
 
         for i, control in self._controls do
             control._id = i
             control.OnClick = CheckBoxOnClick
+            control:SetAlpha(0)
         end
     end,
 }
@@ -124,7 +142,7 @@ DataPanel = Class(Group)
         for i, dropdown in self._dropdowns do
             local cbs = {}
             for j, checkboxData in checkboxes[i] do
-                local checkbox = AnimatedBorderedCheckBox(
+                local checkbox = Chechbox(
                     dropdown,
                     checkboxData.nu,
                     checkboxData.nc,

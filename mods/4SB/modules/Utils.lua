@@ -72,7 +72,7 @@ function GetArmiesFormattedTable()
 end
 
 ---comment
----@param n any
+---@param n number | nil
 ---@return string
 function FormatNumber(n)
     if n == nil then
@@ -86,6 +86,20 @@ function FormatNumber(n)
         return string.format("%01.0fk", n / 1000)
     else
         return string.format("%01.1fm", n / 1000000)
+    end
+end
+
+---comment
+---@param n number | nil
+---@return string
+function FormatRatioNumber(n)
+    if n == nil then
+        return ""
+    end
+    if (math.abs(n) < 10) then
+        return string.format("%01.2f", n)
+    else
+        return FormatNumber(n)
     end
 end
 

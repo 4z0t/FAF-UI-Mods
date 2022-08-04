@@ -7,7 +7,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 
-local expandSpeed = 1000
+local expandSpeed = 500
 
 local expandAnimation = animationFactory
     :OnStart()

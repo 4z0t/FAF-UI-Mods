@@ -152,6 +152,9 @@ checkboxes = {
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
+                if score.general.lost.mass == 0 then
+                    return 0
+                end
                 return score.general.kills.mass / score.general.lost.mass
             end
         },
@@ -261,6 +264,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return (score.resources.massin.rate - score.resources.massout.rate) * 10
+            end
         },
         {
             tooltip = "total-mass-killed",
@@ -271,6 +277,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.general.kills.mass
+            end
         },
         {
             tooltip = "total-mass-collected",
@@ -281,6 +290,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.resources.massin.total
+            end
         }
     },
     { --units
@@ -293,6 +305,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.units.naval.built - score.units.naval.lost
+            end
         },
         {
             tooltip = "air-units",
@@ -303,6 +318,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.units.air.built - score.units.air.lost
+            end
         },
         {
             tooltip = "land-units",
@@ -313,6 +331,22 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.units.land.built - score.units.land.lost
+            end
+        },
+        {
+            tooltip = "sacu-units",
+            text = "S",
+            nu = RGBA "",
+            nc = RGBA "",
+            ou = RGBA "",
+            oc = RGBA "",
+            du = RGBA "",
+            dc = RGBA "",
+            GetData = function(score)
+                return score.units.sacu.built - score.units.sacu.lost
+            end
         },
         {
             tooltip = "all-units",
@@ -323,6 +357,9 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            GetData = function(score)
+                return score.general.currentunits
+            end
         }
     }
 }

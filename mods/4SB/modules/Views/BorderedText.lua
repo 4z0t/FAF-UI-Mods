@@ -36,4 +36,9 @@ BorderedText = Class(Border)
         self:SetTextColor(color)
     end,
 
+    SetAlpha = function(self, alpha, applyToChildren)
+        Border.SetAlpha(self, alpha, applyToChildren)
+        self._text:SetAlpha(alpha, applyToChildren)
+    end
+
 }
