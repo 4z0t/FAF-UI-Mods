@@ -1,6 +1,7 @@
 ---@module "ColorUtils"
 local ColorUtils = import("ColorUtils.lua")
 
+local Utils = import("Utils.lua")
 
 local function RGBA(color)
     if string.len(color) == 9 then -- #rrggbbaa -- > aarrggbb
@@ -19,12 +20,12 @@ local overMassColor = RGBA "#68e344"
 local overEnergyColor = RGBA "#faf202"
 
 
-
 local normalUncheckedColor = RGBA "#3f3f3f"
 local overUncheckedColor = RGBA "#555555"
 
-local normalCheckedColor = ColorUtils.ColorMult(overUncheckedColor, 2)
-local overCheckedColor = ColorUtils.ColorMult(normalCheckedColor, 1.4)
+
+local normalCheckedColor = RGBA "#e0e0e0"
+local overCheckedColor = RGBA "#f0f0f0"
 
 
 
@@ -113,16 +114,6 @@ local overCheckedColor = ColorUtils.ColorMult(normalCheckedColor, 1.4)
 --     }
 -- end
 
---checkbox
-
-    -- normalUnchecked
-    -- normalChecked
-    -- overUnchecked
-    -- overChecked
-    -- disabledUnchecked
-    -- disabledChecked
-    -- GetData = function (armyScore) return 0 end
-    
 ]]
 
 
@@ -139,7 +130,7 @@ checkboxes = {
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
-                return score.general.kills.mass / score.general.built.mass
+                return score.general.kills.mass / score.general.built.mass, Utils.FormatRatioNumber
             end
         },
         {
@@ -155,16 +146,16 @@ checkboxes = {
                 if score.general.lost.mass == 0 then
                     return 0
                 end
-                return score.general.kills.mass / score.general.lost.mass
+                return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
             end
         },
         {
             tooltip = "score-points",
             text = "S",
             nu = RGBA "",
-            nc = RGBA "#e0e0e0",
+            nc = RGBA "",
             ou = RGBA "",
-            oc = RGBA "#f0f0f0",
+            oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
@@ -259,9 +250,9 @@ checkboxes = {
             tooltip = "total-mass-in",
             text = "T",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
@@ -272,9 +263,9 @@ checkboxes = {
             tooltip = "total-mass-killed",
             text = "T",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = RGBA "#ff0000",
             ou = RGBA "",
-            oc = RGBA "",
+            oc = RGBA "#ff2222",
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
@@ -285,9 +276,9 @@ checkboxes = {
             tooltip = "total-mass-collected",
             text = "T",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)

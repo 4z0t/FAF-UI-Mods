@@ -31,7 +31,7 @@ local fadeAnimation = alphaAnimationFactory
 
 ---@module "4SBUtils"
 local Utils = import("../Utils.lua")
-local FormatRatioNumber = Utils.FormatRatioNumber
+local FormatNumber = Utils.FormatNumber
 local TextWidth = Utils.TextWidth
 local Border = import("Border.lua").Border
 local ShareManager = import("../ShareManager.lua")
@@ -411,7 +411,9 @@ ReplayArmyView = Class(ArmyView)
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
             local color = checkboxData.nc
-            local text = FormatRatioNumber(checkboxData.GetData(data))
+            local value, formatFunc = checkboxData.GetData(data)
+            formatFunc = formatFunc or FormatNumber
+            local text = formatFunc(value)
             dataText:SetText(text)
             dataText:SetColor(color)
         end
