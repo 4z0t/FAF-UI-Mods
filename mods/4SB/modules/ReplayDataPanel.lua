@@ -2,10 +2,12 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
+local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Tooltip = import('/lua/ui/game/tooltip.lua')
+
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
 
 
@@ -68,7 +70,6 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
                 end
             end
         end
-
 
         self._active._id = 0
         self._active.OnClick = CheckBoxOnClick
@@ -160,9 +161,12 @@ DataPanel = Class(Group)
                 checkbox:SetText(checkboxData.text)
                 checkbox:SetFont("Zeroes Three", 12)
                 checkbox:SetCheck(true)
+                Tooltip.AddControlTooltip(checkbox, checkboxData.tooltip, 0.5)
                 cbs[j] = checkbox
+
             end
             dropdown:AddControls(cbs)
+
 
 
         end
