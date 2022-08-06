@@ -2,6 +2,7 @@
 
 
 local Group = import('/lua/maui/group.lua').Group
+local MAX_DELTA_ALLOWED = 0.05
 
 ---@class Animator : Control
 ---@field _controls table<Control, Animation>
@@ -21,11 +22,25 @@ Animator = Class(Group)
 
     OnFrame = function(self, delta)
         local controlsStates = self._controlsStates
-        for control, animation in self._controls do
-            if IsDestroyed(control) then
-                self:Remove(control, true)
-            elseif animation.OnFrame(control, delta, controlsStates[control]) then
-                self:Remove(control)
+        if delta > MAX_DELTA_ALLOWED then
+            local n = math.ceil(delta / MAX_DELTA_ALLOWED)
+            delta = delta / n
+            for _ = 1, n do
+                for control, animation in self._controls do
+                    if IsDestroyed(control) then
+                        self:Remove(control, true)
+                    elseif animation.OnFrame(control, delta, controlsStates[control]) then
+                        self:Remove(control)
+                    end
+                end
+            end
+        else
+            for control, animation in self._controls do
+                if IsDestroyed(control) then
+                    self:Remove(control, true)
+                elseif animation.OnFrame(control, delta, controlsStates[control]) then
+                    self:Remove(control)
+                end
             end
         end
     end,
