@@ -122,6 +122,8 @@ checkboxes = {
     { --scores
         {
             tooltip = "kills-built-ratio",
+            title = "Kills-built ratio",
+            description = "Ratio of killed units to built",
             text = "B",
             nu = RGBA "",
             nc = normalMassColor,
@@ -135,6 +137,8 @@ checkboxes = {
         },
         {
             tooltip = "kills-loses-ratio",
+            title = "Kills-loses ratio",
+            description = "Ratio of killed units to lost",
             text = "K",
             nu = RGBA "",
             nc = RGBA "#ff0000",
@@ -144,13 +148,15 @@ checkboxes = {
             dc = RGBA "",
             GetData = function(score)
                 if score.general.lost.mass == 0 then
-                    return 0
+                    return 0, Utils.FormatRatioNumber
                 end
                 return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
             end
         },
         {
             tooltip = "score-points",
+            title = "Army score",
+            description = "Score points of army",
             text = "S",
             nu = RGBA "",
             nc = RGBA "",
@@ -166,6 +172,8 @@ checkboxes = {
     { --mass
         {
             tooltip = "mass-total",
+            title = "Total Mass",
+            description = "Total amount of mass got by army",
             text = "T",
             nu = RGBA "",
             nc = normalMassColor,
@@ -179,6 +187,8 @@ checkboxes = {
         },
         {
             tooltip = "mass-reclaim",
+            title = "Reaclaimed Mass",
+            description = "Total amount of reaclaimed mass by army",
             text = "R",
             nu = RGBA "",
             nc = normalMassColor,
@@ -192,6 +202,8 @@ checkboxes = {
         },
         {
             tooltip = "mass-income",
+            title = "Mass income",
+            description = "Mass income of an army",
             text = "M",
             nu = RGBA "",
             nc = normalMassColor,
@@ -207,6 +219,8 @@ checkboxes = {
     { --energy
         {
             tooltip = "energy-total",
+            title = "Total Energy",
+            description = "Total amount of energy got by army",
             text = "T",
             nu = RGBA "",
             nc = normalEnergyColor,
@@ -220,6 +234,8 @@ checkboxes = {
         },
         {
             tooltip = "energy-reclaim",
+            title = "Reaclaimed Energy",
+            description = "Total amount of reaclaimed energy by army",
             text = "R",
             nu = RGBA "",
             nc = normalEnergyColor,
@@ -233,6 +249,8 @@ checkboxes = {
         },
         {
             tooltip = "energy-income",
+            title = "Energy income",
+            description = "Energy income of an army",
             text = "E",
             nu = RGBA "",
             nc = normalEnergyColor,
@@ -247,7 +265,9 @@ checkboxes = {
     },
     { --total
         {
-            tooltip = "total-mass-in",
+            tooltip = "total-mass-rate",
+            title = "Mass rate",
+            description = "Mass rate of army",
             text = "T",
             nu = RGBA "",
             nc = normalMassColor,
@@ -261,6 +281,8 @@ checkboxes = {
         },
         {
             tooltip = "total-mass-killed",
+            title = "Mass killed",
+            description = "Total amount of mass killed by army",
             text = "T",
             nu = RGBA "",
             nc = RGBA "#ff0000",
@@ -274,6 +296,8 @@ checkboxes = {
         },
         {
             tooltip = "total-mass-collected",
+            title = "Total Mass",
+            description = "Total amount of mass got by army",
             text = "T",
             nu = RGBA "",
             nc = normalMassColor,
@@ -289,6 +313,8 @@ checkboxes = {
     { --units
         {
             tooltip = "naval-units",
+            title = "Naval units",
+            description = "Amount of naval units",
             text = "N",
             nu = RGBA "",
             nc = RGBA "",
@@ -302,6 +328,8 @@ checkboxes = {
         },
         {
             tooltip = "air-units",
+            title = "Air units",
+            description = "Amount of air units",
             text = "A",
             nu = RGBA "",
             nc = RGBA "",
@@ -315,6 +343,8 @@ checkboxes = {
         },
         {
             tooltip = "land-units",
+            title = "Land units",
+            description = "Amount of land units",
             text = "L",
             nu = RGBA "",
             nc = RGBA "",
@@ -328,6 +358,8 @@ checkboxes = {
         },
         {
             tooltip = "sacu-units",
+            title = "SACU",
+            description = "Amount of SACUs",
             text = "S",
             nu = RGBA "",
             nc = RGBA "",
@@ -341,6 +373,8 @@ checkboxes = {
         },
         {
             tooltip = "all-units",
+            title = "All units",
+            description = "Amount of all units",
             text = "T",
             nu = RGBA "",
             nc = RGBA "",
@@ -355,6 +389,7 @@ checkboxes = {
     }
 }
 
+local tooltips = import('/lua/ui/help/tooltips.lua').Tooltips
 for name, category in checkboxes do
     for i, checkbox in category do
         checkbox.nc = checkbox.nc or normalCheckedColor
@@ -367,5 +402,12 @@ for name, category in checkboxes do
         checkbox.dc = checkbox.dc or ColorUtils.ColorMult(checkbox.nc or RGBA "#ffffff", 0.8)
 
         checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
+
+
+
+        tooltips[checkbox.tooltip] = {
+            title = checkbox.title,
+            description = checkbox.description
+        }
     end
 end
