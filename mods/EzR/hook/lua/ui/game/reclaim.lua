@@ -1,8 +1,102 @@
 local MathFloor = math.floor
-
+local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local LazyVar = import("/lua/lazyvar.lua")
 
+local function ComputeLabelProperties(mass)
+    if mass < 10 then
+        return nil, nil
+    end
+    -- change color according to mass value
+    if mass < 100 then
+        return 'ffc7ff8f', 10
+    end
 
+    if mass < 300 then
+        return 'ffd7ff05', 12
+    end
+
+    if mass < 600 then
+        return 'ffffeb23', 17
+    end
+
+    if mass < 1000 then
+        return 'ffff9d23', 20
+    end
+
+    if mass < 2000 then
+        return 'ffff7212', 22
+    end
+
+    -- > 2000
+    return 'fffb0303', 25
+end
+
+ReclaimLabel = Class(WorldLabel)
+{
+    __init = function(self, parent)
+        WorldLabel.__init(self, parent, Vector(0, 0, 0))
+
+        self._mass = Bitmap(self)
+        self._text = UIUtil.CreateText(self, "", 10, UIUtil.bodyFont, true)
+
+        self._oldMass = 0
+
+        self.PosX = LazyVar.Create()
+        self.PosY = LazyVar.Create()
+    end,
+
+    __post_init = function(self)
+        self:_Layout()
+        self:Update()
+    end,
+
+    _Layout = function(self)
+        self._mass.Height:Set(10)
+        self._mass.Width:Set(10)
+
+        LayoutFor(self._mass)
+            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+            :AtCenterIn(self)
+
+        LayoutFor(self._text)
+            :Color('ffc7ff8f')
+            :Above(self._mass, 2)
+            :AtHorizontalCenterIn(self)
+
+        local view = self.parent.view
+        LayoutFor(self)
+            :Left(function()
+                return view.Left() + self.PosX() - self.Width() / 2
+            end)
+            :Top(function()
+                return view.Top() + self.PosY() - self.Height() / 2
+            end)
+            :DisableHitTest(true)
+    end,
+
+    OnHide = function(self, hidden)
+        self:SetNeedsFrameUpdate(not hidden)
+    end,
+
+
+    Update = function(self)
+        local proj = self.parent.view:Project(self.position)
+        self.PosX:Set(proj.x)
+        self.PosY:Set(proj.y)
+        if self._isTextHidden then
+            self._text:Hide()
+        end
+    end,
+
+    SetValue = function(self, value)
+
+    end,
+
+    DisplayReclaim = function(self, reclaim)
+
+    end
+
+}
 
 local function CreateReclaimLabel(view, recl)
     local label = WorldLabel(view, Vector(0, 0, 0))
@@ -46,35 +140,6 @@ local function CreateReclaimLabel(view, recl)
     end
 
     label.SetText = function(self, value)
-
-        local function ComputeLabelProperties(mass)
-            if mass < 10 then
-                return nil, nil
-            end
-            -- change color according to mass value
-            if mass < 100 then
-                return 'ffc7ff8f', 10
-            end
-
-            if mass < 300 then
-                return 'ffd7ff05', 12
-            end
-
-            if mass < 600 then
-                return 'ffffeb23', 17
-            end
-
-            if mass < 1000 then
-                return 'ffff9d23', 20
-            end
-
-            if mass < 2000 then
-                return 'ffff7212', 22
-            end
-
-            -- > 2000
-            return 'fffb0303', 25
-        end
 
         local color, size = ComputeLabelProperties(value)
         if color then
@@ -146,7 +211,7 @@ function UpdateLabels()
     end
 
     table.sort(onScreenReclaims, CompareMass)
-    
+
     for _, r in onScreenReclaims do
         local proj = view:Project(r.position)
         if (not (proj.x < 0 or proj.y < 0 or proj.y > view.Height() or proj.x > view.Width())) then
@@ -227,8 +292,6 @@ function UpdateLabels()
     end
 end
 
--- the reason of conflicts is line 13: have to check for reclaim mode state
--- Wanna have no conflict? add this line to other mods and remove from conflics UIDs
 function OnCommandGraphShow(bool)
     local view = import('/lua/ui/game/worldview.lua').viewLeft
     if view.ShowingReclaim and not CommandGraphActive then return end -- if on by toggle key
