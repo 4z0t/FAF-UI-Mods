@@ -4,7 +4,6 @@ local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
-local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 local LazyVar = import("/lua/lazyvar.lua")
 
 local GetUnits = import("/mods/UMT/modules/units.lua").Get
@@ -28,6 +27,7 @@ local massExtractorsOverlay = massExtractorsOption()
 
 local overlays = {}
 local overlayGroup
+local worldView
 
 function CreateUnitOverlayControl(unit)
     -- creates an empty overlay control for a unit
@@ -103,18 +103,23 @@ function CreateFactoryOverlay(unit)
     -- LayoutHelpers.SetDimensions(overlay,12,12)
     -- overlay.Width:Set(12)
     -- overlay.Height:Set(12)
-    overlay:SetTexture({"/mods/IEL/textures/repeat.dds", "/mods/IEL/textures/idle_fac.dds",
-                        "/mods/IEL/textures/upgrading.dds"})
+    overlay:SetTexture({ "/mods/IEL/textures/repeat.dds", "/mods/IEL/textures/idle_fac.dds",
+        "/mods/IEL/textures/upgrading.dds", "/mods/IEL/textures/engi.dds" })
     LayoutHelpers.SetDimensions(overlay, 8, 8)
     overlay.OnFrame = OnFrameFactory
 end
+
 function OnFrameFactory(self, delta)
     if not self.unit:IsDead() and factoriesOverlay then
         if self.unit:IsIdle() then
             self:SetFrame(1)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
-        elseif (self.unit:IsRepeatQueue()) then
+        elseif self.unit:IsRepeatQueue() and self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("ENGINEER") then
+            self:SetFrame(3)
+            -- LayoutHelpers.SetDimensions(self,8,8)
+            self:Update()
+        elseif self.unit:IsRepeatQueue() then
             self:SetFrame(0)
             -- LayoutHelpers.SetDimensions(self,8,8)
             self:Update()
@@ -183,7 +188,7 @@ function OnFrameMex(self, delta)
 end
 
 function VerifyWV()
-    if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft 
+    if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft
     then
         worldView = import("/lua/ui/game/worldview.lua").viewLeft
         overlays = {}
@@ -196,10 +201,10 @@ function CreateUnitOverlays()
     for _, unit in allunits do
         if not overlays[unit:GetEntityId()] then
             if supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
-                
+
             elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
                 CreateEngineerOverlay(unit)
-            elseif factoriesOverlay ~= 0 and unit:IsInCategory("FACTORY") then
+            elseif factoriesOverlay and unit:IsInCategory("FACTORY") then
                 CreateFactoryOverlay(unit)
 
             elseif tacticalNukesOverlay and unit:IsInCategory("SILO") then
@@ -224,7 +229,7 @@ function initOverlayGroup()
     -- prepare for updating overlays
 end
 
-function init(isReplay)
+function Init(isReplay)
 
     --initOverlayGroup()
     AddBeatFunction(CreateUnitOverlays, true)
@@ -245,10 +250,10 @@ function init(isReplay)
     end
 
     GlobalOptions.AddOptions(modName, "Idle Engineers Light",
-        {OptionsUtils.Filter("Show engineers ovelays", engineersOption),
-         OptionsUtils.Filter("Show factories ovelays", factoriesOption),
-         OptionsUtils.Filter("Show Nukes and TMLs ovelays", tacticalNukesOption),
-         OptionsUtils.Filter("Show Mex ovelays", massExtractorsOption)})
+        { OptionsUtils.Filter("Show engineers ovelays", engineersOption),
+            OptionsUtils.Filter("Show factories ovelays", factoriesOption),
+            OptionsUtils.Filter("Show Nukes and TMLs ovelays", tacticalNukesOption),
+            OptionsUtils.Filter("Show Mex ovelays", massExtractorsOption) })
 
 end
 

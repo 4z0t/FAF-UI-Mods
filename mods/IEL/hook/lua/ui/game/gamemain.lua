@@ -1,5 +1,5 @@
 local originalCreateUI = CreateUI
-function CreateUI(isReplay, parent)
+function CreateUI(isReplay)
     originalCreateUI(isReplay)
-    import("/mods/IEL/modules/main.lua").main(isReplay)
+    import("/mods/IEL/modules/main.lua").Main(isReplay)
 end

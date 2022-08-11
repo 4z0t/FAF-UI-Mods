@@ -1,6 +1,6 @@
-function main(isReplay)
+function Main(isReplay)
     if exists("/mods/UMT/mod_info.lua") and import("/mods/UMT/mod_info.lua").version >= 4 then
-        import("engineers.lua").init(isReplay)
+        import("engineers.lua").Init(isReplay)
     else
         ForkThread(function()
             WaitSeconds(4)
