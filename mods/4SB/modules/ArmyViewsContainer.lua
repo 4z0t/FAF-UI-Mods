@@ -111,18 +111,28 @@ ArmyViewsContainer = Class(Group)
         if not self._sortFunc then
             return
         end
-        
+
         local dataTable = {}
         for armyId, _ in self._armyViews do
             table.insert(dataTable, self._sortFunc(scoreCache[armyId]))
         end
         if self._sortDirection == 1 then
             table.sort(self._lines, function(a, b)
-                return dataTable[a.id] > dataTable[b.id]
+                local data1 = dataTable[a.id]
+                local data2 = dataTable[b.id]
+                if data1 == data2 then
+                    return a.id < b.id
+                end
+                return data1 > data2
             end)
         elseif self._sortDirection == -1 then
             table.sort(self._lines, function(a, b)
-                return dataTable[a.id] < dataTable[b.id]
+                local data1 = dataTable[a.id]
+                local data2 = dataTable[b.id]
+                if data1 == data2 then
+                    return a.id < b.id
+                end
+                return data1 < data2
             end)
         else
             --reset to default
