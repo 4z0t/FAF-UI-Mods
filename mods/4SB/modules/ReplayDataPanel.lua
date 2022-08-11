@@ -22,16 +22,23 @@ local checkboxHeight = 18
 
 local bgColor = "ff000000"
 
+local checkboxes = import("DataPanelConfig.lua").checkboxes
 local Chechbox = Class(AnimatedBorderedCheckBox)
 {
-    -- OnHide = function(self, hidden)
-    --     if not hidden then
-    --         local dropdown = self:GetParent()
-    --         if not dropdown._isExpanded and self ~= dropdown._active then
-    --             self:Hide()
-    --         end
-    --     end
-    -- end
+    HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            local dropdown = self:GetParent()
+            local datePanel = dropdown:GetParent()
+            local GetData = checkboxes[dropdown._id][self._id + 1].GetData
+            if event.WheelRotation > 0 then
+                datePanel._sb:SortArmies(GetData, -1)
+            else
+                datePanel._sb:SortArmies(GetData, 1)
+            end
+            return true
+        end
+        return AnimatedBorderedCheckBox.HandleEvent(self, event)
+    end
 }
 
 local CheckboxDropDown = Class(ExpandableSelectionGroup)
@@ -83,7 +90,6 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
     end,
 }
 
-local checkboxes = import("DataPanelConfig.lua").checkboxes
 
 
 
@@ -175,6 +181,12 @@ DataPanel = Class(Group)
     UpdateDataSetup = function(self, category, id)
         self._setup[category] = id
         self._sb:SetDataSetup(self._setup)
+    end,
+
+    HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            self._sb:SortArmies(nil, 0)
+        end
     end
 
 

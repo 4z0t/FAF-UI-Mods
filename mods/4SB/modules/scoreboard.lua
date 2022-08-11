@@ -8,6 +8,7 @@ local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
+local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 
 
 
@@ -134,52 +135,44 @@ ReplayScoreBoard = Class(ScoreBoard)
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
 
-        self._dataSetup = { 1, 1, 1, 1, 1 }
-
+        self._armiesContainer = ArmyViewsContainer(self)
         self._obs = ObserverPanel(self)
         self._dataPanel = DataPanel(self)
     end,
 
-    _InitArmyViews = function(self)
-        self._lines = {}
-        self._armyViews = {}
-        local armiesData = Utils.GetArmiesFormattedTable()
-
-        -- sorting for better look
-        table.sort(armiesData, function(a, b)
-            if a.teamId ~= b.teamId then
-                return a.teamId < b.teamId
-            end
-            return a.id < b.id
-        end)
-
-
-        for i, armyData in armiesData do
-            local armyView = ArmyViews.ReplayArmyView(self)
-
-            armyView:SetStaticData(
-                armyData.id,
-                armyData.name,
-                armyData.rating,
-                armyData.faction,
-                armyData.color,
-                armyData.teamColor)
-
-            self._lines[i] = armyView
-            self._armyViews[armyData.id] = armyView
-        end
-
+    
+    __post_init = function(self)
+        self:_Layout()
     end,
 
     _Layout = function(self)
-        ScoreBoard._Layout(self)
+        if self._title then
+            LayoutFor(self._title)
+                :AtRightTopIn(self)
+            LayoutFor(self._armiesContainer)
+                :AnchorToBottom(self._title)
+                :Right(self.Right)
+        else
+            LayoutFor(self._armiesContainer)
+               :Top(self.Top) 
+                :Right(self.Right)
+        end
+
+
         LayoutFor(self._obs)
             :Right(self.Right)
-            :Top(self.Bottom)
+            :Top(self._armiesContainer.Bottom)
 
         LayoutFor(self._dataPanel)
             :Right(self.Right)
             :Top(self._obs.Bottom)
+
+        LayoutFor(self)
+            :Width(100)
+            :Bottom(self._dataPanel.Bottom)
+            :Over(GetFrame(0), 1000)
+            :AtRightTopIn(GetFrame(0), 0, 20)
+            :DisableHitTest()
     end,
 
     UpdateGameSpeed = function(self, gameSpeed)
@@ -188,33 +181,23 @@ ReplayScoreBoard = Class(ScoreBoard)
     end,
 
     UpdateArmiesData = function(self, data)
-        if data and self._armyViews then
-            for i, armyView in self._armyViews do
-                armyView:Update(data[i], self._dataSetup)
-            end
-        end
+        self._armiesContainer:Update(data)
     end,
 
-    SortArmies = function(self, func)
-
+    SortArmies = function(self, func, direction)
+        self._armiesContainer:Sort(nil, func, direction)
     end,
 
     SetDataSetup = function(self, setup)
-        local GetScoreCache = import("/lua/ui/game/score.lua").GetScoreCache
-        self._dataSetup = setup
-        self:UpdateArmiesData(GetScoreCache())
+        self._armiesContainer:Setup(setup)
     end,
 
     Expand = function(self, id)
-        for _, armyView in self._armyViews do
-            armyView:ExpandData(id)
-        end
+        self._armiesContainer:Expand(id)
     end,
 
     Contract = function(self, id)
-        for _, armyView in self._armyViews do
-            armyView:ContractData(id)
-        end
+        self._armiesContainer:Contract(id)
     end,
 
 
