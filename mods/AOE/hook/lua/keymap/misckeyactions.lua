@@ -56,7 +56,6 @@ function SelectAirScoutBuildIntel()
     end
 end
 
-
 function SelectNearestIdleTransportOrTransport()
     local selectedUnits = GetSelectedUnits()
     if selectedUnits then
@@ -67,13 +66,49 @@ function SelectNearestIdleTransportOrTransport()
 end
 
 
+local currentMex = nil
+function LoopOverMexes(onScreen, upgrade)
+    if upgrade then
+        local selectedUnits = GetSelectedUnits()
+        if selectedUnits and table.getn(selectedUnits) == 1 and selectedUnits[1]:IsInCategory("MASSEXTRACTION") then
+            local bp = selectedUnits[1]:GetBlueprint()
+            IssueBlueprintCommand("UNITCOMMAND_Upgrade", bp.General.UpgradesTo, 1, false)
+        end
+    end
+    UISelectionByCategory("MASSEXTRACTION STRUCTURE TECH1", false, onScreen, false, true)
+    local selectedMexes = GetSelectedUnits()
+    if selectedMexes and not table.empty(selectedMexes) then
+        table.sort(selectedMexes, function(a, b)
+            return a:GetEntityId() < b:GetEntityId()
+        end)
+        local isFound = false
+        for _, mex in selectedMexes do
+            if currentMex == nil or currentMex:IsDead() then
+                currentMex = mex
+                isFound = true
+                break
+            elseif currentMex:GetEntityId() < mex:GetEntityId() then
+                currentMex = mex
+                isFound = true
+                break
+                -- else
+                --     currentMex = mex
+            end
+        end
+        if not isFound then
+            currentMex = selectedMexes[1]
+        end
+        SelectUnits({ currentMex })
+    end
+end
+
 KeyMapper.SetUserKeyAction("Remove last ququed unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
     category = "orders",
     order = 17
 })
 
-KeyMapper.SetUserKeyAction("Shift Remove last ququed unit in factory", {
+KeyMapper.SetUserKeyAction("Shift Remove last queued unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
     category = "orders",
     order = 18
@@ -126,4 +161,28 @@ KeyMapper.SetUserKeyAction("Shift Select nearest idle transport / transport orde
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectNearestIdleTransportOrTransport()",
     category = "selection",
     order = 26
+})
+
+KeyMapper.SetUserKeyAction("Loop over mexes on screen", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").LoopOverMexes(true, false)",
+    category = "selection",
+    order = 27
+})
+
+KeyMapper.SetUserKeyAction("Loop over mexes on screen and upgrade previous", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").LoopOverMexes(true, true)",
+    category = "selection",
+    order = 28
+})
+
+KeyMapper.SetUserKeyAction("Loop over mexes", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").LoopOverMexes(false, false)",
+    category = "selection",
+    order = 27
+})
+
+KeyMapper.SetUserKeyAction("Loop over mexes and upgrade previous", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").LoopOverMexes(false, true)",
+    category = "selection",
+    order = 28
 })
