@@ -8,7 +8,7 @@ function CreateScoreUI()
     end
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
     local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
-    if isReplay then
+    if isReplay or IsObserver() then
         controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
     else
         controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
