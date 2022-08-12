@@ -65,7 +65,6 @@ function SelectNearestIdleTransportOrTransport()
     end
 end
 
-
 local currentMex = nil
 function LoopOverMexes(onScreen, upgrade)
     if upgrade then
@@ -75,29 +74,38 @@ function LoopOverMexes(onScreen, upgrade)
             IssueBlueprintCommand("UNITCOMMAND_Upgrade", bp.General.UpgradesTo, 1, false)
         end
     end
-    UISelectionByCategory("MASSEXTRACTION STRUCTURE TECH1", false, onScreen, false, true)
-    local selectedMexes = GetSelectedUnits()
-    if selectedMexes and not table.empty(selectedMexes) then
-        table.sort(selectedMexes, function(a, b)
-            return a:GetEntityId() < b:GetEntityId()
-        end)
-        local isFound = false
-        for _, mex in selectedMexes do
-            if currentMex == nil or currentMex:IsDead() then
-                currentMex = mex
+    local isFound = false
+    for _, tech in { "TECH1", "TECH2" } do
+        UISelectionByCategory("MASSEXTRACTION STRUCTURE " .. tech, false, onScreen, false, true)
+        local selectedMexes = GetSelectedUnits()
+        if selectedMexes and not table.empty(selectedMexes) then
+            table.sort(selectedMexes, function(a, b)
+                return a:GetEntityId() < b:GetEntityId()
+            end)
+            for _, mex in selectedMexes do
+                if currentMex == nil or currentMex:IsDead() then
+                    currentMex = mex
+                    isFound = true
+                    break
+                elseif currentMex:GetEntityId() < mex:GetEntityId() then
+                    currentMex = mex
+                    isFound = true
+                    break
+                    -- else
+                    --     currentMex = mex
+                end
+            end
+            if not isFound then
+                currentMex = selectedMexes[1]
                 isFound = true
                 break
-            elseif currentMex:GetEntityId() < mex:GetEntityId() then
-                currentMex = mex
-                isFound = true
-                break
-                -- else
-                --     currentMex = mex
             end
         end
-        if not isFound then
-            currentMex = selectedMexes[1]
+        if isFound then
+            break
         end
+    end
+    if isFound then
         SelectUnits({ currentMex })
     end
 end
