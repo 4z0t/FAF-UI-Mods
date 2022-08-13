@@ -71,7 +71,6 @@ ColoredSlider = Class(Group)
                 control:SetColor(self._overColor)
             elseif event.Type == 'MouseExit' then
                 control:SetColor(self._upColor)
-            elseif event.Type == 'WheelRotation' then
             end
 
             return eventHandled
@@ -245,5 +244,20 @@ ColoredIntegerSlider = Class(ColoredSlider)
             thumbOver,
             thumbDown,
             lineWidth)
+    end,
+
+    HandleEvent = function(self, event)
+        if event.Type == 'WheelRotation' then
+            local value = self._currentValue()
+            if event.WheelRotation > 0 then
+                value = value + self._indentValue
+            else
+                value = value - self._indentValue
+            end
+            self:SetValue(value)
+            self:OnValueSet(self._currentValue())
+            return true
+        end
+        return ColoredSlider.HandleEvent(self, event)
     end,
 }
