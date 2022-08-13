@@ -6,13 +6,17 @@ local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
 
+local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
+
 local obsTextFont = "Zeroes Three"
 local obsTextSize = 12
 
 local bgColor = "ff000000"
 
+
+
 local width = 300
-local height = 30
+local height = 20
 
 ObserverPanel = Class(Group)
 {
@@ -21,11 +25,13 @@ ObserverPanel = Class(Group)
 
         self._bg = Bitmap(self)
 
-        self._slider = IntegerSlider(self, false, -10, 10, 1,
-            UIUtil.SkinnableFile('/slider02/slider_btn_up.dds'),
-            UIUtil.SkinnableFile('/slider02/slider_btn_over.dds'),
-            UIUtil.SkinnableFile('/slider02/slider_btn_down.dds'),
-            UIUtil.SkinnableFile('/dialogs/options/slider-back_bmp.dds'))
+        self._slider = ColoredIntegerSlider(self, false, -10, 10, 1,
+            "ffffffff",
+            "ffeeee00",
+            "ffffff00",
+            "ffffbb00",
+            2
+        )
 
         self._slider.OnValueSet = function(slider, newValue)
             ConExecute("WLD_GameSpeed " .. tostring(newValue))
@@ -57,8 +63,10 @@ ObserverPanel = Class(Group)
             :DisableHitTest()
 
         LayoutFor(self._slider)
-            :AtHorizontalCenterIn(self)
-            :Bottom(self.Bottom)
+            :AtVerticalCenterIn(self)
+            :AtRightIn(self, 5)
+            :RightOf(self._observerText, 5)
+            :Height(height - 4)
 
         LayoutFor(self)
             :Width(width)
