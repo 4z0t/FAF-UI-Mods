@@ -289,7 +289,7 @@ local DelayedAnimationFactory = Class(BaseAnimationFactory)
 
         self
             :OnStart(function(control, state, _delay, _animation)
-                return { time = 0, delay = delay or _delay, animation = _animation or animation }
+                return { time = 0, delay = _delay or delay, animation = _animation or animation }
             end)
             :OnFrame(function(control, delta, state)
                 state.time = state.time + delta
