@@ -176,18 +176,13 @@ ColoredSlider = Class(Group)
         return math.max(math.min(value, self._endValue), self._startValue)
     end,
 
-    -- overload to be informed when the value is set by a mouse release
     OnValueSet = function(self, newValue) end,
 
-    -- overload to be informed when the value is changed
     OnValueChanged = function(self, newValue) end,
 
-    -- overload to be informed when someone starts and stops dragging the
-    -- slider
     OnBeginChange = function(self) end,
     OnEndChange = function(self) end,
 
-    -- overload to be informed during scrub
     OnScrub = function(self, value) end,
 
 

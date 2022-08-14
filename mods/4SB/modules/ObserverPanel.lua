@@ -37,8 +37,16 @@ ObserverPanel = Class(Group)
             ConExecute("WLD_GameSpeed " .. tostring(newValue))
         end
 
-        self._slider:SetValue(0)
 
+
+        self._speed = Text(self)
+        self._speed:SetFont(obsTextFont, obsTextSize)
+
+        self._slider.OnValueChanged = function(slider, newValue)
+            self._speed:SetText(tostring(newValue))
+        end
+
+        self._slider:SetValue(0)
 
         self._observerText = Text(self)
         self._observerText:SetText(LOC("<LOC score_0003>Observer"))
@@ -64,9 +72,14 @@ ObserverPanel = Class(Group)
 
         LayoutFor(self._slider)
             :AtVerticalCenterIn(self)
-            :AtRightIn(self, 5)
+            :AtRightIn(self, 25)
             :RightOf(self._observerText, 5)
             :Height(height - 4)
+
+        LayoutFor(self._speed)
+            :AtVerticalCenterIn(self)
+            :RightOf(self._slider, 5)
+            :DisableHitTest()
 
         LayoutFor(self)
             :Width(width)
