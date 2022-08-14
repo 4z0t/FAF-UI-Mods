@@ -266,16 +266,55 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
     end
 }
 
+---@class DelayedAnimationFactory : BaseAnimationFactory
+local DelayedAnimationFactory = Class(BaseAnimationFactory)
+{
+    Delay = function(self, delay)
+        self._delay = delay
+    end,
+
+
+
+    ---comment
+    ---@param self ColorAnimationFactory
+    ---@param animator? Animator
+    ---@return Animation
+    Create = function(self, animator)
+        local delay = self._delay
+        self._delay = false
+        local animation = nil
+        if self._onFrame then
+            animation = BaseAnimationFactory.Create(self, animator)
+        end
+
+        self
+            :OnStart(function(control, state, _delay, _animation)
+                return { time = 0, delay = delay or _delay, animation = _animation or animation }
+            end)
+            :OnFrame(function(control, delta, state)
+                state.time = state.time + delta
+                if state.time >= state.delay then
+                    return true
+                end
+            end)
+            :OnFinish(function(control, state)
+                state.animation:Apply(control)
+            end)
+        return BaseAnimationFactory.Create(self, animator)
+    end
+}
 
 
 
 local baseFactory
 local alphaAnimationFactory
 local colorAnimationFactory
+local delayedAnimationFactory
 local function Init()
-    baseFactory           = BaseAnimationFactory()
-    alphaAnimationFactory = AlphaAnimationFactory()
-    colorAnimationFactory = ColorAnimationFactory()
+    baseFactory             = BaseAnimationFactory()
+    alphaAnimationFactory   = AlphaAnimationFactory()
+    colorAnimationFactory   = ColorAnimationFactory()
+    delayedAnimationFactory = DelayedAnimationFactory()
 end
 
 function GetAnimationFactory()
@@ -288,6 +327,10 @@ end
 
 function GetColorAnimationFactory()
     return colorAnimationFactory
+end
+
+function GetDelayAnimationFactory()
+    return delayedAnimationFactory
 end
 
 Init()

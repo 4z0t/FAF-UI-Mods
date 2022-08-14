@@ -58,15 +58,19 @@ Animator = Class(Group)
     end,
 
     Remove = function(self, control, skip)
-        if not skip then
-            local animation = self._controls[control]
-            if animation then
-                animation.OnFinish(control, self._controlsStates[control])
-            end
-        end
+
+        local animation = self._controls[control]
+        local controlState = self._controlsStates[control]
 
         self._controls[control] = nil
         self._controlsStates[control] = nil
+
+        if not skip then
+            if animation then
+                animation.OnFinish(control, controlState)
+            end
+        end
+
 
         if table.empty(self._controls) and self:NeedsFrameUpdate() then
             self:SetNeedsFrameUpdate(false)

@@ -1,10 +1,16 @@
+local AnimationFactories = import("AnimationFactory.lua")
+local delayedAnimationFactory = AnimationFactories.GetDelayAnimationFactory()
+
+
+local delayAnimation = delayedAnimationFactory
+    :Create()
+
+
 local function ApplySequentialAnimation(animation, delay, controls, initialDelay)
-    if initialDelay ~= 0 then
-        WaitSeconds(initialDelay)
-    end
+    local curDelay = initialDelay or 0
     for i, control in controls do
-        animation:Apply(control)
-        WaitSeconds(delay)
+        delayAnimation:Apply(control, curDelay, animation)
+        curDelay = delay + curDelay
     end
 end
 
@@ -28,6 +34,6 @@ SequentialAnimation = ClassSimple {
     ---@param self SequentialAnimation
     ---@param controls Control[]
     Apply = function(self, controls)
-        ForkThread(ApplySequentialAnimation, self._animation, self._delay, controls, self._initialDelay)
+        ApplySequentialAnimation(self._animation, self._delay, controls, self._initialDelay)
     end
 }
