@@ -126,6 +126,12 @@ KeyMapper.SetUserKeyAction("Select ACU / Enter OC mode", {
     order = 20
 })
 
+KeyMapper.SetUserKeyAction("Goto ACU", {
+    action = "UI_SelectByCategory +nearest +goto COMMAND",
+    category = "selection",
+    order = 20
+})
+
 KeyMapper.SetUserKeyAction("Select Nearest IDLE T1 engineer / enter reclaim mode", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").ReclaimSelectIDLENearestT1()",
     category = "selection",
