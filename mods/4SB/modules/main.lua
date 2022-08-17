@@ -42,7 +42,7 @@ local colors = {
 
 
 
-
+local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
 
 function Main(isReplay)
     local parent = GetFrame(0)
@@ -67,6 +67,24 @@ function Main(isReplay)
     end
     local sa = SequentialAnimation(slideBackWards, 0.05, 1)
     sa:Apply(controls.entries)
+
+
+    local slider = ColoredIntegerSlider(parent, true, -10, 10, 1,
+        "ffffffff",
+        "ffeeee00",
+        "ffffff00",
+        "ffffbb00",
+        2
+
+    )
+    LayoutFor(slider)
+        :Over(parent, 1000)
+        :Width(20)
+        :Height(200)
+        :AtLeftTopIn(parent, 500, 500)
+    slider.OnValueSet = function(slider, newValue)
+        LOG(newValue)
+    end
 
     -- local eg = ExpandableSelectionGroup(parent, 200, 40)
     -- eg._bg = Bitmap(eg)

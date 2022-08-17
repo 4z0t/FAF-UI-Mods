@@ -52,11 +52,10 @@ ColoredSlider = Class(Group)
 
                 dragger.OnRelease = function(_dragger, x, y)
                     local value = self:CalculateValueFromMouse(x, y)
-                    if (x < self._thumb.Left() or x > self._thumb.Right()) or
-                        (y < self._thumb.Top() or y > self._thumb.Bottom()) then
-                        self._thumb:SetColor(self._upColor)
-                    else
+                    if self._thumb:HitTest(x, y) then
                         self._thumb:SetColor(self._overColor)
+                    else
+                        self._thumb:SetColor(self._upColor)
                     end
                     self:SetValue(value)
                     self:OnValueSet(self:_Constrain(value))
@@ -104,6 +103,29 @@ ColoredSlider = Class(Group)
     _Layout = function(self, lineColor, thumbColor, lineWidth)
         if self._isVertical then
             LayoutFor(self._line)
+                :AtHorizontalCenterIn(self)
+                :Width(lineWidth)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+                :Color(lineColor)
+                :DisableHitTest()
+
+            LayoutFor(self._center)
+                :AtCenterIn(self)
+                :Width(function() return self.Width() / 2 end)
+                :Height(lineWidth)
+                :Color(lineColor)
+                :DisableHitTest()
+
+            LayoutFor(self._thumb)
+                :Height(lineWidth * 5)
+                :Width(self.Width)
+                :AtHorizontalCenterIn(self)
+                :Top(function()
+                    return math.floor(self.Bottom() -
+                        (((self._currentValue() - self._startValue) / (self._endValue - self._startValue)) *
+                            (self.Height())) - self._thumb.Height() / 2)
+                end)
         else
             LayoutFor(self._line)
                 :AtVerticalCenterIn(self)
@@ -129,11 +151,7 @@ ColoredSlider = Class(Group)
                         (((self._currentValue() - self._startValue) / (self._endValue - self._startValue)) *
                             (self.Width())) - self._thumb.Width() / 2)
                 end)
-
-
-
         end
-
     end,
 
     -- this will constrain your values to not exceed min or max
@@ -157,19 +175,13 @@ ColoredSlider = Class(Group)
     end,
 
     CalculateValueFromMouse = function(self, x, y)
-        local newValue = self._currentValue()
         if self._isVertical then
-            newValue = self._startValue +
-                (
-                ((self.Bottom() - y) / (self.Height() - self._thumb.Height())) *
-                    (self._endValue - self._startValue))
+            return self._startValue +
+                (self.Bottom() - y) / (self.Height() - self._thumb.Height()) * (self._endValue - self._startValue)
         else
-            newValue = self._startValue +
-                (
-                ((x - self.Left()) / (self.Width() - self._thumb.Width())) *
-                    (self._endValue - self._startValue))
+            return self._startValue +
+                (x - self.Left()) / (self.Width() - self._thumb.Width()) * (self._endValue - self._startValue)
         end
-        return newValue
     end,
 
     _Constrain = function(self, value)
