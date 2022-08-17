@@ -1,22 +1,14 @@
 local KeyMapper = import("/lua/keymap/keymapper.lua")
 
 
--- Select ACU / goto ACU / OC mode
-local lastACUSelectionTime = 0
-function ACUSelectOCCG()
-    local curTime = GetSystemTimeSeconds()
-    local diffTime = curTime - lastACUSelectionTime
-    if diffTime > 1.0 then
-        local selection = GetSelectedUnits()
-        if not table.empty(selection) and table.getn(selection) == 1 and selection[1]:IsInCategory "COMMAND" then
-            import("/lua/ui/game/orders.lua").EnterOverchargeMode()
-        else
-            ConExecute "UI_SelectByCategory +nearest COMMAND"
-        end
+-- Select ACU / OC mode
+function ACUSelectOC()
+    local selection = GetSelectedUnits()
+    if not table.empty(selection) and table.getn(selection) == 1 and selection[1]:IsInCategory "COMMAND" then
+        import("/lua/ui/game/orders.lua").EnterOverchargeMode()
     else
-        ConExecute "UI_SelectByCategory +nearest +goto COMMAND"
+        ConExecute "UI_SelectByCategory +nearest COMMAND"
     end
-    lastACUSelectionTime = curTime
 end
 
 -- Select nearest idle engineer / Reclaim mode
@@ -129,7 +121,7 @@ KeyMapper.SetUserKeyAction("Select All IDLE engineers on screen not ACU", {
 })
 
 KeyMapper.SetUserKeyAction("Select ACU / Enter OC mode", {
-    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").ACUSelectOCCG()",
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").ACUSelectOC()",
     category = "selection",
     order = 20
 })
