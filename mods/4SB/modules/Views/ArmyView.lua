@@ -297,25 +297,27 @@ AllyView = Class(ArmyView)
         return false
     end,
 
-    Update = function(self, data)
-        if self.id == GetFocusArmy() then
-            -- self._energy:Hide()
-            -- self._mass:Hide()
-
-        else
-        end
-
-
+    Update = function(self, data, mode)
         ArmyView.Update(self, data)
+
+
         if not self.isOutOfGame then
             local resources = data.resources
             if resources then
-                self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
-                self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-            else
-                self._energy:SetText("")
-                self._mass:SetText("")
+                if mode == "income" then
+                    self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
+                    self._mass:SetText(FormatNumber(resources.massin.rate * 10))
+                elseif mode == "storage" then
+                    self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
+                    self._mass:SetText(FormatNumber(resources.storage.storedMass))
+                elseif mode == "maxstorage" then
+                    self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
+                    self._mass:SetText(FormatNumber(resources.storage.maxMass))
+                end
             end
+        else
+            self._energy:SetText("")
+            self._mass:SetText("")
         end
     end
 

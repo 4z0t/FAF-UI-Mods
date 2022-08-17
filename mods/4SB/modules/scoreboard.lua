@@ -36,6 +36,9 @@ ScoreBoard = Class(Group)
             :Over(GetFrame(0), 1000)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
+
+        self._mode = "income"
+        self:SetNeedsFrameUpdate(true)
     end,
 
     _Layout = function(self)
@@ -115,8 +118,9 @@ ScoreBoard = Class(Group)
     end,
     UpdateArmiesData = function(self, data)
         if data then
+            local mode = self._mode
             for i, armyView in self._armyViews do
-                armyView:Update(data[i])
+                armyView:Update(data[i], mode)
             end
         end
     end,
@@ -125,6 +129,27 @@ ScoreBoard = Class(Group)
     UpdateGameSpeed = function(self, gameSpeed)
         if self._title then
             self._title:Update(false, gameSpeed)
+        end
+    end,
+
+    OnFrame = function(self, delta)
+        local isShift = IsKeyDown("shift")
+        local isCtrl = IsKeyDown("control")
+        local update = false
+        if isShift and not isCtrl and self._mode ~= "storage" then
+            self._mode = "storage"
+            update = true
+        elseif isCtrl and not isShift and self._mode ~= "maxstorage" then
+            self._mode = "maxstorage"
+            update = true
+        elseif not isCtrl and not isShift and self._mode ~= "income" then
+            self._mode = "income"
+            update = true
+        end
+
+        if update then
+            local data = import("/lua/ui/game/score.lua").GetScoreCache()
+            self:UpdateArmiesData(data)
         end
     end
 
@@ -140,7 +165,7 @@ ReplayScoreBoard = Class(ScoreBoard)
         self._dataPanel = DataPanel(self)
     end,
 
-    
+
     __post_init = function(self)
         self:_Layout()
     end,
@@ -154,7 +179,7 @@ ReplayScoreBoard = Class(ScoreBoard)
                 :Right(self.Right)
         else
             LayoutFor(self._armiesContainer)
-               :Top(self.Top) 
+                :Top(self.Top)
                 :Right(self.Right)
         end
 
