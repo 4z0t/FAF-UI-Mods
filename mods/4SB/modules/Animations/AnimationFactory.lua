@@ -317,18 +317,26 @@ local function Init()
     delayedAnimationFactory = DelayedAnimationFactory()
 end
 
+---comment
+---@return BaseAnimationFactory
 function GetAnimationFactory()
     return baseFactory
 end
 
+---comment
+---@return AlphaAnimationFactory
 function GetAlphaAnimationFactory()
     return alphaAnimationFactory
 end
 
+---comment
+---@return ColorAnimationFactory
 function GetColorAnimationFactory()
     return colorAnimationFactory
 end
 
+---comment
+---@return DelayedAnimationFactory
 function GetDelayAnimationFactory()
     return delayedAnimationFactory
 end

@@ -8,6 +8,7 @@ local LayoutFor = LayoutHelpers.ReusedLayoutFor
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 
+
 local textFont = "Zeroes Three"
 local textSize = 12
 
@@ -15,6 +16,8 @@ local panelWidth = 300
 local panelHeight = 20
 
 local bgColor = "ff000000"
+
+
 
 function GetSizeInKM(size)
     return math.ceil(size / 51.2 - 0.5)
@@ -33,7 +36,6 @@ InfoPanel = Class(Group)
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        self._bg = Bitmap(self)
         self._mapName = Text(self)
         self._mapSize = Text(self)
 
@@ -47,11 +49,6 @@ InfoPanel = Class(Group)
 
     _Layout = function(self)
 
-        LayoutFor(self._bg)
-            :Fill(self)
-            :Color(bgColor)
-            :Alpha(0.4)
-            :DisableHitTest()
 
         self._mapName:SetFont(textFont, textSize)
         LayoutFor(self._mapName)
@@ -101,6 +98,6 @@ InfoPanel = Class(Group)
         self._mapName:SetText(mapName)
 
         Tooltip.AddForcedControlTooltipManual(self._mapName, sessionInfo.name, mapDescription)
-    end
+    end,
 
 }

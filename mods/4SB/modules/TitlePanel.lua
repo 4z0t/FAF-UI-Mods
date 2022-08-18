@@ -4,6 +4,11 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local InfoPanel = import("InfoPanel.lua").InfoPanel
+
+local alphaAnimator = import("Animations/Animator.lua").Animator(GetFrame(0))
+local animationFactory = import("Animations/AnimationFactory.lua").GetAnimationFactory()
+local alphaAnimationFactory = import("Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 
 local timeTextFont = "Zeroes Three"
 local timeTextSize = 12
@@ -19,14 +24,15 @@ local titlePanelHeight = 20
 
 local bgColor = "ff000000"
 
-TitlePanel = Class(Group)
+
+
+local TopInfoPanel = Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
         self._gameSpeed = 0
 
 
-        self._bg = Bitmap(self)
         self._time = Text(self)
         self._speed = Text(self)
         self._quality = Text(self)
@@ -39,12 +45,6 @@ TitlePanel = Class(Group)
     end,
 
     _Layout = function(self)
-
-        LayoutFor(self._bg)
-            :Fill(self)
-            :Color(bgColor)
-            :Alpha(0.4)
-            :DisableHitTest()
 
         LayoutFor(self._time)
             :AtLeftIn(self, 10)
@@ -97,5 +97,131 @@ TitlePanel = Class(Group)
                 self._unitCap:SetText("")
             end
         end
+    end
+}
+local animationSpeed = 300
+
+local expandAnimation = animationFactory
+    :OnStart(function(control, state, target)
+        state = state or {}
+        state.target = target
+        return state
+    end)
+    :OnFrame(function(control, delta, state)
+
+        if control.Top() > state.target.Bottom() then
+            return true
+        end
+        control.Top:Set(control.Top() + delta * animationSpeed)
+    end)
+    :OnFinish(function(control, state)
+        control.Top:Set(state.target.Bottom)
+        control:EnableHitTest(true)
+    end)
+    :Create()
+
+local contractAnimation = animationFactory
+    :OnStart(function(control, state, target)
+        state = state or {}
+        state.target = target
+        return state
+    end)
+    :OnFrame(function(control, delta, state)
+        if control.Top() < state.target.Top() then
+            return true
+        end
+        control.Top:Set(control.Top() - delta * animationSpeed)
+    end)
+    :OnFinish(function(control, state)
+        control.Top:Set(state.target.Top)
+        control:DisableHitTest(true)
+    end)
+    :Create()
+
+local appearAnimation = alphaAnimationFactory
+    :StartWith(0)
+    :ToAppear()
+    :For(0.3)
+    :EndWith(1)
+    :ApplyToChildren()
+    :Create(alphaAnimator)
+
+local fadeAnimation = alphaAnimationFactory
+    :StartWith(1)
+    :ToFade()
+    :For(0.3)
+    :EndWith(0)
+    :ApplyToChildren()
+    :Create(alphaAnimator)
+
+
+TitlePanel = Class(Group)
+{
+    __init = function(self, parent)
+        Group.__init(self, parent)
+
+        self._bg  = Bitmap(self)
+        self._top = TopInfoPanel(self)
+
+        self._info = InfoPanel(self)
+        self._info:Setup()
+
+        self._arrow = Text(self)
+        self._arrow.state = true
+        self._arrow:SetText("^")
+        self._arrow.HandleEvent = function(control, event)
+            if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+                if control.state then
+                    contractAnimation:Apply(self._info, self._top)
+                    fadeAnimation:Apply(self._info)
+                    self._arrow:SetText("v")
+                else
+                    expandAnimation:Apply(self._info, self._top)
+                    appearAnimation:Apply(self._info)
+                    self._arrow:SetText("^")
+                end
+                control.state = not control.state
+                return true
+            end
+        end
+        self._arrow:SetFont("Arial", 16)
+
+    end,
+
+    __post_init = function(self)
+        self:_Layout()
+    end,
+
+    _Layout = function(self)
+
+
+        LayoutFor(self._bg)
+            :Fill(self)
+            :Color(bgColor)
+            :Alpha(0.4)
+            :DisableHitTest()
+
+        LayoutFor(self._top)
+            :AtRightTopIn(self)
+
+        LayoutFor(self._info)
+            :Top(self._top.Bottom)
+            :Right(self.Right)
+
+        LayoutFor(self._arrow)
+            :AtRightTopIn(self._top, 2, 2)
+            :Over(self._top)
+
+        LayoutFor(self)
+            :Width(self._top.Width)
+            :Bottom(self._info.Bottom)
+    end,
+
+    SetQuality = function(self, quality)
+        self._top:SetQuality(quality)
+    end,
+
+    Update = function(self, data, gameSpeed)
+        self._top:Update(data, gameSpeed)
     end
 }

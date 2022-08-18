@@ -20,8 +20,6 @@ ScoreBoard = Class(Group)
         if isTitle then
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
-            self._info = InfoPanel(self)
-            self._info:Setup()
         end
     end,
 
@@ -29,10 +27,6 @@ ScoreBoard = Class(Group)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)
-
-            LayoutFor(self._info)
-                :Right(self.Right)
-                :AnchorToBottom(self._title)
         end
         self:_InitArmyViews()
         self:_Layout()
@@ -53,7 +47,7 @@ ScoreBoard = Class(Group)
             if i == 1 then
                 if self._title then
                     LayoutFor(armyView)
-                        :AnchorToBottom(self._info)
+                        :AnchorToBottom(self._title)
                         :Right(self.Right)
                 else
                     LayoutFor(armyView)
@@ -180,11 +174,8 @@ ReplayScoreBoard = Class(ScoreBoard)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)
-            LayoutFor(self._info)
-                :Right(self.Right)
-                :AnchorToBottom(self._title)
             LayoutFor(self._armiesContainer)
-                :AnchorToBottom(self._info)
+                :AnchorToBottom(self._title)
                 :Right(self.Right)
         else
             LayoutFor(self._armiesContainer)
