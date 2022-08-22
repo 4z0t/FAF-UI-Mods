@@ -104,17 +104,18 @@ ArmyViewsContainer = Class(Group)
     end,
 
     Sort = function(self, scoreData, sortFunc, direction)
-        self._sortFunc      = sortFunc or self._sortFunc
-        self._sortDirection = direction or self._sortDirection
-        local scoreCache    = scoreData or import("/lua/ui/game/score.lua").GetScoreCache()
-
+        self._sortFunc = sortFunc or self._sortFunc
         if not self._sortFunc then
             return
         end
+        self._sortDirection = direction or self._sortDirection
+        local scoreCache    = scoreData or import("/lua/ui/game/score.lua").GetScoreCache()
+
 
         local dataTable = {}
         for armyId, _ in self._armyViews do
-            table.insert(dataTable, self._sortFunc(scoreCache[armyId]))
+            local val = self._sortFunc(scoreCache[armyId])
+            table.insert(dataTable, val)
         end
         if self._sortDirection == 1 then
             table.sort(self._lines, function(a, b)
