@@ -52,6 +52,12 @@ SelectionInfo = Class(Bitmap) {
         LayoutHelpers.Below(self._buildRate, self._energyRate, 2)
         self._buildRate:DisableHitTest(true)
 
+        self._massKilled = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont, true)
+        self._massKilled:SetColor("FFFF0000")
+        LayoutHelpers.AnchorToBottom(self._massKilled, self._energyCost, 2)
+        LayoutHelpers.AtRightIn(self._massKilled, self._energyCost)
+        self._massKilled:DisableHitTest(true)
+
     end,
 
     HandleEvent = function(self, event)
@@ -88,6 +94,7 @@ SelectionInfo = Class(Bitmap) {
             local massCost = 0
             local energyCost = 0
             local totalbr = 0
+            local totalMassKilled = 0
 
             for index, unit in self._units do
                 if not unit:IsDead() then
@@ -102,7 +109,7 @@ SelectionInfo = Class(Bitmap) {
                         br = bp.Economy.BuildRate
 
                     end
-                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER')  then
+                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
                         br = unit:GetBuildRate()
                     end
 
@@ -126,6 +133,10 @@ SelectionInfo = Class(Bitmap) {
                         massCost = massCost + bp.Economy.BuildCostMass
                         energyCost = energyCost + bp.Economy.BuildCostEnergy
 
+                    end
+                    local unitData = UnitData[unit:GetEntityId()]
+                    if unitData and unitData.totalMassKilledTrue then
+                        totalMassKilled = totalMassKilled + unitData.totalMassKilledTrue
                     end
                 end
             end
@@ -155,6 +166,12 @@ SelectionInfo = Class(Bitmap) {
             else
                 self._buildRate:Hide()
             end
+
+            if totalMassKilled ~= 0 then
+                self._massKilled:SetText(string.format("%d", totalMassKilled))
+            else
+                self._massKilled:Hide()
+            end
         end
     end,
 
@@ -171,4 +188,3 @@ SelectionInfo = Class(Bitmap) {
     end
 
 }
-
