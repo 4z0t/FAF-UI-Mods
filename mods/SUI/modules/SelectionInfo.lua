@@ -102,7 +102,7 @@ SelectionInfo = Class(Bitmap) {
                         br = bp.Economy.BuildRate
 
                     end
-                    if unit:IsInCategory("COMMAND") then
+                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER')  then
                         br = unit:GetBuildRate()
                     end
 
