@@ -9,8 +9,6 @@ function DeselectSelens(selection)
             return selection, false
         end
         return newSelection, true
-    else
-        local a, b = OldDeselectSelens(selection)
-        return a, b
     end
+    return OldDeselectSelens(selection)
 end
