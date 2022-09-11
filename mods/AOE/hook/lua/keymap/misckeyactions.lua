@@ -11,6 +11,21 @@ function ACUSelectOC()
     end
 end
 
+-- Select ACU / OC mode/got acu if not on screen
+function ACUSelectOCGoto()
+    local selection = GetSelectedUnits()
+    if not table.empty(selection) and table.getn(selection) == 1 and selection[1]:IsInCategory "COMMAND" then
+        import("/lua/ui/game/orders.lua").EnterOverchargeMode()
+    else
+        ConExecute "UI_SelectByCategory +nearest COMMAND"
+        local acu = GetSelectedUnits()
+        local worldview = import('/lua/ui/game/worldview.lua').viewLeft
+        if acu and not worldview:GetScreenPos(acu[1]) then
+            ConExecute "UI_SelectByCategory +nearest +goto COMMAND"
+        end
+    end
+end
+
 -- Select nearest idle engineer / Reclaim mode
 function ReclaimSelectIDLENearestT1()
     local selection = GetSelectedUnits()
@@ -126,6 +141,13 @@ KeyMapper.SetUserKeyAction("Select ACU / Enter OC mode", {
     order = 20
 })
 
+KeyMapper.SetUserKeyAction("Select ACU / Enter OC mode / Goto ACU", {
+    action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").ACUSelectOCGoto()",
+    category = "selection",
+    order = 20
+})
+
+
 KeyMapper.SetUserKeyAction("Goto ACU", {
     action = "UI_SelectByCategory +nearest +goto COMMAND",
     category = "selection",
@@ -145,6 +167,8 @@ KeyMapper.SetUserKeyAction("Shift Select Nearest IDLE T1 engineer / enter reclai
 })
 
 
+
+
 KeyMapper.SetUserKeyAction("Select nearest air scout / build sensors", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectAirScoutBuildIntel()",
     category = "selection",
@@ -157,6 +181,7 @@ KeyMapper.SetUserKeyAction("Shift Select nearest air scout / build sensors", {
     order = 24
 })
 
+
 KeyMapper.SetUserKeyAction("Select nearest idle transport / transport order", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").SelectNearestIdleTransportOrTransport()",
     category = "selection",
@@ -168,6 +193,8 @@ KeyMapper.SetUserKeyAction("Shift Select nearest idle transport / transport orde
     category = "selection",
     order = 26
 })
+
+
 
 KeyMapper.SetUserKeyAction("Loop over mexes on screen", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").LoopOverMexes(true, false)",
