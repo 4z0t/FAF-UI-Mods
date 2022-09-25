@@ -1,7 +1,7 @@
 name = "Engineer Alt Selection"
 version = 1
 copyright = ""
-description = ""
+description = "Hold Shift+Alt to select engineers only"
 author = "4z0t"
 url = ""
 uid = "engineer-alt-selection-v01"
