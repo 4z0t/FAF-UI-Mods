@@ -15,6 +15,8 @@ local From = import('/mods/UMT/modules/linq.lua').From
 local Edit = import('/lua/maui/edit.lua').Edit
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 
+
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua')
 local IScrollable = import('IScrollable.lua').IScrollable
 local BPItem = import('BlueprintItem.lua')
@@ -41,11 +43,13 @@ end
 function CreateUI(parent)
     ViewModel.SetActive()
     local group = Group(parent)
-    LayoutHelpers.SetDimensions(group, 1300, 900)
-    LayoutHelpers.AtCenterIn(group, parent)
 
     group.popup = Popup(parent, group)
-    LayoutHelpers.DepthOverParent(group, group.popup, 10)
+    LayoutFor(group)
+        :Width(1300)
+        :Height(900)
+        :AtCenterIn(parent)
+        :Over(group.popup, 10)
 
     group.Title = UIUtil.CreateText(group, 'HotBuild Overhaul', 16, UIUtil.titleFont, true)
     LayoutHelpers.AtHorizontalCenterIn(group.Title, group)
@@ -209,7 +213,7 @@ end
 
 function UpdateItems(item)
     if not IsDestroyed(GUI) then
-        
+
         local curItem
         if item then
             curItem = item
@@ -225,7 +229,7 @@ function UpdateItems(item)
                 break
             end
         end
-        
+
         GUI.combo:AddItems(items, index)
 
     end
