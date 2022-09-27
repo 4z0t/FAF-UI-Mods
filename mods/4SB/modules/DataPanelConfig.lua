@@ -391,26 +391,25 @@ checkboxes = {
         }
     }
 }
+do
+    local tooltips = import('/lua/ui/help/tooltips.lua').Tooltips
+    for name, category in checkboxes do
+        for i, checkbox in category do
+            checkbox.nc = checkbox.nc or normalCheckedColor
+            checkbox.oc = checkbox.oc or overCheckedColor
 
-local tooltips = import('/lua/ui/help/tooltips.lua').Tooltips
-for name, category in checkboxes do
-    for i, checkbox in category do
-        checkbox.nc = checkbox.nc or normalCheckedColor
-        checkbox.oc = checkbox.oc or overCheckedColor
+            checkbox.nu = checkbox.nu or normalUncheckedColor
+            checkbox.ou = checkbox.ou or overUncheckedColor
 
-        checkbox.nu = checkbox.nu or normalUncheckedColor
-        checkbox.ou = checkbox.ou or overUncheckedColor
+            checkbox.du = checkbox.du or ColorUtils.ColorMult(checkbox.nu, 0.8)
+            checkbox.dc = checkbox.dc or ColorUtils.ColorMult(checkbox.nc or RGBA "#ffffff", 0.8)
 
-        checkbox.du = checkbox.du or ColorUtils.ColorMult(checkbox.nu, 0.8)
-        checkbox.dc = checkbox.dc or ColorUtils.ColorMult(checkbox.nc or RGBA "#ffffff", 0.8)
+            checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
 
-        checkbox.GetData = checkbox.GetData or function(armyScore) return 0 end
-
-
-
-        tooltips[checkbox.tooltip] = {
-            title = checkbox.title,
-            description = checkbox.description
-        }
+            tooltips[checkbox.tooltip] = {
+                title = checkbox.title,
+                description = checkbox.description
+            }
+        end
     end
 end
