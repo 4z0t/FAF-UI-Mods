@@ -51,14 +51,19 @@ function CreateUI(parent)
         :AtCenterIn(parent)
         :Over(group.popup, 10)
 
+
     group.Title = UIUtil.CreateText(group, 'HotBuild Overhaul', 16, UIUtil.titleFont, true)
-    LayoutHelpers.AtHorizontalCenterIn(group.Title, group)
-    LayoutHelpers.AtTopIn(group.Title, group, 5)
+    LayoutFor(group.Title)
+        :AtHorizontalCenterIn(group)
+        :AtTopIn(group, 5)
+
 
     group.QuitButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
-    LayoutHelpers.AtHorizontalCenterIn(group.QuitButton, group, 150)
-    LayoutHelpers.AtBottomIn(group.QuitButton, group, 5)
-    LayoutHelpers.DepthOverParent(group.QuitButton, group)
+    LayoutFor(group.QuitButton)
+        :AtHorizontalCenterIn(group, 150)
+        :AtBottomIn(group, 5)
+        :Over(group)
+
 
     group.QuitButton.OnClick = function(control, modifiers)
         group.popup:Destroy()
@@ -80,9 +85,12 @@ function CreateUI(parent)
     end
 
     group.SaveButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Save>Save"))
-    LayoutHelpers.AtHorizontalCenterIn(group.SaveButton, group, -150)
-    LayoutHelpers.AtBottomIn(group.SaveButton, group, 5)
-    LayoutHelpers.DepthOverParent(group.SaveButton, group)
+
+    LayoutFor(group.SaveButton)
+        :AtHorizontalCenterIn(group, -150)
+        :AtBottomIn(group, 5)
+        :Over(group)
+
 
     group.SaveButton.OnClick = function(control, modifiers)
         local text = group.edit:GetText()
@@ -92,19 +100,25 @@ function CreateUI(parent)
 
 
     group.ShareButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Share>Share"))
-    LayoutHelpers.AtHorizontalCenterIn(group.ShareButton, group, -300)
-    LayoutHelpers.AtBottomIn(group.ShareButton, group, 5)
-    LayoutHelpers.DepthOverParent(group.ShareButton, group)
+
+    LayoutFor(group.ShareButton)
+        :AtHorizontalCenterIn(group, -300)
+        :AtBottomIn(group, 5)
+        :Over(group)
 
     group.ShareButton.OnClick = function(control, modifiers)
         ViewModel.SendActiveBuildTable()
     end
 
     group.edit = Edit(group)
-    LayoutHelpers.AtLeftTopIn(group.edit, group, 100, 40)
+    LayoutFor(group.edit)
+        :AtLeftTopIn(group, 100, 40)
+        :Width(200)
+        :Height(20)
+
     UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil,
         nil, 20)
-    LayoutHelpers.SetDimensions(group.edit, 200, 20)
+
     group.edit.OnEnterPressed = function(self, text)
         return true
     end
@@ -117,18 +131,19 @@ function CreateUI(parent)
         ViewModel.SetActive(text)
         UpdateUI()
     end
-
-    LayoutHelpers.AtLeftTopIn(group.combo, group, 50, 20)
-    LayoutHelpers.SetWidth(group.combo, 200)
+    LayoutFor(group.combo)
+        :AtLeftTopIn(group, 50, 20)
+        :Width(200)
 
     group.construction = ConstructionScrollArea(group, ViewModel.FetchConstructionBlueprints(), 5)
     LayoutHelpers.AtLeftTopIn(group.construction, group, 100, 100)
     group.categories = {}
     group.single = Group(group)
-    LayoutHelpers.Below(group.single, group.construction, 10)
-    LayoutHelpers.SetHeight(group.single, 500)
-    group.single.Width:Set(group.construction.Width)
-
+    LayoutFor(group.single)
+        :Below(group.construction, 10)
+        :Height(500)
+        :Width(group.construction.Width)
+    
     local function CreateSingleCategory(category, catParent)
         local categoryGroup = Group(catParent)
         local name = UIUtil.CreateText(categoryGroup, category, 20, UIUtil.titleFont, true)
@@ -163,10 +178,13 @@ function CreateUI(parent)
         end)
 
         local fillButton = UIUtil.CreateButtonStd(categoryGroup, '/widgets02/small', 'fill', 16)
-        LayoutHelpers.AtRightIn(fillButton, categoryGroup, 50)
-        LayoutHelpers.AtVerticalCenterIn(fillButton, categoryGroup)
-        LayoutHelpers.SetDimensions(fillButton, 100, 30)
-        LayoutHelpers.DepthOverParent(fillButton, categoryGroup)
+        LayoutFor(fillButton)
+            :AtRightIn(categoryGroup, 50)
+            :Width(100)
+            :Height(30)
+            :AtVerticalCenterIn(categoryGroup)
+            :Over(categoryGroup)
+
         fillButton.OnClick = function(control, modifiers)
             -- logic for filling alias blueprints
             if modifiers.Left then
