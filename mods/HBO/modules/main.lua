@@ -1,4 +1,4 @@
-function init(isReplay)
+function Main(isReplay)
     if exists("/mods/UMT/mod_info.lua") and import("/mods/UMT/mod_info.lua").version >= 4 then
         local ViewModel = import('viewmodel.lua')
         local Model = import('model.lua')
