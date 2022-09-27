@@ -1,5 +1,8 @@
-local originalCreateUI = CreateUI
-function CreateUI(isReplay, parent)
-    originalCreateUI(isReplay)
-    import("/mods/SRD/modules/main.lua").init(isReplay)
+do 
+    local originalCreateUI = CreateUI
+    function CreateUI(isReplay)
+        originalCreateUI(isReplay)
+        import("/mods/SRD/modules/main.lua").init(isReplay)
+    end
 end
+
