@@ -7,6 +7,7 @@ url = ""
 uid = "EzReclaim-4z0t-v02"
 exclusive = false
 ui_only = true
+icon = "/mods/EzR/icon.png"
 conflicts = {
     "2019eaac-e8ed-11e4-b02c-1681e6b88ec6", -- Advanced Reclaim Info
 }
