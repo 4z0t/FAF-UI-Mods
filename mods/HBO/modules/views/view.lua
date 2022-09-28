@@ -231,7 +231,6 @@ end
 
 function UpdateItems(item)
     if not IsDestroyed(GUI) then
-
         local curItem
         if item then
             curItem = item
@@ -247,7 +246,6 @@ function UpdateItems(item)
                 break
             end
         end
-
         GUI.combo:AddItems(items, index)
 
     end
