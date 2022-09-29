@@ -39,3 +39,5 @@ luac.out
 *.x86_64
 *.hex
 
+# settings of faf-lua intellisence
+.vscode/settings.json
