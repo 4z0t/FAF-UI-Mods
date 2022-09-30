@@ -15,10 +15,66 @@ local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = import('Layouter.lua').ReusedLayoutFor
+local IScrollable = import("Views/IScrollable.lua").IScrollable
 
 local globalOptions = {}
 local optionsSelector = nil
 local optionsWindows = {}
+
+local OptionLine = Class(Group)
+{
+    __init = function(self, parent)
+        Group.__init(self, parent)
+    end,
+
+    
+}
+
+local OptionSelector = Class(IScrollable)
+{
+    __init = function(self, parent)
+        IScrollable.__init(self, parent)
+
+        self._popup = Popup(parent, self)
+        self._title = UIUtil.CreateText(self, 'UI Mods Options', 16, UIUtil.titleFont, true)
+        self._scroll = UIUtil.CreateLobbyVertScrollbar(self, -20, 10, 25) -- scroller
+        self._quitButton = UIUtil.CreateButtonWithDropshadow(self, '/BUTTON/medium/', LOC("<LOC _Close>Close"))
+
+
+        self._quitButton.OnClick = function(button, modifiers)
+            self._popup:Destroy()
+        end
+
+
+    end,
+
+    __post_init = function(self, parent)
+        self:Layout(parent)
+    end,
+
+    _Layout = function(self, parent)
+        LayoutFor(self)
+            :Height(500)
+            :Width(500)
+            :AtCenterIn(parent)
+        LayoutFor(self._title)
+            :AtHorizontalCenterIn(self)
+            :AtTopIn(self, 5)
+        LayoutFor(self._scroll)
+            :Over(self, 10)
+        LayoutFor(self._quitButton)
+            :AtHorizontalCenterIn(self)
+            :AtBottomIn(self, 5)
+            :Over(self, 20)
+    end
+
+
+
+
+
+
+}
+
 
 --- adds options window builder for a mod
 ---@param option string
@@ -26,7 +82,7 @@ local optionsWindows = {}
 ---@param buildTable table
 ---@return nil
 function AddOptions(option, title, buildTable)
-    globalOptions[option] = {title, buildTable}
+    globalOptions[option] = { title, buildTable }
 end
 
 local function CreateUI(parent)
@@ -70,7 +126,7 @@ function CreateOptionsSelector(parent)
         :AtBottomIn(group, 5)
         :Over(group, 20)
         :End()
-    
+
 
     group.QuitButton.OnClick = function(self)
         group.popup:Destroy()
@@ -220,8 +276,8 @@ function CreateOptionsSelector(parent)
         end
         group.numLines = index
     end
+
     CreateOptionsSelectorLines()
     group:CalcVisible()
     return group
 end
-
