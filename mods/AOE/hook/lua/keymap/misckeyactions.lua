@@ -219,3 +219,9 @@ KeyMapper.SetUserKeyAction("Loop over mexes and upgrade previous", {
     category = "selection",
     order = 28
 })
+
+KeyMapper.SetUserKeyAction("Select all sensor structures", {
+    action = "UI_SelectByCategory INTELLIGENCE SONAR NAVAL, INTELLIGENCE STRUCTURE",
+    category = "selection",
+    order = 29
+})
