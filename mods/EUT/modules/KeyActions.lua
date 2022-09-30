@@ -45,6 +45,20 @@ function Init()
         order = 1006
     })
 
+
+    KeyMapper.SetUserKeyAction('Select all upgrading mexes', {
+        action = 'UI_Lua SelectUnits(' .. prefix .. 'GetMexes(3)); UI_Lua AddSelectUnits(' .. prefix .. 'GetMexes(6))',
+        category = nameEUT,
+        order = 1005
+    })
+    
+    KeyMapper.SetUserKeyAction('Select all upgrading paused mexes', {
+        action = 'UI_Lua SelectUnits(' .. prefix .. 'GetMexes(2)); UI_Lua AddSelectUnits(' .. prefix .. 'GetMexes(5))',
+        category = nameEUT,
+        order = 1005
+    })
+
+
     KeyMapper.SetUserKeyAction('Upgrade all idle t1 mexes', {
         action = 'UI_Lua ' .. prefix .. 'UpgradeAll(1)',
         category = nameEUT,

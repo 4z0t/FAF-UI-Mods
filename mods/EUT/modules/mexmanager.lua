@@ -158,6 +158,10 @@ function PauseWorst(id)
     UpdateUI()
 end
 
+function GetMexes(id)
+    return mexData[id].mexes
+end
+
 function UnPauseBest(id)
     local mexes = mexData[id].mexes
     if table.empty(mexes) then
