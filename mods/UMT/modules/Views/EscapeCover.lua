@@ -20,7 +20,6 @@ EscapeCover = Class(Bitmap) {
 
 
         EscapeHandler.PushEscapeHandler(function()
-            EscapeHandler.PopEscapeHandler()
             self:OnEscapePressed()
         end)
     end,
@@ -35,8 +34,8 @@ EscapeCover = Class(Bitmap) {
 
     Close = function(self)
         EscapeHandler.PopEscapeHandler()
+        self:OnClose()
     end,
-
 
     OnEscapePressed = function(self)
         self:Close()
@@ -48,7 +47,10 @@ EscapeCover = Class(Bitmap) {
     end,
 
     OnDestroy = function(self)
-        self:Close()
+        EscapeHandler.PopEscapeHandler()
     end,
 
+    OnClose = function(self)
+
+    end,
 }

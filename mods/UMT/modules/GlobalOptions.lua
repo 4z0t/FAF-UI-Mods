@@ -41,7 +41,8 @@ local OptionLine = Class(Group)
 
         self._bg.OnCheck = function(bg, checked)
             if IsDestroyed(optionsWindows[self.id]) then
-                optionsWindows[self.id] = OptionsWindow(GetFrame(0), self.data[1], self.id, self.data[2])
+                optionsWindows[self.id] = OptionsWindow(GetFrame(parent:GetRootFrame():GetTargetHead()), self.data[1],
+                    self.id, self.data[2])
             end
         end
     end,
@@ -77,12 +78,11 @@ local OptionLine = Class(Group)
             self._name:SetText('')
             self._bg:Disable()
         end
-
     end,
 
 }
 
-local OptionSelector = Class(Group, IScrollable)
+local OptionSelector = Class(IScrollable)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -101,11 +101,9 @@ local OptionSelector = Class(Group, IScrollable)
             self:Destroy()
         end
 
-        self._cover.OnShadowClicked = function(cover)
+        self._cover.OnClose = function(cover)
             self:Destroy()
         end
-
-
     end,
 
     __post_init = function(self, parent)
@@ -177,6 +175,10 @@ local OptionSelector = Class(Group, IScrollable)
     DataIter = function(self, data, key)
         return next(data, key)
     end,
+    
+    OnDestroy = function(self)
+        optionsSelector = nil
+    end
 
 }
 

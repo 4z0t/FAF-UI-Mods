@@ -1,8 +1,13 @@
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 
+
+
 ---@class IScrollable
-IScrollable = ClassSimple {
+---@field _topLine  integer
+---@field _dataSize integer
+---@field _numLines integer
+IScrollable = Class(Group) {
 
     Setup = function(self, topIndex, dataSize, numLines)
         self._topLine = topIndex
@@ -35,7 +40,10 @@ IScrollable = ClassSimple {
         self:ScrollSetTop(nil, self._numLines)
     end,
 
-    -- determines what controls should be visible or not
+    ---Determines what controls should be visible or not
+    ---@generic K, V
+    ---@param self IScrollable
+    ---@param data? table<K,V>
     CalcVisible = function(self, data)
         local lineIndex = 1
         local key, value = self:DataIter(data, nil)
@@ -52,8 +60,8 @@ IScrollable = ClassSimple {
     ---Iterates over given data while CalcVisible, overload for more functions
     ---@generic K, V
     ---@param self IScrollable
-    ---@param data table<K,V>
-    ---@param key any
+    ---@param data? table<K,V>
+    ---@param key? any
     ---@return K
     ---@return V
     DataIter = function(self, data, key)
@@ -68,7 +76,7 @@ IScrollable = ClassSimple {
     ---@param key K
     ---@param value V
     RenderLine = function(self, lineIndex, scrollIndex, key, value)
-
+        WARN(debug.traceback("Not implemented method!"))
     end,
 
     HandleEvent = function(self, event)
@@ -82,7 +90,10 @@ IScrollable = ClassSimple {
         return self:OnEvent(event)
     end,
 
-    -- overload
+    ---HandleEvent overload
+    ---@param self IScrollable
+    ---@param event Event
+    ---@return boolean
     OnEvent = function(self, event)
         return true
     end
