@@ -1,18 +1,13 @@
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-IScrollable = Class(Group) {
-    --[[
-        _dataSize
-        _topLine
-        _numLines
-    ]]
-    __init = function(self, parent, useScroll)
-        Group.__init(self, parent)
-        self._topLine = 1
-        if useScroll then 
-            self._scroll = UIUtil.CreateVertScrollbarFor(self) -- scroller
-        end
+---@class IScrollable
+IScrollable = ClassSimple {
+
+    Setup = function(self, topIndex, dataSize, numLines)
+        self._topLine = topIndex
+        self._dataSize = dataSize
+        self._numLines = numLines
     end,
 
     GetScrollValues = function(self, axis)
@@ -41,17 +36,38 @@ IScrollable = Class(Group) {
     end,
 
     -- determines what controls should be visible or not
-    CalcVisible = function(self)
-        local invIndex = 1
+    CalcVisible = function(self, data)
         local lineIndex = 1
+        local key, value = self:DataIter(data, nil)
+
         for index = self._topLine, self._numLines + self._topLine - 1 do
-            self:RenderLine(lineIndex, index)
+            self:RenderLine(lineIndex, index, key, value)
+            if key ~= nil then
+                key, value = self:DataIter(data, key)
+            end
             lineIndex = lineIndex + 1
         end
     end,
 
-    -- overload
-    RenderLine = function(self, lineIndex, scrollIndex)
+    ---Iterates over given data while CalcVisible, overload for more functions
+    ---@generic K, V
+    ---@param self IScrollable
+    ---@param data table<K,V>
+    ---@param key any
+    ---@return K
+    ---@return V
+    DataIter = function(self, data, key)
+        return nil, nil
+    end,
+
+    ---Overload for rendering lines
+    ---@generic K, V
+    ---@param self IScrollable
+    ---@param lineIndex integer
+    ---@param scrollIndex integer
+    ---@param key K
+    ---@param value V
+    RenderLine = function(self, lineIndex, scrollIndex, key, value)
 
     end,
 

@@ -63,7 +63,7 @@ end
 function Create(modOptionName, subOption, default)
 
     if default == nil then
-        error("Attempt to set option %s:%s to nil by default, dont do that!":format(modOptionName, subOption))
+        error(("Attempt to set option %s:%s to nil by default, dont do that!"):format(modOptionName, subOption))
     end
     local modOptionsTable = Prefs.GetFromCurrentProfile(modOptionName)
     local val = modOptionsTable and modOptionsTable[subOption]
