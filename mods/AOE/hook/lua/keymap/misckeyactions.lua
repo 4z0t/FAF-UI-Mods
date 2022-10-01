@@ -226,6 +226,12 @@ KeyMapper.SetUserKeyAction("Select all sensor structures", {
     order = 29
 })
 
+KeyMapper.SetUserKeyAction("Select all radars", {
+    action = "UI_SelectByCategory INTELLIGENCE STRUCTURE RADAR, INTELLIGENCE STRUCTURE OMNI",
+    category = "selection",
+    order = 29
+})
+
 
 KeyMapper.SetUserKeyAction("Upgrade mex, select next nearest", {
     action = "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Upgrades'); UI_SelectByCategory +inview +idle +nearest MASSEXTRACTION STRUCTURE",
