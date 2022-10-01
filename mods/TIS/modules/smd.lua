@@ -1,5 +1,6 @@
-local Main = import('main.lua')
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
+
+local Update = import('update.lua')
 
 local listeners = {}
 

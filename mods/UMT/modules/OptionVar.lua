@@ -46,12 +46,13 @@ function Create(modOptionName, subOption, default)
         modOptionsTable = modOptionsTable or {}
         modOptionsTable[subOption] = default
         Prefs.SetToCurrentProfile(modOptionName, modOptionsTable)
+        val = default
     end
 
     local result = {
         _m = modOptionName,
         _o = subOption,
-        _lv = LazyVar.Create(val or default),
+        _lv = LazyVar.Create(val),
         _prev = nil,
         OnChange = function(self)
         end
