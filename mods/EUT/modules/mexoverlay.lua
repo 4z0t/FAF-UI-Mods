@@ -12,6 +12,7 @@ local overlays = {}
 local Options = import("options.lua")
 
 local showOverlay = Options.overlayOption()
+local useNumberOverlay = Options.useNumberOverlay()
 
 local function Remove(id)
     overlays[id]:Destroy()
@@ -24,10 +25,17 @@ function init()
         showOverlay = var()
     end
 
+    Options.useNumberOverlay.OnChange = function(var)
+        useNumberOverlay = var()
+    end
+
 
 end
 
-local MexOverlay = Class(Bitmap)
+local upgradeColor = "ff00ff00"
+local idleColor = "ffffffff"
+
+local Overlay = Class(Bitmap)
 {
     __init = function(self, parent, unit)
         Bitmap.__init(self, parent)
@@ -35,10 +43,8 @@ local MexOverlay = Class(Bitmap)
         self:DisableHitTest()
         self.id = unit:GetEntityId()
         self.unit = unit
-        self.offsetX = 5
-        self.offsetY = 6
-        self:SetTexture("/mods/EUT/textures/upgrade.dds")
-        LayoutHelpers.SetDimensions(self, 8, 8)
+        self.offsetX = 0
+        self.offsetY = 0
         self.PosX = LazyVar.Create()
         self.PosY = LazyVar.Create()
         self.Left:Set(function()
@@ -61,6 +67,17 @@ local MexOverlay = Class(Bitmap)
             self:Hide()
         end
     end,
+}
+
+local MexOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 5
+        self.offsetY = 6
+        self:SetTexture("/mods/EUT/textures/upgrade.dds")
+        LayoutHelpers.SetDimensions(self, 8, 8)
+    end,
 
     OnFrame = function(self, delta)
         if not self.unit:IsDead() and showOverlay then
@@ -69,6 +86,46 @@ local MexOverlay = Class(Bitmap)
             else
                 self:Hide()
             end
+        else
+            Remove(self.id)
+        end
+    end
+
+
+}
+
+local NumberMexOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 0
+        self.offsetY = 0
+        LayoutHelpers.SetDimensions(self, 10, 10)
+        self:SetSolidColor("black")
+        local text = "0"
+        if unit:IsInCategory("TECH1") then
+            text = "1"
+        elseif unit:IsInCategory("TECH2") then
+            text = "2"
+        elseif unit:IsInCategory("TECH3") then
+            text = "3"
+        end
+        self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
+        LayoutHelpers.AtCenterIn(self.text, self)
+    end,
+
+    OnFrame = function(self, delta)
+        if not self.unit:IsDead() and showOverlay then
+            if self.unit.isUpgraded then
+                self:Hide()
+                return
+            end
+            if self.unit.isUpgrader then
+                self.text:SetColor(upgradeColor)
+            else
+                self.text:SetColor(idleColor)
+            end
+            self:Update()
         else
             Remove(self.id)
         end
@@ -90,7 +147,11 @@ function UpdateOverlays(mexes)
         VerifyWV()
         for _, mex in mexes do
             if not overlays[mex:GetEntityId()] then
-                overlays[mex:GetEntityId()] = MexOverlay(worldView, mex)
+                if useNumberOverlay then
+                    overlays[mex:GetEntityId()] = NumberMexOverlay(worldView, mex)
+                else
+                    overlays[mex:GetEntityId()] = MexOverlay(worldView, mex)
+                end
             end
         end
     end
