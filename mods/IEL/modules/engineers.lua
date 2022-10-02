@@ -178,7 +178,7 @@ local MexOverlay = Class(Overlay)
 }
 
 
-function VerifyWV()
+local function VerifyWV()
     if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft
     then
         worldView = import("/lua/ui/game/worldview.lua").viewLeft
@@ -186,7 +186,7 @@ function VerifyWV()
     end
 end
 
-function CreateUnitOverlays()
+local function CreateUnitOverlays()
     local allunits = GetUnits()
     local id
     VerifyWV()
