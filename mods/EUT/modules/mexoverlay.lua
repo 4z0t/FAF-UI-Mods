@@ -3,8 +3,9 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
-local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 local LazyVar = import("/lua/lazyvar.lua")
+
+local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
 local overlays = {}
 
@@ -19,35 +20,39 @@ end
 
 function init()
 
-    Options.overlayOption.OnChange = function (var)
+    Options.overlayOption.OnChange = function(var)
         showOverlay = var()
     end
 
-    
+
 end
 
-local function CreateOverlay(mex)
-    local id = mex:GetEntityId()
-    local overlay = Bitmap(worldView)
-    overlay:Hide()
-    overlay:DisableHitTest()
-    overlay.id = mex:GetEntityId()
-    overlay.mex = mex
-    overlay.offsetX = 5
-    overlay.offsetY = 6
-    overlay:SetTexture("/mods/EUT/textures/upgrade.dds")
-    LayoutHelpers.SetDimensions(overlay, 8, 8)
-    overlay.PosX = LazyVar.Create()
-    overlay.PosY = LazyVar.Create()
-    overlay.Left:Set(function()
-        return worldView.Left() + overlay.PosX() - overlay.Width() / 2 + overlay.offsetX
-    end)
-    overlay.Top:Set(function()
-        return worldView.Top() + overlay.PosY() - overlay.Height() / 2 + overlay.offsetY
-    end)
-    overlay:SetNeedsFrameUpdate(true)
-    overlay.Update = function(self)
-        local pos = worldView:GetScreenPos(self.mex)
+local MexOverlay = Class(Bitmap)
+{
+    __init = function(self, parent, unit)
+        Bitmap.__init(self, parent)
+        self:Hide()
+        self:DisableHitTest()
+        self.id = unit:GetEntityId()
+        self.unit = unit
+        self.offsetX = 5
+        self.offsetY = 6
+        self:SetTexture("/mods/EUT/textures/upgrade.dds")
+        LayoutHelpers.SetDimensions(self, 8, 8)
+        self.PosX = LazyVar.Create()
+        self.PosY = LazyVar.Create()
+        self.Left:Set(function()
+            return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
+        end)
+        self.Top:Set(function()
+            return worldView.Top() + self.PosY() - self.Height() / 2 + self.offsetY
+        end)
+        self:SetNeedsFrameUpdate(true)
+    end,
+
+
+    Update = function(self)
+        local pos = worldView:GetScreenPos(self.unit)
         if pos then
             self:Show()
             self.PosX:Set(pos.x)
@@ -55,11 +60,11 @@ local function CreateOverlay(mex)
         else
             self:Hide()
         end
-    end
+    end,
 
-    overlay.OnFrame = function(self, delta)
-        if not self.mex:IsDead() and showOverlay then
-            if self.mex:GetWorkProgress() > 0 then
+    OnFrame = function(self, delta)
+        if not self.unit:IsDead() and showOverlay then
+            if self.unit:GetWorkProgress() > 0 then
                 self:Update()
             else
                 self:Hide()
@@ -69,9 +74,8 @@ local function CreateOverlay(mex)
         end
     end
 
-    return overlay
 
-end
+}
 
 local function VerifyWV()
     if IsDestroyed(worldView)
@@ -86,7 +90,7 @@ function UpdateOverlays(mexes)
         VerifyWV()
         for _, mex in mexes do
             if not overlays[mex:GetEntityId()] then
-                overlays[mex:GetEntityId()] = CreateOverlay(mex)
+                overlays[mex:GetEntityId()] = MexOverlay(worldView, mex)
             end
         end
     end
