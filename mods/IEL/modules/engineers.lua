@@ -7,17 +7,13 @@ local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local LazyVar = import("/lua/lazyvar.lua")
 
 local GetUnits = import("/mods/UMT/modules/units.lua").Get
-local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
-local OptionsUtils = import("/mods/UMT/modules/OptionsWindow.lua")
-local OptionVarCreate = import("/mods/UMT/modules/OptionVar.lua").Create
+local Options = import("options.lua")
 
-local modName = "IEL"
-
-local engineersOption = OptionVarCreate(modName, "engineersOverlay", true)
-local factoriesOption = OptionVarCreate(modName, "factoriesOverlay", true)
-local supportCommanderOption = OptionVarCreate(modName, "supportCommanderOverlay", true)
-local tacticalNukesOption = OptionVarCreate(modName, "tacticalNukesOverlay", true)
-local massExtractorsOption = OptionVarCreate(modName, "massExtractorsOverlay", true)
+local engineersOption = Options.engineersOption
+local factoriesOption = Options.factoriesOption
+local supportCommanderOption = Options.supportCommanderOption
+local tacticalNukesOption = Options.tacticalNukesOption
+local massExtractorsOption = Options.massExtractorsOption
 
 local engineersOverlay = engineersOption()
 local factoriesOverlay = factoriesOption()
@@ -29,7 +25,7 @@ local overlays = {}
 local overlayGroup
 local worldView
 
-function Remove(id)
+local function Remove(id)
     overlays[id]:Destroy()
     overlays[id] = nil
 end
@@ -244,11 +240,4 @@ function Init(isReplay)
     massExtractorsOption.OnChange = function(self)
         massExtractorsOverlay = self()
     end
-
-    GlobalOptions.AddOptions(modName, "Idle Engineers Light",
-        { OptionsUtils.Filter("Show engineers ovelays", engineersOption),
-            OptionsUtils.Filter("Show factories ovelays", factoriesOption),
-            OptionsUtils.Filter("Show Nukes and TMLs ovelays", tacticalNukesOption),
-            OptionsUtils.Filter("Show Mex ovelays", massExtractorsOption) })
-
 end
