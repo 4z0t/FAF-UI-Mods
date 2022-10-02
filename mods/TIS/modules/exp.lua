@@ -1,6 +1,6 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Main = import('main.lua')
+local Update = import('update.lua')
 local Data = import('data.lua')
 local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -21,7 +21,7 @@ local function Remove(id)
         overlays[id]:Destroy()
         overlays[id] = nil
     end
-    Main.Remove(id)
+    Update.Remove(id)
     Data.SendData({
         exp = true,
         remove = true,
@@ -121,7 +121,7 @@ end
 function init(isReplay, option)
     expOption = option
     showOverlay = expOption.overlay()
-    expOption.overlay.OnDirty = function(self)
+    expOption.overlay.OnChange = function(self)
         showOverlay = self()
     end
     AddBeatFunction(UpdateListeners, true)
@@ -212,7 +212,7 @@ function CreateUnitOverlay(unit, id)
     overlay.eta:SetDropShadow(true)
     overlay.eta.offsetX = expOption.eta.offsetX
     overlay.eta.offsetY = expOption.eta.offsetY
-    Main.AtCenterInOffset(overlay.eta, overlay)
+    Update.AtCenterInOffset(overlay.eta, overlay)
 
     overlay.progress = UIUtil.CreateText(overlay, '0%', 9, UIUtil.bodyFont)
     overlay.progress:DisableHitTest()
@@ -221,7 +221,7 @@ function CreateUnitOverlay(unit, id)
 
     overlay.progress.offsetX = expOption.progress.offsetX
     overlay.progress.offsetY = expOption.progress.offsetY
-    Main.AtCenterInOffset(overlay.progress, overlay)
+    Update.AtCenterInOffset(overlay.progress, overlay)
 
     return overlay
 end

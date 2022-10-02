@@ -130,6 +130,7 @@ local FactoryOverlay = Class(Overlay)
         end
     end
 
+
 }
 local SiloOverlay = Class(Overlay)
 {
@@ -220,6 +221,7 @@ function initOverlayGroup()
     -- end
     -- prepare for updating overlays
 end
+
 
 function Init(isReplay)
 

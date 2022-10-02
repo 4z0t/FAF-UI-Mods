@@ -1,8 +1,13 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
+
+---@class Layouter
+---@field c Control
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
+---Disables control
+---@return Layouter
 function LayouterMetaTable:Disable()
     self.c:Disable()
     return self
@@ -48,14 +53,25 @@ function LayouterMetaTable:Texture(texture, border)
     return self
 end
 
-function LayouterMetaTable:HitTest(state)
+
+function LayouterMetaTable:EnableHitTest(recursive)
+    self.c:EnableHitTest(recursive)
+    return self
+end
+
+function LayouterMetaTable:DisableHitTest(recursive)
+    self.c:DisableHitTest(recursive)
+    return self
+end
+
+function LayouterMetaTable:HitTest(state, recursive)
     if state == nil then
         error(":HitTest requires 1 positional argument \"state\"")
     end
     if state then
-        self.c:EnableHitTest()
+        self.c:EnableHitTest(recursive)
     else
-        self.c:DisableHitTest()
+        self.c:DisableHitTest(recursive)
     end
     return self
 end
@@ -339,6 +355,10 @@ function LayouterMetaTable:End()
     return self.c
 end
 
+
+---Creates Layouter for given control
+---@param control Control
+---@return Layouter
 function LayoutFor(control)
     local result = {
         c = control
@@ -347,11 +367,15 @@ function LayoutFor(control)
     return result
 end
 
+
 local layouter = {
     c = false
 }
 setmetatable(layouter, LayouterMetaTable)
 
+---returns Reused Layouter
+---@param control Control
+---@return Layouter
 function ReusedLayoutFor(control)
     layouter.c = control or false
     return layouter

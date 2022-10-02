@@ -27,15 +27,16 @@ end
 local function UpdateCache()
     cached = {}
     assisting = {}
-
+    local focused = {}
+    
     for id, unit in units do
         if not unit:IsDead() then
             TableInsert(cached, unit)
             local focus = unit:GetFocus()
             if focus and not focus:IsDead() then
                 local focusId = focus:GetEntityId()
-                if not units[focusId] then
-                    units[focusId] = focus
+                if not focused[focusId] then
+                    focused[focusId] = focus
                     TableInsert(cached, focus)
                 end
                 -- if EntityCategoryContains(categories.ENGINEER, unit) then
@@ -51,6 +52,9 @@ local function UpdateCache()
                 -- end
             end
         end
+    end
+    for id, unit in focused do
+        units[id] = unit
     end
 end
 
@@ -85,8 +89,8 @@ local function CheckCache()
         -- local n = score[army].general.currentunits.count
 
         if currentTick - 50 > prevReset
-         --and (not n or n > table.getsize(cached)) 
-         then
+        --and (not n or n > table.getsize(cached))
+        then
             UpdateAllUnits()
             prevReset = currentTick
         end
@@ -146,7 +150,7 @@ end
 -- local added = {}
 
 -- --[[
---     checker : nil | function(unit : unit ) -> bool 
+--     checker : nil | function(unit : unit ) -> bool
 --     passer : function( units : table | unit : unit  ) -> nil
 
 -- ]]
