@@ -13,7 +13,6 @@ local showOverlay = Options.overlayOption()
 local useNumberOverlay = Options.useNumberOverlay()
 
 local function Remove(id)
-    overlays[id]:Destroy()
     overlays[id] = nil
 end
 
@@ -65,6 +64,10 @@ local Overlay = Class(Bitmap)
             self:Hide()
         end
     end,
+
+    OnDestroy = function(self)
+        Remove(self.id)
+    end
 }
 
 local MexOverlay = Class(Overlay)
@@ -85,7 +88,7 @@ local MexOverlay = Class(Overlay)
                 self:Hide()
             end
         else
-            Remove(self.id)
+            self:Destroy()
         end
     end
 
@@ -125,7 +128,7 @@ local NumberMexOverlay = Class(Overlay)
             end
             self:Update()
         else
-            Remove(self.id)
+            self:Destroy()
         end
     end
 
