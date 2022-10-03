@@ -1,15 +1,13 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
-local Prefs = import("/lua/user/prefs.lua")
-local LazyVar = import("/lua/lazyvar.lua")
+local LazyVar = import("/lua/lazyvar.lua").Create
+
+local Options = import("options.lua")
 
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
 local overlays = {}
-
-local Options = import("options.lua")
 
 local showOverlay = Options.overlayOption()
 local useNumberOverlay = Options.useNumberOverlay()
@@ -45,8 +43,8 @@ local Overlay = Class(Bitmap)
         self.unit = unit
         self.offsetX = 0
         self.offsetY = 0
-        self.PosX = LazyVar.Create()
-        self.PosY = LazyVar.Create()
+        self.PosX = LazyVar()
+        self.PosY = LazyVar()
         self.Left:Set(function()
             return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
         end)
@@ -145,12 +143,14 @@ end
 function UpdateOverlays(mexes)
     if showOverlay then
         VerifyWV()
+        local id
         for _, mex in mexes do
-            if not overlays[mex:GetEntityId()] then
+            id = mex:GetEntityId()
+            if not overlays[id] then
                 if useNumberOverlay then
-                    overlays[mex:GetEntityId()] = NumberMexOverlay(worldView, mex)
+                    overlays[id] = NumberMexOverlay(worldView, mex)
                 else
-                    overlays[mex:GetEntityId()] = MexOverlay(worldView, mex)
+                    overlays[id] = MexOverlay(worldView, mex)
                 end
             end
         end

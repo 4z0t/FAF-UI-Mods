@@ -1,10 +1,8 @@
 -- upvalue for performance
 local TableInsert = table.insert
-local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryContains = EntityCategoryContains
 local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
-
-local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 
 local Select = import("/mods/UMT/modules/select.lua")
 local GetUnits = import("/mods/UMT/modules/units.lua").Get
@@ -204,5 +202,5 @@ function init()
         upgradeT1 = var()
     end
 
-    AddBeatFunction(UpdateUI, true)
+    import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
 end
