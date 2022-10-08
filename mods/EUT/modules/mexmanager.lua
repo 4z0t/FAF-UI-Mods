@@ -1,10 +1,8 @@
 -- upvalue for performance
 local TableInsert = table.insert
-local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryContains = EntityCategoryContains
 local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local GetIsPaused = GetIsPaused
-
-local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 
 local Select = import("/mods/UMT/modules/select.lua")
 local GetUnits = import("/mods/UMT/modules/units.lua").Get
@@ -12,9 +10,12 @@ local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local UpdateMexPanel = import("mexpanel.lua").Update
+local Options = import("options.lua")
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local mexData = {}
+
+local upgradeT1 = Options.upgradeT1Option()
 
 local toBePaused = {}
 
@@ -23,13 +24,16 @@ local function UpgradeMexes(mexes)
     local upgrades = {}
 
     for _, m in mexes do
-        toBePaused[m:GetEntityId()] = true
-        local bp = m:GetBlueprint()
-        local upgrades_to = bp.General.UpgradesTo
+        if not toBePaused[m:GetEntityId()] then
 
-        upgrades[upgrades_to] = upgrades[upgrades_to] or {}
+            toBePaused[m:GetEntityId()] = true
+            local bp = m:GetBlueprint()
+            local upgrades_to = bp.General.UpgradesTo
 
-        table.insert(upgrades[upgrades_to], m)
+            upgrades[upgrades_to] = upgrades[upgrades_to] or {}
+
+            table.insert(upgrades[upgrades_to], m)
+        end
     end
 
     if not table.empty(upgrades) then
@@ -58,7 +62,7 @@ local function MatchCategory(category, unit)
     end
 
     if category.isPaused ~= nil then
-        if GetIsPaused({unit}) ~= category.isPaused then
+        if GetIsPaused({ unit }) ~= category.isPaused then
             return false
         end
     end
@@ -86,7 +90,7 @@ local function UpdateUI()
             f.isUpgraded = true
             if toBePaused[mex:GetEntityId()] then
                 toBePaused[mex:GetEntityId()] = nil
-                SetPaused({mex}, true)
+                SetPaused({ mex }, true)
             end
         end
     end
@@ -101,6 +105,11 @@ local function UpdateUI()
     end
 
     for id, category in mexCategories do
+
+        if id == 1 and upgradeT1 and not table.empty(mexData[id].mexes) then
+            UpgradeMexes(mexData[id].mexes)
+        end
+
 
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
@@ -143,8 +152,12 @@ function PauseWorst(id)
     if table.empty(mexes) then
         return
     end
-    SetPaused({mexes[table.getn(mexes)]}, true)
+    SetPaused({ mexes[table.getn(mexes)] }, true)
     UpdateUI()
+end
+
+function GetMexes(id)
+    return mexData[id].mexes
 end
 
 function UnPauseBest(id)
@@ -152,13 +165,13 @@ function UnPauseBest(id)
     if table.empty(mexes) then
         return
     end
-    SetPaused({mexes[1]}, false)
+    SetPaused({ mexes[1] }, false)
     UpdateUI()
 end
 
 function SelectBest(id)
     local mexes = mexData[id].mexes
-    SelectUnits({mexes[1]})
+    SelectUnits({ mexes[1] })
 end
 
 function SelectAll(id)
@@ -184,6 +197,10 @@ function SelectOnScreen(id)
 end
 
 function init()
-    AddBeatFunction(UpdateUI, true)
-end
 
+    Options.upgradeT1Option.OnChange = function(var)
+        upgradeT1 = var()
+    end
+
+    import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
+end
