@@ -47,7 +47,11 @@ IScrollable = Class(Group) {
     CalcVisible = function(self, data)
         local lineIndex = 1
         local key, value = self:DataIter(data, nil)
-
+        if key ~= nil then
+            for i = 1, self._topLine - 1 do
+                key, value = self:DataIter(data, key)
+            end
+        end
         for index = self._topLine, self._numLines + self._topLine - 1 do
             self:RenderLine(lineIndex, index, key, value)
             if key ~= nil then
