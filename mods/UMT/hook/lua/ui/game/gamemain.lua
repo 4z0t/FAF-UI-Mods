@@ -1,6 +1,7 @@
-
-local originalCreateUI = CreateUI
-function CreateUI(isReplay, parent)
-    originalCreateUI(isReplay)
-    import("/mods/UMT/modules/main.lua").init(isReplay)
+do
+    local OriginalCreateUI = CreateUI
+    function CreateUI(isReplay, parent)
+        OriginalCreateUI(isReplay)
+        import("/mods/UMT/modules/main.lua").Main(isReplay)
+    end
 end
