@@ -17,7 +17,7 @@ Filter = Class(Group)
         self._check = UIUtil.CreateCheckbox(self, "/dialogs/check-box_btn/", name, true)
 
         self._check.OnCheck = function(control, checked)
-            self._option:Set(checked)
+            optionVar:Set(checked)
         end
         self._check:SetCheck(self._option(), true)
     end,
@@ -31,5 +31,9 @@ Filter = Class(Group)
             :AtCenterIn(self)
             :Over(self)
     end,
+
+    OnDestroy = function(self)
+        self._option = nil
+    end
 
 }
