@@ -50,7 +50,7 @@ end
 ---@return ControlConfig
 function Filter(name, optionVar, indent)
     return {
-        type ="filter",
+        type = "filter",
         name = name,
         optionVar = optionVar,
         indent = indent or 0
@@ -93,7 +93,6 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
-
 ---@class OptionsWindowBuilder
 ---@field _control OptionsWindow
 OptionsWindowBuilder = ClassSimple
@@ -117,10 +116,15 @@ OptionsWindowBuilder = ClassSimple
     ---comment
     ---@param self OptionsWindowBuilder
     ---@param title string
+    ---@return OptionsWindowBuilder
     Title = function(self, title)
         if self:_Started() then
             self._control:SetTitle(title)
+            return self
         end
+
+        
+        return self
     end,
 
     ---comment
