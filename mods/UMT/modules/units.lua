@@ -2,7 +2,7 @@ local TableInsert = table.insert
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
 
-local SelectHidden = import("select.lua").Hidden
+local SelectHidden = UMT.Select.Hidden
 
 local currentArmy = false
 local units = {}
