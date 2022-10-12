@@ -20,6 +20,11 @@ _G.UMT       = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         IScrollable = import("/mods/UMT/modules/Views/IScrollable.lua").IScrollable,
     },
+    WeakMeta      = {
+        Key = { __mode = 'k' },
+        Value = { __mode = 'v' },
+        KeyValue = { __mode = 'kv' },
+    },
     Containers    = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
