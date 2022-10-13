@@ -21,7 +21,7 @@ local EscapeCover = import("Views/EscapeCover.lua").EscapeCover
 
 local globalOptions = {}
 local optionsSelector = nil
-local optionsWindows = {}
+local optionsWindows = setmetatable({}, UMT.WeakMeta.Value)
 
 local OptionLine = Class(Group)
 {
@@ -175,7 +175,7 @@ local OptionSelector = Class(IScrollable)
     DataIter = function(self, data, key)
         return next(data, key)
     end,
-    
+
     OnDestroy = function(self)
         optionsSelector = nil
     end

@@ -1,10 +1,9 @@
-_G.UMT       = {
-    Info          = import("/mods/UMT/mod_info.lua"),
-    Version       = import("/mods/UMT/mod_info.lua").version,
-    Layouter      = import("/mods/UMT/modules/Layouter.lua"),
-    GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua"),
-    OptionVar     = import("/mods/UMT/modules/OptionVar.lua"),
-    Select        = {
+_G.UMT                   = {
+    Info     = import("/mods/UMT/mod_info.lua"),
+    Version  = import("/mods/UMT/mod_info.lua").version,
+    Layouter = import("/mods/UMT/modules/Layouter.lua"),
+    OptionVar  = import("/mods/UMT/modules/OptionVar.lua"),
+    Select     = {
         Hidden = function(callback)
             local CommandMode = import('/lua/ui/game/commandmode.lua')
             local current_command = CommandMode.GetCommandMode()
@@ -16,19 +15,20 @@ _G.UMT       = {
             SetIgnoreSelection(false)
         end
     },
-    Views         = {
+    Views      = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         IScrollable = import("/mods/UMT/modules/Views/IScrollable.lua").IScrollable,
     },
-    WeakMeta      = {
+    WeakMeta   = {
         Key = { __mode = 'k' },
         Value = { __mode = 'v' },
         KeyValue = { __mode = 'kv' },
     },
-    Containers    = {
+    Containers = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     }
 }
-_G.UMT.Units = import("/mods/UMT/modules/units.lua")
+_G.UMT.Units             = import("/mods/UMT/modules/units.lua")
+_G.UMT.GlobalOptions     = import("/mods/UMT/modules/GlobalOptions.lua")
