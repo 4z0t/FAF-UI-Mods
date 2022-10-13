@@ -6,7 +6,7 @@ local SelectHidden = UMT.Select.Hidden
 
 local currentArmy = false
 local units = {}
-local assisting = {}
+--local assisting = {}
 local cached = {}
 
 local prevReset = 0
@@ -26,7 +26,7 @@ end
 
 local function UpdateCache()
     cached = {}
-    assisting = {}
+--    assisting = {}
     local focused = {}
     
     for id, unit in units do
