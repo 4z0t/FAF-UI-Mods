@@ -15,7 +15,7 @@ local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = import('Layouter.lua').ReusedLayoutFor
-local IScrollable = import("Views/IScrollable.lua").IScrollable
+local DynamicScrollable = import("Views/DynamicScrollable.lua").DynamicScrollable
 local EscapeCover = import("Views/EscapeCover.lua").EscapeCover
 
 
@@ -82,7 +82,7 @@ local OptionLine = Class(Group)
 
 }
 
-local OptionSelector = Class(IScrollable)
+local OptionSelector = Class(DynamicScrollable)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -109,7 +109,11 @@ local OptionSelector = Class(IScrollable)
     __post_init = function(self, parent)
         self:_Layout(parent)
         self:_InitLines()
-        self:CalcVisible(globalOptions)
+        self:CalcVisible()
+    end,
+
+    GetData = function(self)
+        return globalOptions
     end,
 
     _InitLines = function(self)
@@ -131,7 +135,7 @@ local OptionSelector = Class(IScrollable)
 
             line = self._lineGroup.lines[index]
         end
-        self:Setup(1, table.getsize(globalOptions), index)
+        self:Setup(1, index)
     end,
 
     _Layout = function(self, parent)
@@ -172,7 +176,7 @@ local OptionSelector = Class(IScrollable)
         self._lineGroup.lines[lineIndex]:Render(value, key)
     end,
 
-    DataIter = function(self, data, key)
+    DataIter = function(self, key, data)
         return next(data, key)
     end,
 
