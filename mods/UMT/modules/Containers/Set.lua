@@ -4,9 +4,9 @@ local _Set
 ---@class Set
 ---@field _data table<any, boolean>
 Set = ClassSimple {
-
-
-
+    ---Creates set from given table
+    ---@param self Set
+    ---@param data? table
     __init = function(self, data)
         self._data = {}
         if data then
