@@ -71,12 +71,8 @@ do
         ---@return Set
         Union = function(self, s)
             local result = _Set()
-            for v, _ in self._data do
-                result:Add(v)
-            end
-            for v, _ in s._data do
-                result:Add(v)
-            end
+            result:Extend(self)
+            result:Extend(s)
             return result
         end,
 
@@ -138,6 +134,15 @@ do
         ---@return boolean
         IsEmpty = function (self)
             return table.empty(self._data)
+        end,
+
+        ---Returns copy of a set
+        ---@param self Set
+        ---@return Set
+        Copy = function (self)
+            local result = _Set()
+            result:Extend(self)
+            return result
         end
 
     }
