@@ -1,3 +1,4 @@
+---@type fun():Set
 local _Set
 ---Class representing set of unique values
 ---@class Set
