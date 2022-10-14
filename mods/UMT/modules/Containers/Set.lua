@@ -3,11 +3,10 @@ local _Set
 ---Class representing set of unique values
 ---@class Set
 ---@field _data table<any, boolean>
-Set = ClassSimple
-{
-    ---Creates Set from given table
-    ---@param self Set
-    ---@param data table
+Set = ClassSimple {
+
+
+
     __init = function(self, data)
         self._data = {}
         if data then
@@ -144,7 +143,61 @@ Set = ClassSimple
         local result = _Set()
         result:Extend(self)
         return result
-    end
+    end,
+    ---Returns union of given sets
+    ---@param self Set
+    ---@param other Set
+    ---@return Set
+    __add = function(self, other)
+        return self:Union(other)
+    end,
+    ---Returns intersection of given sets
+    ---@param self Set
+    ---@param other Set
+    ---@return Set
+    __mul = function(self, other)
+        return self:Intersect(other)
+    end,
+    ---Returns set with elements from the first one, but not from second
+    ---@param self Set
+    ---@param other Set
+    ---@return Set
+    __sub = function(self, other)
+        local c = self:Copy()
+        c:Exclude(other)
+        return c
+    end,
+    -- ---comment
+    -- ---@param self Set
+    -- ---@param other Set
+    -- ---@return Set
+    -- __div = function(self, other)
+
+    -- end,
+    -- ---comment
+    -- ---@param self Set
+    -- ---@param other Set
+    -- ---@return Set
+    -- __pow = function(self, other)
+
+    -- end,
+
 
 }
 _Set = Set
+
+
+-- function Main(isrReplay)
+--     local s = Set({ "a", "b", "c" })
+--     local a = Set({ "d", "e", "f" })
+--     LOG(s:Contains("a"))
+--     LOG(s:Contains("r"))
+--     s:Add("r")
+--     LOG(s:Contains("r"))
+--     reprsl(s+a)
+
+
+
+-- end
+
+-- Main()
