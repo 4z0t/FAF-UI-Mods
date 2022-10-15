@@ -1,8 +1,9 @@
----@type fun():Set
+---@type fun() : Set
 local _Set
 ---Class representing set of unique values
 ---@class Set
 ---@field _data table<any, boolean>
+---@overload fun(data? : table) : Set
 Set = ClassSimple {
     ---Creates set from given table
     ---@param self Set
@@ -181,6 +182,46 @@ Set = ClassSimple {
     -- __pow = function(self, other)
 
     -- end,
+
+    ---Returns true if any element of set satisfies condition
+    ---@param self Set
+    ---@param condition? fun(value:any):boolean
+    ---@return boolean
+    Any = function(self, condition)
+        for v, _ in self._data do
+            if not condition or condition(v) then
+                return true
+            end
+        end
+        return false
+    end,
+
+    ---Returns true if all elements of set satisfy condition or set is empty
+    ---@param self Set
+    ---@param condition fun(value:any):boolean
+    ---@return boolean
+    All = function(self, condition)
+        for v, _ in self._data do
+            if not condition(v) then
+                return false
+            end
+        end
+        return true
+    end,
+    ---Returns new set where each element satisfies condition
+    ---@param self Set
+    ---@param condition fun(value:any):boolean
+    Where = function(self, condition)
+        local result = _Set()
+        for v, _ in self._data do
+            if condition(v) then
+                result:Add(v)
+            end
+        end
+        return result
+    end
+
+
 
 
 }
