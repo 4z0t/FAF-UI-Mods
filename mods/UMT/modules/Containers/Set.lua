@@ -208,9 +208,11 @@ Set = ClassSimple {
         end
         return true
     end,
+
     ---Returns new set where each element satisfies condition
     ---@param self Set
     ---@param condition fun(value:any):boolean
+    ---@return Set
     Where = function(self, condition)
         local result = _Set()
         for v, _ in self._data do
@@ -219,6 +221,23 @@ Set = ClassSimple {
             end
         end
         return result
+    end,
+
+    ---Set Iterator
+    ---@param self Set
+    ---@return fun(tbl: table<any,boolean>, key:any):any,nil
+    ---@return table<any,boolean>
+    Iter = function(self)
+        return self.Next, self._data
+    end,
+
+    ---Next function for set data
+    ---@param tbl table<any,boolean>
+    ---@param key any
+    ---@return any
+    ---@return nil
+    Next = function(tbl, key)
+        return (next(tbl, key)), nil
     end
 
 
