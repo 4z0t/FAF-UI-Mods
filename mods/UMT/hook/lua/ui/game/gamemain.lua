@@ -34,4 +34,4 @@ _G.UMT               = {
     }
 }
 _G.UMT.Units         = import("/mods/UMT/modules/units.lua")
-_G.UMT.GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
+_G.UMT.Options = import("/mods/UMT/modules/Options.lua")

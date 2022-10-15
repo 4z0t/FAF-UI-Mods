@@ -6,5 +6,5 @@ do
             tooltip = 'TODO'
         })
     end
-    actions['UMToptions'] = import('/mods/UMT/modules/GlobalOptions.lua').main
+    actions['UMToptions'] = import('/mods/UMT/modules/Options.lua').Main
 end
