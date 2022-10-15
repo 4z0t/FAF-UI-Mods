@@ -40,7 +40,7 @@ ColoredSlider = Class(Group)
             if event.Type == 'ButtonPress' then
                 local dragger = Dragger()
                 dragger.OnMove = function(_dragger, x, y)
-                    self._thumb:SetColor(self._downColor)
+                    control:SetColor(self._downColor)
                     local value = self:CalculateValueFromMouse(x, y)
                     if self:SetValue(value) then
                         self:OnScrub(value)
@@ -49,10 +49,10 @@ ColoredSlider = Class(Group)
 
                 dragger.OnRelease = function(_dragger, x, y)
                     local value = self:CalculateValueFromMouse(x, y)
-                    if self._thumb:HitTest(x, y) then
-                        self._thumb:SetColor(self._overColor)
+                    if control:HitTest(x, y) then
+                        control:SetColor(self._overColor)
                     else
-                        self._thumb:SetColor(self._upColor)
+                        control:SetColor(self._upColor)
                     end
                     self:SetValue(value)
                     self:OnValueSet(self:_Constrain(value))
