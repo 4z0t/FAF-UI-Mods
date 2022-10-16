@@ -214,13 +214,13 @@ Dict = ClassSimple
     ---@generic V
     ---@generic R
     ---@param self Dict
-    ---@param callback fun(prev:R, key:K, value:V):R
+    ---@param reducer fun(prev:R, key:K, value:V):R
     ---@param initalValue? R
     ---@return R
-    Reduce = function(self, callback, initalValue)
+    Reduce = function(self, reducer, initalValue)
         local result = initalValue or 0
         for k, v in self._data do
-            result = callback(result, k, v)
+            result = reducer(result, k, v)
         end
         return result
     end
