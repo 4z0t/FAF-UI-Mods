@@ -4,7 +4,7 @@ local GameTick = GameTick
 
 local SelectHidden = UMT.Select.Hidden
 
-local currentArmy = false
+local currentArmy
 local units = {}
 --local assisting = {}
 local cached = {}

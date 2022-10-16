@@ -2,7 +2,7 @@
 local _Set
 ---Class representing set of unique values
 ---@class Set
----@field _data table<any, boolean>
+---@field private _data table<any, boolean>
 ---@overload fun(data? : table) : Set
 Set = ClassSimple {
     ---Creates set from given table
