@@ -5,7 +5,7 @@ local GameTick = GameTick
 local SelectHidden = UMT.Select.Hidden
 
 local currentArmy
-local units = {}
+local units = setmetatable({}, UMT.WeakMeta.Value)
 --local assisting = {}
 local cached = {}
 
@@ -13,7 +13,6 @@ local prevReset = 0
 local prevCache = 0
 
 local function ProcessAllUnits()
-    units = {}
     UISelectionByCategory("ALLUNITS", false, false, false, false)
     for _, unit in GetSelectedUnits() or {} do
         units[unit:GetEntityId()] = unit
@@ -26,9 +25,9 @@ end
 
 local function UpdateCache()
     cached = {}
---    assisting = {}
+    --    assisting = {}
     local focused = {}
-    
+
     for id, unit in units do
         if not unit:IsDead() then
             TableInsert(cached, unit)
@@ -51,6 +50,8 @@ local function UpdateCache()
                 --     assisting[focusId]['build_rate'] = assisting[focusId]['build_rate'] + u:GetBuildRate()
                 -- end
             end
+        else
+            units[id] = nil
         end
     end
     for id, unit in focused do
@@ -81,6 +82,7 @@ local function CheckCache()
         prevCache = 0
         currentArmy = army
         cached = {}
+        units = {}
         OnArmyChanged()
     end
 
