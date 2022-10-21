@@ -132,7 +132,7 @@ Dict = ClassSimple
         return true
     end,
 
-    ---Returns new set where each element satisfies condition
+    ---Returns new Dict where each element satisfies condition
     ---@param self Dict
     ---@param condition fun(key:any, value:any):boolean
     ---@return Dict
@@ -154,7 +154,7 @@ Dict = ClassSimple
         return self.Next, self._data
     end,
 
-    ---Next function for set data
+    ---Next function for dict data
     Next = next,
 
     ---Returns first pair satisfying condition
@@ -203,7 +203,7 @@ Dict = ClassSimple
         for k, v in self._data do
             value = callback(k, v)
             if value ~= nil then
-                result:Add(k, callback(k, v))
+                result:Add(k, value)
             end
         end
         return result
@@ -226,4 +226,5 @@ Dict = ClassSimple
     end
 
 }
+---@diagnostic disable-next-line
 _Dict = Dict
