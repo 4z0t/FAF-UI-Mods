@@ -244,6 +244,7 @@ Set = ClassSimple {
 
 
 }
+---@diagnostic disable-next-line
 _Set = Set
 
 
