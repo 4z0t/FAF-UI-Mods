@@ -31,10 +31,10 @@ _G.UMT         = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
-    }
+    },
+    Prevent = import("/mods/UMT/modules/Prevent.lua"),
 }
 _G.UMT.Units   = import("/mods/UMT/modules/units.lua")
 _G.UMT.Options = import("/mods/UMT/modules/Options.lua")
-_G.UMT.Prevent = import("/mods/UMT/modules/Prevent.lua")
 
 _G.UMT = UMT.Prevent.EditOf(_G.UMT)
