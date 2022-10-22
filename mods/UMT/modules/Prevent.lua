@@ -1,3 +1,6 @@
+---Prevents updating of a given table
+---@param t table
+---@return table
 function UpdateOf(t)
     return setmetatable({}, {
         __index = t,
@@ -7,6 +10,9 @@ function UpdateOf(t)
     })
 end
 
+---Prevents deleting the existing fields of a given table
+---@param t table
+---@return table
 function DeleteOf(t)
     return setmetatable({}, {
         __index = t,
@@ -19,6 +25,9 @@ function DeleteOf(t)
     })
 end
 
+---Prevents editing the existing fields of a given table
+---@param t table
+---@return table
 function EditOf(t)
     return setmetatable({}, {
         __index = t,
