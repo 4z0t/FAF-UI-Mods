@@ -1,4 +1,4 @@
-_G.UMT         = {
+_G.UMT         = import("/mods/UMT/modules/Prevent.lua").EditOf {
     Info       = import("/mods/UMT/mod_info.lua"),
     Version    = import("/mods/UMT/mod_info.lua").version,
     Layouter   = import("/mods/UMT/modules/Layouter.lua"),
@@ -36,15 +36,3 @@ _G.UMT         = {
 _G.UMT.Units   = import("/mods/UMT/modules/units.lua")
 _G.UMT.Options = import("/mods/UMT/modules/Options.lua")
 _G.UMT.Prevent = import("/mods/UMT/modules/Prevent.lua")
-
---_G.UMT = UMT.Prevent.EditOf(_G.UMT)
-
-setmetatable(_G.UMT,{
-    __newindex = function(self, key, value)
-        if rawget(self, key) ~= nil then
-            error("Attempt to edit value in a table that doesnt allow this")
-        end
-        rawset(self, key, value)
-    end
-})
-_G.UMT.Prevent = {}
