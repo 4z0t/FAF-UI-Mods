@@ -1,13 +1,16 @@
----@type fun() : Set
+---Creates set from given table
+---@alias SetCreateFunction fun(data? : table) : Set
+
+
+---@type SetCreateFunction
 local _Set
 ---Class representing set of unique values
 ---@class Set
 ---@field private _data table<any, boolean>
----@overload fun(data? : table) : Set
-Set = ClassSimple {
-    ---Creates set from given table
-    ---@param self Set
-    ---@param data? table
+---@type SetCreateFunction
+Set = ClassSimple
+{
+    ---@type SetCreateFunction
     __init = function(self, data)
         self._data = {}
         if data then
@@ -244,7 +247,6 @@ Set = ClassSimple {
 
 
 }
----@diagnostic disable-next-line
 _Set = Set
 
 
