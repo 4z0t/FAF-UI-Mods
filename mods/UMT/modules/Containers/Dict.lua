@@ -5,15 +5,20 @@ local _Dict
 ---@overload fun(data:table?):Dict
 Dict = ClassSimple
 {
-    ---Creates dict from given table
+    ---Creates dict from given table, if wrap is true it doesn't copy table (wraps it)
     ---@param self Dict
     ---@param data? table
-    __init = function(self, data)
+    ---@param wrap? boolean
+    __init = function(self, data, wrap)
         self._data = {}
         if data then
-            local d = self._data
-            for k, v in data do
-                d[k] = v
+            if wrap then
+                self._data = data
+            else
+                local d = self._data
+                for k, v in data do
+                    d[k] = v
+                end
             end
         end
     end,

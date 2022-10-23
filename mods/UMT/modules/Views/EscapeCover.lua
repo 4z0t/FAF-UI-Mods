@@ -6,7 +6,8 @@ local EscapeHandler = import('/lua/ui/dialogs/eschandler.lua')
 
 
 ---@class EscapeCover : Bitmap
-EscapeCover = Class(Bitmap) {
+EscapeCover = Class(Bitmap)
+{
 
     __init = function(self, parent)
         Bitmap.__init(self, parent)
