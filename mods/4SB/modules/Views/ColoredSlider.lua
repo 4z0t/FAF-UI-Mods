@@ -40,22 +40,19 @@ ColoredSlider = Class(Group)
             if event.Type == 'ButtonPress' then
                 local dragger = Dragger()
                 dragger.OnMove = function(_dragger, x, y)
+                    control:SetColor(self._downColor)
                     local value = self:CalculateValueFromMouse(x, y)
-                    value = self:_Constrain(value)
-                    local curVal = self:GetValue()
-                    self._thumb:SetColor(self._downColor)
-                    if value ~= curVal then
-                        self:SetValue(value)
+                    if self:SetValue(value) then
                         self:OnScrub(value)
                     end
                 end
 
                 dragger.OnRelease = function(_dragger, x, y)
                     local value = self:CalculateValueFromMouse(x, y)
-                    if self._thumb:HitTest(x, y) then
-                        self._thumb:SetColor(self._overColor)
+                    if control:HitTest(x, y) then
+                        control:SetColor(self._overColor)
                     else
-                        self._thumb:SetColor(self._upColor)
+                        control:SetColor(self._upColor)
                     end
                     self:SetValue(value)
                     self:OnValueSet(self:_Constrain(value))
@@ -82,8 +79,9 @@ ColoredSlider = Class(Group)
     HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
             local value = self:CalculateValueFromMouse(event.MouseX, event.MouseY)
-            self:SetValue(value)
-            self:OnValueSet(self._currentValue())
+            if self:SetValue(value) then
+                self:OnValueSet(self._currentValue())
+            end
             return true
         end
     end,
@@ -156,8 +154,13 @@ ColoredSlider = Class(Group)
 
     -- this will constrain your values to not exceed min or max
     SetValue = function(self, value)
-        self._currentValue:Set(self:_Constrain(value))
-        self:OnValueChanged(self._currentValue())
+        value = self:_Constrain(value)
+        if value ~= self:GetValue() then
+            self._currentValue:Set(value)
+            self:OnValueChanged(value)
+            return true
+        end
+        return false
     end,
 
     GetValue = function(self)
@@ -261,8 +264,9 @@ ColoredIntegerSlider = Class(ColoredSlider)
             else
                 value = value - self._indentValue
             end
-            self:SetValue(value)
-            self:OnValueSet(self._currentValue())
+            if self:SetValue(value) then
+                self:OnValueSet(self._currentValue())
+            end
             return true
         end
         return ColoredSlider.HandleEvent(self, event)

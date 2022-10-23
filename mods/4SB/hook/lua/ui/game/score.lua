@@ -78,11 +78,6 @@ function NoteGameSpeedChanged(newSpeed)
     end
 end
 
-function ArmyAnnounce(army, text)
-    LOG(army)
-    LOG(text)
-end
-
 function GetScoreCache()
     return ScoresCache
 end
