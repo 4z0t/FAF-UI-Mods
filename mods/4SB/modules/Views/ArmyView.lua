@@ -168,6 +168,14 @@ ArmyView = Class(Group)
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
 
+    SetArmyColor = function(self, color)
+        self._rating:SetColor(color)
+    end,
+
+    GetArmyColor = function (self)
+        return self._rating._color()
+    end,
+
     Update = function(self, data)
         if not self.isOutOfGame and data.Defeated then
             self.isOutOfGame = true

@@ -110,6 +110,10 @@ ScoreBoard = Class(Group)
 
     end,
 
+    GetArmyViews = function (self)
+        return self._armyViews
+    end,
+
     Update = function(self, data)
         if self._title then
             self._title:Update(data)
@@ -225,6 +229,9 @@ ReplayScoreBoard = Class(ScoreBoard)
         self._armiesContainer:Contract(id)
     end,
 
+    GetArmyViews = function (self)
+        return self._armiesContainer._armyViews
+    end,
 
 
 
