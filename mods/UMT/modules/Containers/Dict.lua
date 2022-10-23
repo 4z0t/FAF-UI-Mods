@@ -1,14 +1,14 @@
----@type fun(data:table?) : Dict
+---Creates dict from given table, if wrap is true it doesn't copy table (wraps it)
+---@alias DictCreateFunction fun(data:table? ,wrap:boolean?):Dict
+
+---@type DictCreateFunction
 local _Dict
 ---@class Dict
 ---@field _data table<any,any>
----@overload fun(data:table?):Dict
+---@type DictCreateFunction
 Dict = ClassSimple
 {
-    ---Creates dict from given table, if wrap is true it doesn't copy table (wraps it)
-    ---@param self Dict
-    ---@param data? table<any, any>
-    ---@param wrap? boolean
+    ---@type DictCreateFunction
     __init = function(self, data, wrap)
         if wrap and data then
             self._data = data
@@ -231,5 +231,4 @@ Dict = ClassSimple
     end
 
 }
----@diagnostic disable-next-line
 _Dict = Dict
