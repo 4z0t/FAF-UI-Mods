@@ -7,14 +7,14 @@ Dict = ClassSimple
 {
     ---Creates dict from given table, if wrap is true it doesn't copy table (wraps it)
     ---@param self Dict
-    ---@param data? table
+    ---@param data? table<any, any>
     ---@param wrap? boolean
     __init = function(self, data, wrap)
-        self._data = {}
-        if data then
-            if wrap then
-                self._data = data
-            else
+        if wrap and data then
+            self._data = data
+        else
+            self._data = {}
+            if data then
                 local d = self._data
                 for k, v in data do
                     d[k] = v
