@@ -16,6 +16,7 @@ local mexCategories = import("mexcategories.lua").mexCategories
 local mexData = {}
 
 local upgradeT1 = Options.upgradeT1Option()
+local upgradeT2 = Options.upgradeT2Option()
 
 local toBePaused = {}
 
@@ -70,6 +71,17 @@ local function MatchCategory(category, unit)
     return true
 end
 
+local function GetCappingBonus(mex)
+    local productionPerSecondMass = mex:GetBlueprint().Economy.ProductionPerSecondMass
+    local massProduced = mex:GetEconData().massProduced
+
+    if productionPerSecondMass > 0 then
+        return massProduced / productionPerSecondMass
+    else
+        return 1
+    end
+end
+
 local function UpdateUI()
     local mexes = GetUnits(categoryMex)
 
@@ -104,12 +116,22 @@ local function UpdateUI()
         end
     end
 
-    for id, category in mexCategories do
-
-        if id == 1 and upgradeT1 and not table.empty(mexData[id].mexes) then
-            UpgradeMexes(mexData[id].mexes)
+    if upgradeT1 and not table.empty(mexData[1].mexes) then
+        UpgradeMexes(mexData[1].mexes)
+    end
+    if upgradeT2 and not table.empty(mexData[4].mexes) then
+        local capped = {}
+        for _, mex in mexData[4].mexes do
+            if GetCappingBonus(mex) >= 1.5 then
+                table.insert(capped, mex)
+            end
         end
+        if not table.empty(capped) then
+            UpgradeMexes(capped)
+        end
+    end
 
+    for id, category in mexCategories do
 
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
@@ -200,6 +222,10 @@ function init()
 
     Options.upgradeT1Option.OnChange = function(var)
         upgradeT1 = var()
+    end
+
+    Options.upgradeT2Option.OnChange = function(var)
+        upgradeT2 = var()
     end
 
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
