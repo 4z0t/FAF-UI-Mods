@@ -20,28 +20,47 @@ local upgradeT2 = Options.upgradeT2Option()
 
 local toBePaused = {}
 
-local function UpgradeMexes(mexes)
+local function UpgradeMexes(mexes, selector)
 
     local upgrades = {}
+    if not selector then
+        for _, m in mexes do
+            if not toBePaused[m:GetEntityId()] then
 
-    for _, m in mexes do
-        if not toBePaused[m:GetEntityId()] then
+                toBePaused[m:GetEntityId()] = true
+                local bp = m:GetBlueprint()
+                local upgradesTo = bp.General.UpgradesTo
 
-            toBePaused[m:GetEntityId()] = true
-            local bp = m:GetBlueprint()
-            local upgrades_to = bp.General.UpgradesTo
+                if not upgrades[upgradesTo] then
+                    upgrades[upgradesTo] = { m }
+                else
+                    TableInsert(upgrades[upgradesTo], m)
+                end
 
-            upgrades[upgrades_to] = upgrades[upgrades_to] or {}
+            end
+        end
+    else
+        for _, m in mexes do
+            if not toBePaused[m:GetEntityId()] and selector(m) then
+                toBePaused[m:GetEntityId()] = true
+                local bp = m:GetBlueprint()
+                local upgradesTo = bp.General.UpgradesTo
 
-            table.insert(upgrades[upgrades_to], m)
+                if not upgrades[upgradesTo] then
+                    upgrades[upgradesTo] = { m }
+                else
+                    TableInsert(upgrades[upgradesTo], m)
+                end
+
+            end
         end
     end
 
     if not table.empty(upgrades) then
         Select.Hidden(function()
-            for upgrades_to, up_mexes in upgrades do
-                SelectUnits(up_mexes)
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgrades_to, 1, false)
+            for upgradesTo, upMexes in upgrades do
+                SelectUnits(upMexes)
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgradesTo, 1, false)
             end
         end)
     end
@@ -82,6 +101,10 @@ local function GetCappingBonus(mex)
     end
 end
 
+local function CappedSelector(mex)
+    return GetCappingBonus(mex) >= 1.5
+end
+
 local function UpdateUI()
     local mexes = GetUnits(categoryMex)
 
@@ -120,15 +143,7 @@ local function UpdateUI()
         UpgradeMexes(mexData[1].mexes)
     end
     if upgradeT2 and not table.empty(mexData[4].mexes) then
-        local capped = {}
-        for _, mex in mexData[4].mexes do
-            if GetCappingBonus(mex) >= 1.5 then
-                table.insert(capped, mex)
-            end
-        end
-        if not table.empty(capped) then
-            UpgradeMexes(capped)
-        end
+        UpgradeMexes(mexData[4].mexes, CappedSelector)
     end
 
     for id, category in mexCategories do
