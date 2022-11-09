@@ -20,6 +20,7 @@ local upgradeT1 = Options.upgradeT1Option()
 local upgradeT2 = Options.upgradeT2Option()
 local unpauseAssisted = Options.unpauseAssisted()
 local unpauseAssistedBP = Options.unpauseAssistedBP()
+local unpauseOnce = Options.unpauseOnce()
 
 local mexData = {}
 local toBePaused = {}
@@ -131,7 +132,7 @@ local function UpdateUI()
         local engies = GetUnits(categoryEngineer)
         for _, engy in engies do
             local assistedUnit = engy:GetGuardedEntity()
-            if assistedUnit and EntityCategoryContains(categoryMex, assistedUnit) then
+            if assistedUnit and EntityCategoryContains(categoryMex, assistedUnit) and not GetIsPaused { engy } then
                 assistedUnit.assistBP = assistedUnit.assistBP + engy:GetBlueprint().Economy.BuildRate
             end
         end
@@ -148,7 +149,11 @@ local function UpdateUI()
                 SetPaused({ mex }, true)
             end
 
-            if unpauseAssisted and not unPaused[mex] and mex.assistBP > unpauseAssistedBP and GetIsPaused({ mex }) then
+            if unpauseAssisted and
+                not (unpauseOnce and unPaused[mex]) and
+                mex.assistBP > unpauseAssistedBP and
+                GetIsPaused { mex }
+            then
                 SetPaused({ mex }, false)
                 unPaused[mex] = true
             end
@@ -273,6 +278,9 @@ function init()
     end
     Options.unpauseAssistedBP.OnChange = function(var)
         unpauseAssistedBP = var()
+    end
+    Options.unpauseOnce.OnChange = function(var)
+        unpauseOnce = var()
     end
 
 
