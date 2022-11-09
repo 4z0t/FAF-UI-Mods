@@ -19,6 +19,7 @@ local mexCategories = import("mexcategories.lua").mexCategories
 local upgradeT1 = Options.upgradeT1Option()
 local upgradeT2 = Options.upgradeT2Option()
 local unpauseAssisted = Options.unpauseAssisted()
+local unpauseAssistedBP = Options.unpauseAssistedBP()
 
 local mexData = {}
 local toBePaused = {}
@@ -147,7 +148,7 @@ local function UpdateUI()
                 SetPaused({ mex }, true)
             end
 
-            if unpauseAssisted and not unPaused[mex] and mex.assistBP > 0 and GetIsPaused({ mex }) then
+            if unpauseAssisted and not unPaused[mex] and mex.assistBP > unpauseAssistedBP and GetIsPaused({ mex }) then
                 SetPaused({ mex }, false)
                 unPaused[mex] = true
             end
@@ -270,6 +271,11 @@ function init()
     Options.unpauseAssisted.OnChange = function(var)
         unpauseAssisted = var()
     end
+    Options.unpauseAssistedBP.OnChange = function(var)
+        unpauseAssistedBP = var()
+    end
+
+
 
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
 end
