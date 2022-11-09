@@ -2,6 +2,7 @@
 local TableInsert = table.insert
 local EntityCategoryContains = EntityCategoryContains
 local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
+local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
 local Select = import("/mods/UMT/modules/select.lua")
@@ -12,13 +13,16 @@ local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local UpdateMexPanel = import("mexpanel.lua").Update
 local Options = import("options.lua")
 
+
 local mexCategories = import("mexcategories.lua").mexCategories
-local mexData = {}
 
 local upgradeT1 = Options.upgradeT1Option()
 local upgradeT2 = Options.upgradeT2Option()
+local unpauseAssisted = Options.unpauseAssisted()
 
+local mexData = {}
 local toBePaused = {}
+local unPaused = setmetatable({}, { __mode = 'k' })
 
 local function UpgradeMexes(mexes, selector)
 
@@ -108,6 +112,7 @@ end
 local function UpdateUI()
     local mexes = GetUnits(categoryMex)
 
+
     for id, category in mexCategories do
         mexData[id] = {
             mexes = {},
@@ -117,7 +122,21 @@ local function UpdateUI()
     for _, mex in mexes do
         mex.isUpgraded = false
         mex.isUpgrader = false
+        mex.assistBP   = 0
     end
+
+
+    if unpauseAssisted then
+        local engies = GetUnits(categoryEngineer)
+        for _, engy in engies do
+            local assistedUnit = engy:GetGuardedEntity()
+            if assistedUnit and EntityCategoryContains(categoryMex, assistedUnit) then
+                assistedUnit.assistBP = assistedUnit.assistBP + engy:GetBlueprint().Economy.BuildRate
+            end
+        end
+    end
+
+
     for _, mex in mexes do
         local f = mex:GetFocus()
         if f ~= nil and f:IsInCategory("STRUCTURE") then
@@ -126,6 +145,11 @@ local function UpdateUI()
             if toBePaused[mex:GetEntityId()] then
                 toBePaused[mex:GetEntityId()] = nil
                 SetPaused({ mex }, true)
+            end
+
+            if unpauseAssisted and not unPaused[mex] and mex.assistBP > 0 and GetIsPaused({ mex }) then
+                SetPaused({ mex }, false)
+                unPaused[mex] = true
             end
         end
     end
@@ -241,6 +265,10 @@ function init()
 
     Options.upgradeT2Option.OnChange = function(var)
         upgradeT2 = var()
+    end
+
+    Options.unpauseAssisted.OnChange = function(var)
+        unpauseAssisted = var()
     end
 
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
