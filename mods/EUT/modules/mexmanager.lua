@@ -133,7 +133,7 @@ local function UpdateUI()
         for _, engy in engies do
             local assistedUnit = engy:GetGuardedEntity()
             if assistedUnit and EntityCategoryContains(categoryMex, assistedUnit) and not GetIsPaused { engy } then
-                assistedUnit.assistBP = assistedUnit.assistBP + engy:GetBlueprint().Economy.BuildRate
+                assistedUnit.assistBP = (assistedUnit.assistBP or 0) + engy:GetBlueprint().Economy.BuildRate
             end
         end
     end
