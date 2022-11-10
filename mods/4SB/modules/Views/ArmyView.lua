@@ -3,7 +3,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
 
@@ -172,7 +172,7 @@ ArmyView = Class(Group)
         self._rating:SetColor(color)
     end,
 
-    GetArmyColor = function (self)
+    GetArmyColor = function(self)
         return self._rating._color()
     end,
 

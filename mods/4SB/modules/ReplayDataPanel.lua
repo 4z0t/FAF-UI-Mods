@@ -2,7 +2,7 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 

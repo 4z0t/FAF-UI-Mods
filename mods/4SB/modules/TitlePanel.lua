@@ -3,7 +3,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = LayoutHelpers.ReusedLayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 
 local alphaAnimator = import("Animations/Animator.lua").Animator(GetFrame(0))

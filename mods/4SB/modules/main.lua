@@ -2,7 +2,7 @@ local Group = import('/lua/maui/group.lua').Group
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/lua/maui/layouthelpers.lua").ReusedLayoutFor
+local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 
 local Entry = import("Views/Entry.lua").Entry
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
