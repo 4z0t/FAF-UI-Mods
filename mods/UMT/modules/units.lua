@@ -34,7 +34,7 @@ local function UpdateCache()
             local focus = unit:GetFocus()
             if focus and not focus:IsDead() then
                 local focusId = focus:GetEntityId()
-                if not focused[focusId] then
+                if not (unit[focusId] or focused[focusId]) then
                     focused[focusId] = focus
                     TableInsert(cached, focus)
                 end
