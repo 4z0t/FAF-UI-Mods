@@ -132,7 +132,12 @@ local function UpdateUI()
         local engies = GetUnits(categoryEngineer)
         for _, engy in engies do
             local assistedUnit = engy:GetGuardedEntity()
-            if assistedUnit and EntityCategoryContains(categoryMex, assistedUnit) and not GetIsPaused { engy } then
+            local focusedUnit = engy:GetFocus()
+            if assistedUnit and
+                focusedUnit and --check if we are really assisiting mex now
+                EntityCategoryContains(categoryMex, assistedUnit) and
+                not GetIsPaused { engy }
+            then
                 assistedUnit.assistBP = (assistedUnit.assistBP or 0) + engy:GetBlueprint().Economy.BuildRate
             end
         end
