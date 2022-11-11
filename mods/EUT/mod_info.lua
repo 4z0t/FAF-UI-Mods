@@ -1,5 +1,5 @@
 name = "ECO UI Tools"
-version = 7
+version = 8
 copyright = ""
 description = [[Provides ECO management UI components.
 
@@ -15,7 +15,7 @@ Requires UI mod tools.
 ]]
 author = "4z0t"
 url = ""
-uid = "eco-ui-tools-4z0t-v07"
+uid = "eco-ui-tools-4z0t-v08"
 exclusive = false
 ui_only = true
 conflicts = {}
