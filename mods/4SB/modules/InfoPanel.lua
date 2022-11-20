@@ -20,7 +20,7 @@ local bgColor = "ff000000"
 
 
 function GetSizeInKM(size)
-    return math.ceil(size / 51.2 - 0.5)
+    return size / 512 * 10
 end
 
 local pattern = "neroxis_map_generator"
@@ -78,7 +78,7 @@ InfoPanel = Class(Group)
             mapWidth = areaData[3] - areaData[1]
             mapHeight = areaData[4] - areaData[2]
         end
-        self._mapSize:SetText(string.format("%dx%d", GetSizeInKM(mapWidth), GetSizeInKM(mapHeight)))
+        self._mapSize:SetText(string.format("%.1f x %.1f", GetSizeInKM(mapWidth), GetSizeInKM(mapHeight)))
 
 
         local mapName, isMapGen = FormatMapGenName(sessionInfo.name)
