@@ -113,7 +113,7 @@ end
 
 local globalOptions = {}
 local optionsSelector = nil
-local optionsWindows = setmetatable({}, UMT.WeakMeta.Value)
+local optionsWindows = UMT.MakeWeak.Value{}
 
 local OptionLine = Class(Group)
 {
