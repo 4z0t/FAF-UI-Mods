@@ -243,35 +243,38 @@ AllyView = Class(ArmyView)
         ArmyView._Layout(self)
 
         LayoutFor(self._unitsBtn)
-            :AtRightIn(self, 5)
+            :AtHorizontalCenterIn(self._faction)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile('/textures/ui/icons_strategic/commander_generic.dds'))
+            :Texture(UIUtil.UIFile '/textures/ui/icons_strategic/commander_generic.dds')
             :Width(14)
             :Height(14)
             :Over(self, 5)
             :EnableHitTest()
+            :Alpha(0)
 
         LayoutFor(self._energyBtn)
-            :LeftOf(self._unitsBtn, 5)
+            :AtHorizontalCenterIn(self._energy)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile('/game/build-ui/icon-energy_bmp.dds'))
+            :Texture(UIUtil.UIFile '/game/build-ui/icon-energy_bmp.dds')
             :Width(14)
             :Height(14)
             :Over(self, 5)
             :EnableHitTest()
+            :Alpha(0)
 
 
         LayoutFor(self._massBtn)
-            :LeftOf(self._energyBtn, 5)
+            :AtHorizontalCenterIn(self._mass)
             :AtVerticalCenterIn(self)
             :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             :Width(14)
             :Height(14)
             :Over(self, 5)
             :EnableHitTest()
+            :Alpha(0)
 
         LayoutFor(self._energy)
-            :LeftOf(self._massBtn, 10)
+            :AtRightIn(self, 5)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
             :DisableHitTest()
@@ -280,25 +283,35 @@ AllyView = Class(ArmyView)
 
 
         LayoutFor(self._mass)
-            :LeftOf(self._massBtn, 45)
+            :AtRightIn(self, 45)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
             :DisableHitTest()
         self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
 
         LayoutFor(self._name)
-            :LeftOf(self._massBtn, 75)
-
-
+            :AtRightIn(self, 75)
 
     end,
 
     HandleEvent = function(self, event)
         if event.Type == 'MouseExit' then
-            slideBackWards:Apply(self)
+            appearAnimation:Apply(self._mass)
+            appearAnimation:Apply(self._energy)
+            appearAnimation:Apply(self._faction)
+
+            fadeAnimation:Apply(self._massBtn)
+            fadeAnimation:Apply(self._energyBtn)
+            fadeAnimation:Apply(self._unitsBtn)
             return true
         elseif event.Type == 'MouseEnter' then
-            slideForward:Apply(self)
+            appearAnimation:Apply(self._massBtn)
+            appearAnimation:Apply(self._unitsBtn)
+            appearAnimation:Apply(self._energyBtn)
+
+            fadeAnimation:Apply(self._mass)
+            fadeAnimation:Apply(self._energy)
+            fadeAnimation:Apply(self._faction)
             return true
         end
 
