@@ -27,12 +27,32 @@ _G.UMT         = {
         Value = { __mode = 'v' },
         KeyValue = { __mode = 'kv' },
     },
+    MakeWeak   = {
+        ---Makes table weak by key
+        ---@param t table
+        ---@return table
+        Key = function(t)
+            return setmetatable(t, { __mode = 'k' })
+        end,
+        ---Makes table weak by value
+        ---@param t table
+        ---@return table
+        Value = function(t)
+            return setmetatable(t, { __mode = 'v' })
+        end,
+        ---Makes table weak by key and value
+        ---@param t table
+        ---@return table
+        KeyValue = function(t)
+            return setmetatable(t, { __mode = 'kv' })
+        end,
+    },
     Containers = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     },
-    Prevent = import("/mods/UMT/modules/Prevent.lua"),
+    Prevent    = import("/mods/UMT/modules/Prevent.lua"),
 }
 _G.UMT.Units   = import("/mods/UMT/modules/units.lua")
 _G.UMT.Options = import("/mods/UMT/modules/Options.lua")
