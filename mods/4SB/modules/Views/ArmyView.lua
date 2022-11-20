@@ -19,13 +19,13 @@ local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimati
 local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local appearAnimation = alphaAnimationFactory
     :ToAppear()
-    :For(0.2)
+    :For(0.3)
     :EndWith(1)
     :Create(alphaAnimator)
 
 local fadeAnimation = alphaAnimationFactory
     :ToFade()
-    :For(0.2)
+    :For(0.3)
     :EndWith(0)
     :Create(alphaAnimator)
 
