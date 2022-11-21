@@ -121,6 +121,21 @@ local overCheckedColor = RGBA "#f0f0f0"
 checkboxes = {
     { --scores
         {
+            tooltip = "score-points",
+            title = "Army score",
+            description = "Score points of army",
+            text = "S",
+            nu = RGBA "",
+            nc = RGBA "",
+            ou = RGBA "",
+            oc = RGBA "",
+            du = RGBA "",
+            dc = RGBA "",
+            GetData = function(score)
+                return score.general.score
+            end
+        },
+        {
             tooltip = "kills-built-ratio",
             title = "Kills-built ratio",
             description = "Ratio of killed units to built",
@@ -156,23 +171,24 @@ checkboxes = {
                 return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
             end
         },
+
+    },
+    { --mass
         {
-            tooltip = "score-points",
-            title = "Army score",
-            description = "Score points of army",
-            text = "S",
+            tooltip = "mass-income",
+            title = "Mass income",
+            description = "Mass income of an army",
+            text = "M",
             nu = RGBA "",
-            nc = RGBA "",
+            nc = normalMassColor,
             ou = RGBA "",
-            oc = RGBA "",
+            oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
-                return score.general.score
+                return score.resources.massin.rate * 10
             end
-        }
-    },
-    { --mass
+        },
         {
             tooltip = "mass-total",
             title = "Total Mass",
@@ -203,23 +219,24 @@ checkboxes = {
                 return score.resources.massin.reclaimed
             end
         },
+
+    },
+    { --energy
         {
-            tooltip = "mass-income",
-            title = "Mass income",
-            description = "Mass income of an army",
-            text = "M",
+            tooltip = "energy-income",
+            title = "Energy income",
+            description = "Energy income of an army",
+            text = "E",
             nu = RGBA "",
-            nc = normalMassColor,
+            nc = normalEnergyColor,
             ou = RGBA "",
-            oc = overMassColor,
+            oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
-                return score.resources.massin.rate * 10
+                return score.resources.energyin.rate * 10
             end
-        }
-    },
-    { --energy
+        },
         {
             tooltip = "energy-total",
             title = "Total Energy",
@@ -250,38 +267,9 @@ checkboxes = {
                 return score.resources.energyin.reclaimed
             end
         },
-        {
-            tooltip = "energy-income",
-            title = "Energy income",
-            description = "Energy income of an army",
-            text = "E",
-            nu = RGBA "",
-            nc = normalEnergyColor,
-            ou = RGBA "",
-            oc = overEnergyColor,
-            du = RGBA "",
-            dc = RGBA "",
-            GetData = function(score)
-                return score.resources.energyin.rate * 10
-            end
-        }
+
     },
     { --total
-        {
-            tooltip = "total-mass-rate",
-            title = "Mass rate",
-            description = "Mass rate of army",
-            text = "T",
-            nu = RGBA "",
-            nc = normalMassColor,
-            ou = RGBA "",
-            oc = overMassColor,
-            du = RGBA "",
-            dc = RGBA "",
-            GetData = function(score)
-                return (score.resources.massin.rate - score.resources.massout.rate) * 10
-            end
-        },
         {
             tooltip = "total-mass-killed",
             title = "Mass killed",
@@ -297,6 +285,22 @@ checkboxes = {
                 return score.general.kills.mass
             end
         },
+        {
+            tooltip = "total-mass-rate",
+            title = "Mass rate",
+            description = "Mass rate of army",
+            text = "T",
+            nu = RGBA "",
+            nc = normalMassColor,
+            ou = RGBA "",
+            oc = overMassColor,
+            du = RGBA "",
+            dc = RGBA "",
+            GetData = function(score)
+                return (score.resources.massin.rate - score.resources.massout.rate) * 10
+            end
+        },
+
         {
             tooltip = "total-mass-collected",
             title = "Total Mass",
@@ -314,6 +318,21 @@ checkboxes = {
         }
     },
     { --units
+        {
+            tooltip = "all-units",
+            title = "All units",
+            description = "Amount of all units",
+            text = "T",
+            nu = RGBA "",
+            nc = RGBA "",
+            ou = RGBA "",
+            oc = RGBA "",
+            du = RGBA "",
+            dc = RGBA "",
+            GetData = function(score)
+                return score.general.currentunits
+            end
+        },
         {
             tooltip = "naval-units",
             title = "Naval units",
@@ -374,21 +393,7 @@ checkboxes = {
                 return score.units.sacu.built - score.units.sacu.lost
             end
         },
-        {
-            tooltip = "all-units",
-            title = "All units",
-            description = "Amount of all units",
-            text = "T",
-            nu = RGBA "",
-            nc = RGBA "",
-            ou = RGBA "",
-            oc = RGBA "",
-            du = RGBA "",
-            dc = RGBA "",
-            GetData = function(score)
-                return score.general.currentunits
-            end
-        }
+
     }
 }
 do
