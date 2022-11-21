@@ -12,6 +12,26 @@ local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 
 
+local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
+
+local animationFactory = import("Animations/AnimationFactory.lua").GetAnimationFactory()
+
+local animationSpeed = 300
+
+local slideForward = animationFactory
+    :OnStart()
+    :OnFrame(function(control, delta)
+        if control.Right() < control:GetParent().Right() then
+            return true
+        end
+        control.Right:Set(control.Right() - delta * animationSpeed)
+    end)
+    :OnFinish(function(control)
+        control.Right:Set(control:GetParent().Right)
+    end)
+    :Create()
+
+
 ScoreBoard = Class(Group)
 {
     __init = function(self, parent, isTitle)
@@ -110,7 +130,7 @@ ScoreBoard = Class(Group)
 
     end,
 
-    GetArmyViews = function (self)
+    GetArmyViews = function(self)
         return self._armyViews
     end,
 
@@ -155,6 +175,15 @@ ScoreBoard = Class(Group)
             local data = import("/lua/ui/game/score.lua").GetScoreCache()
             self:UpdateArmiesData(data)
         end
+    end,
+
+    InitialAnimation = function(self)
+        for _, av in self:GetArmyViews() do
+            local w = av.Width()
+            av.Right:Set(av:GetParent().Right() + w)
+        end
+        local sa = SequentialAnimation(slideForward, 0.25, 1)
+        sa:Apply(self:GetArmyViews())
     end
 
 }
@@ -229,10 +258,7 @@ ReplayScoreBoard = Class(ScoreBoard)
         self._armiesContainer:Contract(id)
     end,
 
-    GetArmyViews = function (self)
+    GetArmyViews = function(self)
         return self._armiesContainer._armyViews
     end,
-
-
-
 }

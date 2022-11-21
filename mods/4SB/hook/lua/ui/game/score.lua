@@ -68,7 +68,10 @@ function ToggleScoreControl(state)
 end
 
 function InitialAnimation(state)
-
+    if IsDestroyed(controls.scoreBoard) then
+        return
+    end
+    controls.scoreBoard:InitialAnimation()
 end
 
 function NoteGameSpeedChanged(newSpeed)
