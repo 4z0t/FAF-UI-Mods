@@ -205,7 +205,11 @@ AllyView = Class(ArmyView)
         self._massBtn.HandleEvent = function(control, event)
             if event.Type == "ButtonPress" then
                 if event.Modifiers.Left then
-                    ShareManager.GiveMassToPlayer(self.id)
+                    if event.Modifiers.Ctrl then
+                        ShareManager.GiveAllMassToPlayer(self.id)
+                    else
+                        ShareManager.GiveMassToPlayer(self.id)
+                    end
                 elseif event.Modifiers.Right then
                     ShareManager.RequestMassFromPlayer(self.id)
                 else
@@ -217,7 +221,11 @@ AllyView = Class(ArmyView)
         self._energyBtn.HandleEvent = function(control, event)
             if event.Type == "ButtonPress" then
                 if event.Modifiers.Left then
-                    ShareManager.GiveEnergyToPlayer(self.id)
+                    if event.Modifiers.Ctrl then
+                        ShareManager.GiveAllEnergyToPlayer(self.id)
+                    else
+                        ShareManager.GiveEnergyToPlayer(self.id)
+                    end
                 elseif event.Modifiers.Right then
                     ShareManager.RequestEnergyFromPlayer(self.id)
                 else
