@@ -48,4 +48,62 @@ All these icons can be disabled/enabled separately.
 A mod for creating custom hotbuild actions.
 See [forum post](https://forum.faforever.com/topic/3712/hotbuild-overhaul/1?_=1669191703421) for more info.
 
+## EzReclaim
 
+A mod displaying reclaim labels in reclaim mode.
+
+## ECO UI Tools
+
+A mod providing UI for better ECO management.
+
+### Mex panel
+
+Shows counts of mexes in different states (idle, upgrading, paused) and progress of upgrade on a bottom of each state.
+
+Panel has functions when clicking on a mex state:
+
+* T1/T2 mexes
+  * [Left]              select all
+  * [Right]             select all on screen
+  * [Ctrl + Left]       start upgrading and pause 
+  * [Ctrl + Right]      start upgrading and pause for those on screen
+* T1/T2 upgrading mexes
+  * [Left]              select all
+  * [Right]             pause all
+  * [Ctrl + Left]       select one with highest progress
+  * [Ctrl + Right]      pause one with lowest progress
+* T1/T2 upgrading paused mexes
+  * [Left]              select all
+  * [Right]             unpause all
+  * [Ctrl + Left]       select one with highest progress
+  * [Ctrl + Right]      unpause one with highest progress
+* T3 mexes
+  * [Left]              select all
+  * [Right]             select all on screen
+
+Panel is movable with middle mouse button.
+
+### Overlay
+
+You can enable overlay in options that shows mexes with numbers in squares.
+
+### Key bindings
+
+All actions in mex panel can be binded to a key.
+
+### Automation
+
+You can enable functions for automatic mex actions, such as
+
+* upgrade and pause for t1 mexes
+* upgrade and pause for capped t2 mexes
+* unpause mexes under assist of set amount of BP
+* unpause mexes once
+
+## Engineer Alt Selection
+
+A mod allowing selection of engineers when holding Alt key.
+
+## Additional Orders Extension
+
+A mod adding various QoL key actions.
