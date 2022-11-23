@@ -32,7 +32,6 @@ local function UpgradeMexes(mexes, selector)
     if not selector then
         for _, m in mexes do
             if not toBePaused[m:GetEntityId()] then
-
                 toBePaused[m:GetEntityId()] = true
                 local bp = m:GetBlueprint()
                 local upgradesTo = bp.General.UpgradesTo
@@ -183,6 +182,11 @@ local function UpdateUI()
 
     for id, category in mexCategories do
 
+        if id == 1 and upgradeT1 and not table.empty(mexData[id].mexes) then
+            UpgradeMexes(mexData[id].mexes)
+        end
+
+
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
                 return a:GetWorkProgress() > b:GetWorkProgress()
@@ -273,7 +277,6 @@ function init()
     Options.upgradeT1Option.OnChange = function(var)
         upgradeT1 = var()
     end
-
     Options.upgradeT2Option.OnChange = function(var)
         upgradeT2 = var()
     end
@@ -287,8 +290,5 @@ function init()
     Options.unpauseOnce.OnChange = function(var)
         unpauseOnce = var()
     end
-
-
-
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
 end

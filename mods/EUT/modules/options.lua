@@ -13,7 +13,6 @@ do
     unpauseOnce = OptionVar(modName, "UnpauseOnce", false)
     unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
 
-
     function Init()
         GlobalOptions.AddOptions(modName, "ECO UI Tools", {
             Options.Filter("Show mex overlay", overlayOption),
@@ -24,7 +23,6 @@ do
             Options.Filter("Unpause once", unpauseOnce),
             Options.Slider("Assist BP threshold: mex unpauses if summary BP greater than this value", 4, 100, 1,
                 unpauseAssistedBP)
-
         })
     end
 end
