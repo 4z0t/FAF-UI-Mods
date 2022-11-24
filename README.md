@@ -65,7 +65,7 @@ Panel has functions when clicking on a mex state:
 * T1/T2 mexes
   * [Left]              select all
   * [Right]             select all on screen
-  * [Ctrl + Left]       start upgrading and pause 
+  * [Ctrl + Left]       start upgrading and pause
   * [Ctrl + Right]      start upgrading and pause for those on screen
 * T1/T2 upgrading mexes
   * [Left]              select all
@@ -107,3 +107,14 @@ A mod allowing selection of engineers when holding Alt key.
 ## Additional Orders Extension
 
 A mod adding various QoL key actions.
+
+## 4z0t's ScoreBoard
+
+A mod replacing default scoreboard with a new one with its own features:
+
+* Minimalistic and simple design
+* Animations
+* Flexible replay ScoreBoard
+* Coop support
+
+See [forum post](https://forum.faforever.com/topic/4391/new-scoreboard?_=1669035632876) for more info.
