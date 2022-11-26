@@ -1,9 +1,9 @@
 _G.UMT         = {
-    Info      = import("/mods/UMT/mod_info.lua"),
-    Version   = import("/mods/UMT/mod_info.lua").version,
-    Layouter  = import("/mods/UMT/modules/Layouter.lua"),
-    OptionVar = import("/mods/UMT/modules/OptionVar.lua"),
-    Select    = {
+    Info       = import("/mods/UMT/mod_info.lua"),
+    Version    = import("/mods/UMT/mod_info.lua").version,
+    Layouter   = import("/mods/UMT/modules/Layouter.lua"),
+    OptionVar  = import("/mods/UMT/modules/OptionVar.lua"),
+    Select     = {
         ---Performs hidden unit selection callback
         ---@param callback fun()
         Hidden = function(callback)
@@ -17,17 +17,19 @@ _G.UMT         = {
             SetIgnoreSelection(false)
         end
     },
-    Views     = {
+    Views      = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
         DynamicScrollable = import("/mods/UMT/modules/Views/DynamicScrollable.lua").DynamicScrollable,
     },
-    Weak   = import("/mods/UMT/modules/WeakMeta.lua"),
+    Weak       = import("/mods/UMT/modules/WeakMeta.lua"),
     Containers = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     },
+    Class      = import("/mods/UMT/modules/UIClass.lua").UIClass,
+    Property   = import("/mods/UMT/modules/UIClass.lua").Property,
     Prevent    = import("/mods/UMT/modules/Prevent.lua"),
 }
 _G.UMT.Units   = import("/mods/UMT/modules/units.lua")
