@@ -72,11 +72,9 @@ local function MakeProperties(class)
 end
 
 local function MakeUIClass(bases, spec)
-    local class
+    local class = Class(unpack(bases))
     if spec then
-        class = Class(unpack(bases))(spec)
-    else
-        class = ClassSimple(unpack(bases))
+        class = class(spec)
     end
     return MakeProperties(class)
 end
@@ -90,4 +88,3 @@ function UIClass(...)
         return MakeUIClass(bases, spec)
     end
 end
-

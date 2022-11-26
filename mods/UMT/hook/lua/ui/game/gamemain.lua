@@ -28,6 +28,7 @@ _G.UMT         = {
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     },
+    ---@type fa-class
     Class      = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property   = import("/mods/UMT/modules/UIClass.lua").Property,
     Prevent    = import("/mods/UMT/modules/Prevent.lua"),
