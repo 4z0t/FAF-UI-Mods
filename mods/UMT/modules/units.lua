@@ -82,7 +82,7 @@ local function CheckCache()
         prevCache = 0
         currentArmy = army
         cached = {}
-        units = setmetatable({}, UMT.WeakMeta.Value)
+        units = UMT.Weak.Value{}
         OnArmyChanged()
     end
 

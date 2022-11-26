@@ -1,9 +1,9 @@
 _G.UMT         = {
-    Info       = import("/mods/UMT/mod_info.lua"),
-    Version    = import("/mods/UMT/mod_info.lua").version,
-    Layouter   = import("/mods/UMT/modules/Layouter.lua"),
-    OptionVar  = import("/mods/UMT/modules/OptionVar.lua"),
-    Select     = {
+    Info      = import("/mods/UMT/mod_info.lua"),
+    Version   = import("/mods/UMT/mod_info.lua").version,
+    Layouter  = import("/mods/UMT/modules/Layouter.lua"),
+    OptionVar = import("/mods/UMT/modules/OptionVar.lua"),
+    Select    = {
         ---Performs hidden unit selection callback
         ---@param callback fun()
         Hidden = function(callback)
@@ -17,36 +17,12 @@ _G.UMT         = {
             SetIgnoreSelection(false)
         end
     },
-    Views      = {
+    Views     = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
         DynamicScrollable = import("/mods/UMT/modules/Views/DynamicScrollable.lua").DynamicScrollable,
     },
-    WeakMeta   = {
-        Key = { __mode = 'k' },
-        Value = { __mode = 'v' },
-        KeyValue = { __mode = 'kv' },
-    },
-    MakeWeak   = {
-        ---Makes table weak by key
-        ---@param t table
-        ---@return table
-        Key = function(t)
-            return setmetatable(t, { __mode = 'k' })
-        end,
-        ---Makes table weak by value
-        ---@param t table
-        ---@return table
-        Value = function(t)
-            return setmetatable(t, { __mode = 'v' })
-        end,
-        ---Makes table weak by key and value
-        ---@param t table
-        ---@return table
-        KeyValue = function(t)
-            return setmetatable(t, { __mode = 'kv' })
-        end,
-    },
+    Weak   = import("/mods/UMT/modules/WeakMeta.lua"),
     Containers = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
