@@ -27,7 +27,7 @@ local function LazyImport(name, importFunc)
     return setmetatable(tbl, LazyImportMetaTable)
 end
 
-_G.UMT         = {
+_G.UMT = {
     Info       = import("/mods/UMT/mod_info.lua"),
     Version    = import("/mods/UMT/mod_info.lua").version,
     Layouter   = import("/mods/UMT/modules/Layouter.lua"),
@@ -48,8 +48,8 @@ _G.UMT         = {
     Class      = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property   = import("/mods/UMT/modules/UIClass.lua").Property,
     Prevent    = import("/mods/UMT/modules/Prevent.lua"),
-    Options = LazyImport("/mods/UMT/modules/Options.lua"),
-    Units   = LazyImport("/mods/UMT/modules/units.lua"),
+    Options    = LazyImport("/mods/UMT/modules/Options.lua"),
+    Units      = LazyImport("/mods/UMT/modules/units.lua"),
     LazyImport = LazyImport,
 }
 
