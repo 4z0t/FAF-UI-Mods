@@ -1,22 +1,38 @@
+local LazyImportMetaTable = {
+    __index = function(tbl, key)
+        if not tbl.__module then
+            tbl.__module = tbl.__import(tbl.__name);
+        end
+        return tbl.__module[key]
+    end,
+
+    __newindex = function(tbl, key, value)
+        if not tbl.__module then
+            error "Attempt to set new index on not initialized module"
+        end
+        tbl.__module[key] = value
+    end
+}
+
+---Creates a new lazy import object
+---@param name string
+---@param importFunc (fun(path: string):Module)?
+---@return Module
+local function LazyImport(name, importFunc)
+    local tbl = {
+        __name = name,
+        __import = importFunc or _G.import,
+        __module = false,
+    }
+    return setmetatable(tbl, LazyImportMetaTable)
+end
+
 _G.UMT         = {
     Info       = import("/mods/UMT/mod_info.lua"),
     Version    = import("/mods/UMT/mod_info.lua").version,
     Layouter   = import("/mods/UMT/modules/Layouter.lua"),
     OptionVar  = import("/mods/UMT/modules/OptionVar.lua"),
-    Select     = {
-        ---Performs hidden unit selection callback
-        ---@param callback fun()
-        Hidden = function(callback)
-            local CommandMode = import('/lua/ui/game/commandmode.lua')
-            local current_command = CommandMode.GetCommandMode()
-            local old_selection = GetSelectedUnits() or {}
-            SetIgnoreSelection(true)
-            callback()
-            SelectUnits(old_selection)
-            CommandMode.StartCommandMode(current_command[1], current_command[2])
-            SetIgnoreSelection(false)
-        end
-    },
+    Select     = LazyImport("/mods/UMT/modules/select.lua"),
     Views      = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
@@ -32,8 +48,8 @@ _G.UMT         = {
     Class      = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property   = import("/mods/UMT/modules/UIClass.lua").Property,
     Prevent    = import("/mods/UMT/modules/Prevent.lua"),
+    Options = LazyImport("/mods/UMT/modules/Options.lua"),
+    Units   = LazyImport("/mods/UMT/modules/units.lua"),
 }
-_G.UMT.Units   = import("/mods/UMT/modules/units.lua")
-_G.UMT.Options = import("/mods/UMT/modules/Options.lua")
 
 _G.UMT = UMT.Prevent.EditOf(_G.UMT)
