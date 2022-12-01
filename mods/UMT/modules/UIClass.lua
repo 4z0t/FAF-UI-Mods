@@ -26,8 +26,8 @@ function Property(setup)
 end
 
 local function MakeProperties(class)
-    local setProperties = table.copy(class.__set) or {}
-    local getProperties = table.copy(class.__get) or {}
+    local setProperties = {}
+    local getProperties = {}
     for k, v in class do
         if type(v) == "table" then
             if v.__property then
@@ -41,32 +41,22 @@ local function MakeProperties(class)
 
         end
     end
-
-    class.__set = setProperties
-    class.__get = getProperties
-
-    for k, _ in class.__set do
-        class[k] = nil
-    end
-
-    for k, _ in class.__get do
-        class[k] = nil
-    end
-
-    class.__index = function(self, key)
-        if getProperties[key] then
-            return getProperties[key](self)
+    if not table.empty(getProperties) then
+        class.__index = function(self, key)
+            if getProperties[key] then
+                return getProperties[key](self)
+            end
+            return class[key]
         end
-        return class[key]
     end
-
-    class.__newindex = function(self, key, value)
-        if setProperties[key] then
-            return setProperties[key](self, value)
+    if not table.empty(setProperties) then
+        class.__newindex = function(self, key, value)
+            if setProperties[key] then
+                return setProperties[key](self, value)
+            end
+            rawset(self, key, value)
         end
-        rawset(self, key, value)
     end
-
 
     return class
 end
@@ -79,6 +69,8 @@ local function MakeUIClass(bases, spec)
     return MakeProperties(class)
 end
 
+
+-- ! there is still a problem with __newindex being ambiguous in classes
 function UIClass(...)
     if IsSimpleClass(arg) then
         return MakeUIClass(arg)
