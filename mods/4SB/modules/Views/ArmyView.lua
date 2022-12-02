@@ -354,8 +354,11 @@ AllyView = Class(ArmyView)
 
 }
 
+local lastDataTextOffset = 20
+
 local dataTextOffSet = 40
 
+local lastDataTextOffsetScaled = LayoutHelpers.ScaleNumber(lastDataTextOffset)
 local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
 
 local dataAnimationSpeed = 150
@@ -364,7 +367,7 @@ local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
         fadeAnimation:Apply(control)
         control._contracted = true
-        return state or { nextControl = nextControl }
+        return { nextControl = nextControl }
     end)
     :OnFrame(function(control, delta, state)
         if control.Right() >= state.nextControl.Right() then
@@ -378,13 +381,13 @@ local contractDataAnimation = animationFactory
     :Create()
 
 local expandDataAnimation = animationFactory
-    :OnStart(function(control, state, nextControl)
+    :OnStart(function(control, state, nextControl, offset)
         appearAnimation:Apply(control)
         control._contracted = false
-        return state or { nextControl = nextControl }
+        return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - dataTextOffSetScaled then
+        if control.Right() <= state.nextControl.Right() - state.offset then
             return true
         end
         control.Right:Set(control.Right() - delta * dataAnimationSpeed)
@@ -420,7 +423,7 @@ ReplayArmyView = Class(ArmyView)
                     :DisableHitTest()
             elseif i == dataSize then
                 LayoutFor(self._data[i])
-                    :AtRightIn(self, dataTextOffSet)
+                    :AtRightIn(self, lastDataTextOffset)
                     :AtVerticalCenterIn(self)
                     :DisableHitTest()
             else
@@ -483,12 +486,12 @@ ReplayArmyView = Class(ArmyView)
             local nextControl = self
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl)
+            expandDataAnimation:Apply(control, nextControl, lastDataTextOffsetScaled)
         else
             local nextControl = self._data[id + 1]
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl)
+            expandDataAnimation:Apply(control, nextControl, dataTextOffSetScaled)
         end
 
     end,
