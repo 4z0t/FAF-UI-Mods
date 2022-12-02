@@ -126,7 +126,7 @@ DataPanel = Class(Group)
 
 
         LayoutFor(self)
-            :Width(panelWidth)
+            :AtLeftIn(self._dropdowns[1], -20)
             :Height(panelHeight)
 
         for i, dropdown in self._dropdowns do

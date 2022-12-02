@@ -393,7 +393,7 @@ local expandDataAnimation = animationFactory
         control.Right:Set(control.Right() - delta * dataAnimationSpeed)
     end)
     :OnFinish(function(control, state)
-        LayoutHelpers.AtRightIn(control, state.nextControl, dataTextOffSet)
+        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
     end)
     :Create()
 
