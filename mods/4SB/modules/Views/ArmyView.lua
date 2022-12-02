@@ -312,7 +312,7 @@ AllyView = Class(ArmyView)
             fadeAnimation:Apply(self._energyBtn)
             fadeAnimation:Apply(self._unitsBtn)
             return true
-        elseif event.Type == 'MouseEnter' then
+        elseif event.Type == 'MouseEnter' and not self.isOutOfGame then
             appearAnimation:Apply(self._massBtn)
             appearAnimation:Apply(self._unitsBtn)
             appearAnimation:Apply(self._energyBtn)
