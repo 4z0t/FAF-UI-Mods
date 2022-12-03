@@ -92,7 +92,6 @@ local function MakeUIClass(bases, spec)
     return MakeProperties(class)
 end
 
--- ! there is still a problem with __newindex being ambiguous in classes
 function UIClass(...)
     if IsSimpleClass(arg) then
         return MakeUIClass(arg)

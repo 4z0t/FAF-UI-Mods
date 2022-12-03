@@ -1,5 +1,4 @@
-do
-
+if false then
     local OldCreateUI = CreateUI
     function CreateUI(isReplay)
 
