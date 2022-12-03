@@ -4,6 +4,37 @@ local TableRemove = table.remove
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
+function from(t)
+    local result = {
+        t = t or {}
+    }
+    setmetatable(result, LinqFromMetaTable)
+    return result
+end
+From = from
+
+-- function from_(t)
+--     local result = {}
+--     setmetatable(result, LinqFromMetaTable)
+--     result.t = t or {}
+--     local wrapper = {}
+--     wrapper.t = result
+--     setmetatable(wrapper, WrapperLinqFromMetaTable)
+--     return wrapper
+-- end
+
+function range(startValue, endValue)
+    local result = {}
+    local i = startValue
+    repeat
+        TableInsert(result, i)
+        i = i + 1
+    until i >= endValue + 1
+    return from(result)
+end
+Range = range
+
+
 function LinqFromMetaTable:Select(p)
     local result = {}
     local value

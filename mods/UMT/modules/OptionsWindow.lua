@@ -142,6 +142,8 @@ local windowTextures = {
     br = UIUtil.SkinnableFile("/game/panel/panel_brd_lr.dds"),
     borderColor = "00415055"
 }
+
+---@class OptionsWindow : Window
 OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
         Window.__init(self, parent, title, nil, false, false, true, false, options .. "window", {

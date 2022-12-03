@@ -24,3 +24,55 @@ function main()
     WARN(b)
 
 end
+
+local A = UIClass
+{
+    A = function(self)
+        LOG("called A")
+    end,
+
+    B = Property {
+        set = function(self, value)
+            LOG("Setting new value " .. value)
+        end,
+        get = function(self)
+            return "Hello"
+        end
+    }
+}
+
+
+
+local B = UIClass(A)
+{
+    C = Property {
+        set = function(self, value)
+            LOG("called C" .. value)
+        end,
+        get = function(self)
+            return "CCCCCC"
+        end
+    }
+}
+
+
+
+function Main()
+    local ok, a2 = pcall(function()
+
+        LOG("--------------------------")
+        local a = B()
+        LOG(a.B)
+        a.B = 4
+        LOG(a.B)
+        a:A()
+        LOG(a.C)
+        a.C = 4
+        LOG(a.C)
+        LOG(a.d)
+        LOG("--------------------------")
+    end)
+    if not ok then
+        LOG(debug.traceback(a2))
+    end
+end

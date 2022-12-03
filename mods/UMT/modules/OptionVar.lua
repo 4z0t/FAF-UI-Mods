@@ -8,6 +8,7 @@ local Prefs = import("/lua/user/prefs.lua")
 ---@field _lv LazyVar
 ---@field _prev any
 ---@field OnChange fun(self : OptionVar)
+---@field OnSave fun(self : OptionVar)
 local OptionVarMetaTable = {}
 OptionVarMetaTable.__index = OptionVarMetaTable
 
@@ -40,6 +41,7 @@ function OptionVarMetaTable:Save()
     local modOptionsTable = Prefs.GetFromCurrentProfile(self._m)
     modOptionsTable[self._o] = self._lv()
     Prefs.SetToCurrentProfile(self._m, modOptionsTable)
+    self:OnSave()
     self._prev = nil
 end
 
@@ -81,6 +83,9 @@ function Create(modOptionName, subOption, default)
         _lv = LazyVar.Create(val),
         _prev = nil,
         OnChange = function(self)
+        end,
+        OnSave = function (self)
+            
         end
     }
     setmetatable(result, OptionVarMetaTable)

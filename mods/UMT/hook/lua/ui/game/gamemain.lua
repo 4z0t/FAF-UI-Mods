@@ -1,6 +1,10 @@
+if false then
+    local OldCreateUI = CreateUI
+    function CreateUI(isReplay)
 
-local originalCreateUI = CreateUI
-function CreateUI(isReplay, parent)
-    originalCreateUI(isReplay)
-    import("/mods/UMT/modules/main.lua").init(isReplay)
+        OldCreateUI(isReplay)
+        
+        import('/mods/UMT/modules/Main.lua').Main(isReplay)
+
+    end
 end

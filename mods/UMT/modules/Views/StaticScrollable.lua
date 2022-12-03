@@ -3,11 +3,11 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 
 
 
----@class IScrollable
+---@class StaticScrollable : Group
 ---@field _topLine  integer
 ---@field _dataSize integer
 ---@field _numLines integer
-IScrollable = Class(Group) {
+StaticScrollable = Class(Group) {
 
     Setup = function(self, topIndex, dataSize, numLines)
         self._topLine = topIndex
@@ -29,9 +29,7 @@ IScrollable = Class(Group) {
 
     ScrollSetTop = function(self, axis, top)
         top = math.floor(math.max(math.min(self._dataSize - self._numLines + 1, top), 1))
-        if top == self._topLine then
-            return
-        end
+        if top == self._topLine then return end
         self._topLine = top
         self:CalcVisible()
     end,
@@ -41,41 +39,22 @@ IScrollable = Class(Group) {
     end,
 
     ---Determines what controls should be visible or not
-    ---@generic K, V
-    ---@param self IScrollable
-    ---@param data? table<K,V>
-    CalcVisible = function(self, data)
+    ---@param self StaticScrollable
+    CalcVisible = function(self)
         local lineIndex = 1
-        local key, value = self:DataIter(data, nil)
-
         for index = self._topLine, self._numLines + self._topLine - 1 do
-            self:RenderLine(lineIndex, index, key, value)
-            if key ~= nil then
-                key, value = self:DataIter(data, key)
-            end
+            self:RenderLine(lineIndex, index)
             lineIndex = lineIndex + 1
         end
     end,
 
-    ---Iterates over given data while CalcVisible, overload for more functions
-    ---@generic K, V
-    ---@param self IScrollable
-    ---@param data? table<K,V>
-    ---@param key? any
-    ---@return K
-    ---@return V
-    DataIter = function(self, data, key)
-        return nil, nil
-    end,
+
 
     ---Overload for rendering lines
-    ---@generic K, V
-    ---@param self IScrollable
+    ---@param self StaticScrollable
     ---@param lineIndex integer
     ---@param scrollIndex integer
-    ---@param key K
-    ---@param value V
-    RenderLine = function(self, lineIndex, scrollIndex, key, value)
+    RenderLine = function(self, lineIndex, scrollIndex)
         WARN(debug.traceback("Not implemented method!"))
     end,
 
@@ -91,7 +70,7 @@ IScrollable = Class(Group) {
     end,
 
     ---HandleEvent overload
-    ---@param self IScrollable
+    ---@param self StaticScrollable
     ---@param event Event
     ---@return boolean
     OnEvent = function(self, event)
