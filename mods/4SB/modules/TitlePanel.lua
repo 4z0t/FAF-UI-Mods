@@ -174,11 +174,11 @@ TitlePanel = Class(Group)
                 if control.state then
                     contractAnimation:Apply(self._info, self._top)
                     fadeAnimation:Apply(self._info)
-                    self._arrow:SetText("v")
+                    control:SetText("v")
                 else
                     expandAnimation:Apply(self._info, self._top)
                     appearAnimation:Apply(self._info)
-                    self._arrow:SetText("^")
+                    control:SetText("^")
                 end
                 control.state = not control.state
                 return true
