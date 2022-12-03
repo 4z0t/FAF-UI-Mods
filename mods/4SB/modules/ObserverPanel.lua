@@ -84,7 +84,7 @@ ObserverPanel = Class(Group)
         local topLine = self:GetParent():GetArmyViews()[1]
         LayoutFor(self)
             :Width(function()
-                return math.min(topLine.Width(), width)
+                return math.min(topLine.Width(), LayoutHelpers.ScaleNumber(width))
             end)
             :Height(height)
 
