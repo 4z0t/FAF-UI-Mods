@@ -441,6 +441,12 @@ ReplayArmyView = Class(ArmyView)
 
 
     Update = function(self, data, setup)
+        if data == nil then
+            for i, dataText in self._data do
+                dataText:SetText("")
+            end
+            return
+        end
         ArmyView.Update(self, data)
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
