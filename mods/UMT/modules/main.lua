@@ -18,7 +18,14 @@ function Main(isReplay)
 
         C = UMT.Class
         {
-
+            D = UMT.Property {
+                get = function(self)
+                    LOG("C get method")
+                end,
+                set = function(self, value)
+                    LOG("C set method " .. value)
+                end
+            }
         }
 
         B = UMT.Class(A, C)
@@ -49,6 +56,8 @@ function Main(isReplay)
         bb.B = 5
         LOG(bb.C)
         bb.C = 4
+        LOG(bb.D)
+        bb.D = 4
     end)
     if not a then return LOG(b) end
 end

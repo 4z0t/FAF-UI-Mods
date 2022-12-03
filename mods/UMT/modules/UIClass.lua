@@ -61,14 +61,36 @@ local function MakeProperties(class)
     return class
 end
 
+local function CacheClassFields(classes, fields)
+    local cache = {}
+    for _, field in fields do
+        cache[field] = {}
+        for i, class in ipairs(classes) do
+            cache[field][i] = class[field]
+            class[field] = nil
+        end
+    end
+    return cache
+end
+
+local function RestoreClassFields(classes, cache)
+    for field, data in cache do
+        for i, class in ipairs(classes) do
+            class[field] = data[i]
+        end
+    end
+end
+
 local function MakeUIClass(bases, spec)
+    local cache = CacheClassFields(bases, { "__newindex" })
+
     local class = Class(unpack(bases))
     if spec then
         class = class(spec)
     end
+    RestoreClassFields(bases, cache)
     return MakeProperties(class)
 end
-
 
 -- ! there is still a problem with __newindex being ambiguous in classes
 function UIClass(...)
