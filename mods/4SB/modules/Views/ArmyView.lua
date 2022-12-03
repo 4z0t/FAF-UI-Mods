@@ -441,7 +441,7 @@ ReplayArmyView = Class(ArmyView)
 
 
     Update = function(self, data, setup)
-        if data == nil then
+        if data.resources == nil then
             for i, dataText in self._data do
                 dataText:SetText("")
             end
