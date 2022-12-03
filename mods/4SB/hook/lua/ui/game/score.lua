@@ -77,7 +77,7 @@ end
 function NoteGameSpeedChanged(newSpeed)
     gameSpeed = newSpeed
     if not IsDestroyed(controls.scoreBoard) then
-        controls.scoreBoard:UpdateGameSpeed(newSpeed)
+        controls.scoreBoard.GameSpeed = newSpeed
     end
 end
 

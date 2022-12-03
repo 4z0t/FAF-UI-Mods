@@ -10,6 +10,8 @@ local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local InfoPanel = import("InfoPanel.lua").InfoPanel
+local LazyImport = UMT.LazyImport
+local Scores = LazyImport("/lua/ui/game/score.lua")
 
 
 local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
@@ -32,7 +34,7 @@ local slideForward = animationFactory
     :Create()
 
 
-ScoreBoard = Class(Group)
+ScoreBoard = UMT.Class(Group)
 {
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
@@ -149,12 +151,16 @@ ScoreBoard = Class(Group)
         end
     end,
 
-
-    UpdateGameSpeed = function(self, gameSpeed)
-        if self._title then
-            self._title:Update(false, gameSpeed)
+    GameSpeed = UMT.Property
+    {
+        get = function(self)
+        end,
+        set = function(self, value)
+            if self._title then
+                self._title:Update(false, value)
+            end
         end
-    end,
+    },
 
     OnFrame = function(self, delta)
         local isShift = IsKeyDown("shift")
@@ -172,7 +178,7 @@ ScoreBoard = Class(Group)
         end
 
         if update then
-            local data = import("/lua/ui/game/score.lua").GetScoreCache()
+            local data = Scores.GetScoreCache()
             self:UpdateArmiesData(data)
         end
     end,
@@ -188,7 +194,7 @@ ScoreBoard = Class(Group)
 
 }
 
-ReplayScoreBoard = Class(ScoreBoard)
+ReplayScoreBoard = UMT.Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
@@ -232,11 +238,16 @@ ReplayScoreBoard = Class(ScoreBoard)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
     end,
-
-    UpdateGameSpeed = function(self, gameSpeed)
-        ScoreBoard.UpdateGameSpeed(self, gameSpeed)
-        self._obs:SetGameSpeed(gameSpeed)
-    end,
+    
+    GameSpeed = UMT.Property
+    {
+        get = function(self)
+        end,
+        set = function(self, value)
+            ScoreBoard.GameSpeed.set(self, value)
+            self._obs:SetGameSpeed(value)
+        end
+    },
 
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
