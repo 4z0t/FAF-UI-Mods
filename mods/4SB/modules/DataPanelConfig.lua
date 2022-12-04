@@ -393,7 +393,21 @@ checkboxes = {
                 return score.units.sacu.built - score.units.sacu.lost
             end
         },
-
+        {
+            tooltip = "experimental-units",
+            title = "EXP",
+            description = "Amount of EXPs",
+            text = "E",
+            nu = RGBA "",
+            nc = RGBA "",
+            ou = RGBA "",
+            oc = RGBA "",
+            du = RGBA "",
+            dc = RGBA "",
+            GetData = function(score)
+                return score.units.experimental.built - score.units.experimental.lost
+            end
+        },
     }
 }
 do

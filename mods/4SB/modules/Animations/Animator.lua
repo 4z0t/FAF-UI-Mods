@@ -4,7 +4,7 @@
 local Group = import('/lua/maui/group.lua').Group
 local MAX_DELTA_ALLOWED = 0.05
 
----@class Animator : Control
+---@class Animator : Group
 ---@field _controls table<Control, Animation>
 ---@field _controlsStates table<Control, ControlState>
 Animator = Class(Group)
