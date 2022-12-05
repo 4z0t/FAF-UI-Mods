@@ -6,6 +6,7 @@ local activeSelection = nil
 local activeCommandMode
 local activeCommandModeData
 local lastUnit
+local continuous
 
 local supress
 
@@ -13,6 +14,7 @@ local function Reset(deselect)
     current = nil
     activeSelection = nil
     lastUnit = nil
+    continuous = false
     if deselect then
         SelectUnits(nil)
     end
@@ -41,10 +43,11 @@ function Next()
     current = i
 end
 
-function Start()
+function Start(isContinuous)
     if not activeSelection then
         activeSelection = GetSelectedUnits()
         local cm = CM.GetCommandMode()
+        continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
     end
     Next()
@@ -62,7 +65,7 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
     if not activeSelection or supress then
-        supress = false
+        supress = continuous
         return
     end
     local selectedUnits = GetSelectedUnits()
@@ -84,6 +87,10 @@ function Main(isReplay)
 end
 
 KeyMapper.SetUserKeyAction('Start Group Split', {
-    action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start()',
+    action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(false)',
+    category = 'Group Split'
+})
+KeyMapper.SetUserKeyAction('Start Group Split continuous', {
+    action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(true)',
     category = 'Group Split'
 })
