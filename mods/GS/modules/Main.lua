@@ -66,7 +66,9 @@ function OnCommandEnded(commandMode, commandModeData)
         return
     end
     local selectedUnits = GetSelectedUnits()
-    if (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) and lastUnit then
+    --check if selection changed
+    if lastUnit  and (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) then
+        -- check if unit died for some reason
         if not lastUnit:IsDead() then Reset(false) return end
     end
 
