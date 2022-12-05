@@ -10,6 +10,10 @@ local continuous
 
 local supress
 
+local function IsActive()
+    return activeSelection ~= nil
+end
+
 local function Reset(deselect)
     current = nil
     activeSelection = nil
@@ -21,7 +25,7 @@ local function Reset(deselect)
 end
 
 function Next()
-    if not activeSelection then return end
+    if not IsActive() then return end
     local unit
     local i = current
     repeat
@@ -32,19 +36,18 @@ function Next()
         end
     until not unit:IsDead()
     lastUnit = unit
+
     supress = true
     SelectUnits { unit }
-    -- if activeCommandModeData and activeCommandModeData.name then
-    --     ConExecute(("StartCommandMode order %s"):format(activeCommandModeData.name))
-    -- end
-    -- reprsl(activeCommandMode)
-    -- reprsl(activeCommandModeData)
+    --TODO double next due to guard/build mode
+    --supress = not activeCommandModeData
+    supress = unit:IsInCategory("ENGINEER")
     CM.StartCommandMode(activeCommandMode, activeCommandModeData)
     current = i
 end
 
 function Start(isContinuous)
-    if not activeSelection then
+    if not IsActive() then
         activeSelection = GetSelectedUnits()
         local cm = CM.GetCommandMode()
         continuous = isContinuous
@@ -57,24 +60,27 @@ end
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
-    if not activeSelection then return end
+    if not IsActive() then return end
 end
 
 ---comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
-    if not activeSelection or supress then
-        supress = continuous
-        return
-    end
+    reprsl(commandMode)
+    reprsl(commandModeData)
+    if not IsActive() then return end
     local selectedUnits = GetSelectedUnits()
     --check if selection changed
-    if lastUnit  and (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) then
+    if lastUnit and (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) then
         -- check if unit died for some reason
         if not lastUnit:IsDead() then Reset(false) return end
     end
 
+    if supress then
+        supress = continuous
+        return
+    end
     ForkThread(Next)
 end
 
