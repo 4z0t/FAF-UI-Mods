@@ -9,11 +9,13 @@ local lastUnit
 
 local supress
 
-local function Reset()
+local function Reset(deselect)
     current = nil
     activeSelection = nil
     lastUnit = nil
-    SelectUnits(nil)
+    if deselect then
+        SelectUnits(nil)
+    end
 end
 
 function Next()
@@ -23,7 +25,7 @@ function Next()
     repeat
         i, unit = next(activeSelection, i)
         if i == nil then
-            Reset()
+            Reset(true)
             return
         end
     until not unit:IsDead()
@@ -64,8 +66,8 @@ function OnCommandEnded(commandMode, commandModeData)
         return
     end
     local selectedUnits = GetSelectedUnits()
-    if not selectedUnits and lastUnit then
-        if not lastUnit:IsDead() then Reset() return end
+    if (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) and lastUnit then
+        if not lastUnit:IsDead() then Reset(false) return end
     end
 
     ForkThread(Next)
