@@ -5,8 +5,16 @@ local current = nil
 local activeSelection = nil
 local activeCommandMode
 local activeCommandModeData
+local lastUnit
 
 local supress
+
+local function Reset()
+    current = nil
+    activeSelection = nil
+    lastUnit = nil
+    SelectUnits(nil)
+end
 
 function Next()
     if not activeSelection then return end
@@ -15,13 +23,11 @@ function Next()
     repeat
         i, unit = next(activeSelection, i)
         if i == nil then
-            current = nil
-            activeSelection = nil
-            SelectUnits(nil)
+            Reset()
             return
         end
     until not unit:IsDead()
-
+    lastUnit = unit
     supress = true
     SelectUnits { unit }
     -- if activeCommandModeData and activeCommandModeData.name then
@@ -57,13 +63,18 @@ function OnCommandEnded(commandMode, commandModeData)
         supress = false
         return
     end
+    local selectedUnits = GetSelectedUnits()
+    if not selectedUnits and lastUnit then
+        if not lastUnit:IsDead() then Reset() return end
+    end
+
     ForkThread(Next)
 end
 
 function Main(isReplay)
     if isReplay then return end
 
-    CM.AddStartBehavior(OnCommandStarted)
+    -- CM.AddStartBehavior(OnCommandStarted)
     CM.AddEndBehavior(OnCommandEnded)
 
 end
