@@ -7,6 +7,7 @@ local activeCommandMode
 local activeCommandModeData
 local lastUnit
 local continuous
+local isStarted
 
 local supress
 
@@ -19,12 +20,13 @@ local function Reset(deselect)
     activeSelection = nil
     lastUnit = nil
     continuous = false
+    isStarted = false
     if deselect then
         SelectUnits(nil)
     end
 end
 
-function Next()
+function Next(isManual)
     if not IsActive() then return end
     local unit
     local i = current
@@ -36,13 +38,14 @@ function Next()
         end
     until not unit:IsDead()
     lastUnit = unit
-
     supress = true
     SelectUnits { unit }
     --TODO double next due to guard/build mode
     --supress = not activeCommandModeData
     supress = unit:IsInCategory("ENGINEER")
-    CM.StartCommandMode(activeCommandMode, activeCommandModeData)
+    if not isManual then
+        CM.StartCommandMode(activeCommandMode, activeCommandModeData)
+    end
     current = i
 end
 
@@ -53,7 +56,7 @@ function Start(isContinuous)
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
     end
-    Next()
+    Next(true)
 end
 
 ---comment
@@ -61,6 +64,10 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
     if not IsActive() then return end
+    -- LOG("-------------start----------")
+    -- reprsl(commandMode)
+    -- reprsl(commandModeData)
+    isStarted = true
 end
 
 ---comment
@@ -68,33 +75,36 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
     if not IsActive() then return end
+    --if commandModeData and not commandModeData.isCancel then return end
     local selectedUnits = GetSelectedUnits()
     --check if selection changed
     if lastUnit and (not selectedUnits or table.getn(selectedUnits) ~= 1 or selectedUnits[1] ~= lastUnit) then
         -- check if unit died for some reason
         if not lastUnit:IsDead() then Reset(false) return end
     end
-
+    -- LOG("-------------end----------")
+    -- reprsl(commandMode)
+    -- reprsl(commandModeData)
     if supress then
         supress = continuous
         return
     end
-    ForkThread(Next)
+    ForkThread(Next, false)
 end
 
 function Main(isReplay)
     if isReplay then return end
 
-    -- CM.AddStartBehavior(OnCommandStarted)
+    CM.AddStartBehavior(OnCommandStarted)
     CM.AddEndBehavior(OnCommandEnded)
 
 end
 
-KeyMapper.SetUserKeyAction('Start Group Split', {
+KeyMapper.SetUserKeyAction('Quick Group Split', {
     action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(false)',
     category = 'Group Split'
 })
-KeyMapper.SetUserKeyAction('Start Group Split continuous', {
+KeyMapper.SetUserKeyAction('Continuous Group Split', {
     action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(true)',
     category = 'Group Split'
 })
