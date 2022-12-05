@@ -67,8 +67,6 @@ end
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
-    reprsl(commandMode)
-    reprsl(commandModeData)
     if not IsActive() then return end
     local selectedUnits = GetSelectedUnits()
     --check if selection changed
