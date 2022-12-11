@@ -1,5 +1,5 @@
 name = "4z0t's ScoreBoard"
-version = 1
+version = 2
 copyright = ""
 description = [[4z0t's ScoreBoard:
 * Minimalistic and simple design
@@ -13,7 +13,7 @@ See forum post for more info https://forum.faforever.com/topic/4391/new-scoreboa
 ]]
 author = "4z0t"
 url = ""
-uid = "4z0ts-scoreboard-v01"
+uid = "4z0ts-scoreboard-v02"
 exclusive = false
 ui_only = true
 conflicts = {}
