@@ -31,13 +31,13 @@ local slideBackWards = AnimationFactory.GetAnimationFactory()
     :Create()
 
 local colors = {
-    "ff" .. "FF0000",
-    "ff" .. "FF7F00",
-    "ff" .. "FFFF00",
-    "ff" .. "00FF00",
-    "ff" .. "0000FF",
-    "ff" .. "4B0082",
-    "ff" .. "9400D3",
+    "ffFF0000",
+    "ffFF7F00",
+    "ffFFFF00",
+    "ff00FF00",
+    "ff0000FF",
+    "ff4B0082",
+    "ff9400D3",
 }
 
 

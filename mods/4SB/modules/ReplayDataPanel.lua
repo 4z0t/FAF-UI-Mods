@@ -126,7 +126,7 @@ DataPanel = Class(Group)
 
 
         LayoutFor(self)
-            :Width(panelWidth)
+            :AtLeftIn(self._dropdowns[1], -20)
             :Height(panelHeight)
 
         for i, dropdown in self._dropdowns do
@@ -165,7 +165,7 @@ DataPanel = Class(Group)
                     :Width(checkboxWidth)
                     :Height(checkboxHeight)
                 checkbox:SetText(checkboxData.text)
-                checkbox:SetFont("Zeroes Three", 12)
+                checkbox:SetFont(textFont, textSize)
                 checkbox:SetCheck(true)
                 Tooltip.AddControlTooltip(checkbox, checkboxData.tooltip, 0.5)
                 cbs[j] = checkbox

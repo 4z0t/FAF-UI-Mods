@@ -24,7 +24,7 @@ function GetSizeInKM(size)
 end
 
 local pattern = "neroxis_map_generator"
-function FormatMapGenName(name)
+function FormatMapName(name)
     if string.find(name, pattern) then
         return "Neroxis Map Generator", true
     end
@@ -81,7 +81,7 @@ InfoPanel = Class(Group)
         self._mapSize:SetText(string.format("%.1f x %.1f", GetSizeInKM(mapWidth), GetSizeInKM(mapHeight)))
 
 
-        local mapName, isMapGen = FormatMapGenName(sessionInfo.name)
+        local mapName, isMapGen = FormatMapName(sessionInfo.name)
         local mapDescription = sessionInfo.description
         if not mapDescription or mapDescription == "" then
             mapDescription = "No description set by the author."
