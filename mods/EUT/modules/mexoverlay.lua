@@ -13,6 +13,8 @@ local overlays = UMT.Weak.Value {}
 local showOverlay = Options.overlayOption()
 local useNumberOverlay = Options.useNumberOverlay()
 
+local overlaySize = Options.overlaySize:Raw()
+
 function init()
 
     Options.overlayOption.OnChange = function(var)
@@ -95,7 +97,8 @@ local NumberMexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 0
         self.offsetY = 0
-        LayoutHelpers.SetDimensions(self, 10, 10)
+        self.Width:Set(overlaySize)
+        self.Height:Set(overlaySize)
         self:SetSolidColor("black")
         local text = "0"
         if unit:IsInCategory("TECH1") then
@@ -117,12 +120,10 @@ local NumberMexOverlay = Class(Overlay)
             end
             if self.unit.isUpgrader then
                 self.text:SetColor(upgradeColor)
+            elseif self.unit.isCapped == nil or self.unit.isCapped then
+                self.text:SetColor(idleCappedColor)
             else
-                if self.unit.isCapped == nil or self.unit.isCapped then
-                    self.text:SetColor(idleCappedColor)
-                else
-                    self.text:SetColor(idleNotCappedColor)
-                end
+                self.text:SetColor(idleNotCappedColor)
             end
             self:Update()
         else
