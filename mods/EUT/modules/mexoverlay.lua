@@ -2,6 +2,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LazyVar = import("/lua/lazyvar.lua").Create
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local Options = import("options.lua")
 
@@ -31,6 +32,8 @@ end
 local upgradeColor = "ff00ff00"
 local idleCappedColor = "ffffffff"
 local idleNotCappedColor = "FFE21313"
+
+local progressColor = "3300ff00"
 
 local Overlay = Class(Bitmap)
 {
@@ -109,7 +112,17 @@ local NumberMexOverlay = Class(Overlay)
             text = "3"
         end
         self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
-        LayoutHelpers.AtCenterIn(self.text, self)
+        self.progress = Bitmap(self)
+
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+
+        LayoutFor(self.progress)
+            :Bottom(self.Bottom)
+            :Left(self.Left)
+            :Right(self.Right)
+            :Height(0)
+            :Color(progressColor)
     end,
 
     OnFrame = function(self, delta)
@@ -125,6 +138,11 @@ local NumberMexOverlay = Class(Overlay)
             else
                 self.text:SetColor(idleNotCappedColor)
             end
+
+            if self.unit.progress then
+                self.progress.Height:Set(self.unit.progress * self.Height())
+            end
+
             self:Update()
         else
             self:Destroy()

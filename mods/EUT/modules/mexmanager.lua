@@ -209,7 +209,9 @@ local function UpdateUI()
             end)
 
             local sorted = sortedMexes:Map(function(k, m)
-                return m:GetWorkProgress()
+                local wp = m:GetWorkProgress()
+                m.progress = wp
+                return wp
             end):ToDictionary()
 
             mexData[id].progress = sorted
