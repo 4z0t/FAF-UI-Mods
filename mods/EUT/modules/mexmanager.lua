@@ -24,7 +24,7 @@ local unpauseOnce = Options.unpauseOnce()
 
 local mexData = {}
 local toBePaused = {}
-local unPaused = UMT.Weak.Key{}
+local unPaused = UMT.Weak.Key {}
 
 local function UpgradeMexes(mexes, selector)
 
@@ -197,12 +197,6 @@ local function UpdateUI()
     end
 
     for id, category in mexCategories do
-
-        if id == 1 and upgradeT1 and not table.empty(mexData[id].mexes) then
-            UpgradeMexes(mexData[id].mexes)
-        end
-
-
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
                 return a:GetWorkProgress() > b:GetWorkProgress()
