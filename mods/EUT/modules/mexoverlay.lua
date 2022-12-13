@@ -5,16 +5,13 @@ local LazyVar = import("/lua/lazyvar.lua").Create
 
 local Options = import("options.lua")
 
+---@type WorldView
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
-local overlays = {}
+local overlays = UMT.Weak.Value {}
 
 local showOverlay = Options.overlayOption()
 local useNumberOverlay = Options.useNumberOverlay()
-
-local function Remove(id)
-    overlays[id] = nil
-end
 
 function init()
 
@@ -63,10 +60,6 @@ local Overlay = Class(Bitmap)
         else
             self:Hide()
         end
-    end,
-
-    OnDestroy = function(self)
-        Remove(self.id)
     end
 }
 
@@ -139,7 +132,6 @@ local function VerifyWV()
     if IsDestroyed(worldView)
     then
         worldView = import("/lua/ui/game/worldview.lua").viewLeft
-        overlays = {}
     end
 end
 
@@ -149,7 +141,7 @@ function UpdateOverlays(mexes)
         local id
         for _, mex in mexes do
             id = mex:GetEntityId()
-            if not overlays[id] then
+            if IsDestroyed(overlays[id]) then
                 if useNumberOverlay then
                     overlays[id] = NumberMexOverlay(worldView, mex)
                 else
