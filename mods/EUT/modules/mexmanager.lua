@@ -106,8 +106,14 @@ local function GetCappingBonus(mex)
     end
 end
 
-local function CappedSelector(mex)
+local function IsCapped(mex)
     return GetCappingBonus(mex) >= 1.5
+end
+
+local function CheckCapped(mexes)
+    for _, mex in mexes do
+        mex.isCapped = IsCapped(mex)
+    end
 end
 
 local function UpdateUI()
@@ -177,7 +183,17 @@ local function UpdateUI()
         UpgradeMexes(mexData[1].mexes)
     end
     if upgradeT2 and not table.empty(mexData[4].mexes) then
-        UpgradeMexes(mexData[4].mexes, CappedSelector)
+        UpgradeMexes(mexData[4].mexes, IsCapped)
+    end
+
+    -- T2 mexes
+    if not table.empty(mexData[4].mexes) then
+        CheckCapped(mexData[4].mexes)
+    end
+
+    -- T3 mexes
+    if not table.empty(mexData[7].mexes) then
+        CheckCapped(mexData[7].mexes)
     end
 
     for id, category in mexCategories do

@@ -27,7 +27,8 @@ function init()
 end
 
 local upgradeColor = "ff00ff00"
-local idleColor = "ffffffff"
+local idleCappedColor = "ffffffff"
+local idleNotCappedColor = "FFE21313"
 
 local Overlay = Class(Bitmap)
 {
@@ -117,7 +118,11 @@ local NumberMexOverlay = Class(Overlay)
             if self.unit.isUpgrader then
                 self.text:SetColor(upgradeColor)
             else
-                self.text:SetColor(idleColor)
+                if self.unit.isCapped == nil or self.unit.isCapped then
+                    self.text:SetColor(idleCappedColor)
+                else
+                    self.text:SetColor(idleNotCappedColor)
+                end
             end
             self:Update()
         else
@@ -138,9 +143,8 @@ end
 function UpdateOverlays(mexes)
     if showOverlay then
         VerifyWV()
-        local id
         for _, mex in mexes do
-            id = mex:GetEntityId()
+            local id = mex:GetEntityId()
             if IsDestroyed(overlays[id]) then
                 if useNumberOverlay then
                     overlays[id] = NumberMexOverlay(worldView, mex)
