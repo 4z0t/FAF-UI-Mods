@@ -3,7 +3,7 @@ local function ExistGlobal(name)
 end
 
 function main(parent)
-    if ExistGlobal("UMT") and UMT.Version >= 7 then
+    if ExistGlobal "UMT" and UMT.Version >= 7 then
         local MexManager = import("mexmanager.lua")
         local MexPanel = import("mexpanel.lua")
         local MexOverlay = import("mexoverlay.lua")
@@ -17,7 +17,7 @@ function main(parent)
     else
         ForkThread(function()
             WaitSeconds(4)
-            print("ECO UI tools requires UI mod tools version 4 and higher!!!")
+            print("ECO UI tools requires UI mod tools version 7 and higher!!!")
         end)
         return
     end

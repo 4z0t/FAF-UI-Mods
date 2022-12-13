@@ -5,8 +5,8 @@ local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
-local Select = import("/mods/UMT/modules/select.lua")
-local GetUnits = import("/mods/UMT/modules/units.lua").Get
+local Select = UMT.Select
+local GetUnits = UMT.Units.Get
 local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays

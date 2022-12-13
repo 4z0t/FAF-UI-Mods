@@ -1,7 +1,6 @@
 do
-    local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
-    local Options = import("/mods/UMT/modules/OptionsWindow.lua")
-    local OptionVar = import("/mods/UMT/modules/OptionVar.lua").Create
+    local Options = UMT.Options
+    local OptionVar = UMT.OptionVar.Create
 
     local modName = "EUT"
 
@@ -14,7 +13,7 @@ do
     unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
 
     function Init()
-        GlobalOptions.AddOptions(modName, "ECO UI Tools", {
+        UMT.Options.AddOptions(modName, "ECO UI Tools", {
             Options.Filter("Show mex overlay", overlayOption),
             Options.Filter("Auto T1 mex upgrade", upgradeT1Option),
             Options.Filter("Auto T2 capped mex upgrade", upgradeT2Option),
