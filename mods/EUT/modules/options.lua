@@ -14,7 +14,7 @@ do
     unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
 
     function Init()
-        UMT.Options.AddOptions(modName, "ECO UI Tools", {
+        Options.AddOptions(modName, "ECO UI Tools", {
             Options.Filter("Show mex overlay", overlayOption),
             Options.Filter("Auto T1 mex upgrade", upgradeT1Option),
             Options.Filter("Auto T2 capped mex upgrade", upgradeT2Option),

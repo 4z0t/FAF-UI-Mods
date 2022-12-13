@@ -100,9 +100,8 @@ local NumberMexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 0
         self.offsetY = 0
-        self.Width:Set(overlaySize)
-        self.Height:Set(overlaySize)
-        self:SetSolidColor("black")
+
+
         local text = "0"
         if unit:IsInCategory("TECH1") then
             text = "1"
@@ -111,8 +110,14 @@ local NumberMexOverlay = Class(Overlay)
         elseif unit:IsInCategory("TECH3") then
             text = "3"
         end
+
         self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
         self.progress = Bitmap(self)
+
+        LayoutFor(self)
+            :Width(overlaySize)
+            :Height(overlaySize)
+            :Color("black")
 
         LayoutFor(self.text)
             :AtCenterIn(self)
@@ -126,21 +131,22 @@ local NumberMexOverlay = Class(Overlay)
     end,
 
     OnFrame = function(self, delta)
-        if not self.unit:IsDead() and showOverlay then
-            if self.unit.isUpgraded then
+        local unit = self.unit
+        if not unit:IsDead() and showOverlay then
+            if unit.isUpgraded then
                 self:Hide()
                 return
             end
-            if self.unit.isUpgrader then
+            if unit.isUpgrader then
                 self.text:SetColor(upgradeColor)
-            elseif self.unit.isCapped == nil or self.unit.isCapped then
+            elseif unit.isCapped == nil or unit.isCapped then
                 self.text:SetColor(idleCappedColor)
             else
                 self.text:SetColor(idleNotCappedColor)
             end
 
-            if self.unit.progress then
-                self.progress.Height:Set(self.unit.progress * self.Height())
+            if unit.progress then
+                self.progress.Height:Set(unit.progress * self.Height())
             end
 
             self:Update()
@@ -153,8 +159,7 @@ local NumberMexOverlay = Class(Overlay)
 }
 
 local function VerifyWV()
-    if IsDestroyed(worldView)
-    then
+    if IsDestroyed(worldView) then
         worldView = import("/lua/ui/game/worldview.lua").viewLeft
     end
 end

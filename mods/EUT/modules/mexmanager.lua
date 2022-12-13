@@ -24,7 +24,7 @@ local unpauseOnce = Options.unpauseOnce()
 
 local mexData = {}
 local toBePaused = {}
-local unPaused = setmetatable({}, { __mode = 'k' })
+local unPaused = UMT.Weak.Key{}
 
 local function UpgradeMexes(mexes, selector)
 
