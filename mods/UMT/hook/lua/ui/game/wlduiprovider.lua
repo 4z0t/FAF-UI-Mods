@@ -62,6 +62,7 @@ _G.UMT = {
     Options    = LazyImport("/mods/UMT/modules/Options.lua"),
     Units      = LazyImport("/mods/UMT/modules/units.lua"),
     LazyImport = LazyImport,
+    ExistsGlobal = ExistsGlobal
 }
 
 _G.UMT = UMT.Prevent.EditOf(_G.UMT)
