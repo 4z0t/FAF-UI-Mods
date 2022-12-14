@@ -175,7 +175,7 @@ local function UpdateFast()
         prevReset = 0
         prevUpdate = 0
         currentArmy = army
-        units = setmetatable({}, UMT.WeakMeta.Value)
+        units = UMT.Weak.Value{}
         OnArmyChanged()
     end
 
