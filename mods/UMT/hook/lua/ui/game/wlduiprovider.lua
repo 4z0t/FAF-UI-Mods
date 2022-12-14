@@ -1,31 +1,42 @@
-local LazyImportMetaTable = {
-    __index = function(tbl, key)
-        if not tbl.__module then
-            tbl.__module = tbl.__import(tbl.__name);
-        end
-        return tbl.__module[key]
-    end,
-
-    __newindex = function(tbl, key, value)
-        if not tbl.__module then
-            error "Attempt to set new index on not initialized module"
-        end
-        tbl.__module[key] = value
-    end
-}
-
----Creates a new lazy import object
----@param name string
----@param importFunc (fun(path: string):Module)?
----@return Module
-local function LazyImport(name, importFunc)
-    local tbl = {
-        __name = name,
-        __import = importFunc or _G.import,
-        __module = false,
-    }
-    return setmetatable(tbl, LazyImportMetaTable)
+local function ExistsGlobal(name)
+    return rawget(_G, name) ~= nil
 end
+
+local LazyImport
+if ExistsGlobal "lazyimport" then
+    LOG("UMT: using lazyimport")
+    LazyImport = lazyimport
+else
+    local LazyImportMetaTable = {
+        __index = function(tbl, key)
+            if not tbl.__module then
+                tbl.__module = tbl.__import(tbl.__name);
+            end
+            return tbl.__module[key]
+        end,
+
+        __newindex = function(tbl, key, value)
+            if not tbl.__module then
+                error "Attempt to set new index on not initialized module"
+            end
+            tbl.__module[key] = value
+        end
+    }
+
+    ---Creates a new lazy import object
+    ---@param name string
+    ---@param importFunc (fun(path: string):Module)?
+    ---@return Module
+    LazyImport = function(name, importFunc)
+        local tbl = {
+            __name = name,
+            __import = importFunc or _G.import,
+            __module = false,
+        }
+        return setmetatable(tbl, LazyImportMetaTable)
+    end
+end
+
 
 _G.UMT = {
     Info       = import("/mods/UMT/mod_info.lua"),
