@@ -5,8 +5,8 @@ local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
-local Select = import("/mods/UMT/modules/select.lua")
-local GetUnits = import("/mods/UMT/modules/units.lua").Get
+local Select = UMT.Select
+local GetUnits = UMT.Units.Get
 local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
@@ -24,7 +24,7 @@ local unpauseOnce = Options.unpauseOnce()
 
 local mexData = {}
 local toBePaused = {}
-local unPaused = setmetatable({}, { __mode = 'k' })
+local unPaused = UMT.Weak.Key {}
 
 local function UpgradeMexes(mexes, selector)
 
@@ -106,8 +106,14 @@ local function GetCappingBonus(mex)
     end
 end
 
-local function CappedSelector(mex)
+local function IsCapped(mex)
     return GetCappingBonus(mex) >= 1.5
+end
+
+local function CheckCapped(mexes)
+    for _, mex in mexes do
+        mex.isCapped = IsCapped(mex)
+    end
 end
 
 local function UpdateUI()
@@ -177,23 +183,29 @@ local function UpdateUI()
         UpgradeMexes(mexData[1].mexes)
     end
     if upgradeT2 and not table.empty(mexData[4].mexes) then
-        UpgradeMexes(mexData[4].mexes, CappedSelector)
+        UpgradeMexes(mexData[4].mexes, IsCapped)
+    end
+
+    -- T2 mexes
+    if not table.empty(mexData[4].mexes) then
+        CheckCapped(mexData[4].mexes)
+    end
+
+    -- T3 mexes
+    if not table.empty(mexData[7].mexes) then
+        CheckCapped(mexData[7].mexes)
     end
 
     for id, category in mexCategories do
-
-        if id == 1 and upgradeT1 and not table.empty(mexData[id].mexes) then
-            UpgradeMexes(mexData[id].mexes)
-        end
-
-
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
                 return a:GetWorkProgress() > b:GetWorkProgress()
             end)
 
             local sorted = sortedMexes:Map(function(k, m)
-                return m:GetWorkProgress()
+                local wp = m:GetWorkProgress()
+                m.progress = wp
+                return wp
             end):ToDictionary()
 
             mexData[id].progress = sorted
