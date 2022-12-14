@@ -1,3 +1,6 @@
+---Returns true if given name exists in the global table
+---@param name string
+---@return boolean
 local function ExistsGlobal(name)
     return rawget(_G, name) ~= nil
 end
