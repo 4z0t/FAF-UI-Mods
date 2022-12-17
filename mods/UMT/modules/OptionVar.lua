@@ -57,6 +57,16 @@ function OptionVarMetaTable:Raw()
     return self._lv
 end
 
+---called when option data has been changed
+---@return LazyVar
+function OptionVarMetaTable:OnChange()
+end
+
+---called when option data has been saved
+---@return LazyVar
+function OptionVarMetaTable:OnSave()
+end
+
 ---creates optionvar with default value if there is no saved one with given name
 ---@param modOptionName string
 ---@param subOption string
@@ -82,11 +92,6 @@ function Create(modOptionName, subOption, default)
         _o = subOption,
         _lv = LazyVar.Create(val),
         _prev = nil,
-        OnChange = function(self)
-        end,
-        OnSave = function (self)
-            
-        end
     }
     setmetatable(result, OptionVarMetaTable)
     return result
