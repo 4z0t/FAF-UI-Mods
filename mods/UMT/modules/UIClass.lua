@@ -67,7 +67,7 @@ local function CacheClassFields(classes, fields)
         cache[field] = {}
         for i, class in ipairs(classes) do
             cache[field][i] = class[field]
-            class[field] = nil
+            class[field] = false
         end
     end
     return cache
@@ -83,6 +83,13 @@ end
 
 local function MakeUIClass(bases, spec)
     local cache = CacheClassFields(bases, { "__newindex" })
+
+    -- make those fields true, so older versions wont complain about class editting
+    if spec then
+        spec.__newindex = true
+    else
+        bases[1].__newindex = true
+    end
 
     local class = Class(unpack(bases))
     if spec then
