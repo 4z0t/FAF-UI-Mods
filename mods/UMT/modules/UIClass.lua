@@ -49,7 +49,9 @@ local function MakeProperties(class)
             return class[key]
         end
     end
-    if not table.empty(setProperties) then
+    if table.empty(setProperties) then
+        class.__newindex = nil
+    else
         class.__newindex = function(self, key, value)
             if setProperties[key] then
                 return setProperties[key](self, value)
