@@ -107,7 +107,6 @@ BCLine = Class(Checkbox) {
         self._teamCB:Deactivate()
         self:Hide()
         self:Disable()
-        self:SetNeedsFrameUpdate(true)
     end,
 
     SetText = function(self, text, color)

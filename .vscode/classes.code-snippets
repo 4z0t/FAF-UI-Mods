@@ -1,0 +1,98 @@
+{
+    "classinit": {
+        "body": [
+            "${1:class} = Class(${2:Base})",
+            "{",
+            "__init = function(self, parent)",
+            "   ${2:Base}.__init(self, parent)",
+            "end,",
+            "}"
+        ],
+        "prefix": [
+            "classinit"
+        ],
+        "description": "class with basic init"
+    },
+    "classsimpleinit": {
+        "body": [
+            "${1:class} = ClassSimple",
+            "{",
+            "__init = function(self)",
+            "end,",
+            "}"
+        ],
+        "prefix": [
+            "classsimpleinit"
+        ],
+        "description": "simple class with basic init"
+    },
+    "classlayoutable": {
+        "body": [
+            "${1:class} = Class(${2:Base})",
+            "{",
+            "",
+            "__init = function(self, parent)",
+            "   ${2:Base}.__init(self, parent)",
+            "end,",
+            "",
+            "__post_init = function(self)",
+            "   self:_Layout()",
+            "end,",
+            "",
+            "_Layout = function(self)",
+            "end,",
+            "",
+            "}"
+        ],
+        "prefix": [
+            "classlayoutable"
+        ],
+        "description": "class with layout interface"
+    },
+    "classscrollable": {
+        "body": [
+            "${1:class} = Class(IScrollable)",
+            "{",
+            "",
+            "__init = function(self, parent)",
+            "   self:Setup(${topIndex}, ${dataSize}, ${numLines})",
+            "end,",
+            "",
+            "---Iterates over given data while CalcVisible, overload for more functions",
+            "---@generic K, V",
+            "---@param self IScrollable",
+            "---@param data? table<K,V>",
+            "---@param key? any",
+            "---@return K",
+            "---@return V",
+            "DataIter = function(self, data, key)",
+            "    return nil, nil",
+            "end,",
+            "",
+            "---Overload for rendering lines",
+            "---@generic K, V",
+            "---@param self IScrollable",
+            "---@param lineIndex integer",
+            "---@param scrollIndex integer",
+            "---@param key K",
+            "---@param value V",
+            "RenderLine = function(self, lineIndex, scrollIndex, key, value)",
+            "    WARN(debug.traceback(\"Not implemented method!\"))",
+            "end,",
+            "",
+            "---HandleEvent overload",
+            "---@param self IScrollable",
+            "---@param event Event",
+            "---@return boolean",
+            "OnEvent = function(self, event)",
+            "    return true",
+            "end",
+            "",
+            "}"
+        ],
+        "prefix": [
+            "classscrollable"
+        ],
+        "description": "class with scrollable interface"
+    },
+}

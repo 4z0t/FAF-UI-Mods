@@ -1,59 +1,64 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
-local Prefs = import("/lua/user/prefs.lua")
+local LazyVar = import("/lua/lazyvar.lua").Create
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+
+local Options = import("options.lua")
+
+---@type WorldView
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
-local LazyVar = import("/lua/lazyvar.lua")
 
-local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
+local overlays = UMT.Weak.Value {}
 
-local Options = import("/mods/UMT/modules/OptionsWindow.lua")
+local showOverlay = Options.overlayOption()
+local useNumberOverlay = Options.useNumberOverlay()
 
-local overlays = {}
-
-local overlayOption = import("/mods/UMT/modules/OptionVar.lua").Create("EUT", "MexOverlay", true)
-
-local showOverlay = overlayOption()
-
-local function Remove(id)
-    overlays[id]:Destroy()
-    overlays[id] = nil
-end
+local overlaySize = Options.overlaySize:Raw()
 
 function init()
 
-    overlayOption.OnChange = function (var)
+    Options.overlayOption.OnChange = function(var)
         showOverlay = var()
     end
 
-    GlobalOptions.AddOptions("EUT", "ECO UI Tools", {
-        Options.Filter("Show mex overlay", overlayOption)
-    })
+    Options.useNumberOverlay.OnChange = function(var)
+        useNumberOverlay = var()
+    end
+
+
 end
 
-local function CreateOverlay(mex)
-    local id = mex:GetEntityId()
-    local overlay = Bitmap(worldView)
-    overlay:Hide()
-    overlay:DisableHitTest()
-    overlay.id = mex:GetEntityId()
-    overlay.mex = mex
-    overlay.offsetX = 5
-    overlay.offsetY = 6
-    overlay:SetTexture("/mods/EUT/textures/upgrade.dds")
-    LayoutHelpers.SetDimensions(overlay, 8, 8)
-    overlay.PosX = LazyVar.Create()
-    overlay.PosY = LazyVar.Create()
-    overlay.Left:Set(function()
-        return worldView.Left() + overlay.PosX() - overlay.Width() / 2 + overlay.offsetX
-    end)
-    overlay.Top:Set(function()
-        return worldView.Top() + overlay.PosY() - overlay.Height() / 2 + overlay.offsetY
-    end)
-    overlay:SetNeedsFrameUpdate(true)
-    overlay.Update = function(self)
-        local pos = worldView:GetScreenPos(self.mex)
+local upgradeColor = "ff00ff00"
+local idleCappedColor = "ffffffff"
+local idleNotCappedColor = "FFE21313"
+
+local progressColor = "3300ff00"
+
+local Overlay = Class(Bitmap)
+{
+    __init = function(self, parent, unit)
+        Bitmap.__init(self, parent)
+        self:Hide()
+        self:DisableHitTest()
+        self.id = unit:GetEntityId()
+        self.unit = unit
+        self.offsetX = 0
+        self.offsetY = 0
+        self.PosX = LazyVar()
+        self.PosY = LazyVar()
+        self.Left:Set(function()
+            return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
+        end)
+        self.Top:Set(function()
+            return worldView.Top() + self.PosY() - self.Height() / 2 + self.offsetY
+        end)
+        self:SetNeedsFrameUpdate(true)
+    end,
+
+
+    Update = function(self)
+        local pos = worldView:GetScreenPos(self.unit)
         if pos then
             self:Show()
             self.PosX:Set(pos.x)
@@ -62,28 +67,100 @@ local function CreateOverlay(mex)
             self:Hide()
         end
     end
+}
 
-    overlay.OnFrame = function(self, delta)
-        if not self.mex:IsDead() and showOverlay then
-            if self.mex:GetWorkProgress() > 0 then
+local MexOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 5
+        self.offsetY = 6
+        self:SetTexture("/mods/EUT/textures/upgrade.dds")
+        LayoutHelpers.SetDimensions(self, 8, 8)
+    end,
+
+    OnFrame = function(self, delta)
+        if not self.unit:IsDead() and showOverlay then
+            if self.unit:GetWorkProgress() > 0 then
                 self:Update()
             else
                 self:Hide()
             end
         else
-            Remove(self.id)
+            self:Destroy()
         end
     end
 
-    return overlay
 
-end
+}
+
+local NumberMexOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 0
+        self.offsetY = 0
+
+
+        local text = "0"
+        if unit:IsInCategory("TECH1") then
+            text = "1"
+        elseif unit:IsInCategory("TECH2") then
+            text = "2"
+        elseif unit:IsInCategory("TECH3") then
+            text = "3"
+        end
+
+        self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
+        self.progress = Bitmap(self)
+
+        LayoutFor(self)
+            :Width(overlaySize)
+            :Height(overlaySize)
+            :Color("black")
+
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+
+        LayoutFor(self.progress)
+            :Bottom(self.Bottom)
+            :Left(self.Left)
+            :Right(self.Right)
+            :Height(0)
+            :Color(progressColor)
+    end,
+
+    OnFrame = function(self, delta)
+        local unit = self.unit
+        if not unit:IsDead() and showOverlay then
+            if unit.isUpgraded then
+                self:Hide()
+                return
+            end
+            if unit.isUpgrader then
+                self.text:SetColor(upgradeColor)
+            elseif unit.isCapped == nil or unit.isCapped then
+                self.text:SetColor(idleCappedColor)
+            else
+                self.text:SetColor(idleNotCappedColor)
+            end
+
+            if unit.progress then
+                self.progress.Height:Set(unit.progress * self.Height())
+            end
+
+            self:Update()
+        else
+            self:Destroy()
+        end
+    end
+
+
+}
 
 local function VerifyWV()
-    if IsDestroyed(worldView)
-    then
+    if IsDestroyed(worldView) then
         worldView = import("/lua/ui/game/worldview.lua").viewLeft
-        overlays = {}
     end
 end
 
@@ -91,8 +168,13 @@ function UpdateOverlays(mexes)
     if showOverlay then
         VerifyWV()
         for _, mex in mexes do
-            if not overlays[mex:GetEntityId()] then
-                overlays[mex:GetEntityId()] = CreateOverlay(mex)
+            local id = mex:GetEntityId()
+            if IsDestroyed(overlays[id]) then
+                if useNumberOverlay then
+                    overlays[id] = NumberMexOverlay(worldView, mex)
+                else
+                    overlays[id] = MexOverlay(worldView, mex)
+                end
             end
         end
     end

@@ -1,8 +1,13 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 
+
+---@class Layouter
+---@field c Control
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
+---Disables control
+---@return Layouter
 function LayouterMetaTable:Disable()
     self.c:Disable()
     return self
@@ -350,6 +355,10 @@ function LayouterMetaTable:End()
     return self.c
 end
 
+
+---Creates Layouter for given control
+---@param control Control
+---@return Layouter
 function LayoutFor(control)
     local result = {
         c = control
@@ -358,11 +367,15 @@ function LayoutFor(control)
     return result
 end
 
+
 local layouter = {
     c = false
 }
 setmetatable(layouter, LayouterMetaTable)
 
+---returns Reused Layouter
+---@param control Control
+---@return Layouter
 function ReusedLayoutFor(control)
     layouter.c = control or false
     return layouter

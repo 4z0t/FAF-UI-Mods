@@ -137,6 +137,7 @@ SelectionInfo = Class(Bitmap) {
                     local unitData = UnitData[unit:GetEntityId()]
                     if unitData and unitData.totalMassKilledTrue then
                         totalMassKilled = totalMassKilled + unitData.totalMassKilledTrue
+
                     end
                 end
             end

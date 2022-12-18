@@ -2,18 +2,17 @@ local TableInsert = table.insert
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
 
-local SelectHidden = import("select.lua").Hidden
+local SelectHidden = UMT.Select.Hidden
 
-local currentArmy = false
-local units = {}
-local assisting = {}
+local currentArmy
+local units
+--local assisting = {}
 local cached = {}
 
 local prevReset = 0
 local prevCache = 0
 
 local function ProcessAllUnits()
-    units = {}
     UISelectionByCategory("ALLUNITS", false, false, false, false)
     for _, unit in GetSelectedUnits() or {} do
         units[unit:GetEntityId()] = unit
@@ -26,7 +25,8 @@ end
 
 local function UpdateCache()
     cached = {}
-    assisting = {}
+    --    assisting = {}
+    local focused = {}
 
     for id, unit in units do
         if not unit:IsDead() then
@@ -34,8 +34,8 @@ local function UpdateCache()
             local focus = unit:GetFocus()
             if focus and not focus:IsDead() then
                 local focusId = focus:GetEntityId()
-                if not units[focusId] then
-                    units[focusId] = focus
+                if not (unit[focusId] or focused[focusId]) then
+                    focused[focusId] = focus
                     TableInsert(cached, focus)
                 end
                 -- if EntityCategoryContains(categories.ENGINEER, unit) then
@@ -50,7 +50,12 @@ local function UpdateCache()
                 --     assisting[focusId]['build_rate'] = assisting[focusId]['build_rate'] + u:GetBuildRate()
                 -- end
             end
+        else
+            units[id] = nil
         end
+    end
+    for id, unit in focused do
+        units[id] = unit
     end
 end
 
@@ -77,6 +82,7 @@ local function CheckCache()
         prevCache = 0
         currentArmy = army
         cached = {}
+        units = UMT.Weak.Value{}
         OnArmyChanged()
     end
 
@@ -85,8 +91,8 @@ local function CheckCache()
         -- local n = score[army].general.currentunits.count
 
         if currentTick - 50 > prevReset
-         --and (not n or n > table.getsize(cached)) 
-         then
+        --and (not n or n > table.getsize(cached))
+        then
             UpdateAllUnits()
             prevReset = currentTick
         end
@@ -138,15 +144,60 @@ function Get(filter)
     end
 end
 
--- local current_tick = 0
--- local prev_tick = 0
--- local current_army = nil
--- local prev_update = 0
--- local units = {}
--- local added = {}
+local function Update()
+    local focused = {}
+    for id, unit in units do
+        if not unit:IsDead() then
+            local focus = unit:GetFocus()
+            if focus and not focus:IsDead() then
+                local focusId = focus:GetEntityId()
+                if not (unit[focusId] or focused[focusId]) then
+                    focused[focusId] = focus
+                end
+            end
+        else
+            units[id] = nil
+        end
+    end
+    for id, unit in focused do
+        units[id] = unit
+    end
+end
+
+local prevUpdate = 0
+
+
+local function UpdateFast()
+    local currentTick = GameTick()
+    local army = GetFocusArmy()
+
+    if army ~= currentArmy then
+        prevReset = 0
+        prevUpdate = 0
+        currentArmy = army
+        units = setmetatable({}, UMT.WeakMeta.Value)
+        OnArmyChanged()
+    end
+
+    if army ~= -1 and currentTick - 10 >= prevUpdate then
+        if currentTick - 50 > prevReset
+        then
+            UpdateAllUnits()
+            prevReset = currentTick
+        end
+
+        Update()
+        prevUpdate = currentTick
+    end
+end
+
+function GetFast()
+    UpdateFast()
+    return units
+end
 
 -- --[[
---     checker : nil | function(unit : unit ) -> bool 
+--     checker : nil | function(unit : unit ) -> bool
 --     passer : function( units : table | unit : unit  ) -> nil
 
 -- ]]
@@ -168,25 +219,4 @@ end
 
 --         end
 --     end
--- end
-
--- function UpdateUnits()
---     current_tick = GameTick()
---     if current_tick ~= prev_tick then
-
---         local army = GetFocusArmy()
-
---         if army ~= current_army then
---             prev_update = 0
---             current_army = army
---             units = {}
---             added = {}
---         end
-
---         prev_tick = current_tick
---     end
--- end
-
--- function init(isReplay)
-
 -- end
