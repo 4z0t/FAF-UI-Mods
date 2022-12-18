@@ -66,8 +66,10 @@ local function CacheClassFields(classes, fields)
     for _, field in fields do
         cache[field] = {}
         for i, class in ipairs(classes) do
-            cache[field][i] = class[field]
-            class[field] = false
+            if class[field] then
+                cache[field][i] = class[field]
+                class[field] = false
+            end
         end
     end
     return cache
@@ -76,7 +78,9 @@ end
 local function RestoreClassFields(classes, cache)
     for field, data in cache do
         for i, class in ipairs(classes) do
-            class[field] = data[i]
+            if data[i] then
+                class[field] = data[i]
+            end
         end
     end
 end
