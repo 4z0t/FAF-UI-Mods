@@ -15,12 +15,14 @@ local VERTICAL_OFFSET = 10
 SelectionInfo = Class(Bitmap) {
     __init = function(self, parent)
         Bitmap.__init(self, parent)
-        LayoutHelpers.SetDimensions(self, 110, 60)
-        LayoutHelpers.DepthOverParent(self, parent, 500)
-        self:SetSolidColor('33000000')
         local pos = self:_LoadPosition()
 
-        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, VERTICAL_OFFSET)
+        LayoutFor(self)
+            :Width(110)
+            :Height(72)
+            :Over(parent, 500)
+            :Color('33000000')
+            :AtLeftTopIn(parent, pos.left, VERTICAL_OFFSET)
 
         self._massCost = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
         self._massCost:SetColor("FFB8F400")
@@ -57,6 +59,12 @@ SelectionInfo = Class(Bitmap) {
         LayoutHelpers.AtRightIn(self._massKilled, self._energyCost)
         self._massKilled:DisableHitTest(true)
 
+        self._siloCount = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont, true)
+        LayoutFor(self._siloCount)
+            :Below(self._buildRate, 2)
+            :Color("ffffffff")
+            :DisableHitTest()
+
     end,
 
     HandleEvent = function(self, event)
@@ -91,6 +99,8 @@ SelectionInfo = Class(Bitmap) {
         local energyCost = 0
         local totalbr = 0
         local totalMassKilled = 0
+        local totalSilo = 0
+        local totalUnitsLoaded = 0
 
         for _, unit in self._units do
             if not unit:IsDead() then
@@ -123,10 +133,21 @@ SelectionInfo = Class(Bitmap) {
                     massCost = massCost + bp.Economy.BuildCostMass
                     energyCost = energyCost + bp.Economy.BuildCostEnergy
                 end
+
                 local unitData = UnitData[unit:GetEntityId()]
                 if unitData and unitData.totalMassKilledTrue then
                     totalMassKilled = totalMassKilled + unitData.totalMassKilledTrue
                 end
+
+                local siloInfo = unit:GetMissileInfo()
+                local s = siloInfo.nukeSiloStorageCount + siloInfo.tacticalSiloStorageCount
+                if s > 0 then
+                    totalSilo = totalSilo + s
+                    totalUnitsLoaded = totalUnitsLoaded + 1
+                end
+
+
+
             end
         end
         self._massCost:SetText(string.format("%d", massCost))
@@ -160,6 +181,12 @@ SelectionInfo = Class(Bitmap) {
             self._massKilled:SetText(string.format("%d", totalMassKilled))
         else
             self._massKilled:Hide()
+        end
+
+        if totalSilo ~= 0 then
+            self._siloCount:SetText(string.format("%d / %d", totalSilo, totalUnitsLoaded))
+        else
+            self._siloCount:Hide()
         end
 
     end,
