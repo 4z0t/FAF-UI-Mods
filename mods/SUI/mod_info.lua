@@ -1,13 +1,11 @@
 name = "Selected Units Info"
-version = 1
+version = 2
 copyright = ""
-
-description = "Displays units cost, production/consumption and build power"
+description = "Displays units cost, production/consumption, build power and total mass killed"
 author = "4z0t"
 url = ""
 icon = "/mods/SUI/icon.png"
-
-uid = "selected-units-info-v01"
+uid = "selected-units-info-v02"
 exclusive = false
 ui_only = true
 conflicts = {}
