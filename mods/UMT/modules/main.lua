@@ -1,4 +1,6 @@
-function Main(isReplay)
+local LuaQ = import("LuaQ.lua")
+
+function TestUIClass()
     local a, b = pcall(function()
         A = UMT.Class
         {
@@ -60,4 +62,23 @@ function Main(isReplay)
         bb.D = 4
     end)
     if not a then return LOG(b) end
+end
+
+function TestLuaQ()
+    local t = { 1, 2, 3, 4, 5 }
+        | LuaQ.foreach(LOG)
+        | LuaQ.where(function(_, v) return v > 3 end)
+        | LuaQ.foreach(LOG)
+        | LuaQ.sum
+    LOG(t)
+
+end
+
+function Main(isReplay)
+    --TestUIClass()
+    TestLuaQ()
+end
+
+function __moduleinfo.OnReload()
+    Main()
 end
