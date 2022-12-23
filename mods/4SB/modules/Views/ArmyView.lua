@@ -282,7 +282,7 @@ AllyView = Class(ArmyView)
             :Alpha(0)
 
         LayoutFor(self._energy)
-            :AtRightIn(self, 5)
+            :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
             :DisableHitTest()
@@ -291,14 +291,14 @@ AllyView = Class(ArmyView)
 
 
         LayoutFor(self._mass)
-            :AtRightIn(self, 45)
+            :AtRightIn(self, 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
             :DisableHitTest()
         self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
 
         LayoutFor(self._name)
-            :AtRightIn(self, 75)
+            :AtRightIn(self, 80)
 
     end,
 

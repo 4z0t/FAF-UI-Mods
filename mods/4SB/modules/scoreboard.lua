@@ -49,6 +49,21 @@ ScoreBoard = UMT.Class(Group)
         self._bracket.top = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
         self._bracket.middle = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_m.dds"))
         self._bracket.bottom = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_b.dds"))
+
+
+
+        self._border = Group(self)
+        self._border.t = Bitmap(self._border,
+            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds"))
+        self._border.tr = Bitmap(self._border,
+            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds"))
+        self._border.r = Bitmap(self._border,
+            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds"))
+        self._border.br = Bitmap(self._border,
+            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds"))
+        self._border.b = Bitmap(self._border,
+            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds"))
+
     end,
 
     __post_init = function(self)
@@ -65,6 +80,7 @@ ScoreBoard = UMT.Class(Group)
                 :AtRightTopIn(self)
         end
         local last
+        local first
         for i, armyView in self._lines do
             if i == 1 then
                 if self._title then
@@ -75,6 +91,7 @@ ScoreBoard = UMT.Class(Group)
                     LayoutFor(armyView)
                         :AtRightTopIn(self)
                 end
+                first = armyView
             else
                 LayoutFor(armyView)
                     :AnchorToBottom(self._lines[i - 1])
@@ -86,32 +103,83 @@ ScoreBoard = UMT.Class(Group)
             self.Bottom:Set(last.Bottom)
         end
 
+        do -- border layout
 
-        local offset = -12
-        LayoutFor(self._bracket)
-            :Top(self.Top)
-            :Left(self.Right)
-            :Bottom(self.Bottom)
-            :Width(0)
-            :Over(self, 10)
-            :DisableHitTest(true)
+            local leftTop = first.Left
+            local leftBottom = last.Left
+            if self._title then
+                leftTop = self._title.Left
+            end
 
-        LayoutFor(self._bracket.top)
-            :AnchorToRight(self._bracket, offset + 3)
-            :AtTopIn(self._bracket, -5)
+            local offset = -10
+            LayoutFor(self._border)
+                :Top(self.Top)
+                :Left(self.Right)
+                :Bottom(self.Bottom)
+                :Width(0)
+                :Over(self, 5)
+                :DisableHitTest(true)
 
-
-        LayoutFor(self._bracket.bottom)
-            :AnchorToRight(self._bracket, offset + 3)
-            :AtBottomIn(self._bracket, -5)
-
-
-        LayoutFor(self._bracket.middle)
-            :AnchorToRight(self._bracket, offset + 12)
-            :Top(self._bracket.top.Bottom)
-            :Bottom(self._bracket.bottom.Top)
+            LayoutFor(self._border.tr)
+                :AnchorToLeft(self._border, offset + 3)
+                :AtTopIn(self._border, -10)
+                :Alpha(0.5)
 
 
+            LayoutFor(self._border.br)
+                :AnchorToLeft(self._border, offset + 3)
+                :AtBottomIn(self._border, -10)
+                :Alpha(0.5)
+
+
+            LayoutFor(self._border.r)
+                :AnchorToLeft(self._border, offset + 5)
+                :Top(self._border.tr.Bottom)
+                :Bottom(self._border.br.Top)
+                :Alpha(0.5)
+
+
+            LayoutFor(self._border.t)
+                :AtTopIn(self._border.tr, 1)
+                :Right(self._border.tr.Left)
+                :Left(leftTop)
+                :Alpha(0.5)
+
+            LayoutFor(self._border.b)
+                :AtBottomIn(self._border.br, 1)
+                :Right(self._border.br.Left)
+                :Left(leftBottom)
+                :Alpha(0.5)
+
+
+
+        end
+        do -- bracket layout
+            local offset = -12
+            LayoutFor(self._bracket)
+                :Top(self.Top)
+                :Left(self.Right)
+                :Bottom(self.Bottom)
+                :Width(0)
+                :Over(self, 10)
+                :DisableHitTest(true)
+
+            LayoutFor(self._bracket.top)
+                :AnchorToRight(self._bracket, offset + 3)
+                :AtTopIn(self._bracket, -10)
+
+
+            LayoutFor(self._bracket.bottom)
+                :AnchorToRight(self._bracket, offset + 3)
+                :AtBottomIn(self._bracket, -10)
+
+
+            LayoutFor(self._bracket.middle)
+                :AnchorToRight(self._bracket, offset + 12)
+                :Top(self._bracket.top.Bottom)
+                :Bottom(self._bracket.bottom.Top)
+
+        end
 
         LayoutFor(self)
             :Width(100)
