@@ -246,7 +246,7 @@ local LuaQKeyMetaTable = {
     __bor = function(tbl, self)
         local keys = {}
 
-        for k, v in tbl do
+        for k, _ in tbl do
             table.insert(keys, k)
         end
 
