@@ -166,12 +166,12 @@ ScoreBoard = UMT.Class(Group)
 
             LayoutFor(self._bracket.top)
                 :AnchorToRight(self._bracket, offset + 3)
-                :AtTopIn(self._bracket, -10)
+                :AtTopIn(self._bracket, -13)
 
 
             LayoutFor(self._bracket.bottom)
                 :AnchorToRight(self._bracket, offset + 3)
-                :AtBottomIn(self._bracket, -10)
+                :AtBottomIn(self._bracket, -13)
 
 
             LayoutFor(self._bracket.middle)
