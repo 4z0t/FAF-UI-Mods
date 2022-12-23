@@ -1,6 +1,7 @@
 local Group = import('/lua/maui/group.lua').Group
 local ArmyViews = import("Views/ArmyView.lua")
 local Utils = import("Utils.lua")
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
@@ -43,27 +44,26 @@ ScoreBoard = UMT.Class(Group)
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
+
+        self._bracket = Group(self)
+        self._bracket.top = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
+        self._bracket.middle = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_m.dds"))
+        self._bracket.bottom = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_b.dds"))
     end,
 
     __post_init = function(self)
+
+        self:_InitArmyViews()
+        self:_Layout()
+
+        self._mode = "income"
+    end,
+
+    _Layout = function(self)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)
         end
-        self:_InitArmyViews()
-        self:_Layout()
-        LayoutFor(self)
-            :Width(100)
-            :Height(100)
-            :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 0, 20)
-            :DisableHitTest()
-
-        self._mode = "income"
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-    _Layout = function(self)
         local last
         for i, armyView in self._lines do
             if i == 1 then
@@ -85,6 +85,41 @@ ScoreBoard = UMT.Class(Group)
         if last then
             self.Bottom:Set(last.Bottom)
         end
+
+
+        local offset = -12
+        LayoutFor(self._bracket)
+            :Top(self.Top)
+            :Left(self.Right)
+            :Bottom(self.Bottom)
+            :Width(0)
+            :Over(self, 10)
+            :DisableHitTest(true)
+
+        LayoutFor(self._bracket.top)
+            :AnchorToRight(self._bracket, offset + 3)
+            :AtTopIn(self._bracket, -5)
+
+
+        LayoutFor(self._bracket.bottom)
+            :AnchorToRight(self._bracket, offset + 3)
+            :AtBottomIn(self._bracket, -5)
+
+
+        LayoutFor(self._bracket.middle)
+            :AnchorToRight(self._bracket, offset + 12)
+            :Top(self._bracket.top.Bottom)
+            :Bottom(self._bracket.bottom.Top)
+
+
+
+        LayoutFor(self)
+            :Width(100)
+            :Over(GetFrame(0), 1000)
+            :AtRightTopIn(GetFrame(0), 20, 20)
+            :DisableHitTest()
+            :NeedsFrameUpdate(true)
+
     end,
 
     _InitArmyViews = function(self)
@@ -238,7 +273,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
     end,
-    
+
     GameSpeed = UMT.Property
     {
         get = function(self)
