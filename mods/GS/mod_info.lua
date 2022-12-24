@@ -1,5 +1,5 @@
 name = "Group Scatter"
-version = 1
+version = 2
 copyright = ""
 description = [[Adds two groups scatter actions that allow you to loop over units in selected group.
 
@@ -10,7 +10,7 @@ Continuous mode only switches to next unit if bind is pressed.
 ]]
 author = "4z0t"
 url = ""
-uid = "group-scatter-v01"
+uid = "group-scatter-v02"
 icon = "/mods/GS/icon.png"
 selectable = true
 enabled = true
