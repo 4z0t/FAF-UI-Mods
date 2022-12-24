@@ -74,7 +74,7 @@ end
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
-    if not IsActive() or continuous then return end
+    if not IsActive() then return end
     --if commandModeData and not commandModeData.isCancel then return end
     local selectedUnits = GetSelectedUnits()
     --check if selection changed
@@ -86,9 +86,10 @@ function OnCommandEnded(commandMode, commandModeData)
     -- reprsl(commandMode)
     -- reprsl(commandModeData)
     if supress then
-        supress = false
+        supress = continuous
         return
     end
+    
     ForkThread(Next, false)
 end
 
