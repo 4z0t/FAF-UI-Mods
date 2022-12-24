@@ -1,10 +1,11 @@
-local OldCreateUI = CreateUI
-function CreateUI(isReplay)
+do
+    local OldCreateUI = CreateUI
+    function CreateUI(isReplay)
 
-    OldCreateUI(isReplay)
-    -- your mod's UI may start here
-    import('/mods/GS/modules/Main.lua').Main(isReplay)
+        OldCreateUI(isReplay)
+        import('/mods/GS/modules/Main.lua').Main(isReplay)
 
+    end
 end
 
 

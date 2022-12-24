@@ -42,7 +42,7 @@ function Next(isManual)
     SelectUnits { unit }
     --TODO double next due to guard/build mode
     --supress = not activeCommandModeData
-    supress = unit:IsInCategory("ENGINEER")
+    --supress = unit:IsInCategory("ENGINEER")
     if not isManual then
         CM.StartCommandMode(activeCommandMode, activeCommandModeData)
     end
@@ -74,7 +74,7 @@ end
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
-    if not IsActive() then return end
+    if not IsActive() or continuous then return end
     --if commandModeData and not commandModeData.isCancel then return end
     local selectedUnits = GetSelectedUnits()
     --check if selection changed
@@ -86,7 +86,7 @@ function OnCommandEnded(commandMode, commandModeData)
     -- reprsl(commandMode)
     -- reprsl(commandModeData)
     if supress then
-        supress = continuous
+        supress = false
         return
     end
     ForkThread(Next, false)
@@ -100,11 +100,11 @@ function Main(isReplay)
 
 end
 
-KeyMapper.SetUserKeyAction('Quick Group Split', {
+KeyMapper.SetUserKeyAction('Quick Group Scatter', {
     action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(false)',
-    category = 'Group Split'
+    category = 'Group Scatter'
 })
-KeyMapper.SetUserKeyAction('Continuous Group Split', {
+KeyMapper.SetUserKeyAction('Continuous Group Scatter', {
     action = 'UI_Lua import("/mods/GS/modules/Main.lua").Start(true)',
-    category = 'Group Split'
+    category = 'Group Scatter'
 })
