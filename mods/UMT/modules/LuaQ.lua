@@ -22,8 +22,6 @@ local LuaQWhereMetaTable = {
         return self
     end
 }
-
-
 where = setmetatable({}, LuaQWhereMetaTable)
 
 
@@ -34,8 +32,6 @@ local LuaQDeepCopyMetaTable = {
     end,
 
 }
-
-
 deepcopy = setmetatable({}, LuaQDeepCopyMetaTable)
 
 
@@ -45,8 +41,6 @@ local LuaQCopyMetaTable = {
     end,
 
 }
-
-
 copy = setmetatable({}, LuaQCopyMetaTable)
 
 
@@ -66,7 +60,6 @@ local LuaQSortMetaTable = {
         return self
     end
 }
-
 sort = setmetatable({}, LuaQSortMetaTable)
 
 
@@ -91,8 +84,6 @@ local LuaQContainsMetaTable = {
         return self
     end
 }
-
-
 contains = setmetatable({}, LuaQContainsMetaTable)
 
 
@@ -124,8 +115,6 @@ local LuaQSelectMetaTable = {
         return self
     end
 }
-
-
 select = setmetatable({}, LuaQSelectMetaTable)
 
 local LuaQForeachMetaTable = {
@@ -145,7 +134,6 @@ local LuaQForeachMetaTable = {
         return self
     end
 }
-
 foreach = setmetatable({}, LuaQForeachMetaTable)
 
 
@@ -173,8 +161,8 @@ local LuaQSumMetaTable = {
         return self
     end
 }
-
 sum = setmetatable({}, LuaQSumMetaTable)
+
 
 local LuaQReduceMetaTable = {
     __bor = function(tbl, self)
@@ -196,8 +184,8 @@ local LuaQReduceMetaTable = {
         return self
     end
 }
-
 reduce = setmetatable({}, LuaQReduceMetaTable)
+
 
 local LuaQAllMetaTable = {
     __bor = function(tbl, self)
@@ -220,8 +208,8 @@ local LuaQAllMetaTable = {
         return self
     end
 }
-
 all = setmetatable({}, LuaQAllMetaTable)
+
 
 local LuaQAnyMetaTable = {
     __bor = function(tbl, self)
@@ -246,8 +234,8 @@ local LuaQAnyMetaTable = {
         return self
     end
 }
-
 any = setmetatable({}, LuaQAnyMetaTable)
+
 
 local LuaQKeyMetaTable = {
     __bor = function(tbl, self)
@@ -260,7 +248,6 @@ local LuaQKeyMetaTable = {
         return result
     end
 }
-
 keys = setmetatable({}, LuaQKeyMetaTable)
 
 
@@ -284,8 +271,8 @@ local LuaQFirstMetaTable = {
         return self
     end
 }
-
 first = setmetatable({}, LuaQFirstMetaTable)
+
 
 local LuaQCountMetaTable = {
     __bor = function(tbl, self)
@@ -309,8 +296,8 @@ local LuaQCountMetaTable = {
         return self
     end
 }
-
 count = setmetatable({}, LuaQCountMetaTable)
+
 
 local LuaQToSetMetaTable = {
     __bor = function(tbl, self)
@@ -340,9 +327,7 @@ local LuaQToSetMetaTable = {
         return self
     end
 }
-
 toSet = setmetatable({}, LuaQToSetMetaTable)
-
 
 
 local LuaQDistinctMetaTable = {
@@ -350,7 +335,6 @@ local LuaQDistinctMetaTable = {
         return tbl | toSet | keys
     end,
 }
-
 distinct = setmetatable({}, LuaQDistinctMetaTable)
 
 
