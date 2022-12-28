@@ -1,4 +1,3 @@
-
 local TableInsert = table.insert
 
 
@@ -252,13 +251,13 @@ any = setmetatable({}, LuaQAnyMetaTable)
 
 local LuaQKeyMetaTable = {
     __bor = function(tbl, self)
-        local keys = {}
+        local result = {}
 
         for k, _ in tbl do
-            table.insert(keys, k)
+            TableInsert(result, k)
         end
 
-        return keys
+        return result
     end
 }
 
@@ -344,6 +343,8 @@ local LuaQToSetMetaTable = {
 
 toSet = setmetatable({}, LuaQToSetMetaTable)
 
+
+
 local LuaQDistinctMetaTable = {
     __bor = function(tbl, self)
         return tbl | toSet | keys
@@ -351,6 +352,7 @@ local LuaQDistinctMetaTable = {
 }
 
 distinct = setmetatable({}, LuaQDistinctMetaTable)
+
 
 
 function range(startValue, endValue)
