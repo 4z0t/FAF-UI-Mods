@@ -44,7 +44,6 @@ local LuaQCopyMetaTable = {
 copy = setmetatable({}, LuaQCopyMetaTable)
 
 
-
 local LuaQSortMetaTable = {
     __bor = function(tbl, self)
         local func = self.__func
@@ -61,7 +60,6 @@ local LuaQSortMetaTable = {
     end
 }
 sort = setmetatable({}, LuaQSortMetaTable)
-
 
 
 local LuaQContainsMetaTable = {
@@ -116,6 +114,7 @@ local LuaQSelectMetaTable = {
     end
 }
 select = setmetatable({}, LuaQSelectMetaTable)
+
 
 local LuaQForeachMetaTable = {
     __bor = function(tbl, self)
