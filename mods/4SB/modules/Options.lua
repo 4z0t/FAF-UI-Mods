@@ -8,9 +8,9 @@ local modName = "4SB"
 player = {
 
     font = {
-        name = OptionVar(modName, "playerFonts.name", "Arial"),
-        rating = OptionVar(modName, "player.fonts.rating", "Arial"),
-        focus = OptionVar(modName, "player.fonts.focus", "Arial")
+        name = OptionVar(modName, "player.font.name", "Arial"),
+        rating = OptionVar(modName, "player.font.rating", "Arial"),
+        focus = OptionVar(modName, "player.font.focus", "Arial")
         
     },
 
