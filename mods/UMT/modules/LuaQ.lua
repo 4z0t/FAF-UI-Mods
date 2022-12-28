@@ -1,3 +1,7 @@
+
+local TableInsert = table.insert
+
+
 local LuaQWhereMetaTable = {
     __bor = function(tbl, self)
         local func = self.__func
@@ -6,7 +10,7 @@ local LuaQWhereMetaTable = {
         local result = {}
 
         for k, v in tbl do
-            if  func(k, v) then
+            if func(k, v) then
                 result[k] = v
             end
         end
@@ -261,3 +265,100 @@ local LuaQKeyMetaTable = {
 keys = setmetatable({}, LuaQKeyMetaTable)
 
 
+local LuaQFirstMetaTable = {
+    __bor = function(tbl, self)
+
+        local condition = self.__condition
+        self.__condition = nil
+
+        for _, v in ipairs(tbl) do
+            if condition(v) then
+                return v
+            end
+        end
+
+        return nil
+    end,
+
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end
+}
+
+first = setmetatable({}, LuaQFirstMetaTable)
+
+local LuaQCountMetaTable = {
+    __bor = function(tbl, self)
+
+        local condition = self.__condition
+        self.__condition = nil
+
+        local count = 0
+
+        for k, v in tbl do
+            if condition(k, v) then
+                count = count + 1
+            end
+        end
+
+        return count
+    end,
+
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end
+}
+
+count = setmetatable({}, LuaQCountMetaTable)
+
+local LuaQToSetMetaTable = {
+    __bor = function(tbl, self)
+
+        local condition = self.__condition
+        self.__condition = nil
+
+        local result = {}
+
+        if condition then
+            for k, v in tbl do
+                if condition(k, v) then
+                    result[v] = true
+                end
+            end
+        else
+            for _, v in tbl do
+                result[v] = true
+            end
+        end
+
+        return result
+    end,
+
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end
+}
+
+toSet = setmetatable({}, LuaQToSetMetaTable)
+
+local LuaQDistinctMetaTable = {
+    __bor = function(tbl, self)
+        return tbl | toSet | keys
+    end,
+}
+
+distinct = setmetatable({}, LuaQDistinctMetaTable)
+
+
+function range(startValue, endValue)
+    local result = {}
+    local i = startValue
+    repeat
+        TableInsert(result, i)
+        i = i + 1
+    until i >= endValue + 1
+    return result
+end
