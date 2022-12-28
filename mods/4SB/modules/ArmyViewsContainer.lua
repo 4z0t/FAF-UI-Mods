@@ -160,7 +160,7 @@ ArmyViewsContainer = Class(Group)
     Setup = function(self, setup)
         self._dataSetup = setup
         local scoreCache = import("/lua/ui/game/score.lua").GetScoreCache()
-        if scoreCache and table.getn(scoreCache) ~= 0 then
+        if scoreCache and not table.empty(scoreCache) then
             self:Update(scoreCache)
         end
     end
