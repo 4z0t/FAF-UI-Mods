@@ -3,13 +3,15 @@ local LuaQWhereMetaTable = {
         local func = self.__func
         self.__func = nil
 
+        local result = {}
+
         for k, v in tbl do
-            if not func(k, v) then
-                tbl[k] = nil
+            if  func(k, v) then
+                result[k] = v
             end
         end
 
-        return tbl
+        return result
     end,
 
     __call = function(self, func)
@@ -96,20 +98,22 @@ local LuaQSelectMetaTable = {
         local selector = self.__selector
         self.__selector = nil
 
+        local result = {}
+
         if type(selector) == "string" then
             for k, v in tbl do
-                tbl[k] = v[selector]
+                result[k] = v[selector]
             end
         elseif type(selector) == "function" then
             for k, v in tbl do
                 local value = selector(k, v)
                 if value ~= nil then
-                    tbl[k] = value
+                    result[k] = value
                 end
             end
         end
 
-        return tbl
+        return result
     end,
 
     __call = function(self, selector)
@@ -255,3 +259,5 @@ local LuaQKeyMetaTable = {
 }
 
 keys = setmetatable({}, LuaQKeyMetaTable)
+
+
