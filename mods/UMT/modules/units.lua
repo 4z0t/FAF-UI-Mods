@@ -237,7 +237,7 @@ local EntityCategoryFilterDownMetaTable = {
     __bor = function(units, self)
         local category = self.__category
         self.__category = nil
-        return EntityCategoryFilterDown(category, units)
+        return EntityCategoryFilterDown(category, units) or {}
     end,
 
     ---sets category for units to match
@@ -265,7 +265,7 @@ local EntityCategoryFilterOutMetaTable = {
     __bor = function(units, self)
         local category = self.__category
         self.__category = nil
-        return EntityCategoryFilterOut(category, units)
+        return EntityCategoryFilterOut(category, units) or {}
     end,
 
     ---sets category for units to exlude
@@ -281,4 +281,3 @@ local EntityCategoryFilterOutMetaTable = {
 }
 ---@type EntityCategoryFilterOutTable
 entityCategoryFilterOut = setmetatable({}, EntityCategoryFilterOutMetaTable)
-
