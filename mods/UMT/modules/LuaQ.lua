@@ -102,7 +102,14 @@ local LuaQSortMetaTable = {
 sort = setmetatable({}, LuaQSortMetaTable)
 
 
+---@class ContainsPipeTable
 local LuaQContainsMetaTable = {
+    ---returns if table contains a given value
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self ContainsPipeTable
+    ---@return boolean, V?
     __bor = function(tbl, self)
         local value = self.__value
         self.__value = nil
@@ -116,12 +123,17 @@ local LuaQContainsMetaTable = {
         end
         return false, nil
     end,
-
+    ---sets value to be seek in the table
+    ---@generic V
+    ---@param self ContainsPipeTable
+    ---@param value V
+    ---@return ContainsPipeTable
     __call = function(self, value)
         self.__value = value
         return self
     end
 }
+---@type ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
 
 
