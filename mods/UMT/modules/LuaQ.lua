@@ -38,22 +38,35 @@ local LuaQWhereMetaTable = {
 where = setmetatable({}, LuaQWhereMetaTable)
 
 
-
+---@class DeepCopyPipeTable
 local LuaQDeepCopyMetaTable = {
+    ---returns the deep copy of the table
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self DeepCopyPipeTable
+    ---@return table<K,V>
     __bor = function(tbl, self)
         return table.deepcopy(tbl)
     end,
-
 }
+---@type DeepCopyPipeTable
 deepcopy = setmetatable({}, LuaQDeepCopyMetaTable)
 
 
+---@class CopyPipeTable
 local LuaQCopyMetaTable = {
+    ---returns the deep copy of the table
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self CopyPipeTable
+    ---@return table<K,V>
     __bor = function(tbl, self)
         return table.copy(tbl)
     end,
-
 }
+---@type CopyPipeTable
 copy = setmetatable({}, LuaQCopyMetaTable)
 
 
