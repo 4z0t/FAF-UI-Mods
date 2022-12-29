@@ -128,8 +128,14 @@ local LuaQSelectMetaTable = {
 }
 select = setmetatable({}, LuaQSelectMetaTable)
 
-
+---@class ForeachPipeTable
 local LuaQForeachMetaTable = {
+    ---loops over table applying a function to each entry in the table
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self WherePipeTable
+    ---@return table<K,V>
     __bor = function(tbl, self)
         local func = self.__func
         self.__func = nil
@@ -141,11 +147,18 @@ local LuaQForeachMetaTable = {
         return tbl
     end,
 
+    ---Sets function to be called for each entry in the table
+    ---@generic K
+    ---@generic V
+    ---@param self WherePipeTable
+    ---@param func fun(key:K, value:V):boolean
+    ---@return WherePipeTable
     __call = function(self, func)
         self.__func = func
         return self
     end
 }
+---@type ForeachPipeTable
 foreach = setmetatable({}, LuaQForeachMetaTable)
 
 
