@@ -77,6 +77,8 @@ function TestLuaQ()
         | LuaQ.where(function(_, v) return v & 1 == 1 end)
         | LuaQ.reduce(function(val, _, v) return v * val end, 1)
     LOG(m)
+
+
 end
 
 function Main(isReplay)

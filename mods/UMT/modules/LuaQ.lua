@@ -70,7 +70,14 @@ local LuaQCopyMetaTable = {
 copy = setmetatable({}, LuaQCopyMetaTable)
 
 
+---@class SortPipeTable
 local LuaQSortMetaTable = {
+    ---sorts table based on the given function
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self SortPipeTable
+    ---@return table<K,V>
     __bor = function(tbl, self)
         local func = self.__func
         self.__func = nil
@@ -80,11 +87,18 @@ local LuaQSortMetaTable = {
         return tbl
     end,
 
+    ---sets sort function
+    ---@generic K
+    ---@generic V
+    ---@param self SortPipeTable
+    ---@param func fun(a:V, b:V):boolean
+    ---@return SortPipeTable
     __call = function(self, func)
         self.__func = func
         return self
     end
 }
+---@type SortPipeTable
 sort = setmetatable({}, LuaQSortMetaTable)
 
 
