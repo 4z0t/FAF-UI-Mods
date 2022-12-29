@@ -1,3 +1,6 @@
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryFilterOut = EntityCategoryFilterOut
+
 local TableInsert = table.insert
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
@@ -82,7 +85,7 @@ local function CheckCache()
         prevCache = 0
         currentArmy = army
         cached = {}
-        units = UMT.Weak.Value{}
+        units = UMT.Weak.Value {}
         OnArmyChanged()
     end
 
@@ -175,7 +178,7 @@ local function UpdateFast()
         prevReset = 0
         prevUpdate = 0
         currentArmy = army
-        units = UMT.Weak.Value{}
+        units = UMT.Weak.Value {}
         OnArmyChanged()
     end
 
@@ -220,3 +223,62 @@ end
 --         end
 --     end
 -- end
+
+
+
+---@class EntityCategoryFilterDownTable
+local EntityCategoryFilterDownMetaTable = {
+    ---returns units that match the given category
+    ---@generic K
+    ---@generic V
+    ---@param units UserUnit[]
+    ---@param self EntityCategoryFilterDownTable
+    ---@return UserUnit[]
+    __bor = function(units, self)
+        local category = self.__category
+        self.__category = nil
+        return EntityCategoryFilterDown(category, units)
+    end,
+
+    ---sets category for units to match
+    ---@generic K
+    ---@generic V
+    ---@param self EntityCategoryFilterDownTable
+    ---@param category EntityCategory
+    ---@return EntityCategoryFilterDownTable
+    __call = function(self, category)
+        self.__category = category
+        return self
+    end
+}
+---@type EntityCategoryFilterDownTable
+entityCategoryFilterDown = setmetatable({}, EntityCategoryFilterDownMetaTable)
+
+---@class EntityCategoryFilterOutTable
+local EntityCategoryFilterOutMetaTable = {
+    ---returns units that doesnt match the given category
+    ---@generic K
+    ---@generic V
+    ---@param units UserUnit[]
+    ---@param self EntityCategoryFilterOutTable
+    ---@return UserUnit[]
+    __bor = function(units, self)
+        local category = self.__category
+        self.__category = nil
+        return EntityCategoryFilterOut(category, units)
+    end,
+
+    ---sets category for units to exlude
+    ---@generic K
+    ---@generic V
+    ---@param self EntityCategoryFilterOutTable
+    ---@param category EntityCategory
+    ---@return EntityCategoryFilterOutTable
+    __call = function(self, category)
+        self.__category = category
+        return self
+    end
+}
+---@type EntityCategoryFilterOutTable
+entityCategoryFilterOut = setmetatable({}, EntityCategoryFilterOutMetaTable)
+
