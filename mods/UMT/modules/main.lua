@@ -72,7 +72,6 @@ function TestLuaQ()
         | LuaQ.sum
     LOG(t)
 
-
     local m = { 1, 2, 3, 4, 5 }
         | LuaQ.where(function(_, v) return v & 1 == 1 end)
         | LuaQ.reduce(function(val, _, v) return v * val end, 1)
