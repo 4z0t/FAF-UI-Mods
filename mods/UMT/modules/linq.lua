@@ -4,6 +4,7 @@ local TableRemove = table.remove
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
+---@deprecated
 function from(t)
     local result = {
         t = t or {}
@@ -11,6 +12,7 @@ function from(t)
     setmetatable(result, LinqFromMetaTable)
     return result
 end
+---@deprecated
 From = from
 
 -- function from_(t)
@@ -22,7 +24,7 @@ From = from
 --     setmetatable(wrapper, WrapperLinqFromMetaTable)
 --     return wrapper
 -- end
-
+---@deprecated
 function range(startValue, endValue)
     local result = {}
     local i = startValue
@@ -32,6 +34,7 @@ function range(startValue, endValue)
     until i >= endValue + 1
     return from(result)
 end
+---@deprecated
 Range = range
 
 
@@ -283,7 +286,7 @@ end
 -- function WrapperLinqFromMetaTable:__newindex(key, value)
 --     error('attemt to set value for linq table')
 -- end
-
+---@deprecated
 function from(t)
     local result = {
         t = t or {}
@@ -291,6 +294,7 @@ function from(t)
     setmetatable(result, LinqFromMetaTable)
     return result
 end
+---@deprecated
 From = from
 
 -- function from_(t)

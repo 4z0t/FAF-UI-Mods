@@ -268,6 +268,7 @@ local EntityCategoryFilterDownMetaTable = {
 ---@type EntityCategoryFilterDownTable
 entityCategoryFilterDown = setmetatable({}, EntityCategoryFilterDownMetaTable)
 
+
 ---@class EntityCategoryFilterOutTable
 local EntityCategoryFilterOutMetaTable = {
     ---returns units that doesnt match the given category
