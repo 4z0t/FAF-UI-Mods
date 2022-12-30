@@ -243,8 +243,6 @@ end
 ---@class EntityCategoryFilterDownTable
 local EntityCategoryFilterDownMetaTable = {
     ---returns units that match the given category
-    ---@generic K
-    ---@generic V
     ---@param units UserUnit[]
     ---@param self EntityCategoryFilterDownTable
     ---@return UserUnit[]
@@ -255,8 +253,6 @@ local EntityCategoryFilterDownMetaTable = {
     end,
 
     ---sets category for units to match
-    ---@generic K
-    ---@generic V
     ---@param self EntityCategoryFilterDownTable
     ---@param category EntityCategory
     ---@return EntityCategoryFilterDownTable
@@ -272,8 +268,6 @@ entityCategoryFilterDown = setmetatable({}, EntityCategoryFilterDownMetaTable)
 ---@class EntityCategoryFilterOutTable
 local EntityCategoryFilterOutMetaTable = {
     ---returns units that doesnt match the given category
-    ---@generic K
-    ---@generic V
     ---@param units UserUnit[]
     ---@param self EntityCategoryFilterOutTable
     ---@return UserUnit[]
@@ -284,8 +278,6 @@ local EntityCategoryFilterOutMetaTable = {
     end,
 
     ---sets category for units to exlude
-    ---@generic K
-    ---@generic V
     ---@param self EntityCategoryFilterOutTable
     ---@param category EntityCategory
     ---@return EntityCategoryFilterOutTable
