@@ -1,11 +1,13 @@
+local TableInsert = table.insert
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 local EntityCategoryFilterOut = EntityCategoryFilterOut
-
-local TableInsert = table.insert
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
 
-local SelectHidden = UMT.Select.Hidden
+
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local CommandMode = import('/lua/ui/game/commandmode.lua')
+
 
 local currentArmy
 local units
@@ -15,6 +17,18 @@ local cached = {}
 local prevReset = 0
 local prevCache = 0
 
+---Performs hidden unit selection callback
+---@param callback fun()
+function HiddenSelect(callback)
+    local currentCommand = CommandMode.GetCommandMode()
+    local oldSelection = GetSelectedUnits() or {}
+    SetIgnoreSelection(true)
+    callback()
+    SelectUnits(oldSelection)
+    CommandMode.StartCommandMode(currentCommand[1], currentCommand[2])
+    SetIgnoreSelection(false)
+end
+
 local function ProcessAllUnits()
     UISelectionByCategory("ALLUNITS", false, false, false, false)
     for _, unit in GetSelectedUnits() or {} do
@@ -23,7 +37,7 @@ local function ProcessAllUnits()
 end
 
 local function UpdateAllUnits()
-    SelectHidden(ProcessAllUnits)
+    HiddenSelect(ProcessAllUnits)
 end
 
 local function UpdateCache()
