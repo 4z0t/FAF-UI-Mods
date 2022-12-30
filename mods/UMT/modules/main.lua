@@ -1,4 +1,4 @@
-local LuaQ = import("LuaQ.lua")
+local LuaQ = UMT.LuaQ
 
 function TestUIClass()
     local a, b = pcall(function()
@@ -14,6 +14,15 @@ function TestUIClass()
                 end,
                 set = function(self, value)
                     LOG("A set method " .. value)
+                end
+            },
+
+            E = UMT.Property {
+                get = function(self)
+                    return self._f
+                end,
+                set = function(self, value)
+                    self._f = value
                 end
             }
         }
@@ -60,6 +69,12 @@ function TestUIClass()
         bb.C = 4
         LOG(bb.D)
         bb.D = 4
+
+        bb.E = function(self)
+            LOG("E call with self: "..tostring(self))
+        end
+        bb:E()
+        bb.E()
     end)
     if not a then return LOG(b) end
 end
@@ -81,7 +96,7 @@ function TestLuaQ()
 end
 
 function Main(isReplay)
-    --TestUIClass()
+    TestUIClass()
     TestLuaQ()
 end
 
