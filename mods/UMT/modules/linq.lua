@@ -1,9 +1,15 @@
 local TableInsert = table.insert
 local TableRemove = table.remove
 
+---@class LinqFromMetaTable
+---@field private t table
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
+---creates wrapper around table to perform operations on it
+---@param t table?
+---@return LinqFromMetaTable
+---@nodiscard
 ---@deprecated
 function from(t)
     local result = {
@@ -12,18 +18,13 @@ function from(t)
     setmetatable(result, LinqFromMetaTable)
     return result
 end
----@deprecated
 From = from
 
--- function from_(t)
---     local result = {}
---     setmetatable(result, LinqFromMetaTable)
---     result.t = t or {}
---     local wrapper = {}
---     wrapper.t = result
---     setmetatable(wrapper, WrapperLinqFromMetaTable)
---     return wrapper
--- end
+---creates wrapper around table with integers from startValue to endValue including both
+---@param startValue integer
+---@param endValue integer
+---@return LinqFromMetaTable
+---@nodiscard
 ---@deprecated
 function range(startValue, endValue)
     local result = {}
@@ -34,7 +35,6 @@ function range(startValue, endValue)
     until i >= endValue + 1
     return from(result)
 end
----@deprecated
 Range = range
 
 
@@ -270,50 +270,3 @@ end
 function LinqFromMetaTable:__newindex(key, value)
     error('attempt to set new index for a Linq object')
 end
-
--- local WrapperLinqFromMetaTable = table.deepcopy(LinqFromMetaTable)
-
--- function WrapperLinqFromMetaTable:__index(key)
---     if key == 't' then
---         return rawget(self, key)
---     end
---     return function(...)
---         local t = self.t
---         return rawget(t.__index, key)(t, unpack(arg))
---     end
--- end
-
--- function WrapperLinqFromMetaTable:__newindex(key, value)
---     error('attemt to set value for linq table')
--- end
----@deprecated
-function from(t)
-    local result = {
-        t = t or {}
-    }
-    setmetatable(result, LinqFromMetaTable)
-    return result
-end
----@deprecated
-From = from
-
--- function from_(t)
---     local result = {}
---     setmetatable(result, LinqFromMetaTable)
---     result.t = t or {}
---     local wrapper = {}
---     wrapper.t = result
---     setmetatable(wrapper, WrapperLinqFromMetaTable)
---     return wrapper
--- end
-
-function range(startValue, endValue)
-    local result = {}
-    local i = startValue
-    repeat
-        TableInsert(result, i)
-        i = i + 1
-    until i >= endValue + 1
-    return from(result)
-end
-Range = range

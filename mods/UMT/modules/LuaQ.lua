@@ -307,6 +307,8 @@ local LuaQAnyMetaTable = {
         return false
     end,
 
+
+    
     __call = function(self, condition)
         self.__condition = condition
         return self
@@ -314,19 +316,79 @@ local LuaQAnyMetaTable = {
 }
 any = setmetatable({}, LuaQAnyMetaTable)
 
-
-local LuaQKeyMetaTable = {
+---@class LuaQKeysTable
+local LuaQKeysMetaTable = {
     __bor = function(tbl, self)
-        local result = {}
 
-        for k, _ in tbl do
-            TableInsert(result, k)
+        local condition = self.__condition
+        self.__condition = nil
+
+        local result = {}
+        if condition then
+            for k, _ in tbl do
+                if condition(k) then
+                    TableInsert(result, k)
+                end
+            end
+        else
+            for k, _ in tbl do
+                TableInsert(result, k)
+            end
         end
 
         return result
+    end,
+
+    ---sets condition for keys to be selected
+    ---@generic K
+    ---@param self LuaQKeysTable
+    ---@param condition fun(key:K):boolean
+    ---@return LuaQKeysTable
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
     end
 }
-keys = setmetatable({}, LuaQKeyMetaTable)
+---@type LuaQKeysTable
+keys = setmetatable({}, LuaQKeysMetaTable)
+
+
+---@class LuaQValuesTable
+local LuaQValuesMetaTable = {
+    __bor = function(tbl, self)
+
+        local condition = self.__condition
+        self.__condition = nil
+        local result = {}
+
+        if condition then
+            for _, v in tbl do
+                if condition(v) then
+                    TableInsert(result, v)
+                end
+            end
+        else
+            for _, v in tbl do
+                TableInsert(result, v)
+            end
+        end
+
+        return result
+    end,
+
+
+    ---sets condition for values to be selected
+    ---@generic V
+    ---@param self LuaQValuesTable
+    ---@param condition fun(value:V):boolean
+    ---@return LuaQValuesTable
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end
+}
+---@type LuaQValuesTable
+values = setmetatable({}, LuaQValuesMetaTable)
 
 
 local LuaQFirstMetaTable = {
