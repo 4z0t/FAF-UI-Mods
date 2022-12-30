@@ -308,7 +308,7 @@ local LuaQAnyMetaTable = {
     end,
 
 
-    
+
     __call = function(self, condition)
         self.__condition = condition
         return self
@@ -326,7 +326,7 @@ local LuaQKeysMetaTable = {
         local result = {}
         if condition then
             for k, _ in tbl do
-                if condition(k) then
+                if condition(k, v) then
                     TableInsert(result, k)
                 end
             end
@@ -341,8 +341,9 @@ local LuaQKeysMetaTable = {
 
     ---sets condition for keys to be selected
     ---@generic K
+    ---@generic V
     ---@param self LuaQKeysTable
-    ---@param condition fun(key:K):boolean
+    ---@param condition fun(key:K, value:V):boolean
     ---@return LuaQKeysTable
     __call = function(self, condition)
         self.__condition = condition
@@ -363,7 +364,7 @@ local LuaQValuesMetaTable = {
 
         if condition then
             for _, v in tbl do
-                if condition(v) then
+                if condition(k, v) then
                     TableInsert(result, v)
                 end
             end
@@ -378,9 +379,10 @@ local LuaQValuesMetaTable = {
 
 
     ---sets condition for values to be selected
+    ---@generic K
     ---@generic V
     ---@param self LuaQValuesTable
-    ---@param condition fun(value:V):boolean
+    ---@param condition fun(key:K, value:V):boolean
     ---@return LuaQValuesTable
     __call = function(self, condition)
         self.__condition = condition
