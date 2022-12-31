@@ -1,7 +1,6 @@
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor = import('../Layouter.lua').ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 ---@class Filter : Group
 Filter = Class(Group)
