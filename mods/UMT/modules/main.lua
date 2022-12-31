@@ -71,7 +71,7 @@ function TestUIClass()
         bb.D = 4
 
         bb.E = function(self)
-            LOG("E call with self: "..tostring(self))
+            LOG("E call with self: " .. tostring(self))
         end
         bb:E()
         bb.E()
@@ -95,9 +95,25 @@ function TestLuaQ()
 
 end
 
+function TestOptions()
+
+    local OptionVar = UMT.OptionVar.Create
+    local options = {
+        strings = OptionVar("TEST", "strings", "First")
+    }
+
+
+    UMT.Options.AddOptions("Test", "Test",
+        {
+            UMT.Options.Strings("Strings selector", { "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh" }
+                , options.strings)
+        })
+end
+
 function Main(isReplay)
     TestUIClass()
     TestLuaQ()
+    TestOptions()
 end
 
 function __moduleinfo.OnReload()

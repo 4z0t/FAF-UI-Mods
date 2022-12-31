@@ -86,15 +86,6 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
-function Strings(name, items, optionVar, indent)
-    return {
-        type = "strings",
-        name = name,
-        optionVar = optionVar,
-        items = items,
-    }
-end
-
 -- extend group for options
 -- TODO:
 function Extend()
@@ -222,6 +213,11 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
+    ---comment
+    ---@param self OptionsWindow
+    ---@param data ControlConfig
+    ---@param passSizing boolean
+    ---@return OptionsWindow
     Add = function(self, data, passSizing)
         local option
         if data.optionVar then

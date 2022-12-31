@@ -28,9 +28,9 @@ StringSelector = Class(Group)
 
 
         local currentItem = optionVar()
-        local found, id = items | LuaQ.contains(currentItem)
-
-        if not found then
+        
+        local id = items | LuaQ.contains(currentItem)
+        if not id then
             optionVar:Set(items[1])
             optionVar:Save()
             id = 1
