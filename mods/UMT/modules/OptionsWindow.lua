@@ -13,10 +13,11 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local LazyVar = import("/lua/lazyvar.lua")
+local StringSelector = import("Views/StringSelector.lua").StringSelector
 
 local LayoutFor = import("Layouter.lua").ReusedLayoutFor
 
-local colors = {"ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42"}
+local colors = { "ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42" }
 
 local splitterTable = {
     type = "splitter"
@@ -85,7 +86,16 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
--- extend group for options 
+function Strings(name, items, optionVar, indent)
+    return {
+        type = "strings",
+        name = name,
+        optionVar = optionVar,
+        items = items,
+    }
+end
+
+-- extend group for options
 -- TODO:
 function Extend()
     return nil
@@ -224,6 +234,7 @@ OptionsWindow = Class(Window) {
                 :Height(2)
             return splitter
         end
+
         local function CreateEntry(data)
             local group = Group(self._optionsGroup)
             if data.type == "filter" then
@@ -390,7 +401,12 @@ OptionsWindow = Class(Window) {
             return group
         end
 
-        local entry = CreateEntry(data)
+        local entry
+        if data.type == "strings" then
+            entry = StringSelector(self._optionsGroup, data.optionVar, data.name, data.items)
+        else
+            entry = CreateEntry(data)
+        end
         self:_addEntry(entry, data.indent)
         if not passSizing then
             self._optionsGroup.Bottom:Set(self._previous.Bottom)
