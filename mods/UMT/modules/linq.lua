@@ -7,10 +7,10 @@ local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
 
 ---creates wrapper around table to perform operations on it
+---@deprecated
 ---@param t table?
 ---@return LinqFromMetaTable
 ---@nodiscard
----@deprecated
 function from(t)
     local result = {
         t = t or {}
@@ -21,11 +21,11 @@ end
 From = from
 
 ---creates wrapper around table with integers from startValue to endValue including both
+---@deprecated
 ---@param startValue integer
 ---@param endValue integer
 ---@return LinqFromMetaTable
 ---@nodiscard
----@deprecated
 function range(startValue, endValue)
     local result = {}
     local i = startValue
