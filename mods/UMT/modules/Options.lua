@@ -22,7 +22,7 @@ local EscapeCover = import("Views/EscapeCover.lua").EscapeCover
 
 
 ---@class ControlConfig
----@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"
+---@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"
 ---@field name string
 ---@field optionVar OptionVar
 ---@field indent number
@@ -109,11 +109,19 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
-
+---@return ControlConfig
+function Strings(name, items, optionVar, indent)
+    return {
+        type = "strings",
+        name = name,
+        optionVar = optionVar,
+        items = items,
+    }
+end
 
 local globalOptions = {}
 local optionsSelector = nil
-local optionsWindows = UMT.Weak.Value{}
+local optionsWindows = UMT.Weak.Value {}
 
 local OptionLine = Class(Group)
 {
