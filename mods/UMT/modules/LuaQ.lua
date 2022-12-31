@@ -109,7 +109,7 @@ local LuaQContainsMetaTable = {
     ---@generic V
     ---@param tbl table<K,V>
     ---@param self ContainsPipeTable
-    ---@return boolean, V?
+    ---@return K?
     __bor = function(tbl, self)
         local value = self.__value
         self.__value = nil
