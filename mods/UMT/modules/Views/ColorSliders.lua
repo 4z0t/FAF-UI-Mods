@@ -2,7 +2,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
-local LayoutFor = import('../Layouter.lua').ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 local function norm(s)

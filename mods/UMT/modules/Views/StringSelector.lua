@@ -52,6 +52,7 @@ StringSelector = Class(Group)
             :Width(200)
 
         LayoutFor(self)
+            :Right(self._combo.Right)
             :Bottom(self._combo.Bottom)
     end,
 
