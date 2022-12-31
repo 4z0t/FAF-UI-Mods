@@ -117,11 +117,11 @@ local LuaQContainsMetaTable = {
         if value ~= nil then
             for k, v in tbl do
                 if v == value then
-                    return true, k
+                    return k
                 end
             end
         end
-        return false, nil
+        return nil
     end,
     ---sets value to be seek in the table
     ---@generic V
@@ -130,6 +130,7 @@ local LuaQContainsMetaTable = {
     ---@return ContainsPipeTable
     __call = function(self, value)
         self.__value = value
+
         return self
     end
 }
