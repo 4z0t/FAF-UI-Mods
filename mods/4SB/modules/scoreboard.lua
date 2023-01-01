@@ -1,4 +1,3 @@
-
 local Group = import('/lua/maui/group.lua').Group
 local ArmyViews = import("Views/ArmyView.lua")
 local Utils = import("Utils.lua")
@@ -111,91 +110,12 @@ ScoreBoard = UMT.Class(Group)
             self.Bottom:Set(last.Bottom)
         end
 
-        do -- border layout
-
-            local leftTop = first.Left
-            local leftBottom = last.Left
-            if self._title then
-                leftTop = self._title.Left
-            end
-
-            local offset = -10
-            LayoutFor(self._border)
-                :Top(self.Top)
-                :Left(self.Right)
-                :Bottom(self.Bottom)
-                :Width(0)
-                :Over(self, 5)
-                :DisableHitTest(true)
-
-            LayoutFor(self._border.tr)
-                :AnchorToLeft(self._border, offset + 3)
-                :AtTopIn(self._border, -10)
-                :Alpha(0.5)
-
-
-            LayoutFor(self._border.br)
-                :AnchorToLeft(self._border, offset + 3)
-                :AtBottomIn(self._border, -10)
-                :Alpha(0.5)
-
-
-            LayoutFor(self._border.r)
-                :AnchorToLeft(self._border, offset + 5)
-                :Top(self._border.tr.Bottom)
-                :Bottom(self._border.br.Top)
-                :Alpha(0.5)
-
-
-            LayoutFor(self._border.t)
-                :AtTopIn(self._border.tr, 1)
-                :Right(self._border.tr.Left)
-                :Left(leftTop)
-                :Alpha(0.5)
-
-            LayoutFor(self._border.b)
-                :AtBottomIn(self._border.br, 1)
-                :Right(self._border.br.Left)
-                :Left(leftBottom)
-                :Alpha(0.5)
-
-
-
-        end
-        do -- bracket layout
-            local offset = -12
-            LayoutFor(self._bracket)
-                :Top(self.Top)
-                :Left(self.Right)
-                :Bottom(self.Bottom)
-                :Width(0)
-                :Over(self, 10)
-                :DisableHitTest(true)
-
-            LayoutFor(self._bracket.top)
-                :AnchorToRight(self._bracket, offset + 3)
-                :AtTopIn(self._bracket, -13)
-
-
-            LayoutFor(self._bracket.bottom)
-                :AnchorToRight(self._bracket, offset + 3)
-                :AtBottomIn(self._bracket, -13)
-
-
-            LayoutFor(self._bracket.middle)
-                :AnchorToRight(self._bracket, offset + 12)
-                :Top(self._bracket.top.Bottom)
-                :Bottom(self._bracket.bottom.Top)
-
-        end
-
         LayoutFor(self)
             :Width(100)
             :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 20, 20)
+            :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
             :NeedsFrameUpdate(true)
-
     end,
 
     _InitArmyViews = function(self)
