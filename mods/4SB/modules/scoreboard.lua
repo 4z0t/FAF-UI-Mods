@@ -1,3 +1,4 @@
+
 local Group = import('/lua/maui/group.lua').Group
 local ArmyViews = import("Views/ArmyView.lua")
 local Utils = import("Utils.lua")
@@ -35,6 +36,7 @@ local slideForward = animationFactory
     :Create()
 
 
+---@class ScoreBoard : Group
 ScoreBoard = UMT.Class(Group)
 {
     __init = function(self, parent, isTitle)
@@ -45,24 +47,6 @@ ScoreBoard = UMT.Class(Group)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
 
-        self._bracket = Group(self)
-        self._bracket.top = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
-        self._bracket.middle = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_m.dds"))
-        self._bracket.bottom = Bitmap(self._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_b.dds"))
-
-
-
-        self._border = Group(self)
-        self._border.t = Bitmap(self._border,
-            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds"))
-        self._border.tr = Bitmap(self._border,
-            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds"))
-        self._border.r = Bitmap(self._border,
-            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds"))
-        self._border.br = Bitmap(self._border,
-            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds"))
-        self._border.b = Bitmap(self._border,
-            UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds"))
 
     end,
 
