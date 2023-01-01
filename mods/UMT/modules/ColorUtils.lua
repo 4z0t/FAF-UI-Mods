@@ -14,12 +14,22 @@ local function Norm(s)
     return s
 end
 
+local MathFloor = math.floor
+local MathClamp = math.clamp
+
+---returns hex representation of the given int
+---@param int integer
+---@return string
+local function ToHexString(int)
+    return string.format("%02X", int)
+end
+
 ---returns new color with given aplha part
 ---@param color Color
 ---@param alpha integer
 ---@return Color
 function SetAlpha(color, alpha)
-    return Norm(STR_itox(alpha)) .. string.sub(color, 3)
+    return ToHexString(alpha) .. string.sub(color, 3)
 end
 
 ---returns new color with given red part
@@ -27,7 +37,7 @@ end
 ---@param red integer
 ---@return Color
 function SetRed(color, red)
-    return string.sub(color, 1, 2) .. Norm(STR_itox(red)) .. string.sub(color, 5)
+    return string.sub(color, 1, 2) .. ToHexString(red) .. string.sub(color, 5)
 end
 
 ---returns new color with given green part
@@ -35,7 +45,7 @@ end
 ---@param green integer
 ---@return Color
 function SetGreen(color, green)
-    return string.sub(color, 1, 4) .. Norm(STR_itox(green)) .. string.sub(color, 7)
+    return string.sub(color, 1, 4) .. ToHexString(green) .. string.sub(color, 7)
 end
 
 ---returns new color with given blue part
@@ -43,35 +53,35 @@ end
 ---@param blue integer
 ---@return Color
 function SetBlue(color, blue)
-    return string.sub(color, 1, 6) .. Norm(STR_itox(blue))
+    return string.sub(color, 1, 6) .. ToHexString(blue)
 end
 
 ---returns alpha part of color
 ---@param color Color
 ---@return integer
 function GetAlpha(color)
-    return STR_xtoi(string.sub(color, 1, 2))
+    return tonumber(string.sub(color, 1, 2), 16)
 end
 
 ---returns red part of color
 ---@param color Color
 ---@return integer
 function GetRed(color)
-    return STR_xtoi(string.sub(color, 3, 4))
+    return tonumber(string.sub(color, 3, 4), 16)
 end
 
 ---returns green part of color
 ---@param color Color
 ---@return integer
 function GetGreen(color)
-    return STR_xtoi(string.sub(color, 5, 6))
+    return tonumber(string.sub(color, 5, 6), 16)
 end
 
 ---returns blue part of color
 ---@param color Color
 ---@return integer
 function GetBlue(color)
-    return STR_xtoi(string.sub(color, 7, 8))
+    return tonumber(string.sub(color, 7, 8), 16)
 end
 
 ---returns color as string from RGBA components
@@ -82,14 +92,9 @@ end
 ---@return Color
 function ColorRGBA(r, g, b, a)
     if a then
-        return Norm(STR_itox(a)) ..
-            Norm(STR_itox(r)) ..
-            Norm(STR_itox(g)) ..
-            Norm(STR_itox(b))
+        return string.format("%02x%02x%02x%02x", r, g, b, a)
     else
-        return "FF" .. Norm(STR_itox(r)) ..
-            Norm(STR_itox(g)) ..
-            Norm(STR_itox(b))
+        return string.format("FF%02x%02x%02x", r, g, b)
     end
 end
 
@@ -109,8 +114,8 @@ end
 ---@return Color
 function ColorMult(color, mult)
     local r, g, b = UnpackColor(color)
-    r = math.floor(math.clamp(r * mult, 0, 255))
-    g = math.floor(math.clamp(g * mult, 0, 255))
-    b = math.floor(math.clamp(b * mult, 0, 255))
+    r = MathFloor(MathClamp(r * mult, 0, 255))
+    g = MathFloor(MathClamp(g * mult, 0, 255))
+    b = MathFloor(MathClamp(b * mult, 0, 255))
     return ColorRGBA(r, g, b)
 end
