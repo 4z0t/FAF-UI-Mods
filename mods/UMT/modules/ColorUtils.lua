@@ -1,19 +1,5 @@
 ---@module "ColorUtils"
 
-
----@alias Color  string
----@alias hexstring string
-
----comment
----@param s hexstring
----@return hexstring
-local function Norm(s)
-    if string.len(s) == 1 then
-        return "0" .. s
-    end
-    return s
-end
-
 local MathFloor = math.floor
 local MathClamp = math.clamp
 
