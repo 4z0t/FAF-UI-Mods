@@ -62,6 +62,16 @@ _G.UMT = {
         Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     },
+    Animation = {
+        Factory ={
+            Base =  import("/mods/UMT/modules/Animations/AnimationFactory.lua").GetAnimationFactory(),
+            Alpha = import("/mods/UMT/modules/Animations/AnimationFactory.lua").GetAlphaAnimationFactory(),
+            Color =  import("/mods/UMT/modules/Animations/AnimationFactory.lua").GetColorAnimationFactory(),
+            Delay =  import("/mods/UMT/modules/Animations/AnimationFactory.lua").GetDelayAnimationFactory(),
+        },
+        Sequential = import("/mods/UMT/modules/Animations/SequentialAnimation.lua").SequentialAnimation,
+        Animator = import("/mods/UMT/modules/Animations/Animator.lua").Animator
+    },
     ---@type fa-class
     Class        = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property     = import("/mods/UMT/modules/UIClass.lua").Property,
@@ -70,7 +80,8 @@ _G.UMT = {
     Units        = LazyImport("/mods/UMT/modules/units.lua"),
     LazyImport   = LazyImport,
     ExistsGlobal = ExistsGlobal,
-    LuaQ = import("/mods/UMT/modules/LuaQ.lua")
+    LuaQ = import("/mods/UMT/modules/LuaQ.lua"),
+    ColorUtils = import("/mods/UMT/modules/ColorUtils.lua")
 }
 
 _G.UMT = UMT.Prevent.EditOf(_G.UMT)
