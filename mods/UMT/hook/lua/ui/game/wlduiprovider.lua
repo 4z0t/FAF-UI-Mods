@@ -55,6 +55,7 @@ _G.UMT = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
         DynamicScrollable = import("/mods/UMT/modules/Views/DynamicScrollable.lua").DynamicScrollable,
+        UnitOverlay = import("/mods/UMT/modules/Views/UnitOverlay.lua").UnitOverlay,
     },
     Weak         = import("/mods/UMT/modules/WeakMeta.lua"),
     Containers   = {
