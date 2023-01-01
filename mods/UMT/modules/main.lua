@@ -1,5 +1,3 @@
-local LuaQ = UMT.LuaQ
-
 function TestUIClass()
     local a, b = pcall(function()
         A = UMT.Class
@@ -80,6 +78,7 @@ function TestUIClass()
 end
 
 function TestLuaQ()
+    local LuaQ = UMT.LuaQ
     local t = { 1, 2, 3, 4, 5 }
         | LuaQ.foreach(LOG)
         | LuaQ.where(function(_, v) return v > 3 end)
