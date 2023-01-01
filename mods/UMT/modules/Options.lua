@@ -14,9 +14,9 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
-local LayoutFor = import('Layouter.lua').ReusedLayoutFor
-local DynamicScrollable = import("Views/DynamicScrollable.lua").DynamicScrollable
-local EscapeCover = import("Views/EscapeCover.lua").EscapeCover
+local LayoutFor = UMT.Layout.ReusedLayoutFor
+local DynamicScrollable = UMT.Views.DynamicScrollable
+local EscapeCover = UMT.Views.EscapeCover
 
 
 
