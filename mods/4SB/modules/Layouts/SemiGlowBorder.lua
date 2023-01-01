@@ -8,7 +8,7 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 
----comment
+---A clear function for additional layout
 ---@param scoreboard ScoreBoard
 local Clear = function(scoreboard)
     scoreboard._bracket:Destroy()
@@ -19,8 +19,9 @@ local Clear = function(scoreboard)
 end
 
 
----comment
+---A layout function for scoreboard
 ---@param scoreboard ScoreBoard
+---@return fun(scoreboard:ScoreBoard)
 Layout = function(scoreboard)
     scoreboard._bracket = Group(scoreboard)
     scoreboard._bracket.top = Bitmap(scoreboard._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
