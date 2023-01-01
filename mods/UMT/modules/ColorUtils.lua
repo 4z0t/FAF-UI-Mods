@@ -14,7 +14,7 @@ local function Norm(s)
     return s
 end
 
----comment
+---returns new color with given aplha part
 ---@param color Color
 ---@param alpha integer
 ---@return Color
@@ -22,7 +22,7 @@ function SetAlpha(color, alpha)
     return Norm(STR_itox(alpha)) .. string.sub(color, 3)
 end
 
----comment
+---returns new color with given red part
 ---@param color Color
 ---@param red integer
 ---@return Color
@@ -30,7 +30,7 @@ function SetRed(color, red)
     return string.sub(color, 1, 2) .. Norm(STR_itox(red)) .. string.sub(color, 5)
 end
 
----comment
+---returns new color with given green part
 ---@param color Color
 ---@param green integer
 ---@return Color
@@ -38,7 +38,7 @@ function SetGreen(color, green)
     return string.sub(color, 1, 4) .. Norm(STR_itox(green)) .. string.sub(color, 7)
 end
 
----comment
+---returns new color with given blue part
 ---@param color Color
 ---@param blue integer
 ---@return Color
@@ -46,35 +46,35 @@ function SetBlue(color, blue)
     return string.sub(color, 1, 6) .. Norm(STR_itox(blue))
 end
 
----comment
+---returns alpha part of color
 ---@param color Color
 ---@return integer
 function GetAlpha(color)
     return STR_xtoi(string.sub(color, 1, 2))
 end
 
----comment
+---returns red part of color
 ---@param color Color
 ---@return integer
 function GetRed(color)
     return STR_xtoi(string.sub(color, 3, 4))
 end
 
----comment
+---returns green part of color
 ---@param color Color
 ---@return integer
 function GetGreen(color)
     return STR_xtoi(string.sub(color, 5, 6))
 end
 
----comment
+---returns blue part of color
 ---@param color Color
 ---@return integer
 function GetBlue(color)
     return STR_xtoi(string.sub(color, 7, 8))
 end
 
----comment
+---returns color as string from RGBA components
 ---@param r integer
 ---@param g integer
 ---@param b integer
@@ -93,7 +93,7 @@ function ColorRGBA(r, g, b, a)
     end
 end
 
----comment
+---retuns RGBA components of the given color as integers
 ---@param color string
 ---@return integer
 ---@return integer
@@ -103,7 +103,7 @@ function UnpackColor(color)
     return GetRed(color), GetGreen(color), GetBlue(color), GetAlpha(color)
 end
 
----comment
+---multiplies color by given value
 ---@param color Color
 ---@param mult number
 ---@return Color
