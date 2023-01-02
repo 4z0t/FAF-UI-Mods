@@ -548,6 +548,7 @@ local LuaQMaxMetaTable = {
 
 
 }
+---@type LuaQMaxMetaTable
 max = setmetatable({}, LuaQMaxMetaTable)
 
 
@@ -620,8 +621,13 @@ local LuaQMinMetaTable = {
         return self
     end,
 }
+---@type LuaQMinMetaTable
 min = setmetatable({}, LuaQMinMetaTable)
 
+---returns table of integers from startValue to endValue including both
+---@param startValue integer
+---@param endValue integer
+---@return integer[]
 function range(startValue, endValue)
     local result = {}
     local i = startValue
