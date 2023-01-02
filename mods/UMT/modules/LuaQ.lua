@@ -531,16 +531,16 @@ local LuaQMaxMetaTable = {
     end,
 
     ---makes max function return key of max value
-    ---@param self any
-    ---@return any
+    ---@param self LuaQMaxMetaTable
+    ---@return LuaQMaxMetaTable
     Key = function(self)
         self.__return = "key"
         return self
     end,
 
     ---makes max function return max value
-    ---@param self any
-    ---@return any
+    ---@param self LuaQMaxMetaTable
+    ---@return LuaQMaxMetaTable
     Value = function(self)
         self.__return = "value"
         return self
@@ -604,17 +604,17 @@ local LuaQMinMetaTable = {
     end,
 
     
-    ---makes min function return key of max value
-    ---@param self any
-    ---@return any
+    ---makes min function return key of min value
+    ---@param self LuaQMinMetaTable
+    ---@return LuaQMinMetaTable
     Key = function(self)
         self.__return = "key"
         return self
     end,
 
-    ---makes min function return max value
-    ---@param self any
-    ---@return any
+    ---makes min function return min value
+    ---@param self LuaQMinMetaTable
+    ---@return LuaQMinMetaTable
     Value = function(self)
         self.__return = "value"
         return self
