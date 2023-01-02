@@ -122,8 +122,16 @@ end
 
 function Fonts(name, optionVar, indent)
     return Strings(name,
-        { "Arial", "Arial Black", "Arial Narrow", "Zeros Three", "Butterbelly", "Arial Rounded MT Bold", "VDub",
-            "Wintermute" }, optionVar, indent)
+        {
+            "Arial",
+            "Arial Black",
+            "Arial Narrow",
+            "Zeros Three",
+            "Butterbelly",
+            "Arial Rounded MT Bold",
+            "VDub",
+            "Wintermute"
+        }, optionVar, indent)
 end
 
 local globalOptions = {}
