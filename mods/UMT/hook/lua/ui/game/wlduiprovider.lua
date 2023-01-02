@@ -51,6 +51,7 @@ _G.UMT = {
     Layouter     = import("/mods/UMT/modules/Layouter.lua"),
     OptionVar    = import("/mods/UMT/modules/OptionVar.lua"),
     Select       = LazyImport("/mods/UMT/modules/select.lua"),
+    Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/Main.lua"),
     Views        = {
         EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
