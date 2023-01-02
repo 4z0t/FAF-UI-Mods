@@ -112,11 +112,18 @@ end
 ---@return ControlConfig
 function Strings(name, items, optionVar, indent)
     return {
-        type = "strings",
-        name = name,
+        type      = "strings",
+        name      = name,
         optionVar = optionVar,
-        items = items,
+        items     = items,
+        indent    = indent or 0
     }
+end
+
+function Fonts(name, optionVar, indent)
+    return Strings(name,
+        { "Arial", "Arial Black", "Arial Narrow", "Zeros Three", "Butterbelly", "Arial Rounded MT Bold", "VDub",
+            "Wintermute" }, optionVar, indent)
 end
 
 local globalOptions = {}
