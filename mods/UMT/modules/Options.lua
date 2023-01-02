@@ -150,6 +150,7 @@ local OptionLine = Class(Group)
             if IsDestroyed(optionsWindows[self.id]) then
                 optionsWindows[self.id] = OptionsWindow(GetFrame(parent:GetRootFrame():GetTargetHead()), self.data[1],
                     self.id, self.data[2])
+                optionsSelector:Destroy()
             end
         end
     end,
