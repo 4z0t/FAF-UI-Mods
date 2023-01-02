@@ -43,8 +43,9 @@ local function MakeProperties(class)
     end
     if not table.empty(getProperties) then
         class.__index = function(self, key)
-            if getProperties[key] then
-                return getProperties[key](self)
+            local get = getProperties[key]
+            if get then
+                return get(self)
             end
             return class[key]
         end
@@ -53,8 +54,9 @@ local function MakeProperties(class)
         class.__newindex = nil
     else
         class.__newindex = function(self, key, value)
-            if setProperties[key] then
-                return setProperties[key](self, value)
+            local set = setProperties[key]
+            if set then
+                return set(self, value)
             end
             rawset(self, key, value)
         end
