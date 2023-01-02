@@ -326,7 +326,7 @@ local LuaQKeysMetaTable = {
 
         local result = {}
         if condition then
-            for k, _ in tbl do
+            for k, v in tbl do
                 if condition(k, v) then
                     TableInsert(result, k)
                 end
