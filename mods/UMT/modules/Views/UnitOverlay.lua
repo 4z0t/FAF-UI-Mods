@@ -2,6 +2,12 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LazyVar = import('/lua/lazyvar.lua').Create
 
 ---@class UnitOverlay : Bitmap
+---@field PosX LazyVar<number>
+---@field PosY LazyVar<number>
+---@field unit UserUnit
+---@field id integer
+---@field offsetX number
+---@field offsetY number
 UnitOverlay = Class(Bitmap)
 {
     ---inits a unit overlay
