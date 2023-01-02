@@ -76,7 +76,7 @@ ScoreBoard = UMT.Class(Group)
             end
         end,
         get = function(self)
-            return self._layout
+            return self._layout or self._Layout
         end
     },
 
