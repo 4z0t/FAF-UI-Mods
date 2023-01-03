@@ -81,13 +81,13 @@ function TestLuaQ()
     local LuaQ = UMT.LuaQ
     local t = { 1, 2, 3, 4, 5 }
         | LuaQ.foreach(LOG)
-        | LuaQ.where(function(_, v) return v > 3 end)
+        | LuaQ.where(function(v) return v > 3 end)
         | LuaQ.foreach(LOG)
         | LuaQ.sum
     LOG(t)
 
     local m = { 1, 2, 3, 4, 5 }
-        | LuaQ.where(function(_, v) return v & 1 == 1 end)
+        | LuaQ.where(function(v) return v & 1 == 1 end)
         | LuaQ.reduce(function(val, _, v) return v * val end, 1)
     LOG(m)
 
