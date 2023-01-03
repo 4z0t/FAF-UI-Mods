@@ -480,42 +480,71 @@ local LuaQDistinctMetaTable = {
 }
 distinct = setmetatable({}, LuaQDistinctMetaTable)
 
----@class LuaQMaxMetaTable
-local LuaQMaxMetaTable = {
-    __bor = function(tbl, self)
 
+local function FindMax(tbl, condition)
+
+    local keyMax
+    local valueMax
+
+    if condition then
+        for k, v in tbl do
+            local value = condition(k, v)
+            if not valueMax or value > valueMax then
+                keyMax = k
+                valueMax = value
+            end
+        end
+    else
+        for k, v in tbl do
+            if v > valueMax then
+                keyMax = k
+                valueMax = v
+            end
+        end
+    end
+
+    if not keyMax then
+        return nil, nil, nil
+    end
+    return keyMax, tbl[keyMax], valueMax
+end
+
+local function FindMin(tbl, condition)
+
+    local keyMin
+    local valueMin
+
+    if condition then
+        for k, v in tbl do
+            local value = condition(k, v)
+            if not valueMin or value < valueMin then
+                keyMin = k
+                valueMin = value
+            end
+        end
+    else
+        for k, v in tbl do
+            if v < valueMin then
+                keyMin = k
+                valueMin = v
+            end
+        end
+    end
+
+    if not keyMin then
+        return nil, nil, nil
+    end
+    return keyMin, tbl[keyMin], valueMin
+end
+
+---@class LuaQMaxMetaTable
+local LuaQMaxKeyMetaTable = {
+    __bor = function(tbl, self)
         local condition = self.__condition
         self.__condition = nil
 
-        local __return = self.__return
-        self.__return = nil
-
-        local keyMax
-        local valueMax
-
-        if condition then
-            for k, v in tbl do
-                local value = condition(k, v)
-                if not valueMax or value > valueMax then
-                    keyMax = k
-                    valueMax = value
-                end
-            end
-        else
-            for k, v in tbl do
-                if v > valueMax then
-                    keyMax = k
-                    valueMax = v
-                end
-            end
-        end
-
-        if __return == "key" then
-            return keyMax
-        elseif __return == "value" then
-            return tbl[keyMax]
-        end
-        return valueMax
+        local k, _, _ = FindMax(tbl, condition)
+        return k
     end,
 
     ---sets function which returns value to be compared in order determine max value
@@ -529,28 +558,111 @@ local LuaQMaxMetaTable = {
         self.__condition = condition
         return self
     end,
+}
 
-    ---makes max function return key of max value
-    ---@param self LuaQMaxMetaTable
-    ---@return LuaQMaxMetaTable
-    Key = function(self)
-        self.__return = "key"
-        return self
+
+
+---@class LuaQMaxMetaTable
+local LuaQMaxValueMetaTable = {
+    __bor = function(tbl, self)
+        local condition = self.__condition
+        self.__condition = nil
+
+        local _, v, _ = FindMax(tbl, condition)
+        return v
     end,
 
-    ---makes max function return max value
+    ---sets function which returns value to be compared in order determine max value
+    ---@generic K
+    ---@generic V
+    ---@generic T
     ---@param self LuaQMaxMetaTable
+    ---@param condition fun(key:K, value:V):T
     ---@return LuaQMaxMetaTable
-    Value = function(self)
-        self.__return = "value"
+    __call = function(self, condition)
+        self.__condition = condition
         return self
     end,
+}
 
+---@class LuaQMaxMetaTable
+local LuaQMaxMetaTable = {
+    __bor = function(tbl, self)
 
+        local condition = self.__condition
+        self.__condition = nil
+
+        local _, _, t = FindMax(tbl, condition)
+        return t
+    end,
+
+    ---sets function which returns value to be compared in order determine max value
+    ---@generic K
+    ---@generic V
+    ---@generic T
+    ---@param self LuaQMaxMetaTable
+    ---@param condition fun(key:K, value:V):T
+    ---@return LuaQMaxMetaTable
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end,
 }
 ---@type LuaQMaxMetaTable
-max = setmetatable({}, LuaQMaxMetaTable)
+max = setmetatable({
+    key = setmetatable({}, LuaQMaxKeyMetaTable),
+    value = setmetatable({}, LuaQMaxValueMetaTable),
+}, LuaQMaxMetaTable)
 
+
+
+---@class LuaQMaxMetaTable
+local LuaQMinKeyMetaTable = {
+    __bor = function(tbl, self)
+        local condition = self.__condition
+        self.__condition = nil
+
+        local k, _, _ = FindMin(tbl, condition)
+        return k
+    end,
+
+    ---sets function which returns value to be compared in order determine max value
+    ---@generic K
+    ---@generic V
+    ---@generic T
+    ---@param self LuaQMaxMetaTable
+    ---@param condition fun(key:K, value:V):T
+    ---@return LuaQMaxMetaTable
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end,
+}
+
+
+
+---@class LuaQMaxMetaTable
+local LuaQMinValueMetaTable = {
+    __bor = function(tbl, self)
+        local condition = self.__condition
+        self.__condition = nil
+
+        local _, v, _ = FindMin(tbl, condition)
+        return v
+    end,
+
+    ---sets function which returns value to be compared in order determine max value
+    ---@generic K
+    ---@generic V
+    ---@generic T
+    ---@param self LuaQMaxMetaTable
+    ---@param condition fun(key:K, value:V):T
+    ---@return LuaQMaxMetaTable
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end,
+}
 
 ---@class LuaQMinMetaTable
 local LuaQMinMetaTable = {
@@ -559,70 +671,29 @@ local LuaQMinMetaTable = {
         local condition = self.__condition
         self.__condition = nil
 
-        
-        local __return = self.__return
-        self.__return = nil
-
-        local keyMin
-        local valueMin
-
-        if condition then
-            for k, v in tbl do
-                local value = condition(k, v)
-                if not valueMin or value < valueMin then
-                    keyMin = k
-                    valueMin = value
-                end
-            end
-        else
-            for k, v in tbl do
-                if v < valueMin then
-                    keyMin = k
-                    valueMin = v
-                end
-            end
-        end
-
-        
-        if __return == "key" then
-            return keyMin
-        elseif __return == "value" then
-            return tbl[keyMin]
-        end
-        return valueMin
+        local _, _, t = FindMin(tbl, condition)
+        return t
     end,
 
     ---sets function which returns value to be compared in order determine max value
     ---@generic K
     ---@generic V
     ---@generic T
-    ---@param self LuaQMinMetaTable
+    ---@param self LuaQMaxMetaTable
     ---@param condition fun(key:K, value:V):T
-    ---@return LuaQMinMetaTable
+    ---@return LuaQMaxMetaTable
     __call = function(self, condition)
         self.__condition = condition
         return self
     end,
-
-    
-    ---makes min function return key of min value
-    ---@param self LuaQMinMetaTable
-    ---@return LuaQMinMetaTable
-    Key = function(self)
-        self.__return = "key"
-        return self
-    end,
-
-    ---makes min function return min value
-    ---@param self LuaQMinMetaTable
-    ---@return LuaQMinMetaTable
-    Value = function(self)
-        self.__return = "value"
-        return self
-    end,
 }
 ---@type LuaQMinMetaTable
-min = setmetatable({}, LuaQMinMetaTable)
+min = setmetatable({
+    key = setmetatable({}, LuaQMinKeyMetaTable),
+    value = setmetatable({}, LuaQMinValueMetaTable),
+}, LuaQMinMetaTable)
+
+
 
 ---returns table of integers from startValue to endValue including both
 ---@param startValue integer
