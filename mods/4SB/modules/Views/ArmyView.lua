@@ -3,20 +3,15 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
 
----@module "Animations/Animator"
-local Animator = import("../Animations/Animator.lua")
-local alphaAnimator = Animator.Animator(GetFrame(0))
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
+local animationFactory = UMT.Animation.Factory.Base
+local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
 
----@class BaseAnimationFactory
-local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
-
-
-local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local appearAnimation = alphaAnimationFactory
     :ToAppear()
     :For(0.3)

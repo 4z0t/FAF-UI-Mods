@@ -3,9 +3,8 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-
-local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
-local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
+local animationFactory = UMT.Animation.Factory.Base
+local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
 local expandSpeed = 500
 
