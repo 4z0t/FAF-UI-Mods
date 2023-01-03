@@ -51,13 +51,8 @@ _G.UMT = {
     Layouter     = import("/mods/UMT/modules/Layouter.lua"),
     OptionVar    = import("/mods/UMT/modules/OptionVar.lua"),
     Select       = LazyImport("/mods/UMT/modules/select.lua"),
-    Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/Main.lua"),
-    Views        = {
-        EscapeCover = import("/mods/UMT/modules/Views/EscapeCover.lua").EscapeCover,
-        StaticScrollable = import("/mods/UMT/modules/Views/StaticScrollable.lua").StaticScrollable,
-        DynamicScrollable = import("/mods/UMT/modules/Views/DynamicScrollable.lua").DynamicScrollable,
-        UnitOverlay = import("/mods/UMT/modules/Views/UnitOverlay.lua").UnitOverlay,
-    },
+    Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/__Init__.lua"),
+    Views        = LazyImport("/mods/UMT/modules/Views/__Init__.lua"),
     Weak         = import("/mods/UMT/modules/WeakMeta.lua"),
     Containers   = {
         Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
