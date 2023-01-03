@@ -176,7 +176,7 @@ local LuaQContainsMetaTable = {
 contains = setmetatable({}, LuaQContainsMetaTable)
 
 
-local LuaQSelectMetaTable = {
+local LuaQSelectKeyValueMetaTable = {
     __bor = function(tbl, self)
         local selector = self.__selector
         self.__selector = nil
@@ -189,10 +189,7 @@ local LuaQSelectMetaTable = {
             end
         elseif type(selector) == "function" then
             for k, v in tbl do
-                local value = selector(k, v)
-                if value ~= nil then
-                    result[k] = value
-                end
+                result[k] = selector(k, v)
             end
         end
 
@@ -204,7 +201,36 @@ local LuaQSelectMetaTable = {
         return self
     end
 }
-select = setmetatable({}, LuaQSelectMetaTable)
+
+local LuaQSelectMetaTable = {
+    __bor = function(tbl, self)
+        local selector = self.__selector
+        self.__selector = nil
+
+        local result = {}
+
+        if type(selector) == "string" then
+            for _, v in ipairs(tbl) do
+                TableInsert(result, v[selector])
+            end
+        elseif type(selector) == "function" then
+            for _, v in ipairs(tbl) do
+                TableInsert(result, selector(v))
+            end
+        end
+
+        return result
+    end,
+
+    __call = function(self, selector)
+        self.__selector = selector
+        return self
+    end
+}
+
+select = setmetatable({
+    keyvalue = setmetatable({}, LuaQSelectKeyValueMetaTable)
+}, LuaQSelectMetaTable)
 
 ---@class ForeachPipeTable
 local LuaQForeachMetaTable = {
