@@ -1,7 +1,10 @@
 local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
 
 
-
+local layouts = {
+    ["default"] = false,
+    ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout
+}
 function CreateScoreUI()
     if not IsDestroyed(controls.scoreBoard) then
         return
@@ -21,6 +24,15 @@ function CreateScoreUI()
     controls.scoreBoard.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(Update)
     end
+
+
+    local Options = import("/mods/4SB/modules/Options.lua")
+    Options.Init()
+    Options.style.OnChange = function(var)
+        controls.scoreBoard.Layout = layouts[var()]
+    end
+    controls.scoreBoard.Layout = layouts[Options.style()]
+
 end
 
 function SetLayout()
