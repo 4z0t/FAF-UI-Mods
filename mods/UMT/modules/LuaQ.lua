@@ -1,7 +1,7 @@
 local TableInsert = table.insert
 
 ---@class WherePipeTable
-local LuaQWhereMetaTable = {
+local LuaQWhereKeyValueMetaTable = {
     ---return new table with elements satisfying the given condition
     ---@generic K
     ---@generic V
@@ -34,8 +34,46 @@ local LuaQWhereMetaTable = {
         return self
     end
 }
+
+
+---@class WherePipeTable
+local LuaQWhereMetaTable = {
+    ---return new table with elements satisfying the given condition
+    ---@generic K
+    ---@generic V
+    ---@param tbl table<K,V>
+    ---@param self WherePipeTable
+    ---@return table<K,V>
+    __bor = function(tbl, self)
+        local func = self.__func
+        self.__func = nil
+
+        local result = {}
+
+        for _, v in ipairs(tbl) do
+            if func(v) then
+                TableInsert(result, v)
+            end
+        end
+
+        return result
+    end,
+
+    ---Sets condition for filtering table
+    ---@generic K
+    ---@generic V
+    ---@param self WherePipeTable
+    ---@param func fun(value:V):boolean
+    ---@return WherePipeTable
+    __call = function(self, func)
+        self.__func = func
+        return self
+    end
+}
 ---@type WherePipeTable
-where = setmetatable({}, LuaQWhereMetaTable)
+where = setmetatable({
+    keyvalue = setmetatable({}, LuaQWhereKeyValueMetaTable)
+}, LuaQWhereMetaTable)
 
 
 ---@class DeepCopyPipeTable
