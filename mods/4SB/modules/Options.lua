@@ -11,7 +11,7 @@ player = {
         name = OptionVar(modName, "player.font.name", "Arial"),
         rating = OptionVar(modName, "player.font.rating", "Arial"),
         focus = OptionVar(modName, "player.font.focus", "Arial")
-        
+
     },
 
     color = {
@@ -19,10 +19,11 @@ player = {
     }
 }
 
+style = OptionVar(modName, "scoreboardStyle", "default")
 
 
 function Init()
     Options.AddOptions(modName, "4z0t's ScoreBoard", {
-
+        Options.Strings("Scoreboard style", { "default", "semi glow border" }, style, 4)
     })
 end

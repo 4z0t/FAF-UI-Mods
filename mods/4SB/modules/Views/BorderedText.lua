@@ -1,6 +1,6 @@
 local Border = import("Border.lua").Border
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local Text = import("/lua/maui/text.lua").Text
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 ---@class BorderedText : BorderColored
