@@ -4,9 +4,10 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor =import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 local textFont = "Zeroes Three"

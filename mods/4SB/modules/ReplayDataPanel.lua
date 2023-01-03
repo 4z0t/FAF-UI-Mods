@@ -2,10 +2,10 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox

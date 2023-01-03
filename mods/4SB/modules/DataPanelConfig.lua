@@ -1,5 +1,5 @@
 ---@module "ColorUtils"
-local ColorUtils = import("ColorUtils.lua")
+local ColorUtils = UMT.ColorUtils
 
 local Utils = import("Utils.lua")
 

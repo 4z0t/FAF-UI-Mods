@@ -3,11 +3,12 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+
 
 local Utils = import("Utils.lua")
 local ArmyViews = import("Views/ArmyView.lua")
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local defaultSortFunc = function()
 

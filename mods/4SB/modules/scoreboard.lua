@@ -5,19 +5,19 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local InfoPanel = import("InfoPanel.lua").InfoPanel
+
+
 local LazyImport = UMT.LazyImport
 local Scores = LazyImport("/lua/ui/game/score.lua")
 
-
-local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
-
-local animationFactory = import("Animations/AnimationFactory.lua").GetAnimationFactory()
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local SequentialAnimation = UMT.Animation.Sequential
+local animationFactory = UMT.Animation.Factory.Base
 
 local animationSpeed = 300
 
@@ -36,6 +36,7 @@ local slideForward = animationFactory
 
 
 ---@class ScoreBoard : Group
+---@field GameSpeed PropertyTable
 ScoreBoard = UMT.Class(Group)
 {
     __init = function(self, parent, isTitle)
