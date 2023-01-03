@@ -1,4 +1,4 @@
-local LazyVar = import("/lua/lazyvar.lua")
+local LazyVar = import("/lua/lazyvar.lua").Create
 local Prefs = import("/lua/user/prefs.lua")
 
 
@@ -87,12 +87,11 @@ function Create(modOptionName, subOption, default)
         val = default
     end
 
-    local result = {
+    return setmetatable({
         _m = modOptionName,
         _o = subOption,
-        _lv = LazyVar.Create(val),
+        _lv = LazyVar(val),
         _prev = nil,
-    }
-    setmetatable(result, OptionVarMetaTable)
-    return result
+    }, OptionVarMetaTable)
+
 end
