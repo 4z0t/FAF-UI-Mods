@@ -15,7 +15,7 @@ local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local LazyVar = import("/lua/lazyvar.lua")
 local StringSelector = import("Views/StringSelector.lua").StringSelector
 
-local LayoutFor = import("Layouter.lua").ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local colors = { "ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42" }
 
