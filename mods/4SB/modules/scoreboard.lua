@@ -37,7 +37,7 @@ local slideForward = animationFactory
 
 ---@class ScoreBoard : Group
 ---@field GameSpeed PropertyTable
-ScoreBoard = UMT.Class(Group)
+ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
@@ -57,30 +57,6 @@ ScoreBoard = UMT.Class(Group)
 
         self._mode = "income"
     end,
-
-
-
-    Layout = UMT.Property
-    {
-        set = function(self, value)
-            if self._clearLayout then
-                self:_clearLayout()
-                self._clearLayout = false
-            end
-
-            self._layout = value
-
-            if self._layout then
-                self._clearLayout = self:_layout()
-            else
-                self:_Layout()
-            end
-        end,
-        get = function(self)
-            return self._layout or self._Layout
-        end
-    },
-
 
     _Layout = function(self)
         if self._title then

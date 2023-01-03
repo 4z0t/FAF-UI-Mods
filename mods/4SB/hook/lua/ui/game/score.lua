@@ -6,15 +6,22 @@ local layouts = {
     ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout
 }
 function CreateScoreUI()
-    if not IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if not IsDestroyed(controls.scoreBoard) then return end
+
+    
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
     local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
     if isReplay or IsObserver() then
         controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
     else
         controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
+        local Options = import("/mods/4SB/modules/Options.lua")
+        Options.Init()
+        Options.style.OnChange = function(var)
+            controls.scoreBoard.Layout = layouts[var()]
+        end
+        controls.scoreBoard.Layout = layouts[Options.style()]
+
     end
 
 
@@ -24,15 +31,6 @@ function CreateScoreUI()
     controls.scoreBoard.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(Update)
     end
-
-
-    local Options = import("/mods/4SB/modules/Options.lua")
-    Options.Init()
-    Options.style.OnChange = function(var)
-        controls.scoreBoard.Layout = layouts[var()]
-    end
-    controls.scoreBoard.Layout = layouts[Options.style()]
-
 end
 
 function SetLayout()
