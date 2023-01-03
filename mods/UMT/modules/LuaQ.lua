@@ -1,6 +1,6 @@
 local TableInsert = table.insert
 
----@class WherePipeTable
+---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
     ---return new table with elements satisfying the given condition
     ---@generic K
@@ -36,7 +36,7 @@ local LuaQWhereKeyValueMetaTable = {
 }
 
 
----@class WherePipeTable
+---@class LuaQWherePipeTable
 local LuaQWhereMetaTable = {
     ---return new table with elements satisfying the given condition
     ---@generic K
@@ -70,6 +70,9 @@ local LuaQWhereMetaTable = {
         return self
     end
 }
+---@class WherePipeTable : LuaQWherePipeTable
+---@field keyvalue LuaQWhereKeyValueMetaTable
+
 ---@type WherePipeTable
 where = setmetatable({
     keyvalue = setmetatable({}, LuaQWhereKeyValueMetaTable)
@@ -545,6 +548,15 @@ local LuaQDistinctMetaTable = {
 distinct = setmetatable({}, LuaQDistinctMetaTable)
 
 
+---retuns max of the given table
+---@generic K
+---@generic V
+---@generic T
+---@param tbl table<K,V>
+---@param condition fun(k:K , v:V) :T
+---@return K?
+---@return V?
+---@return T?
 local function FindMax(tbl, condition)
 
     local keyMax
@@ -573,6 +585,16 @@ local function FindMax(tbl, condition)
     return keyMax, tbl[keyMax], valueMax
 end
 
+
+---retuns min of the given table
+---@generic K
+---@generic V
+---@generic T
+---@param tbl table<K,V>
+---@param condition fun(k:K , v:V) :T
+---@return K?
+---@return V?
+---@return T?
 local function FindMin(tbl, condition)
 
     local keyMin
