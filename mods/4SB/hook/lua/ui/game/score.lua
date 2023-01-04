@@ -8,7 +8,7 @@ local layouts = {
 function CreateScoreUI()
     if not IsDestroyed(controls.scoreBoard) then return end
 
-    
+
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
     local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
     if isReplay or IsObserver() then
@@ -34,9 +34,9 @@ function CreateScoreUI()
 end
 
 function SetLayout()
-    if IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
+
+
     local avatarsControls = import('/lua/ui/game/avatars.lua').controls
     LayoutHelpers.AnchorToBottom(avatarsControls.avatarGroup, controls.scoreBoard, 10)
     if import('/lua/ui/campaign/campaignmanager.lua').campaignMode then
@@ -48,9 +48,7 @@ function SetLayout()
 end
 
 function Update()
-    if IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
 
     controls.scoreBoard:Update(currentScores)
     if currentScores then
@@ -61,16 +59,15 @@ function Update()
 end
 
 function Contract()
-    if IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
+
     controls.scoreBoard:Hide()
 end
 
 function Expand()
-    if IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
+
+
     controls.scoreBoard:Show()
 end
 
@@ -78,17 +75,18 @@ function ToggleScoreControl(state)
 end
 
 function InitialAnimation(state)
-    if IsDestroyed(controls.scoreBoard) then
-        return
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
+
     controls.scoreBoard:InitialAnimation()
 end
 
 function NoteGameSpeedChanged(newSpeed)
     gameSpeed = newSpeed
-    if not IsDestroyed(controls.scoreBoard) then
-        controls.scoreBoard.GameSpeed = newSpeed
-    end
+    if IsDestroyed(controls.scoreBoard) then return end
+
+
+    controls.scoreBoard.GameSpeed = newSpeed
+
 end
 
 function GetScoreCache()
