@@ -490,10 +490,13 @@ local LuaQCountMetaTable = {
         local condition = self.__condition
         self.__condition = nil
 
-        local count = 0
+        if not condition then
+            return table.getn(tbl)
+        end
 
-        for k, v in tbl do
-            if condition(k, v) then
+        local count = 0
+        for _, v in ipairs(tbl) do
+            if condition(v) then
                 count = count + 1
             end
         end
@@ -584,7 +587,6 @@ local function FindMax(tbl, condition)
     end
     return keyMax, tbl[keyMax], valueMax
 end
-
 
 ---retuns min of the given table
 ---@generic K
