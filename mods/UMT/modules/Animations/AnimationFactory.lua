@@ -1,10 +1,8 @@
 ---@module "Animations/AnimationFactory"
 
 local emptyFunc = function() end
----@module "Animations/Animation"
 local Animation = import("Animation.lua")
----@module "ColorUtils"
-local ColorUtils = import("../ColorUtils.lua")
+local ColorUtils = UMT.ColorUtils
 
 ---@class BaseAnimationFactory
 local BaseAnimationFactory = ClassSimple
@@ -61,27 +59,45 @@ local BaseAnimationFactory = ClassSimple
 ---@class AlphaAnimationFactory : BaseAnimationFactory
 local AlphaAnimationFactory = Class(BaseAnimationFactory)
 {
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@param startAlpha number
+    ---@return AlphaAnimationFactory
     StartWith = function(self, startAlpha)
         self._startAlpha = math.clamp(startAlpha, 0., 1.)
         self._isStart = true
         return self
     end,
 
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@return AlphaAnimationFactory
     ToAppear = function(self)
         self._direction = 1
         return self
     end,
 
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@return AlphaAnimationFactory
     ToFade = function(self)
         self._direction = -1
         return self
     end,
 
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@param endAlpha number
+    ---@return AlphaAnimationFactory
     EndWith = function(self, endAlpha)
         self._endAlpha = math.clamp(endAlpha, 0., 1.)
         return self
     end,
 
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@param duration number
+    ---@return AlphaAnimationFactory
     For = function(self, duration)
         assert(duration > 0, "Duration of alpha animation cant be negative or 0")
 
@@ -89,6 +105,9 @@ local AlphaAnimationFactory = Class(BaseAnimationFactory)
         return self
     end,
 
+    ---comment
+    ---@param self AlphaAnimationFactory
+    ---@return AlphaAnimationFactory
     ApplyToChildren = function(self)
         self._children = true
         return self
