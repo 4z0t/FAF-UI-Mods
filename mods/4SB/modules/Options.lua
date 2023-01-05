@@ -11,6 +11,9 @@ title = {
         mapName = OptionVar(modName, "title.font.mapName", "Arial"),
         mapSize = OptionVar(modName, "title.font.mapSize", "Arial"),
         quality = OptionVar(modName, "title.font.quality", "Arial"),
+    },
+    color = {
+        bg = OptionVar(modName, "title.color.bg", "66000000"),
     }
 }
 
@@ -25,8 +28,8 @@ player = {
     },
 
     color = {
-
-    }
+        bg = OptionVar(modName, "player.color.bg", "66000000"),
+     }
 }
 
 style = OptionVar(modName, "scoreboardStyle", "default")
@@ -47,5 +50,9 @@ function Init()
         Options.Fonts("Rating", player.font.rating, 4),
         Options.Fonts("Mass", player.font.mass, 4),
         Options.Fonts("Energy", player.font.energy, 4),
+        Options.Title("Title colors"),
+        Options.ColorSlider("Background", title.color.bg, 4),
+        Options.Title("Player colors"),
+        Options.ColorSlider("Background", player.color.bg, 4),
     })
 end

@@ -25,7 +25,7 @@ local unitCapTextSize = 12
 local titlePanelWidth = 300
 local titlePanelHeight = 20
 
-local bgColor = "ff000000"
+local bgColor = Options.title.color.bg:Raw()
 
 
 
@@ -201,7 +201,6 @@ TitlePanel = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
         LayoutFor(self._top)

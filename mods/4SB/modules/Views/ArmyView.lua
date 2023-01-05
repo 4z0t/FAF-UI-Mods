@@ -34,7 +34,7 @@ local ShareManager = import("../ShareManager.lua")
 
 local checkboxes = import("../DataPanelConfig.lua").checkboxes
 
-local bgColor = 'ff000000'
+local bgColor = Options.player.color.bg:Raw()
 
 local armyViewTextPointSize = 12
 
@@ -110,7 +110,6 @@ ArmyView = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
         LayoutFor(self._color)
