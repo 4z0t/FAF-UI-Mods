@@ -378,21 +378,21 @@ checkboxes = {
                 return score.units.land.built - score.units.land.lost
             end
         },
-        {
-            tooltip = "sacu-units",
-            title = "SACU",
-            description = "Amount of SACUs",
-            text = "S",
-            nu = RGBA "",
-            nc = RGBA "",
-            ou = RGBA "",
-            oc = RGBA "",
-            du = RGBA "",
-            dc = RGBA "",
-            GetData = function(score)
-                return score.units.sacu.built - score.units.sacu.lost
-            end
-        },
+        -- {
+        --     tooltip = "sacu-units",
+        --     title = "SACU",
+        --     description = "Amount of SACUs",
+        --     text = "S",
+        --     nu = RGBA "",
+        --     nc = RGBA "",
+        --     ou = RGBA "",
+        --     oc = RGBA "",
+        --     du = RGBA "",
+        --     dc = RGBA "",
+        --     GetData = function(score)
+        --         return score.units.sacu.built - score.units.sacu.lost
+        --     end
+        -- },
         {
             tooltip = "experimental-units",
             title = "EXP",
