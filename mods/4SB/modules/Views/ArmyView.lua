@@ -113,34 +113,35 @@ ArmyView = Class(Group)
             :Alpha(0.4)
             :DisableHitTest()
 
-        LayoutFor(self._name)
-            :AtVerticalCenterIn(self)
-            :AtRightIn(self, 20)
-            :DisableHitTest()
-            :DropShadow(true)
-
-        LayoutFor(self._rating)
-            :AtVerticalCenterIn(self)
-            :LeftOf(self._name, 7)
-            :DisableHitTest()
-            :DropShadow(true)
-
-        LayoutFor(self._faction)
-            :AtVerticalCenterIn(self)
-            :AtRightIn(self._rating, 30)
-            :Over(self, 5)
-            :DisableHitTest()
-
         LayoutFor(self._color)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
-            --:Alpha(0.9)
             :Width(3)
             :DisableHitTest()
 
+        LayoutFor(self._faction)
+            :AtVerticalCenterIn(self)
+            :AtLeftIn(self, 4)
+            :Over(self, 5)
+            :DisableHitTest()
+
+        LayoutFor(self._rating)
+            :AtVerticalCenterIn(self)
+            :AnchorToLeft(self, -60)
+            :DisableHitTest()
+            :DropShadow(true)
+
+
+        LayoutFor(self._name)
+            :AtVerticalCenterIn(self)
+            :AtLeftIn(self, 70)
+            :DisableHitTest()
+            :DropShadow(true)
+
+
         LayoutFor(self)
-            :AtLeftIn(self._faction, -5)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(70) end)
             :Height(armyViewHeight)
 
     end,
@@ -292,9 +293,10 @@ AllyView = Class(ArmyView)
             :DisableHitTest()
         self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
 
-        LayoutFor(self._name)
-            :AtRightIn(self, 80)
+    
 
+        LayoutFor(self)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
     end,
 
     HandleEvent = function(self, event)
