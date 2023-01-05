@@ -15,29 +15,32 @@ function CreateScoreUI()
     local Options = import("/mods/4SB/modules/Options.lua")
     Options.Init()
 
+    local scoreboard
     if isReplay or IsObserver() then
-        controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
+        scoreboard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
     else
-        controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
+        scoreboard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
 
         Options.style.OnChange = function(var)
-            controls.scoreBoard.Layout = layouts[var()]
+            scoreboard.Layout = layouts[var()]
         end
-        controls.scoreBoard.Layout = layouts[Options.style()]
+        scoreboard.Layout = layouts[Options.style()]
 
     end
 
     Options.player.font.name.OnChange = function(var)
-        controls.scoreBoard:ResetArmyData()
+        scoreboard:ResetArmyData()
     end
 
 
     SetLayout()
     GameMain.AddBeatFunction(Update, true)
 
-    controls.scoreBoard.OnDestroy = function(self)
+    scoreboard.OnDestroy = function(self)
         GameMain.RemoveBeatFunction(Update)
     end
+
+    controls.scoreBoard = scoreboard
 end
 
 function SetLayout()
