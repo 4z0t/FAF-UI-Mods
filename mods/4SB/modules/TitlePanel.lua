@@ -5,6 +5,9 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 
+
+local Options = import("/mods/4SB/modules/Options.lua")
+
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
@@ -50,24 +53,24 @@ local TopInfoPanel = Class(Group)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
             :DisableHitTest()
-        self._time:SetFont(timeTextFont, timeTextSize)
+        self._time:SetFont(Options.title.font.time, timeTextSize)
 
 
         LayoutFor(self._speed)
             :AtCenterIn(self, 0, -30)
             :DisableHitTest()
-        self._speed:SetFont(qualityTextFont, qualityTextSize)
+        self._speed:SetFont(Options.title.font.gameSpeed, qualityTextSize)
 
         LayoutFor(self._quality)
             :AtCenterIn(self, 0, 30)
             :DisableHitTest()
-        self._quality:SetFont(qualityTextFont, qualityTextSize)
+        self._quality:SetFont(Options.title.font.quality, qualityTextSize)
 
         LayoutFor(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :DisableHitTest()
-        self._unitCap:SetFont(unitCapTextFont, unitCapTextSize)
+        self._unitCap:SetFont(Options.title.font.totalUnits, unitCapTextSize)
 
         LayoutFor(self)
             :Width(titlePanelWidth)

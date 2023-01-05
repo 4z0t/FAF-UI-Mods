@@ -34,7 +34,6 @@ local ShareManager = import("../ShareManager.lua")
 
 local checkboxes = import("../DataPanelConfig.lua").checkboxes
 
-local bgColor = UIUtil.disabledColor
 local bgColor = 'ff000000'
 
 local armyViewTextPointSize = 12

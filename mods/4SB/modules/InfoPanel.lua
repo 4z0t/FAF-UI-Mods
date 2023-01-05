@@ -6,6 +6,7 @@ local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -51,12 +52,12 @@ InfoPanel = Class(Group)
     _Layout = function(self)
 
 
-        self._mapName:SetFont(textFont, textSize)
+        self._mapName:SetFont(Options.title.font.mapName, textSize)
         LayoutFor(self._mapName)
             :AtCenterIn(self)
 
 
-        self._mapSize:SetFont(textFont, textSize)
+        self._mapSize:SetFont(Options.title.font.mapSize, textSize)
         LayoutFor(self._mapSize)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, 10)
