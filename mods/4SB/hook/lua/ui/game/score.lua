@@ -27,6 +27,10 @@ function CreateScoreUI()
 
     end
 
+    Options.player.font.name.OnChange = function(var)
+        controls.scoreBoard:ResetArmyData()
+    end
+
 
     SetLayout()
     GameMain.AddBeatFunction(Update, true)

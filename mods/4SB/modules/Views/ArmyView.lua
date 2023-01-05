@@ -42,7 +42,7 @@ local armyViewTextPointSize = 12
 local armyViewTextFont = "Zeroes Three"
 local focusArmyTextFont = 'Arial Bold'
 
-local nameWidth = LazyVar(20)
+nameWidth = LazyVar(20)
 
 
 local armyViewWidth = 250
@@ -142,7 +142,7 @@ ArmyView = Class(Group)
 
 
         LayoutFor(self)
-            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(70) end)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
             :Height(armyViewHeight)
 
     end,
@@ -159,7 +159,7 @@ ArmyView = Class(Group)
         self._name:SetText(name)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, armyViewTextFont, armyViewTextPointSize)))
+        nameWidth:Set(math.max(nameWidth(), TextWidth(name, Options.player.font.name(), armyViewTextPointSize)))
         self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
@@ -283,7 +283,7 @@ AllyView = Class(ArmyView)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
             :DisableHitTest()
-        self._energy:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._energy:SetFont(Options.player.font.energy:Raw(), armyViewTextPointSize)
 
 
 
@@ -292,7 +292,7 @@ AllyView = Class(ArmyView)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
             :DisableHitTest()
-        self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._mass:SetFont(Options.player.font.mass:Raw(), armyViewTextPointSize)
 
 
 
@@ -438,7 +438,8 @@ ReplayArmyView = Class(ArmyView)
 
         LayoutFor(self)
             :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(70) + self.Right() - first.Right() +
-                dataTextOffSet end)
+                    dataTextOffSet
+            end)
 
     end,
 
