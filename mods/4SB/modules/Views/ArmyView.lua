@@ -5,6 +5,7 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
@@ -153,13 +154,13 @@ ArmyView = Class(Group)
 
         self._rating:SetColor(armyColor)
         self._rating:SetText(rating)
-        self._rating:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
         self._name:SetText(name)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
         nameWidth:Set(math.max(nameWidth(), TextWidth(name, armyViewTextFont, armyViewTextPointSize)))
-        self._name:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,

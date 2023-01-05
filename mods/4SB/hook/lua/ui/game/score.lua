@@ -11,12 +11,15 @@ function CreateScoreUI()
 
     local isCampaign = import('/lua/ui/campaign/campaignmanager.lua').campaignMode
     local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
+
+    local Options = import("/mods/4SB/modules/Options.lua")
+    Options.Init()
+
     if isReplay or IsObserver() then
         controls.scoreBoard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
     else
         controls.scoreBoard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
-        local Options = import("/mods/4SB/modules/Options.lua")
-        Options.Init()
+
         Options.style.OnChange = function(var)
             controls.scoreBoard.Layout = layouts[var()]
         end
