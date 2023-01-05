@@ -293,7 +293,7 @@ AllyView = Class(ArmyView)
             :DisableHitTest()
         self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
 
-    
+
 
         LayoutFor(self)
             :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
@@ -408,7 +408,7 @@ ReplayArmyView = Class(ArmyView)
     _Layout = function(self)
         ArmyView._Layout(self)
 
-
+        local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
             if i == 1 then
@@ -418,6 +418,7 @@ ReplayArmyView = Class(ArmyView)
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
                     :AtVerticalCenterIn(self)
                     :DisableHitTest()
+                first = self._data[i]
             elseif i == dataSize then
                 LayoutFor(self._data[i])
                     :AtRightIn(self, lastDataTextOffset)
@@ -433,6 +434,10 @@ ReplayArmyView = Class(ArmyView)
             self._data[i]:SetText("0")
             self._data[i]._contracted = false
         end
+
+        LayoutFor(self)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(70) + self.Right() - first.Right() +
+                dataTextOffSet end)
 
     end,
 
