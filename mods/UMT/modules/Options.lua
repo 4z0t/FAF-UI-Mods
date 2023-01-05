@@ -126,7 +126,7 @@ function Fonts(name, optionVar, indent)
             "Arial",
             "Arial Black",
             "Arial Narrow",
-            "Zeros Three",
+            "Zeroes Three",
             "Butterbelly",
             "Arial Rounded MT Bold",
             "VDub",
