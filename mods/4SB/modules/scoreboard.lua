@@ -140,6 +140,21 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 
     end,
 
+    ResetArmyData = function(self)
+        ArmyViews.nameWidth:Set(20)
+        for _, armyData in Utils.GetArmiesFormattedTable() do
+            self:GetArmyViews()[armyData.id]:SetStaticData(
+                armyData.id,
+                armyData.name,
+                armyData.rating,
+                armyData.faction,
+                armyData.color,
+                armyData.teamColor
+            )
+
+        end
+    end,
+
     GetArmyViews = function(self)
         return self._armyViews
     end,
