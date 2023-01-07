@@ -3,7 +3,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local count = 20
+local count = 30
 
 local offset = 0
 
@@ -71,9 +71,10 @@ local pingColors = {
 
 PingAnimation = Class(Group)
 {
-    __init = function(self, parent, color)
+    __init = function(self, parent, color, location)
         Group.__init(self, parent)
         self._color = color
+        self._location = location
         self:_InitLayers(count)
     end,
 
@@ -112,13 +113,23 @@ PingAnimation = Class(Group)
                 :Width(1)
                 :Color(pingColors[self._color])
                 :Alpha(0)
+                :DisableHitTest()
             layer.id = i
             prev = layer
         end
         LayoutFor(self)
             :Left(prev.Left)
-            :DisableHitTest(true)
+            :EnableHitTest()
 
+    end,
+
+    HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' then
+            local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
+            currentCamSettings.Focus = self._location
+            GetCamera('WorldCamera'):RestoreSettings(currentCamSettings)
+            return true
+        end
     end,
 
     Animate = function(self)
