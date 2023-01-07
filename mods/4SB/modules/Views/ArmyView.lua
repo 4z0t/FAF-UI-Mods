@@ -183,7 +183,7 @@ ArmyView = Class(Group)
     ---@param self ArmyView
     ---@param pingData PingData
     DisplayPing = function(self, pingData)
-        local ping = PingAnimation(self, pingData.ArrowColor)
+        local ping = PingAnimation(self, pingData.ArrowColor, pingData.Location)
         LayoutFor(ping)
             :Top(self.Top)
             :Bottom(self.Bottom)
