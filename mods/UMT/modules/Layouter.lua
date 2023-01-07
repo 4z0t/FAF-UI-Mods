@@ -81,8 +81,8 @@ function LayouterMetaTable:NeedsFrameUpdate(state)
     return self
 end
 
-function LayouterMetaTable:Alpha(alpha)
-    self.c:SetAlpha(alpha)
+function LayouterMetaTable:Alpha(alpha, applyToChildren)
+    self.c:SetAlpha(alpha, applyToChildren)
     return self
 end
 
