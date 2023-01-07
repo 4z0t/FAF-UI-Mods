@@ -123,6 +123,10 @@ PingAnimation = Class(Group)
 
     end,
 
+    ---comment
+    ---@param self any
+    ---@param event KeyEvent
+    ---@return boolean
     HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' then
             local currentCamSettings = GetCamera('WorldCamera'):SaveSettings()
