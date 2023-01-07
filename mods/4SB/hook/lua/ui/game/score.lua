@@ -43,6 +43,12 @@ function CreateScoreUI()
     controls.scoreBoard = scoreboard
 end
 
+function DisplayPing(parent, pingData)
+    if IsDestroyed(controls.scoreBoard) then return end
+    controls.scoreBoard:DisplayPing(pingData)
+
+end
+
 function SetLayout()
     if IsDestroyed(controls.scoreBoard) then return end
 

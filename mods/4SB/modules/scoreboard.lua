@@ -37,6 +37,7 @@ local slideForward = animationFactory
 
 ---@class ScoreBoard : Group
 ---@field GameSpeed PropertyTable
+---@field _armyViews table<integer, ArmyView>
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
@@ -155,6 +156,9 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     end,
 
+    ---comment
+    ---@param self ScoreBoard
+    ---@return table<integer, ArmyView>
     GetArmyViews = function(self)
         return self._armyViews
     end,
@@ -213,10 +217,21 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
         local sa = SequentialAnimation(slideForward, 0.25, 1)
         sa:Apply(self:GetArmyViews())
+    end,
+
+    ---Displays ping data in scoreboard UI
+    ---@param self ScoreBoard
+    ---@param pingData PingData
+    DisplayPing = function(self, pingData)
+        if pingData.Marker or pingData.Renew then return end
+        self:GetArmyViews()[pingData.Owner + 1]:DisplayPing(pingData)
+
     end
 
 }
 
+
+---@class ReplayScoreBoard : ScoreBoard
 ReplayScoreBoard = UMT.Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)
