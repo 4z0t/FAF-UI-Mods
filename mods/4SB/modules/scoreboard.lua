@@ -16,12 +16,10 @@ local LazyImport = UMT.LazyImport
 local Scores = LazyImport("/lua/ui/game/score.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
-local SequentialAnimation = UMT.Animation.Sequential
-local animationFactory = UMT.Animation.Factory.Base
 
 local animationSpeed = 300
 
-local slideForward = animationFactory
+local slideForward = UMT.Animation.Factory.Base
     :OnStart()
     :OnFrame(function(control, delta)
         if control.Right() < control:GetParent().Right() then
@@ -215,7 +213,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
             local w = av.Width()
             av.Right:Set(av:GetParent().Right() + w)
         end
-        local sa = SequentialAnimation(slideForward, 0.25, 1)
+        local sa = UMT.Animation.Sequential(slideForward, 0.25, 1)
         sa:Apply(self:GetArmyViews())
     end,
 
