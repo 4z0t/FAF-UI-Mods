@@ -12,6 +12,7 @@ local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
+local PingAnimation = import("PingAnimation.lua").PingAnimation
 
 local appearAnimation = alphaAnimationFactory
     :ToAppear()
@@ -82,7 +83,7 @@ local slideBackWards = animationFactory
     end)
     :Create()
 
-
+---@class ArmyView : Group
 ArmyView = Class(Group)
 {
     __init = function(self, parent)
@@ -176,6 +177,18 @@ ArmyView = Class(Group)
             self.isOutOfGame = true
             self._name:SetColor(outOfGameColor)
         end
+    end,
+
+    ---comment
+    ---@param self ArmyView
+    ---@param pingData PingData
+    DisplayPing = function(self, pingData)
+        local ping = PingAnimation(self, pingData.ArrowColor)
+        LayoutFor(ping)
+            :Top(self.Top)
+            :Bottom(self.Bottom)
+            :Right(self.Left)
+        ping:Animate()
     end
 }
 
