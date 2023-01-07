@@ -4,15 +4,15 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local textures = {
-    tl = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_ul.dds'),
-    tr = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds'),
-    tm = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds'),
-    ml = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_vert_l.dds'),
-    m = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_m.dds'),
-    mr = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds'),
-    bl = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_ll.dds'),
-    bm = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds'),
-    br = UIUtil.UIFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'),
+    tl = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_ul.dds'),
+    tr = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds'),
+    tm = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds'),
+    ml = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_vert_l.dds'),
+    m = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_m.dds'),
+    mr = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds'),
+    bl = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_ll.dds'),
+    bm = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds'),
+    br = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'),
 }
 
 
