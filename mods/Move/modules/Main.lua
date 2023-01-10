@@ -11,25 +11,23 @@ end
 
 function Start()
     locked = not locked
-    if locked then
-        Reset()
-    end
+    Reset()
 end
 
 ---comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
-    if locked and not (not commandModeData or commandModeData.name ~= "RULEUCC_Move") then
-        ForkThread(Reset)
-    end
+
 end
 
 ---comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
-
+    if locked and (commandModeData and commandModeData.name == "RULEUCC_Move") then
+        ForkThread(Reset)
+    end
 end
 
 function Main(isReplay)
