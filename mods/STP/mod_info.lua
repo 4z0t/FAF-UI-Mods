@@ -1,10 +1,10 @@
 name = "Specific Target Priorities"
-version = 1
+version = 2
+uid = "Specific-Target-Priorities-v02"
 copyright = ""
 description = "Hover over specific unit to target its type"
 author = "4z0t"
 url = ""
-uid = "Specific-Target-Priorities-v01"
 exclusive = false
 ui_only = true
 conflicts = {}
