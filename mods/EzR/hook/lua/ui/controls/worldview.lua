@@ -24,12 +24,6 @@ do
                 self.EnabledWithReclaimMode = false
             end
             return oldWorldView.OnUpdateCursor(self)
-        end,
-
-        OnDestroy = function(self)
-            ShowReclaim(false)
-            oldWorldView.OnDestroy(self)
         end
-        
     }
 end
