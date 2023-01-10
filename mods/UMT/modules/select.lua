@@ -1,6 +1,7 @@
-local SetIgnoreSelection = import('/lua/ui/game/gamemain.lua').SetIgnoreSelection
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 local CommandMode = import('/lua/ui/game/commandmode.lua')
-
+---Performs hidden unit selection callback
+---@param callback fun()
 function Hidden(callback)
     local current_command = CommandMode.GetCommandMode()
     local old_selection = GetSelectedUnits() or {}

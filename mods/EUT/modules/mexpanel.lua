@@ -1,28 +1,31 @@
-local CommonUnits = import('/mods/common/units.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
-local Text = import('/lua/maui/text.lua').Text
-local UIUtil = import('/lua/ui/uiutil.lua')
-local GameMain = import('/lua/ui/game/gamemain.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Prefs = import('/lua/user/prefs.lua')
-local Dragger = import('/lua/maui/dragger.lua').Dragger
+local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = import("/lua/maui/group.lua").Group
+local Text = import("/lua/maui/text.lua").Text
+local UIUtil = import("/lua/ui/uiutil.lua")
+local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+local Prefs = import("/lua/user/prefs.lua")
+local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-local mexCategories = import('mexcategories.lua').mexCategories
-local From = import('/mods/UMT/modules/linq.lua').From
-local MexManager = import('mexmanager.lua')
+local From = import("/mods/UMT/modules/linq.lua").From
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+
+local mexCategories = import("mexcategories.lua").mexCategories
+local MexManager = import("mexmanager.lua")
 
 local mexPanel
-function init()
+local upgradeTexture = "/mods/EUT/textures/upgrade.dds"
+local pausedTexture = "/textures/ui/common/game/strategicicons/pause_rest.dds"
+
+function init(parent)
     if not IsDestroyed(mexPanel) then
         mexPanel:Destroy()
     end
-    mexPanel = MexPanel(GetFrame(0))
+    mexPanel = MexPanel(parent)
 end
 
 local function MexPanelHandleEvent(control, event, category)
     local id = control.id
-    if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+    if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
         if event.Modifiers.Right then
             if category.isPaused ~= nil then
                 if event.Modifiers.Ctrl then
@@ -34,12 +37,26 @@ local function MexPanelHandleEvent(control, event, category)
                 else
                     MexManager.SetPausedAll(id, not category.isPaused)
                 end
+            else
+                if event.Modifiers.Ctrl then
+                    MexManager.UpgradeOnScreen(id)
+                else
+                    MexManager.SelectOnScreen(id)
+                end
             end
         elseif event.Modifiers.Left then
-            if event.Modifiers.Ctrl then
-                MexManager.SelectBest(id)
+            if category.isPaused ~= nil then
+                if event.Modifiers.Ctrl then
+                    MexManager.SelectBest(id)
+                else
+                    MexManager.SelectAll(id)
+                end
             else
-                MexManager.SelectAll(id)
+                if event.Modifiers.Ctrl then
+                    MexManager.UpgradeAll(id)
+                else
+                    MexManager.SelectAll(id)
+                end
             end
         else
             -- middle mouse button
@@ -62,15 +79,19 @@ MexPanel = Class(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:EnableHitTest()
-        LayoutHelpers.DepthOverParent(self, parent, 100)
-        LayoutHelpers.SetDimensions(self, 170, 60)
-        self.contents = Group(self)
-        LayoutHelpers.SetDimensions(self.contents, 168, 50)
-        LayoutHelpers.AtCenterIn(self.contents, self)
-        self:InitMexPanels(self.contents)
         local pos = self:_LoadPosition()
-        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
+        LayoutFor(self)
+            :Width(170)
+            :Height(60)
+            :AtLeftTopIn(parent, pos.left, pos.top)
+            :HitTest(true)
+            :Over(parent, 100)
+        self.contents = Group(self)
+        LayoutFor(self.contents)
+            :Width(168)
+            :Height(50)
+            :AtCenterIn(self)
+        self:InitMexPanels(self.contents)
     end,
 
     InitMexPanels = function(self, parent)
@@ -91,46 +112,53 @@ MexPanel = Class(Group) {
 
     CreateMexCategoryPanel = function(self, parent, category)
         local group = Bitmap(parent)
-        group:EnableHitTest()
-        group:SetSolidColor('aa000000')
-        LayoutHelpers.SetDimensions(group, 22, 50)
+
+        LayoutFor(group)
+            :HitTest(true)
+            :Color("aa000000")
+            :Width(22)
+            :Height(50)
+
+
         group.category = category
+        local iconName = "/textures/ui/common/game/strategicicons/" .. category.icon .. "_rest.dds"
 
         group.stratIcon = Bitmap(group)
-        group.stratIcon:DisableHitTest()
-        local iconName = '/textures/ui/common/game/strategicicons/' .. category.icon .. '_rest.dds'
-        group.stratIcon:SetTexture(iconName)
-        group.stratIcon:SetAlpha(0.3)
-        LayoutHelpers.AtHorizontalCenterIn(group.stratIcon, group)
-        LayoutHelpers.AtTopIn(group.stratIcon, group, 11)
+
+        LayoutFor(group.stratIcon)
+            :HitTest(false)
+            :Texture(iconName)
+            :Alpha(0.3)
+            :AtTopCenterIn(group, 11)
 
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
-            group.pauseIcon:DisableHitTest()
-            local iconName = '/textures/ui/common/game/strategicicons/pause_rest.dds'
-            group.pauseIcon:SetTexture(iconName)
-            LayoutHelpers.SetDimensions(group.pauseIcon, 24, 24)
-            group.pauseIcon:SetAlpha(0.3)
-            LayoutHelpers.AtHorizontalCenterIn(group.pauseIcon, group)
-            LayoutHelpers.AtTopIn(group.pauseIcon, group, 8)
+            LayoutFor(group.pauseIcon)
+                :HitTest(false)
+                :Texture(pausedTexture)
+                :Width(24)
+                :Height(24)
+                :Alpha(0.3)
+                :AtTopCenterIn(group, 8)
         end
 
         if category.isUpgrading then
             group.upgrIcon = Bitmap(group)
-            group.upgrIcon:DisableHitTest()
-            local iconName = '/mods/EUT/textures/upgrade.dds'
-            group.upgrIcon:SetTexture(iconName)
-            LayoutHelpers.SetDimensions(group.upgrIcon, 8, 8)
-            group.upgrIcon:SetAlpha(0.3)
-            LayoutHelpers.AtHorizontalCenterIn(group.upgrIcon, group, 5)
-            LayoutHelpers.AtTopIn(group.upgrIcon, group, 20)
+
+            LayoutFor(group.upgrIcon)
+                :HitTest(false)
+                :Texture(upgradeTexture)
+                :Width(8)
+                :Height(8)
+                :Alpha(0.3)
+                :AtTopCenterIn(group, 20, 5)
         end
 
         group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
-        group.countLabel:SetNewColor('ffaaaaaa')
-        group.countLabel:DisableHitTest()
-        LayoutHelpers.AtHorizontalCenterIn(group.countLabel, group)
-        LayoutHelpers.AtTopIn(group.countLabel, group, 1)
+        LayoutFor(group.countLabel)
+            :Color("ffaaaaaa")
+            :HitTest(false)
+            :AtTopCenterIn(group, 1)
 
         if category.isUpgrading then
             group.ProgressBars = {}
@@ -138,20 +166,23 @@ MexPanel = Class(Group) {
             for i = 0, 9 do
 
                 local progress = Bitmap(group)
-                progress:DisableHitTest()
-                progress:SetSolidColor('3300ff00')
-                progress.Width:Set(group.Width)
-                LayoutHelpers.SetHeight(progress, 2)
-                LayoutHelpers.AtLeftBottomIn(progress, group, 0, i * 2)
-                progress:Hide()
+                LayoutFor(progress)
+                    :HitTest(false)
+                    :Color("3300ff00")
+                    :Width(group.Width)
+                    :Height(2)
+                    :AtLeftBottomIn(group, 0, i * 2)
+                    :Hide()
 
                 local bg = Bitmap(group)
-                bg:DisableHitTest()
-                bg:SetSolidColor('1100ff00')
-                bg.Width:Set(group.Width)
-                LayoutHelpers.SetHeight(bg, 2)
-                LayoutHelpers.AtLeftBottomIn(bg, group, 0, i * 2)
-                bg:Hide()
+
+                LayoutFor(bg)
+                    :HitTest(false)
+                    :Color("1100ff00")
+                    :Width(group.Width)
+                    :Height(2)
+                    :AtLeftBottomIn(group, 0, i * 2)
+                    :Hide()
 
                 table.insert(group.ProgressBars, progress)
                 table.insert(group.BackGroundBars, bg)
@@ -159,10 +190,10 @@ MexPanel = Class(Group) {
         end
 
         group.HandleEvent = function(control, event)
-            if event.Type == 'MouseExit' then
-                control:SetSolidColor('aa000000')
-            elseif event.Type == 'MouseEnter' then
-                control:SetSolidColor('11ffffff')
+            if event.Type == "MouseExit" then
+                control:SetSolidColor("aa000000")
+            elseif event.Type == "MouseEnter" then
+                control:SetSolidColor("11ffffff")
             else
                 return MexPanelHandleEvent(control, event, control.category)
             end
@@ -194,6 +225,9 @@ MexPanel = Class(Group) {
                             control.ProgressBars[i]:Show()
                             control.BackGroundBars[i]:Show()
                             control.ProgressBars[i].Width:Set(control.BackGroundBars[i].Width() * progress)
+                        else
+                            control.ProgressBars[i]:Hide()
+                            control.BackGroundBars[i]:Hide()
                         end
                     else
                         control.ProgressBars[i]:Hide()
@@ -207,20 +241,23 @@ MexPanel = Class(Group) {
     end,
 
     UpdateMexPanels = function(self, data)
+        if self:IsHidden() then
+            return
+        end
         for i, d in data do
             self.contents.panels[i]:Update(d)
         end
     end,
 
     HandleEvent = function(self, event)
-        if event.Type == 'ButtonPress' then
+        if event.Type == "ButtonPress" then
             local drag = Dragger()
             local offX = event.MouseX - self.Left()
             local offY = event.MouseY - self.Top()
             drag.OnMove = function(dragself, x, y)
                 self.Left:Set(x - offX)
                 self.Top:Set(y - offY)
-                GetCursor():SetTexture(UIUtil.GetCursor('MOVE_WINDOW'))
+                GetCursor():SetTexture(UIUtil.GetCursor("MOVE_WINDOW"))
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
@@ -232,7 +269,7 @@ MexPanel = Class(Group) {
     end,
 
     _LoadPosition = function(self)
-        return Prefs.GetFromCurrentProfile('EUTpos') or {
+        return Prefs.GetFromCurrentProfile("EUTpos") or {
             left = 100,
             top = 50
         }
@@ -240,8 +277,8 @@ MexPanel = Class(Group) {
 
     _SavePosition = function(self)
         Prefs.SetToCurrentProfile("EUTpos", {
-            left = self.Left(),
-            top = self.Top()
+            left = LayoutHelpers.InvScaleNumber(self.Left()),
+            top = LayoutHelpers.InvScaleNumber(self.Top())
         })
     end
 
