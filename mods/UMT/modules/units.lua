@@ -21,7 +21,7 @@ local prevCache = 0
 ---@param callback fun()
 function HiddenSelect(callback)
     local currentCommand = CommandMode.GetCommandMode()
-    local oldSelection = GetSelectedUnits() or {}
+    local oldSelection = GetSelectedUnits()
     SetIgnoreSelection(true)
     callback()
     SelectUnits(oldSelection)
