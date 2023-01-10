@@ -3,7 +3,9 @@ local KeyMapper = import('/lua/keymap/keymapper.lua')
 
 local locked = false
 
-
+function IsLocked()
+    return locked
+end
 
 function Reset()
     ConExecute 'StartCommandMode order RULEUCC_Move'
