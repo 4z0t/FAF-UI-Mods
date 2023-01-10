@@ -11,7 +11,7 @@ function Reset()
     ConExecute 'StartCommandMode order RULEUCC_Move'
 end
 
-function Start()
+function Toggle()
     locked = not locked
     Reset()
 end
@@ -41,6 +41,6 @@ function Main(isReplay)
 end
 
 KeyMapper.SetUserKeyAction('Move only', {
-    action = 'UI_Lua import("/mods/Move/modules/Main.lua").Start()',
+    action = 'UI_Lua import("/mods/Move/modules/Main.lua").Toggle()',
     category = 'orders'
 })

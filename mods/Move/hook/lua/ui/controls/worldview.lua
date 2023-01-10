@@ -8,7 +8,7 @@ do
         ---@param event KeyEvent
         HandleEvent = function(self, event)
             if event.Modifiers.Right and MoveOnly.IsLocked() then
-                MoveOnly.Start()
+                MoveOnly.Toggle()
             end
             oldWorldView.HandleEvent(self, event)
         end
