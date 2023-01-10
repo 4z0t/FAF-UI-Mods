@@ -19,6 +19,7 @@ EscapeCover = Class(Bitmap)
 
         self:SetSolidColor('78000000')
 
+        self._poped = false
 
         EscapeHandler.PushEscapeHandler(function()
             self:OnEscapePressed()
@@ -35,6 +36,7 @@ EscapeCover = Class(Bitmap)
 
     Close = function(self)
         EscapeHandler.PopEscapeHandler()
+        self._poped = true
         self:OnClose()
     end,
 
@@ -48,6 +50,7 @@ EscapeCover = Class(Bitmap)
     end,
 
     OnDestroy = function(self)
+        if self._poped then return end
         EscapeHandler.PopEscapeHandler()
     end,
 
