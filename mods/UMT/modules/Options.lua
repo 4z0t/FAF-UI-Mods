@@ -156,7 +156,7 @@ local OptionLine = Class(Group)
 
         self._bg.OnCheck = function(bg, checked)
             if IsDestroyed(optionsWindows[self.id]) then
-                optionsWindows[self.id] = OptionsWindow(GetFrame(parent:GetRootFrame():GetTargetHead()), self.data[1],
+                optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
                     self.id, self.data[2])
                 optionsSelector:Destroy()
             end

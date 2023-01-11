@@ -13,7 +13,7 @@ EscapeCover = Class(Bitmap)
         Bitmap.__init(self, parent)
 
 
-        local frame = GetFrame(parent:GetRootFrame():GetTargetHead())
+        local frame = parent:GetRootFrame()
         LayoutHelpers.FillParent(self, frame)
         self.Depth:Set(frame:GetTopmostDepth() + 10)
 
