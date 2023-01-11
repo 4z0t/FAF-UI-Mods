@@ -1,4 +1,5 @@
 local TableInsert = table.insert
+local ipairs = ipairs
 
 ---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
