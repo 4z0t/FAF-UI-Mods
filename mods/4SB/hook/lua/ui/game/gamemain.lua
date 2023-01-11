@@ -1,4 +1,8 @@
-do
+local function ExistGlobal(name)
+    return rawget(_G, name) ~= nil
+end
+
+if ExistGlobal "UMT" and UMT.Version >= 8 then
     local OriginalCreateUI = CreateUI
     function CreateUI(isReplay)
         OriginalCreateUI(isReplay)
