@@ -10,7 +10,7 @@ local MAX_DELTA_ALLOWED = 0.05
 Animator = Class(Group)
 {
     __init = function(self, parent)
-        Group.__init(self, parent)
+        Group.__init(self, parent or GetFrame(0))
         self._controls = {}
         self._controlsStates = {}
         self.Left:Set(0)
@@ -87,7 +87,7 @@ Animator = Class(Group)
 local globalAnimator
 
 function Init()
-    globalAnimator = Animator(GetFrame(0))
+    globalAnimator = Animator()
 end
 
 ---global animator applies animation to control with additional args
