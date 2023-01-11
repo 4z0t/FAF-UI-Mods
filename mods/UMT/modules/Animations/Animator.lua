@@ -1,6 +1,7 @@
 ---@module "Animations/Animator"
 
 
+local IsDestroyed = IsDestroyed
 local Group = import('/lua/maui/group.lua').Group
 local MAX_DELTA_ALLOWED = 0.05
 
