@@ -189,7 +189,7 @@ ColoredSlider = Class(Group)
     end,
 
     _Constrain = function(self, value)
-        return math.max(math.min(value, self._endValue), self._startValue)
+        return math.clamp(value, self._startValue, self._endValue)
     end,
 
     OnValueSet = function(self, newValue) end,
