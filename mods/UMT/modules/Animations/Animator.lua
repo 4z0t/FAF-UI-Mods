@@ -21,28 +21,26 @@ Animator = Class(Group)
         self:DisableHitTest()
     end,
 
-    OnFrame = function(self, delta)
+    AnimateControls = function(self, delta)
         local controlsStates = self._controlsStates
+        for control, animation in self._controls do
+            if IsDestroyed(control) then
+                self:Remove(control, true)
+            elseif animation.OnFrame(control, delta, controlsStates[control]) then
+                self:Remove(control)
+            end
+        end
+    end,
+
+    OnFrame = function(self, delta)
         if delta > MAX_DELTA_ALLOWED then
             local n = math.ceil(delta / MAX_DELTA_ALLOWED)
             delta = delta / n
             for _ = 1, n do
-                for control, animation in self._controls do
-                    if IsDestroyed(control) then
-                        self:Remove(control, true)
-                    elseif animation.OnFrame(control, delta, controlsStates[control]) then
-                        self:Remove(control)
-                    end
-                end
+                self:AnimateControls(delta)
             end
         else
-            for control, animation in self._controls do
-                if IsDestroyed(control) then
-                    self:Remove(control, true)
-                elseif animation.OnFrame(control, delta, controlsStates[control]) then
-                    self:Remove(control)
-                end
-            end
+            self:AnimateControls(delta)
         end
     end,
 
