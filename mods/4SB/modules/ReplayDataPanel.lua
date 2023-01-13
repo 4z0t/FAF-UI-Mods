@@ -48,7 +48,6 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
         self._bg = Bitmap(self)
         LayoutFor(self._bg)
             :Color(bgColor)
-            :Alpha(0.4)
             :Fill(self._expand)
             :Top(self.Bottom)
     end,
@@ -120,7 +119,6 @@ DataPanel = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
 
