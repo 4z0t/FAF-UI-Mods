@@ -40,16 +40,25 @@ ArmyViewsContainer = Class(Group)
 
     _Layout = function(self)
         local last
+        local first
         for i, armyView in self._lines do
             if i == 1 then
                 LayoutFor(armyView)
                     :AtRightTopIn(self)
+                first = armyView
             else
                 LayoutFor(armyView)
                     :AnchorToBottom(self._lines[i - 1])
                     :Right(self.Right)
             end
             last = armyView
+        end
+        if not first then
+            LayoutFor(self)
+                :Height(0)
+                :Width(0)
+                :DisableHitTest()
+            return
         end
         if last then
             self.Bottom:Set(last.Bottom)
