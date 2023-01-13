@@ -4,7 +4,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-
+local Options = import("/mods/4SB/modules/Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
@@ -12,7 +12,7 @@ local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSli
 local obsTextFont = "Zeroes Three"
 local obsTextSize = 12
 
-local bgColor = "ff000000"
+local bgColor = Options.player.color.bg:Raw()
 
 
 

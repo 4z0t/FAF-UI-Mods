@@ -4,12 +4,12 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
 local textFont = "Zeroes Three"
 local textSize = 12
@@ -20,7 +20,7 @@ local panelHeight = 20
 local checkboxWidth = 18
 local checkboxHeight = 18
 
-local bgColor = "ff000000"
+local bgColor = Options.player.color.bg:Raw()
 
 local checkboxes = import("DataPanelConfig.lua").checkboxes
 local Chechbox = Class(AnimatedBorderedCheckBox)

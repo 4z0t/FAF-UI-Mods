@@ -1,10 +1,3 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
-local UIUtil = import('/lua/ui/uiutil.lua')
-
-
 local Utils = import("Utils.lua")
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local ArmyViews = import("Views/ArmyView.lua")

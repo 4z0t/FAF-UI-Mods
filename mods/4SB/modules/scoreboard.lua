@@ -265,18 +265,18 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
             :Right(self.Right)
             :Top(self._armiesContainer.Bottom)
 
-        LayoutFor(self._dataPanel)
+        LayoutFor(self._teamsContainer)
             :Right(self.Right)
             :Top(self._obs.Bottom)
 
-        LayoutFor(self._teamsContainer)
+        LayoutFor(self._dataPanel)
             :Right(self.Right)
-            :Top(self._dataPanel.Bottom)
+            :Top(self._teamsContainer.Bottom)
 
 
         LayoutFor(self)
             :Width(100)
-            :Bottom(self._teamsContainer.Bottom)
+            :Bottom(self._dataPanel.Bottom)
             :Over(GetFrame(0), 1000)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
