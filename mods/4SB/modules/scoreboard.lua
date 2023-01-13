@@ -9,6 +9,7 @@ local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
+local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 
 
@@ -236,6 +237,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         ScoreBoard.__init(self, parent, isTitle)
 
         self._armiesContainer = ArmyViewsContainer(self)
+        self._teamsContainer = TeamViewsContainer(self)
         self._obs = ObserverPanel(self)
         self._dataPanel = DataPanel(self)
     end,
@@ -267,9 +269,14 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
             :Right(self.Right)
             :Top(self._obs.Bottom)
 
+        LayoutFor(self._teamsContainer)
+            :Right(self.Right)
+            :Top(self._dataPanel.Bottom)
+
+
         LayoutFor(self)
             :Width(100)
-            :Bottom(self._dataPanel.Bottom)
+            :Bottom(self._teamsContainer.Bottom)
             :Over(GetFrame(0), 1000)
             :AtRightTopIn(GetFrame(0), 0, 20)
             :DisableHitTest()
@@ -287,6 +294,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
+        self._teamsContainer:Update(data)
     end,
 
     SortArmies = function(self, func, direction)
@@ -295,14 +303,17 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
     SetDataSetup = function(self, setup)
         self._armiesContainer:Setup(setup)
+        self._teamsContainer:Setup(setup)
     end,
 
     Expand = function(self, id)
         self._armiesContainer:Expand(id)
+        self._teamsContainer:Expand(id)
     end,
 
     Contract = function(self, id)
         self._armiesContainer:Contract(id)
+        self._teamsContainer:Contract(id)
     end,
 
     GetArmyViews = function(self)

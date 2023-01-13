@@ -563,13 +563,12 @@ ReplayTeamView = Class(ReplayArmyView)
                 res, formatFunc = checkboxData.GetData(data)
                 return res
             end)
-
             formatFunc = formatFunc or FormatNumber
             local text = formatFunc(value)
             dataText:SetText(text)
             dataText:SetColor(color)
         end
-        
+
     end,
 
 }
