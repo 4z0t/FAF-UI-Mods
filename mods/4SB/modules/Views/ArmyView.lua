@@ -522,15 +522,6 @@ local LuaQ = UMT.LuaQ
 
 ReplayTeamView = Class(ReplayArmyView)
 {
-    __init = function(self, parent)
-        ReplayArmyView.__init(self, parent)
-
-        self._data = {}
-        for i = 1, table.getn(checkboxes) do
-            self._data[i] = Text(self)
-        end
-    end,
-
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
         self.id = teamId
         self._armies = armies | LuaQ.toSet

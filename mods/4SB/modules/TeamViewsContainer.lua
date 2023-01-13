@@ -23,22 +23,19 @@ TeamViewsContainer = Class(ArmyViewsContainer)
 
         local armiesData = Utils.GetArmiesFormattedTable()
 
-        local teamIds = armiesData | LuaQ.select(function(armyData) return armyData.teamId end) | LuaQ.toSet
-
-
-        local teams = teamIds |
-            LuaQ.select.keyvalue(function(id)
+        local teams = armiesData | LuaQ.select(function(armyData) return armyData.teamId end)
+            | LuaQ.toSet
+            | LuaQ.select.keyvalue(function(id)
                 return armiesData
                     | LuaQ.where(function(armyData) return armyData.teamId == id end)
                     | LuaQ.select "id"
             end)
-        reprsl(teams)
 
         for team, armies in teams do
             local teamView = ArmyViews.ReplayTeamView(self)
             local teamColor = (armiesData | LuaQ.first(function(armyData) return armyData.teamId == team end)).teamColor
             local rating = armiesData |
-                LuaQ.sum(function(_,armyData) if armyData.teamId ~= team then return 0 end return armyData.rating end)
+                LuaQ.sum(function(_, armyData) if armyData.teamId ~= team then return 0 end return armyData.rating end)
 
             teamView:SetStaticData(
                 team,
@@ -51,7 +48,7 @@ TeamViewsContainer = Class(ArmyViewsContainer)
             self._armyViews[team] = teamView
         end
 
-
+        self._teams = teams
         self._armyDataCache = armiesData
     end,
 
