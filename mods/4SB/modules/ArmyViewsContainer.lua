@@ -57,7 +57,7 @@ ArmyViewsContainer = Class(Group)
         self._top = self._lines[1]
         self._bottom = last
         LayoutFor(self)
-            :Width(0)
+            :Width(self._top.Width)
             :DisableHitTest()
     end,
 
