@@ -517,3 +517,59 @@ ReplayArmyView = Class(ArmyView)
 
     end,
 }
+
+local LuaQ = UMT.LuaQ
+
+ReplayTeamView = Class(ReplayArmyView)
+{
+    __init = function(self, parent)
+        ReplayArmyView.__init(self, parent)
+
+        self._data = {}
+        for i = 1, table.getn(checkboxes) do
+            self._data[i] = Text(self)
+        end
+    end,
+
+    SetStaticData = function(self, teamId, name, rating, teamColor, armies)
+        self.id = teamId
+        self._armies = armies | LuaQ.toSet
+        self._color:SetSolidColor(teamColor)
+
+        self._rating:SetText(rating)
+        self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
+
+        self._name:SetText(name)
+        self._name:SetClipToWidth(true)
+        self._name.Width:Set(nameWidth)
+        nameWidth:Set(math.max(nameWidth(), TextWidth(name, Options.player.font.name(), armyViewTextPointSize)))
+        self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
+
+        self._faction:Hide()
+    end,
+
+
+    Update = function(self, playersData, setup)
+
+
+        for i, dataText in self._data do
+            local checkboxData = checkboxes[i][ setup[i] ]
+            local color = checkboxData.nc
+
+            local formatFunc
+            local value = playersData | LuaQ.sum(function(i, data)
+                if not self._armies[i] or data.resources == nil then return 0 end
+                local res
+                res, formatFunc = checkboxData.GetData(data)
+                return res
+            end)
+
+            formatFunc = formatFunc or FormatNumber
+            local text = formatFunc(value)
+            dataText:SetText(text)
+            dataText:SetColor(color)
+        end
+        
+    end,
+
+}
