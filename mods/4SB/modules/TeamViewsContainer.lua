@@ -24,7 +24,8 @@ TeamViewsContainer = Class(ArmyViewsContainer)
                     | LuaQ.select "id"
             end)
         self._teams = teams
-        if teams | LuaQ.count == armiesData | LuaQ.count then return end
+        self._armyDataCache = armiesData
+        if teams | LuaQ.count.keyvalue == armiesData | LuaQ.count then return end
 
         for team, armies in teams do
             local teamView = ArmyViews.ReplayTeamView(self)
@@ -39,11 +40,10 @@ TeamViewsContainer = Class(ArmyViewsContainer)
                 teamColor,
                 armies)
 
-            self._lines[team] = teamView
+            table.insert(self._lines, teamView)
             self._armyViews[team] = teamView
         end
 
-        self._armyDataCache = armiesData
     end,
 
     Update = function(self, data)
