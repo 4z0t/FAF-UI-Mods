@@ -16,7 +16,7 @@ TeamViewsContainer = Class(ArmyViewsContainer)
 
         local armiesData = Utils.GetArmiesFormattedTable()
 
-        local teams = armiesData | LuaQ.select(function(armyData) return armyData.teamId end)
+        local teams = armiesData | LuaQ.select "teamId"
             | LuaQ.toSet
             | LuaQ.select.keyvalue(function(id)
                 return armiesData
@@ -38,7 +38,8 @@ TeamViewsContainer = Class(ArmyViewsContainer)
                 ("Team %d"):format(team),
                 rating,
                 teamColor,
-                armies)
+                armies
+            )
 
             table.insert(self._lines, teamView)
             self._armyViews[team] = teamView
