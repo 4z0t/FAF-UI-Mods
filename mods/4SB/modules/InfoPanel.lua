@@ -50,21 +50,21 @@ InfoPanel = Class(Group)
     end,
 
     _Layout = function(self)
+        local parent = self:GetParent()
 
-
-        self._mapName:SetFont(Options.title.font.mapName, textSize)
+        self._mapName:SetFont(Options.title.font.mapName:Raw(), textSize)
         LayoutFor(self._mapName)
             :AtCenterIn(self)
 
 
-        self._mapSize:SetFont(Options.title.font.mapSize, textSize)
+        self._mapSize:SetFont(Options.title.font.mapSize:Raw(), textSize)
         LayoutFor(self._mapSize)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, 10)
             :DisableHitTest()
 
         LayoutFor(self)
-            :Width(panelWidth)
+            :Width(parent.Width)
             :Height(panelHeight)
             :DisableHitTest()
     end,

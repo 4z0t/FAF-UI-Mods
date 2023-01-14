@@ -48,32 +48,32 @@ local TopInfoPanel = Class(Group)
     end,
 
     _Layout = function(self)
-
+        local parent = self:GetParent()
         LayoutFor(self._time)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
             :DisableHitTest()
-        self._time:SetFont(Options.title.font.time, timeTextSize)
+        self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
 
 
         LayoutFor(self._speed)
             :AtCenterIn(self, 0, -30)
             :DisableHitTest()
-        self._speed:SetFont(Options.title.font.gameSpeed, qualityTextSize)
+        self._speed:SetFont(Options.title.font.gameSpeed:Raw(), qualityTextSize)
 
         LayoutFor(self._quality)
             :AtCenterIn(self, 0, 30)
             :DisableHitTest()
-        self._quality:SetFont(Options.title.font.quality, qualityTextSize)
+        self._quality:SetFont(Options.title.font.quality:Raw(), qualityTextSize)
 
         LayoutFor(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :DisableHitTest()
-        self._unitCap:SetFont(Options.title.font.totalUnits, unitCapTextSize)
+        self._unitCap:SetFont(Options.title.font.totalUnits:Raw(), unitCapTextSize)
 
         LayoutFor(self)
-            :Width(titlePanelWidth)
+            :Width(parent.Width)
             :Height(titlePanelHeight)
     end,
 
@@ -215,7 +215,7 @@ TitlePanel = Class(Group)
             :Over(self._top)
 
         LayoutFor(self)
-            :Width(self._top.Width)
+            :Width(titlePanelWidth)
             :Bottom(self._info.Bottom)
     end,
 
