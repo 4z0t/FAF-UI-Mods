@@ -548,7 +548,7 @@ ReplayTeamView = Class(ReplayArmyView)
             local color = checkboxData.nc
 
             local formatFunc
-            local value = playersData | LuaQ.sum(function(i, data)
+            local value = playersData | LuaQ.sum.keyvalue(function(i, data)
                 if not self._armies[i] or data.resources == nil then return 0 end
                 local res
                 res, formatFunc = checkboxData.GetData(data)
