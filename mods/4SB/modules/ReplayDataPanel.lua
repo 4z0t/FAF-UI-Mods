@@ -8,6 +8,7 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
+local LazyVar = import('/lua/lazyvar.lua').Create
 
 local Options = import("/mods/4SB/modules/Options.lua")
 
@@ -116,28 +117,48 @@ DataPanel = Class(Group)
 
     _Layout = function(self)
 
+
+        local dropdownsCount = table.getn(self._dropdowns)
+
+
+        local spacing = LazyVar()
+        spacing:Set(function()
+            return math.min(
+                math.floor((self.Width() - LayoutHelpers.ScaleNumber(dropdownsCount * checkboxWidth)) /
+                    (1 + dropdownsCount)),
+                LayoutHelpers.ScaleNumber(20)
+            )
+        end)
+
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
             :DisableHitTest()
 
-
+        local first = self._dropdowns[1]
 
         LayoutFor(self)
-            :AtLeftIn(self._dropdowns[1], -20)
+            :Width(panelWidth)
             :Height(panelHeight)
 
         for i, dropdown in self._dropdowns do
-            if i == table.getn(self._dropdowns) then
+            if i == dropdownsCount then
 
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :AtRightIn(self, 20)
+                    :Right(function()
+                        return self.Right() - spacing()
+                    end)
+
 
             else
+                local nextDD = self._dropdowns[i + 1]
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :LeftOf(self._dropdowns[i + 1], 20)
+                    :Right(function()
+                        return nextDD.Left() - spacing()
+                    end)
+                   
             end
         end
     end,
