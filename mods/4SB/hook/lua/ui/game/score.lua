@@ -24,16 +24,16 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         local isReplay   = import("/lua/ui/game/gamemain.lua").GetReplayState()
 
         local Options = import("/mods/4SB/modules/Options.lua")
-        Options.Init()
+        Options.Init(isReplay or IsObserver())
 
         local scoreboard
         if isReplay or IsObserver() then
             scoreboard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
 
-            Options.style.OnChange = function(var)
+            Options.replayStyle.OnChange = function(var)
                 scoreboard.Layout = replayLayouts[var()]
             end
-            scoreboard.Layout = replayLayouts[Options.style()]
+            scoreboard.Layout = replayLayouts[Options.replayStyle()]
         else
             scoreboard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
 

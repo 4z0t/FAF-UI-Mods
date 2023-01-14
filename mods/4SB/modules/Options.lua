@@ -29,15 +29,26 @@ player = {
 
     color = {
         bg = OptionVar(modName, "player.color.bg", "66000000"),
-     }
+    }
 }
 
 style = OptionVar(modName, "scoreboardStyle", "default")
+replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
 
 
-function Init()
+function Init(isReplay)
     Options.AddOptions(modName, "4z0t's ScoreBoard", {
-        Options.Strings("Scoreboard style", { "default", "semi glow border","glow border" }, style, 4),
+        isReplay and Options.Strings("Replay Scoreboard style",
+            {
+                "default",
+                "glow border"
+            },
+            replayStyle, 4) or Options.Strings("Scoreboard style",
+            {
+                "default",
+                "semi glow border",
+            },
+            style, 4),
         Options.Title("Title Fonts"),
         Options.Fonts("Game speed", title.font.gameSpeed, 4),
         Options.Fonts("Unit cap", title.font.totalUnits, 4),
