@@ -10,9 +10,7 @@ local ArmyViews = import("Views/ArmyView.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local defaultSortFunc = function()
 
-end
 
 ArmyViewsContainer = Class(Group)
 {

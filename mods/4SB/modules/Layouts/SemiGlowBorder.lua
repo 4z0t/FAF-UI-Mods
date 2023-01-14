@@ -46,35 +46,10 @@ Layout = function(scoreboard)
     scoreboard._border.b = Bitmap(scoreboard._border,
         UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds"))
 
-
-    local last
-    local first
-    for i, armyView in scoreboard._lines do
-        if i == 1 then
-            if scoreboard._title then
-                LayoutFor(armyView)
-                    :AnchorToBottom(scoreboard._title)
-                    :Right(scoreboard.Right)
-            else
-                LayoutFor(armyView)
-                    :AtRightTopIn(scoreboard)
-            end
-            first = armyView
-        else
-            LayoutFor(armyView)
-                :AnchorToBottom(scoreboard._lines[i - 1])
-                :Right(scoreboard.Right)
-        end
-        last = armyView
-    end
-    if last then
-        scoreboard.Bottom:Set(last.Bottom)
-    end
-
     do -- border layout
 
-        local leftTop = first.Left
-        local leftBottom = last.Left
+        local leftTop = scoreboard._lines[1].Left
+        local leftBottom = scoreboard._lines[scoreboard._lines | UMT.LuaQ.count].Left
         if scoreboard._title then
             leftTop = scoreboard._title.Left
         end
@@ -150,11 +125,8 @@ Layout = function(scoreboard)
     end
 
     LayoutFor(scoreboard)
-        :Width(100)
-        :Over(GetFrame(0), 1000)
         :AtRightIn(GetFrame(0), 20)
-        :DisableHitTest()
-        :NeedsFrameUpdate(true)
+
 
     return Clear
 end

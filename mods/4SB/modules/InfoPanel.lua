@@ -10,15 +10,10 @@ local Options = import("/mods/4SB/modules/Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-
-local textFont = "Zeroes Three"
 local textSize = 12
 
 local panelWidth = 300
 local panelHeight = 20
-
-local bgColor = "ff000000"
-
 
 
 function GetSizeInKM(size)

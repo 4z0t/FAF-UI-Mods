@@ -13,14 +13,10 @@ local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
-local timeTextFont = "Zeroes Three"
 local timeTextSize = 12
-
-local qualityTextFont = timeTextFont
 local qualityTextSize = 12
-
-local unitCapTextFont = timeTextFont
 local unitCapTextSize = 12
+
 
 local titlePanelWidth = 300
 local titlePanelHeight = 20
