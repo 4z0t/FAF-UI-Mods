@@ -37,7 +37,7 @@ style = OptionVar(modName, "scoreboardStyle", "default")
 
 function Init()
     Options.AddOptions(modName, "4z0t's ScoreBoard", {
-        Options.Strings("Scoreboard style", { "default", "semi glow border" }, style, 4),
+        Options.Strings("Scoreboard style", { "default", "semi glow border","glow border" }, style, 4),
         Options.Title("Title Fonts"),
         Options.Fonts("Game speed", title.font.gameSpeed, 4),
         Options.Fonts("Unit cap", title.font.totalUnits, 4),

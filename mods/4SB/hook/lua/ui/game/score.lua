@@ -11,6 +11,11 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         ["default"] = false,
         ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout
     }
+
+    local replayLayouts = {
+        ["default"] = false,
+        ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout
+    }
     function CreateScoreUI()
         if not IsDestroyed(controls.scoreBoard) then return end
 
@@ -24,6 +29,11 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         local scoreboard
         if isReplay or IsObserver() then
             scoreboard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
+
+            Options.style.OnChange = function(var)
+                scoreboard.Layout = replayLayouts[var()]
+            end
+            scoreboard.Layout = replayLayouts[Options.style()]
         else
             scoreboard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
 
