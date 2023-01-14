@@ -31,7 +31,7 @@ TeamViewsContainer = Class(ArmyViewsContainer)
             local teamView = ArmyViews.ReplayTeamView(self)
             local teamColor = (armiesData | LuaQ.first(function(armyData) return armyData.teamId == team end)).teamColor
             local rating = armiesData |
-                LuaQ.sum(function(armyData) if armyData.teamId ~= team then return 0 end return armyData.rating end)
+                LuaQ.sum(function(armyData) return armyData.teamId == team and armyData.rating or 0 end)
 
             teamView:SetStaticData(
                 team,

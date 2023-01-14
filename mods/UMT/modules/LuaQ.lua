@@ -335,10 +335,10 @@ local LuaQSumMetaTable = {
     end,
 
     ---sets selector for summing values of the table
-    ---@generic K
+    ---@generic T
     ---@generic V
     ---@param self SumPipeTable
-    ---@param selector fun(key:K, value:V):V
+    ---@param selector fun(value:V):T
     ---@return SumPipeTable
     __call = function(self, selector)
         self.__selector = selector
