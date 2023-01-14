@@ -485,6 +485,32 @@ local LuaQFirstMetaTable = {
 first = setmetatable({}, LuaQFirstMetaTable)
 
 
+local LuaQCountKeyValueMetaTable = {
+    __bor = function(tbl, self)
+
+        local condition = self.__condition
+        self.__condition = nil
+
+        if not condition then
+            return table.getsize(tbl)
+        end
+
+        local count = 0
+        for k, v in tbl do
+            if condition(k, v) then
+                count = count + 1
+            end
+        end
+
+        return count
+    end,
+
+    __call = function(self, condition)
+        self.__condition = condition
+        return self
+    end
+}
+
 local LuaQCountMetaTable = {
     __bor = function(tbl, self)
 
@@ -510,7 +536,11 @@ local LuaQCountMetaTable = {
         return self
     end
 }
-count = setmetatable({}, LuaQCountMetaTable)
+
+
+count = setmetatable({
+    keyvalue = setmetatable({}, LuaQCountKeyValueMetaTable)
+}, LuaQCountMetaTable)
 
 
 local LuaQToSetMetaTable = {
