@@ -22,6 +22,9 @@ end
 ---@param scoreboard ScoreBoard
 ---@return fun(scoreboard:ScoreBoard)
 Layout = function(scoreboard)
+
+    scoreboard:_Layout()
+
     scoreboard._bracket = Group(scoreboard)
     scoreboard._bracket.top = Bitmap(scoreboard._bracket, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
     scoreboard._bracket.middle = Bitmap(scoreboard._bracket,
@@ -149,7 +152,7 @@ Layout = function(scoreboard)
     LayoutFor(scoreboard)
         :Width(100)
         :Over(GetFrame(0), 1000)
-        :AtRightTopIn(GetFrame(0), 20, 20)
+        :AtRightIn(GetFrame(0), 20)
         :DisableHitTest()
         :NeedsFrameUpdate(true)
 

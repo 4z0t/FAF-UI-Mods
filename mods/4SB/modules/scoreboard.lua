@@ -90,7 +90,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         LayoutFor(self)
             :Width(100)
             :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 0, 20)
+            :AtRightIn(GetFrame(0))
             :DisableHitTest()
             :NeedsFrameUpdate(true)
     end,
@@ -279,7 +279,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
             :Width(self._armiesContainer.Width)
             :Bottom(self._dataPanel.Bottom)
             :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 0, 20)
+            :AtRightIn(GetFrame(0))
             :DisableHitTest()
     end,
 

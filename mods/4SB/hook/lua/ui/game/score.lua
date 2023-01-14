@@ -49,6 +49,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         end
 
 
+        controls.scoreBoard = scoreboard
         SetLayout()
         GameMain.AddBeatFunction(Update, true)
 
@@ -56,7 +57,6 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             GameMain.RemoveBeatFunction(Update)
         end
 
-        controls.scoreBoard = scoreboard
     end
 
     function DisplayPing(parent, pingData)
@@ -75,7 +75,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             local objectivesControls = import('/lua/ui/game/objectives2.lua').controls
             LayoutHelpers.AnchorToBottom(controls.scoreBoard, objectivesControls.bg.bracketBottom, 10)
         else
-
+            LayoutHelpers.AtTopIn(controls.scoreBoard, GetFrame(0), 20)
         end
     end
 
