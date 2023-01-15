@@ -186,7 +186,7 @@ OptionsWindow = Class(Window) {
         LayoutFor(self)
             :ResetRight()
             :Width(function()
-                return self.WidthColoumns() * 300
+                return LayoutHelpers.ScaleNumber(math.max(self.WidthColoumns() * 300, 400))
             end)
 
         cancelBtn.OnClick = function(control)
