@@ -48,27 +48,27 @@ local TopInfoPanel = Class(Group)
         LayoutFor(self._time)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
-            :Color(Options.title.color.time)
+            :Color(Options.title.color.time:Raw())
             :DisableHitTest()
         self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
 
 
         LayoutFor(self._speed)
             :AtCenterIn(self, 0, -30)
-            :Color(Options.title.color.gameSpeed)
+            :Color(Options.title.color.gameSpeed:Raw())
             :DisableHitTest()
         self._speed:SetFont(Options.title.font.gameSpeed:Raw(), qualityTextSize)
 
         LayoutFor(self._quality)
             :AtCenterIn(self, 0, 30)
-            
+            :Color(Options.title.color.quality:Raw())
             :DisableHitTest()
         self._quality:SetFont(Options.title.font.quality:Raw(), qualityTextSize)
 
         LayoutFor(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
-            :Color(Options.title.color.totalUnits)
+            :Color(Options.title.color.totalUnits:Raw())
             :DisableHitTest()
         self._unitCap:SetFont(Options.title.font.totalUnits:Raw(), unitCapTextSize)
 

@@ -15,6 +15,7 @@ title = {
     color = {
         time = OptionVar(modName, "title.color.time", 'ff00dbff'),
         gameSpeed = OptionVar(modName, "title.color.gameSpeed", 'ff00dbff'),
+        quality = OptionVar(modName, "title.color.quality", 'ff00dbff'),
         totalUnits = OptionVar(modName, "title.color.totalUnits", 'ffff9900'),
         bg = OptionVar(modName, "title.color.bg", "66000000"),
     }
@@ -69,6 +70,7 @@ function Init(isReplay)
         Options.ColorSlider("Timer", title.color.time, 4),
         Options.ColorSlider("Game speed", title.color.gameSpeed, 4),
         Options.ColorSlider("Unit cap", title.color.totalUnits, 4),
+        Options.ColorSlider("Quality", title.color.quality, 4),
         Options.Title("Player colors"),
         Options.ColorSlider("Background", player.color.bg, 4),
     })
