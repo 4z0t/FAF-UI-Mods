@@ -35,7 +35,7 @@ local slideForward = UMT.Animation.Factory.Base
 
 
 ---@class ScoreBoard : Group
----@field GameSpeed PropertyTable
+---@field GameSpeed PropertyTable<ScoreBoard, integer>
 ---@field _armyViews table<integer, ArmyView>
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
@@ -177,9 +177,11 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     end,
 
+    ---@type PropertyTable<ScoreBoard, integer>
     GameSpeed = UMT.Property
     {
         get = function(self)
+            
         end,
         set = function(self, value)
             if self._title then

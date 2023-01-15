@@ -4,17 +4,19 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
----@class SetupPropertyTable
----@field  set fun(class:fa-class, value:any)
----@field  get fun(class:fa-class): any
+---@generic T
+---@generic C: fa-class
+---@class SetupPropertyTable<C,T> : { set : fun(class: C, value: T), get : fun(class: C): T }
 
----@class PropertyTable
----@field  set fun(class:fa-class, value:any)
----@field  get fun(class:fa-class): any
+---@generic T
+---@generic C: fa-class
+---@class PropertyTable<C,T> : SetupPropertyTable
 ---@field __property true
 
----@param setup SetupPropertyTable
----@return PropertyTable
+---@generic T
+---@generic C: fa-class
+---@param setup SetupPropertyTable<C,T>
+---@return PropertyTable<C,T>
 function Property(setup)
     local getFunc = setup.get
     local setFunc = setup.set
