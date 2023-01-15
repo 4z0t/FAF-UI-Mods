@@ -21,7 +21,7 @@ local unitCapTextSize = 12
 local titlePanelWidth = 300
 local titlePanelHeight = 20
 
-local bgColor = Options.title.color.bg:Raw()
+local bgColor = Options.player.color.bg:Raw()
 
 
 
@@ -48,23 +48,27 @@ local TopInfoPanel = Class(Group)
         LayoutFor(self._time)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
+            :Color(Options.title.color.time)
             :DisableHitTest()
         self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
 
 
         LayoutFor(self._speed)
             :AtCenterIn(self, 0, -30)
+            :Color(Options.title.color.gameSpeed)
             :DisableHitTest()
         self._speed:SetFont(Options.title.font.gameSpeed:Raw(), qualityTextSize)
 
         LayoutFor(self._quality)
             :AtCenterIn(self, 0, 30)
+            
             :DisableHitTest()
         self._quality:SetFont(Options.title.font.quality:Raw(), qualityTextSize)
 
         LayoutFor(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
+            :Color(Options.title.color.totalUnits)
             :DisableHitTest()
         self._unitCap:SetFont(Options.title.font.totalUnits:Raw(), unitCapTextSize)
 

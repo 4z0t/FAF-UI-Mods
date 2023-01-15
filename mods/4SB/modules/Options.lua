@@ -13,6 +13,9 @@ title = {
         quality = OptionVar(modName, "title.font.quality", "Arial"),
     },
     color = {
+        time = OptionVar(modName, "title.color.time", 'ff00dbff'),
+        gameSpeed = OptionVar(modName, "title.color.gameSpeed", 'ff00dbff'),
+        totalUnits = OptionVar(modName, "title.color.totalUnits", 'ffff9900'),
         bg = OptionVar(modName, "title.color.bg", "66000000"),
     }
 }
@@ -62,7 +65,10 @@ function Init(isReplay)
         Options.Fonts("Mass", player.font.mass, 4),
         Options.Fonts("Energy", player.font.energy, 4),
         Options.Title("Title colors"),
-        Options.ColorSlider("Background", title.color.bg, 4),
+        --Options.ColorSlider("Background", title.color.bg, 4),
+        Options.ColorSlider("Timer", title.color.time, 4),
+        Options.ColorSlider("Game speed", title.color.gameSpeed, 4),
+        Options.ColorSlider("Unit cap", title.color.totalUnits, 4),
         Options.Title("Player colors"),
         Options.ColorSlider("Background", player.color.bg, 4),
     })
