@@ -523,19 +523,8 @@ local LuaQ = UMT.LuaQ
 ReplayTeamView = Class(ReplayArmyView)
 {
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
-        self.id = teamId
+        ReplayArmyView.SetStaticData(self, teamId, name, rating, 0, "ffffffff", teamColor)
         self._armies = armies | LuaQ.toSet
-        self._color:SetSolidColor(teamColor)
-
-        self._rating:SetText(rating)
-        self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
-
-        self._name:SetText(name)
-        self._name:SetClipToWidth(true)
-        self._name.Width:Set(nameWidth)
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, Options.player.font.name(), armyViewTextPointSize)))
-        self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
-
         self._faction:Hide()
     end,
 
