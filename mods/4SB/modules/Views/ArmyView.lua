@@ -560,6 +560,14 @@ ReplayTeamView = Class(ReplayArmyView)
             dataText:SetColor(color)
         end
 
+        if not self.isOutOfGame then
+            local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
+            if defeated then
+                self.isOutOfGame = true
+                self._name:SetColor(outOfGameColor)
+            end
+        end
+
     end,
 
 }
