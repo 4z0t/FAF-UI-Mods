@@ -149,7 +149,7 @@ OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
         Window.__init(self, parent, title, nil, false, false, true, false, options .. "window", {
             Left = 100,
-            Right = 600,
+            Right = 400,
             Top = 100,
             Bottom = 800
         }, windowTextures)
@@ -173,6 +173,8 @@ OptionsWindow = Class(Window) {
         end
         self._okBtn = okBtn
         self._colors = colors
+        self.WidthColoumns = LazyVar.Create(1)
+
 
         local cancelBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Cancel>', 16)
         LayoutFor(cancelBtn)
@@ -181,6 +183,11 @@ OptionsWindow = Class(Window) {
             :ResetLeft()
             :Over(self._optionsGroup)
             :End()
+        LayoutFor(self)
+            :ResetRight()
+            :Width(function()
+                return self.WidthColoumns() * 300
+            end)
 
         cancelBtn.OnClick = function(control)
             self:OnClose()
@@ -188,9 +195,16 @@ OptionsWindow = Class(Window) {
         self._optionVars = {}
         self._options = options
         self._previous = false
+        self._column = 1
         if buildTable then
             for _, entry in buildTable do
-                self:Add(entry, true)
+                if entry.type ~= "column" then
+                    self:Add(entry, true)
+                else
+                    self._column = entry.index
+                    self.WidthColoumns:Set(math.max(self.WidthColoumns(), self._column))
+                    self._previous = false
+                end
             end
             if self._previous then
                 self._optionsGroup.Bottom:Set(self._previous.Bottom)
@@ -414,9 +428,9 @@ OptionsWindow = Class(Window) {
     _addEntry = function(self, entry, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
-            LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
+            LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent + (self._column - 1) * 300)
         else
-            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup, indent)
+            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup, indent + (self._column - 1) * 300)
         end
         LayoutHelpers.DepthOverParent(entry, self._optionsGroup)
         self._previous = entry

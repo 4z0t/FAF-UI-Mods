@@ -65,6 +65,7 @@ function Init(isReplay)
         Options.Fonts("Rating", player.font.rating, 4),
         Options.Fonts("Mass", player.font.mass, 4),
         Options.Fonts("Energy", player.font.energy, 4),
+        Options.Column(2),
         Options.Title("Title colors"),
         --Options.ColorSlider("Background", title.color.bg, 4),
         Options.ColorSlider("Timer", title.color.time, 4),

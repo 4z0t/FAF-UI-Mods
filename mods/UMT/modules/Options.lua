@@ -22,7 +22,7 @@ local EscapeCover = UMT.Views.EscapeCover
 
 
 ---@class ControlConfig
----@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"
+---@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"|"column"
 ---@field name string
 ---@field optionVar OptionVar
 ---@field indent number
@@ -36,6 +36,13 @@ local splitterTable = {
 ---@return ControlConfig
 function Splitter()
     return splitterTable
+end
+
+function Column(index)
+    return {
+        type = "column",
+        index = index
+    }
 end
 
 ---comment
