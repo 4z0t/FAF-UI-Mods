@@ -525,7 +525,10 @@ ReplayTeamView = Class(ReplayArmyView)
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
         ReplayArmyView.SetStaticData(self, teamId, name, rating, 0, "ffffffff", teamColor)
         self._armies = armies | LuaQ.toSet
-        self._faction:Hide()
+        if self._faction then
+            self._faction:Destroy()
+            self._faction = nil
+        end
     end,
 
 
