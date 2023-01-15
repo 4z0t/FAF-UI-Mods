@@ -83,9 +83,7 @@ ObserverPanel = Class(Group)
 
         local topLine = self:GetParent():GetArmyViews()[1]
         LayoutFor(self)
-            :Width(function()
-                return math.min(topLine.Width(), LayoutHelpers.ScaleNumber(width))
-            end)
+            :Width(UMT.Layouter.Functions.Min(topLine.Width, width))
             :Height(height)
 
     end,
