@@ -60,7 +60,6 @@ _G.UMT = {
         Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
     },
     Animation    = LazyImport("/mods/UMT/modules/Animations/__Init__.lua"),
-    ---@type fa-class
     Class        = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property     = import("/mods/UMT/modules/UIClass.lua").Property,
     Prevent      = import("/mods/UMT/modules/Prevent.lua"),

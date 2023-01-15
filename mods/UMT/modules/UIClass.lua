@@ -107,6 +107,10 @@ local function MakeUIClass(bases, spec)
     return MakeProperties(class)
 end
 
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function UIClass(...)
     if IsSimpleClass(arg) then
         return MakeUIClass(arg)
