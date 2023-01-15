@@ -6,11 +6,11 @@ end
 
 ---@generic T
 ---@generic C: fa-class
----@class SetupPropertyTable<C,T> : { set : fun(class: C, value: T), get : fun(class: C): T }
+---@class SetupPropertyTable<C,T> : { set : fun(self: C, value: T), get : fun(self: C): T }
 
 ---@generic T
 ---@generic C: fa-class
----@class PropertyTable<C,T> : SetupPropertyTable
+---@class PropertyTable<C,T> : { set : fun(self: C, value: T), get : fun(self: C): T }
 ---@field __property true
 
 ---@generic T

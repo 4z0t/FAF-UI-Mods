@@ -177,12 +177,13 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     end,
 
-    ---@type PropertyTable<ScoreBoard, integer>
+    
     GameSpeed = UMT.Property
     {
         get = function(self)
             
         end,
+        
         set = function(self, value)
             if self._title then
                 self._title:Update(false, value)
