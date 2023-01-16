@@ -7,6 +7,5 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
     function CreateUI(isReplay)
         OriginalCreateUI(isReplay)
         import('/lua/ui/game/score.lua').CreateScoreUI()
-        --import("/mods/4SB/modules/main.lua").Main(isReplay)
     end
 end
