@@ -29,11 +29,11 @@ FactionRightBracket = Class(Group)
 
         LayoutFor(self.bottom)
             :Right(self.Right)
-            :Bottom(self.bottom)
+            :Bottom(self.Bottom)
             :DisableHitTest()
 
         LayoutFor(self.middle)
-            :AtRightIn(self, 9)
+            :AtRightIn(self, 7)
             :Top(self.top.Bottom)
             :Bottom(self.bottom.Top)
             :DisableHitTest()

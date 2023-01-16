@@ -3,3 +3,4 @@ StaticScrollable = import("StaticScrollable.lua").StaticScrollable
 DynamicScrollable = import("DynamicScrollable.lua").DynamicScrollable
 UnitOverlay = import("UnitOverlay.lua").UnitOverlay
 GlowBorder = import("GlowBorder.lua").GlowBorder
+FactionRightBracket = import("FactionRightBracket.lua").FactionRightBracket
