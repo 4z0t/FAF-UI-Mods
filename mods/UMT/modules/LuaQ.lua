@@ -1,6 +1,18 @@
 local TableInsert = table.insert
 local ipairs = ipairs
 
+---@generic K
+---@generic V
+---@class BORTable<K,V> : table
+---@operator bor(WherePipeTable):table
+
+---comment
+---@param tbl table
+---@return BORTable
+function From(tbl)
+    return tbl
+end
+
 ---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
     ---return new table with elements satisfying the given condition
@@ -71,8 +83,12 @@ local LuaQWhereMetaTable = {
         return self
     end
 }
+
+
+
 ---@class WherePipeTable : LuaQWherePipeTable
 ---@field keyvalue LuaQWhereKeyValueMetaTable
+---@operator call:WherePipeTable
 
 ---@type WherePipeTable
 where = setmetatable({
