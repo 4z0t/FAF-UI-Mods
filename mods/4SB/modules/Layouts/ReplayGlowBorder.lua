@@ -7,6 +7,29 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 
+local animationSpeed = LayoutHelpers.ScaleNumber(300)
+
+
+local slideAnimation = UMT.Animation.Factory.Base
+    :OnStart(function(control)
+        local width = control.Width()
+        LayoutFor(control)
+            :Right(function() return GetFrame(0).Right() + width end)
+    end)
+    :OnFrame(function(control, delta)
+        if control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) then
+            return true
+        end
+        control.Right:Set(control.Right() - delta * animationSpeed)
+    end)
+    :OnFinish(function(control)
+        LayoutFor(control)
+            :AtRightIn(GetFrame(0), 25)
+            LOG("Animation done")
+    end)
+    :Create()
+
+
 ---A clear function for additional layout
 ---@param scoreboard ScoreBoard
 local Clear = function(scoreboard)
@@ -17,6 +40,11 @@ local Clear = function(scoreboard)
     scoreboard._bracket = nil
 end
 
+---inital animation for scoreboard
+---@param scoreboard ReplayScoreBoard
+local InitialAnimation = function(scoreboard)
+    slideAnimation:Apply(scoreboard)
+end
 
 ---A layout function for scoreboard
 ---@param scoreboard ReplayScoreBoard
@@ -24,7 +52,7 @@ end
 Layout = function(scoreboard)
 
     scoreboard:_Layout()
-
+    scoreboard.InitialAnimation = InitialAnimation
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
