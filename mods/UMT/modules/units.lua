@@ -1,8 +1,13 @@
 local TableInsert = table.insert
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryFilterOut = EntityCategoryFilterOut
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
 
-local SelectHidden = UMT.Select.Hidden
+
+local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+local CommandMode = import('/lua/ui/game/commandmode.lua')
+
 
 local currentArmy
 local units
@@ -12,6 +17,18 @@ local cached = {}
 local prevReset = 0
 local prevCache = 0
 
+---Performs hidden unit selection callback
+---@param callback fun()
+function HiddenSelect(callback)
+    local currentCommand = CommandMode.GetCommandMode()
+    local oldSelection = GetSelectedUnits()
+    SetIgnoreSelection(true)
+    callback()
+    SelectUnits(oldSelection)
+    CommandMode.StartCommandMode(currentCommand[1], currentCommand[2])
+    SetIgnoreSelection(false)
+end
+
 local function ProcessAllUnits()
     UISelectionByCategory("ALLUNITS", false, false, false, false)
     for _, unit in GetSelectedUnits() or {} do
@@ -20,7 +37,7 @@ local function ProcessAllUnits()
 end
 
 local function UpdateAllUnits()
-    SelectHidden(ProcessAllUnits)
+    HiddenSelect(ProcessAllUnits)
 end
 
 local function UpdateCache()
@@ -82,7 +99,7 @@ local function CheckCache()
         prevCache = 0
         currentArmy = army
         cached = {}
-        units = UMT.Weak.Value{}
+        units = UMT.Weak.Value {}
         OnArmyChanged()
     end
 
@@ -175,7 +192,7 @@ local function UpdateFast()
         prevReset = 0
         prevUpdate = 0
         currentArmy = army
-        units = setmetatable({}, UMT.WeakMeta.Value)
+        units = UMT.Weak.Value {}
         OnArmyChanged()
     end
 
@@ -220,3 +237,54 @@ end
 --         end
 --     end
 -- end
+
+
+
+---@class EntityCategoryFilterDownTable
+local EntityCategoryFilterDownMetaTable = {
+    ---returns units that match the given category
+    ---@param units UserUnit[]
+    ---@param self EntityCategoryFilterDownTable
+    ---@return UserUnit[]
+    __bor = function(units, self)
+        local category = self.__category
+        self.__category = nil
+        return EntityCategoryFilterDown(category, units) or {}
+    end,
+
+    ---sets category for units to match
+    ---@param self EntityCategoryFilterDownTable
+    ---@param category EntityCategory
+    ---@return EntityCategoryFilterDownTable
+    __call = function(self, category)
+        self.__category = category
+        return self
+    end
+}
+---@type EntityCategoryFilterDownTable
+entityCategoryFilterDown = setmetatable({}, EntityCategoryFilterDownMetaTable)
+
+
+---@class EntityCategoryFilterOutTable
+local EntityCategoryFilterOutMetaTable = {
+    ---returns units that doesnt match the given category
+    ---@param units UserUnit[]
+    ---@param self EntityCategoryFilterOutTable
+    ---@return UserUnit[]
+    __bor = function(units, self)
+        local category = self.__category
+        self.__category = nil
+        return EntityCategoryFilterOut(category, units) or {}
+    end,
+
+    ---sets category for units to exlude
+    ---@param self EntityCategoryFilterOutTable
+    ---@param category EntityCategory
+    ---@return EntityCategoryFilterOutTable
+    __call = function(self, category)
+        self.__category = category
+        return self
+    end
+}
+---@type EntityCategoryFilterOutTable
+entityCategoryFilterOut = setmetatable({}, EntityCategoryFilterOutMetaTable)

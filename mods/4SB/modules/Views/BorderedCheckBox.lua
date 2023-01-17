@@ -2,11 +2,11 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local BorderedText = import("BorderedText.lua").BorderedText
 local LazyVar = import('/lua/lazyvar.lua').Create
-local LayoutFor =import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local Text = import("/lua/maui/text.lua").Text
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-local colorAnimationFactory = import("../Animations/AnimationFactory.lua").GetColorAnimationFactory()
+local colorAnimationFactory = UMT.Animation.Factory.Color
 
 ---@class BorderedCheckBox : BorderedText
 BorderedCheckBox = Class(BorderedText)
@@ -144,8 +144,7 @@ BorderedCheckBox = Class(BorderedText)
     end,
 }
 
----@type Animator
-local colorAnimator = import("../Animations/Animator.lua").Animator(GetFrame(0))
+local colorAnimator = UMT.Animation.Animator(GetFrame(0))
 local colorAnimation = colorAnimationFactory
     :For(0.3)
     :Create(colorAnimator)

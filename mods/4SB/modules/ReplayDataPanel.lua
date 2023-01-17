@@ -2,14 +2,15 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
-
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").ExpandableSelectionGroup
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
+local LazyVar = import('/lua/lazyvar.lua').Create
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
 local textFont = "Zeroes Three"
 local textSize = 12
@@ -20,7 +21,7 @@ local panelHeight = 20
 local checkboxWidth = 18
 local checkboxHeight = 18
 
-local bgColor = "ff000000"
+local bgColor = Options.player.color.bg:Raw()
 
 local checkboxes = import("DataPanelConfig.lua").checkboxes
 local Chechbox = Class(AnimatedBorderedCheckBox)
@@ -48,7 +49,6 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
         self._bg = Bitmap(self)
         LayoutFor(self._bg)
             :Color(bgColor)
-            :Alpha(0.4)
             :Fill(self._expand)
             :Top(self.Bottom)
     end,
@@ -117,29 +117,48 @@ DataPanel = Class(Group)
 
     _Layout = function(self)
 
+
+        local dropdownsCount = table.getn(self._dropdowns)
+
+
+        local spacing = LazyVar()
+        spacing:Set(function()
+            return math.min(
+                math.floor((self.Width() - LayoutHelpers.ScaleNumber(dropdownsCount * checkboxWidth)) /
+                    (1 + dropdownsCount)),
+                LayoutHelpers.ScaleNumber(20)
+            )
+        end)
+
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
-
+        local first = self._dropdowns[1]
 
         LayoutFor(self)
-            :AtLeftIn(self._dropdowns[1], -20)
+            :Width(panelWidth)
             :Height(panelHeight)
 
         for i, dropdown in self._dropdowns do
-            if i == table.getn(self._dropdowns) then
+            if i == dropdownsCount then
 
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :AtRightIn(self, 20)
+                    :Right(function()
+                        return self.Right() - spacing()
+                    end)
+
 
             else
+                local nextDD = self._dropdowns[i + 1]
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :LeftOf(self._dropdowns[i + 1], 20)
+                    :Right(function()
+                        return nextDD.Left() - spacing()
+                    end)
+                   
             end
         end
     end,

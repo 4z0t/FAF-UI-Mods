@@ -3,20 +3,17 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua').Create
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
----@module "Animations/Animator"
-local Animator = import("../Animations/Animator.lua")
-local alphaAnimator = Animator.Animator(GetFrame(0))
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
+local animationFactory = UMT.Animation.Factory.Base
+local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
+local PingAnimation = import("PingAnimation.lua").PingAnimation
 
----@class BaseAnimationFactory
-local animationFactory = import("../Animations/AnimationFactory.lua").GetAnimationFactory()
-
-
-local alphaAnimationFactory = import("../Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 local appearAnimation = alphaAnimationFactory
     :ToAppear()
     :For(0.3)
@@ -38,15 +35,14 @@ local ShareManager = import("../ShareManager.lua")
 
 local checkboxes = import("../DataPanelConfig.lua").checkboxes
 
-local bgColor = UIUtil.disabledColor
-local bgColor = 'ff000000'
+local bgColor = Options.player.color.bg:Raw()
 
 local armyViewTextPointSize = 12
 
 local armyViewTextFont = "Zeroes Three"
 local focusArmyTextFont = 'Arial Bold'
 
-local nameWidth = LazyVar(20)
+nameWidth = LazyVar(20)
 
 
 local armyViewWidth = 250
@@ -87,7 +83,7 @@ local slideBackWards = animationFactory
     end)
     :Create()
 
-
+---@class ArmyView : Group
 ArmyView = Class(Group)
 {
     __init = function(self, parent)
@@ -115,37 +111,37 @@ ArmyView = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
-            :DisableHitTest()
-
-        LayoutFor(self._name)
-            :AtVerticalCenterIn(self)
-            :AtRightIn(self, 20)
-            :DisableHitTest()
-            :DropShadow(true)
-
-        LayoutFor(self._rating)
-            :AtVerticalCenterIn(self)
-            :LeftOf(self._name, 7)
-            :DisableHitTest()
-            :DropShadow(true)
-
-        LayoutFor(self._faction)
-            :AtVerticalCenterIn(self)
-            :AtRightIn(self._rating, 30)
-            :Over(self, 5)
             :DisableHitTest()
 
         LayoutFor(self._color)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
-            --:Alpha(0.9)
             :Width(3)
             :DisableHitTest()
 
+        LayoutFor(self._faction)
+            :AtVerticalCenterIn(self)
+            :AtLeftIn(self, 4)
+            :Over(self, 5)
+            :DisableHitTest()
+
+        LayoutFor(self._rating)
+            :AtVerticalCenterIn(self)
+            :AnchorToLeft(self, -60)
+            :DisableHitTest()
+            :DropShadow(true)
+
+
+        LayoutFor(self._name)
+            :AtVerticalCenterIn(self)
+            :AtLeftIn(self, 70)
+            :DisableHitTest()
+            :DropShadow(true)
+
+
         LayoutFor(self)
-            :AtLeftIn(self._faction, -5)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
             :Height(armyViewHeight)
 
     end,
@@ -157,13 +153,13 @@ ArmyView = Class(Group)
 
         self._rating:SetColor(armyColor)
         self._rating:SetText(rating)
-        self._rating:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
         self._name:SetText(name)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, armyViewTextFont, armyViewTextPointSize)))
-        self._name:SetFont(armyViewTextFont, armyViewTextPointSize)
+        nameWidth:Set(math.max(nameWidth(), TextWidth(name, Options.player.font.name(), armyViewTextPointSize)))
+        self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
@@ -181,6 +177,18 @@ ArmyView = Class(Group)
             self.isOutOfGame = true
             self._name:SetColor(outOfGameColor)
         end
+    end,
+
+    ---comment
+    ---@param self ArmyView
+    ---@param pingData PingData
+    DisplayPing = function(self, pingData)
+        local ping = PingAnimation(self, pingData.ArrowColor, pingData.Location)
+        LayoutFor(ping)
+            :Top(self.Top)
+            :Bottom(self.Bottom)
+            :Right(self.Left)
+        ping:Animate()
     end
 }
 
@@ -282,24 +290,25 @@ AllyView = Class(ArmyView)
             :Alpha(0)
 
         LayoutFor(self._energy)
-            :AtRightIn(self, 5)
+            :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
             :DisableHitTest()
-        self._energy:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._energy:SetFont(Options.player.font.energy:Raw(), armyViewTextPointSize)
 
 
 
         LayoutFor(self._mass)
-            :AtRightIn(self, 45)
+            :AtRightIn(self, 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
             :DisableHitTest()
-        self._mass:SetFont(armyViewTextFont, armyViewTextPointSize)
+        self._mass:SetFont(Options.player.font.mass:Raw(), armyViewTextPointSize)
 
-        LayoutFor(self._name)
-            :AtRightIn(self, 75)
 
+
+        LayoutFor(self)
+            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
     end,
 
     HandleEvent = function(self, event)
@@ -355,13 +364,9 @@ AllyView = Class(ArmyView)
 }
 
 local lastDataTextOffset = 20
-
 local dataTextOffSet = 40
 
-local lastDataTextOffsetScaled = LayoutHelpers.ScaleNumber(lastDataTextOffset)
-local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
-
-local dataAnimationSpeed = 150
+local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
@@ -387,7 +392,7 @@ local expandDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - state.offset then
+        if control.Right() <= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
             return true
         end
         control.Right:Set(control.Right() - delta * dataAnimationSpeed)
@@ -411,7 +416,7 @@ ReplayArmyView = Class(ArmyView)
     _Layout = function(self)
         ArmyView._Layout(self)
 
-
+        local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
             if i == 1 then
@@ -421,6 +426,7 @@ ReplayArmyView = Class(ArmyView)
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
                     :AtVerticalCenterIn(self)
                     :DisableHitTest()
+                first = self._data[i]
             elseif i == dataSize then
                 LayoutFor(self._data[i])
                     :AtRightIn(self, lastDataTextOffset)
@@ -436,6 +442,12 @@ ReplayArmyView = Class(ArmyView)
             self._data[i]:SetText("0")
             self._data[i]._contracted = false
         end
+
+        LayoutFor(self)
+            :Width(function()
+                return nameWidth() + LayoutHelpers.ScaleNumber(70 + dataTextOffSet)
+                    + self.Right() - first.Right()
+            end)
 
     end,
 
@@ -492,13 +504,59 @@ ReplayArmyView = Class(ArmyView)
             local nextControl = self
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl, lastDataTextOffsetScaled)
+            expandDataAnimation:Apply(control, nextControl, lastDataTextOffset)
         else
             local nextControl = self._data[id + 1]
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl, dataTextOffSetScaled)
+            expandDataAnimation:Apply(control, nextControl, dataTextOffSet)
         end
 
     end,
+}
+
+local LuaQ = UMT.LuaQ
+
+ReplayTeamView = Class(ReplayArmyView)
+{
+    SetStaticData = function(self, teamId, name, rating, teamColor, armies)
+        ReplayArmyView.SetStaticData(self, teamId, name, rating, 0, "ffffffff", teamColor)
+        self._armies = armies | LuaQ.toSet
+        if self._faction then
+            self._faction:Destroy()
+            self._faction = nil
+        end
+    end,
+
+
+    Update = function(self, playersData, setup)
+
+
+        for i, dataText in self._data do
+            local checkboxData = checkboxes[i][ setup[i] ]
+            local color = checkboxData.nc
+
+            local formatFunc
+            local value = playersData | LuaQ.sum.keyvalue(function(i, data)
+                if not self._armies[i] or data.resources == nil then return 0 end
+                local res
+                res, formatFunc = checkboxData.GetData(data)
+                return res
+            end)
+            formatFunc = formatFunc or FormatNumber
+            local text = formatFunc(value)
+            dataText:SetText(text)
+            dataText:SetColor(color)
+        end
+
+        if not self.isOutOfGame then
+            local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
+            if defeated then
+                self.isOutOfGame = true
+                self._name:SetColor(outOfGameColor)
+            end
+        end
+
+    end,
+
 }

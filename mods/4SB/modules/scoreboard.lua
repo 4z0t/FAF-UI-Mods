@@ -1,32 +1,30 @@
 local Group = import('/lua/maui/group.lua').Group
 local ArmyViews = import("Views/ArmyView.lua")
 local Utils = import("Utils.lua")
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
+local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
 local InfoPanel = import("InfoPanel.lua").InfoPanel
+
+
 local LazyImport = UMT.LazyImport
 local Scores = LazyImport("/lua/ui/game/score.lua")
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local SequentialAnimation = import("Animations/SequentialAnimation.lua").SequentialAnimation
+local animationSpeed = LayoutHelpers.ScaleNumber(300)
 
-local animationFactory = import("Animations/AnimationFactory.lua").GetAnimationFactory()
-
-local animationSpeed = 300
-
-local slideForward = animationFactory
+local slideForward = UMT.Animation.Factory.Base
     :OnStart()
     :OnFrame(function(control, delta)
-        if control.Right() < control:GetParent().Right() then
-            return true
-        end
-        control.Right:Set(control.Right() - delta * animationSpeed)
+        return control.Right() < control:GetParent().Right() or
+            control.Right:Set(control.Right() - delta * animationSpeed)
     end)
     :OnFinish(function(control)
         control.Right:Set(control:GetParent().Right)
@@ -34,7 +32,10 @@ local slideForward = animationFactory
     :Create()
 
 
-ScoreBoard = UMT.Class(Group)
+---@class ScoreBoard : Group
+---@field GameSpeed PropertyTable<ScoreBoard, integer>
+---@field _armyViews table<integer, ArmyView>
+ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
@@ -43,28 +44,25 @@ ScoreBoard = UMT.Class(Group)
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
+
+
     end,
 
     __post_init = function(self)
+
+        self:_InitArmyViews()
+        self:_Layout()
+
+        self._mode = "income"
+    end,
+
+    _Layout = function(self)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)
         end
-        self:_InitArmyViews()
-        self:_Layout()
-        LayoutFor(self)
-            :Width(100)
-            :Height(100)
-            :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 0, 20)
-            :DisableHitTest()
-
-        self._mode = "income"
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-    _Layout = function(self)
         local last
+        local first
         for i, armyView in self._lines do
             if i == 1 then
                 if self._title then
@@ -75,6 +73,7 @@ ScoreBoard = UMT.Class(Group)
                     LayoutFor(armyView)
                         :AtRightTopIn(self)
                 end
+                first = armyView
             else
                 LayoutFor(armyView)
                     :AnchorToBottom(self._lines[i - 1])
@@ -85,6 +84,13 @@ ScoreBoard = UMT.Class(Group)
         if last then
             self.Bottom:Set(last.Bottom)
         end
+
+        LayoutFor(self)
+            :Width(100)
+            :Over(GetFrame(0), 1000)
+            :AtRightIn(GetFrame(0))
+            :DisableHitTest()
+            :NeedsFrameUpdate(true)
     end,
 
     _InitArmyViews = function(self)
@@ -132,6 +138,24 @@ ScoreBoard = UMT.Class(Group)
 
     end,
 
+    ResetArmyData = function(self)
+        ArmyViews.nameWidth:Set(20)
+        for _, armyData in Utils.GetArmiesFormattedTable() do
+            self:GetArmyViews()[armyData.id]:SetStaticData(
+                armyData.id,
+                armyData.name,
+                armyData.rating,
+                armyData.faction,
+                armyData.color,
+                armyData.teamColor
+            )
+
+        end
+    end,
+
+    ---comment
+    ---@param self ScoreBoard
+    ---@return table<integer, ArmyView>
     GetArmyViews = function(self)
         return self._armyViews
     end,
@@ -151,10 +175,13 @@ ScoreBoard = UMT.Class(Group)
         end
     end,
 
+
     GameSpeed = UMT.Property
     {
         get = function(self)
+
         end,
+
         set = function(self, value)
             if self._title then
                 self._title:Update(false, value)
@@ -188,18 +215,30 @@ ScoreBoard = UMT.Class(Group)
             local w = av.Width()
             av.Right:Set(av:GetParent().Right() + w)
         end
-        local sa = SequentialAnimation(slideForward, 0.25, 1)
+        local sa = UMT.Animation.Sequential(slideForward, 0.25, 1)
         sa:Apply(self:GetArmyViews())
+    end,
+
+    ---Displays ping data in scoreboard UI
+    ---@param self ScoreBoard
+    ---@param pingData PingData
+    DisplayPing = function(self, pingData)
+        if pingData.Marker or pingData.Renew then return end
+        self:GetArmyViews()[pingData.Owner + 1]:DisplayPing(pingData)
+
     end
 
 }
 
+
+---@class ReplayScoreBoard : ScoreBoard
 ReplayScoreBoard = UMT.Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
 
         self._armiesContainer = ArmyViewsContainer(self)
+        self._teamsContainer = TeamViewsContainer(self)
         self._obs = ObserverPanel(self)
         self._dataPanel = DataPanel(self)
     end,
@@ -226,19 +265,25 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         LayoutFor(self._obs)
             :Right(self.Right)
             :Top(self._armiesContainer.Bottom)
+            :Width(self.Width)
 
-        LayoutFor(self._dataPanel)
+        LayoutFor(self._teamsContainer)
             :Right(self.Right)
             :Top(self._obs.Bottom)
 
+        LayoutFor(self._dataPanel)
+            :Right(self.Right)
+            :Top(self._teamsContainer.Bottom)
+
+
         LayoutFor(self)
-            :Width(100)
+            :Width(self._armiesContainer.Width)
             :Bottom(self._dataPanel.Bottom)
             :Over(GetFrame(0), 1000)
-            :AtRightTopIn(GetFrame(0), 0, 20)
+            :AtRightIn(GetFrame(0))
             :DisableHitTest()
     end,
-    
+
     GameSpeed = UMT.Property
     {
         get = function(self)
@@ -251,6 +296,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
+        self._teamsContainer:Update(data)
     end,
 
     SortArmies = function(self, func, direction)
@@ -259,14 +305,17 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
     SetDataSetup = function(self, setup)
         self._armiesContainer:Setup(setup)
+        self._teamsContainer:Setup(setup)
     end,
 
     Expand = function(self, id)
         self._armiesContainer:Expand(id)
+        self._teamsContainer:Expand(id)
     end,
 
     Contract = function(self, id)
         self._armiesContainer:Contract(id)
+        self._teamsContainer:Contract(id)
     end,
 
     GetArmyViews = function(self)

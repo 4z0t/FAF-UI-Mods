@@ -2,47 +2,8 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local Group = import("/lua/maui/group.lua").Group
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
-local LayoutFor = import('../Layouter.lua').ReusedLayoutFor
-
-
-local function norm(s)
-    if string.len(s) == 1 then
-        return "0" .. s
-    end
-    return s
-end
-
-local function setAlpha(color, alpha)
-    return norm(STR_itox(alpha)) .. string.sub(color, 3)
-end
-
-local function setRed(color, red)
-    return string.sub(color, 1, 2) .. norm(STR_itox(red)) .. string.sub(color, 5)
-end
-
-local function setGreen(color, green)
-    return string.sub(color, 1, 4) .. norm(STR_itox(green)) .. string.sub(color, 7)
-end
-
-local function setBlue(color, blue)
-    return string.sub(color, 1, 6) .. norm(STR_itox(blue))
-end
-
-local function getAlpha(color)
-    return STR_xtoi(string.sub(color, 1, 2))
-end
-
-local function getRed(color)
-    return STR_xtoi(string.sub(color, 3, 4))
-end
-
-local function getGreen(color)
-    return STR_xtoi(string.sub(color, 5, 6))
-end
-
-local function getBlue(color)
-    return STR_xtoi(string.sub(color, 7, 8))
-end
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local ColorUtils = UMT.ColorUtils
 
 local function IntColorSlider(parent)
     return IntegerSlider(
@@ -97,16 +58,16 @@ ColorSliders = Class(Group)
 
 
         self.alphaSlider.OnValueSet = function(control, newValue)
-            optionVar:Set(setAlpha(optionVar(), newValue))
+            optionVar:Set(ColorUtils.SetAlpha(optionVar(), newValue))
         end
         self.redSlider.OnValueSet = function(control, newValue)
-            optionVar:Set(setRed(optionVar(), newValue))
+            optionVar:Set(ColorUtils.SetRed(optionVar(), newValue))
         end
         self.greenSlider.OnValueSet = function(control, newValue)
-            optionVar:Set(setGreen(optionVar(), newValue))
+            optionVar:Set(ColorUtils.SetGreen(optionVar(), newValue))
         end
         self.blueSlider.OnValueSet = function(control, newValue)
-            optionVar:Set(setBlue(optionVar(), newValue))
+            optionVar:Set(ColorUtils.SetBlue(optionVar(), newValue))
         end
 
         self.alphaValue = UIUtil.CreateText(self, "A", 14, "Arial")
@@ -132,10 +93,10 @@ ColorSliders = Class(Group)
 
 
 
-        self.alphaSlider:SetValue(getAlpha(self._option()))
-        self.redSlider:SetValue(getRed(self._option()))
-        self.greenSlider:SetValue(getGreen(self._option()))
-        self.blueSlider:SetValue(getBlue(self._option()))
+        self.alphaSlider:SetValue(ColorUtils.GetAlpha(self._option()))
+        self.redSlider:SetValue(ColorUtils.GetRed(self._option()))
+        self.greenSlider:SetValue(ColorUtils.GetGreen(self._option()))
+        self.blueSlider:SetValue(ColorUtils.GetBlue(self._option()))
 
 
     end,

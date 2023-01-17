@@ -14,15 +14,15 @@ local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
-local LayoutFor = import('Layouter.lua').ReusedLayoutFor
-local DynamicScrollable = import("Views/DynamicScrollable.lua").DynamicScrollable
-local EscapeCover = import("Views/EscapeCover.lua").EscapeCover
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local DynamicScrollable = UMT.Views.DynamicScrollable
+local EscapeCover = UMT.Views.EscapeCover
 
 
 
 
 ---@class ControlConfig
----@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"
+---@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"|"column"
 ---@field name string
 ---@field optionVar OptionVar
 ---@field indent number
@@ -36,6 +36,13 @@ local splitterTable = {
 ---@return ControlConfig
 function Splitter()
     return splitterTable
+end
+
+function Column(index)
+    return {
+        type = "column",
+        index = index
+    }
 end
 
 ---comment
@@ -109,11 +116,34 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
+---@return ControlConfig
+function Strings(name, items, optionVar, indent)
+    return {
+        type      = "strings",
+        name      = name,
+        optionVar = optionVar,
+        items     = items,
+        indent    = indent or 0
+    }
+end
 
+function Fonts(name, optionVar, indent)
+    return Strings(name,
+        {
+            "Arial",
+            "Arial Black",
+            "Arial Narrow",
+            "Zeroes Three",
+            "Butterbelly",
+            "Arial Rounded MT Bold",
+            "VDub",
+            "Wintermute"
+        }, optionVar, indent)
+end
 
 local globalOptions = {}
 local optionsSelector = nil
-local optionsWindows = UMT.Weak.Value{}
+local optionsWindows = UMT.Weak.Value {}
 
 local OptionLine = Class(Group)
 {
@@ -133,8 +163,9 @@ local OptionLine = Class(Group)
 
         self._bg.OnCheck = function(bg, checked)
             if IsDestroyed(optionsWindows[self.id]) then
-                optionsWindows[self.id] = OptionsWindow(GetFrame(parent:GetRootFrame():GetTargetHead()), self.data[1],
+                optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
                     self.id, self.data[2])
+                optionsSelector:Destroy()
             end
         end
     end,

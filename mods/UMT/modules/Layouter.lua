@@ -1,5 +1,5 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
-
+Functions = import("LayoutFunctions.lua")
 
 ---@class Layouter
 ---@field c Control
@@ -81,8 +81,8 @@ function LayouterMetaTable:NeedsFrameUpdate(state)
     return self
 end
 
-function LayouterMetaTable:Alpha(alpha)
-    self.c:SetAlpha(alpha)
+function LayouterMetaTable:Alpha(alpha, applyToChildren)
+    self.c:SetAlpha(alpha, applyToChildren)
     return self
 end
 
@@ -351,9 +351,10 @@ function LayouterMetaTable:End()
         WARN("incorrect layout for Left-Width-Right")
         WARN(debug.traceback())
     end
-
+    
     return self.c
 end
+
 
 
 ---Creates Layouter for given control

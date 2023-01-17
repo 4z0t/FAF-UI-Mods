@@ -3,15 +3,14 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+
 
 local Utils = import("Utils.lua")
 local ArmyViews = import("Views/ArmyView.lua")
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local defaultSortFunc = function()
 
-end
 
 ArmyViewsContainer = Class(Group)
 {
@@ -39,10 +38,12 @@ ArmyViewsContainer = Class(Group)
 
     _Layout = function(self)
         local last
+        local first
         for i, armyView in self._lines do
             if i == 1 then
                 LayoutFor(armyView)
                     :AtRightTopIn(self)
+                first = armyView
             else
                 LayoutFor(armyView)
                     :AnchorToBottom(self._lines[i - 1])
@@ -50,13 +51,20 @@ ArmyViewsContainer = Class(Group)
             end
             last = armyView
         end
+        if not first then
+            LayoutFor(self)
+                :Height(0)
+                :Width(0)
+                :DisableHitTest()
+            return
+        end
         if last then
             self.Bottom:Set(last.Bottom)
         end
         self._top = self._lines[1]
         self._bottom = last
         LayoutFor(self)
-            :Width(0)
+            :Width(self._top.Width)
             :DisableHitTest()
     end,
 
@@ -160,7 +168,7 @@ ArmyViewsContainer = Class(Group)
     Setup = function(self, setup)
         self._dataSetup = setup
         local scoreCache = import("/lua/ui/game/score.lua").GetScoreCache()
-        if scoreCache and table.getn(scoreCache) ~= 0 then
+        if scoreCache and not table.empty(scoreCache) then
             self:Update(scoreCache)
         end
     end

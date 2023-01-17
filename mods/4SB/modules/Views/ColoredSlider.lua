@@ -2,9 +2,10 @@ local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Border = import("Border.lua").Border
 local LazyVar = import('/lua/lazyvar.lua').Create
-local LayoutFor =import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local Text = import("/lua/maui/text.lua").Text
 local Dragger = import("/lua/maui/dragger.lua").Dragger
+
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 ColoredSlider = Class(Group)
@@ -188,7 +189,7 @@ ColoredSlider = Class(Group)
     end,
 
     _Constrain = function(self, value)
-        return math.max(math.min(value, self._endValue), self._startValue)
+        return math.clamp(value, self._startValue, self._endValue)
     end,
 
     OnValueSet = function(self, newValue) end,

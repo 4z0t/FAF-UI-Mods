@@ -1,7 +1,8 @@
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local LazyVar = import('/lua/lazyvar.lua').Create
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+
 
 ---@class BorderColored : Group
 Border = Class(Group)

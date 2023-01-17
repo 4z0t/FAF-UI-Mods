@@ -4,19 +4,16 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor =import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+local Options = import("/mods/4SB/modules/Options.lua")
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local textFont = "Zeroes Three"
 local textSize = 12
 
 local panelWidth = 300
 local panelHeight = 20
-
-local bgColor = "ff000000"
-
 
 
 function GetSizeInKM(size)
@@ -48,21 +45,21 @@ InfoPanel = Class(Group)
     end,
 
     _Layout = function(self)
+        local parent = self:GetParent()
 
-
-        self._mapName:SetFont(textFont, textSize)
+        self._mapName:SetFont(Options.title.font.mapName:Raw(), textSize)
         LayoutFor(self._mapName)
             :AtCenterIn(self)
 
 
-        self._mapSize:SetFont(textFont, textSize)
+        self._mapSize:SetFont(Options.title.font.mapSize:Raw(), textSize)
         LayoutFor(self._mapSize)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, 10)
             :DisableHitTest()
 
         LayoutFor(self)
-            :Width(panelWidth)
+            :Width(parent.Width)
             :Height(panelHeight)
             :DisableHitTest()
     end,

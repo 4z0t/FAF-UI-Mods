@@ -3,26 +3,25 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 
-local alphaAnimator = import("Animations/Animator.lua").Animator(GetFrame(0))
-local animationFactory = import("Animations/AnimationFactory.lua").GetAnimationFactory()
-local alphaAnimationFactory = import("Animations/AnimationFactory.lua").GetAlphaAnimationFactory()
 
-local timeTextFont = "Zeroes Three"
+local Options = import("/mods/4SB/modules/Options.lua")
+
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
+local animationFactory = UMT.Animation.Factory.Base
+local alphaAnimationFactory = UMT.Animation.Factory.Alpha
+
 local timeTextSize = 12
-
-local qualityTextFont = timeTextFont
 local qualityTextSize = 12
-
-local unitCapTextFont = timeTextFont
 local unitCapTextSize = 12
+
 
 local titlePanelWidth = 300
 local titlePanelHeight = 20
 
-local bgColor = "ff000000"
+local bgColor = Options.player.color.bg:Raw()
 
 
 
@@ -45,32 +44,36 @@ local TopInfoPanel = Class(Group)
     end,
 
     _Layout = function(self)
-
+        local parent = self:GetParent()
         LayoutFor(self._time)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
+            :Color(Options.title.color.time:Raw())
             :DisableHitTest()
-        self._time:SetFont(timeTextFont, timeTextSize)
+        self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
 
 
         LayoutFor(self._speed)
             :AtCenterIn(self, 0, -30)
+            :Color(Options.title.color.gameSpeed:Raw())
             :DisableHitTest()
-        self._speed:SetFont(qualityTextFont, qualityTextSize)
+        self._speed:SetFont(Options.title.font.gameSpeed:Raw(), qualityTextSize)
 
         LayoutFor(self._quality)
             :AtCenterIn(self, 0, 30)
+            :Color(Options.title.color.quality:Raw())
             :DisableHitTest()
-        self._quality:SetFont(qualityTextFont, qualityTextSize)
+        self._quality:SetFont(Options.title.font.quality:Raw(), qualityTextSize)
 
         LayoutFor(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
+            :Color(Options.title.color.totalUnits:Raw())
             :DisableHitTest()
-        self._unitCap:SetFont(unitCapTextFont, unitCapTextSize)
+        self._unitCap:SetFont(Options.title.font.totalUnits:Raw(), unitCapTextSize)
 
         LayoutFor(self)
-            :Width(titlePanelWidth)
+            :Width(parent.Width)
             :Height(titlePanelHeight)
     end,
 
@@ -198,7 +201,6 @@ TitlePanel = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
         LayoutFor(self._top)
@@ -213,7 +215,7 @@ TitlePanel = Class(Group)
             :Over(self._top)
 
         LayoutFor(self)
-            :Width(self._top.Width)
+            :Width(titlePanelWidth)
             :Bottom(self._info.Bottom)
     end,
 

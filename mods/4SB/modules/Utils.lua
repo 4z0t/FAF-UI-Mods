@@ -14,8 +14,19 @@ function GetSmallFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].SmallIcon
 end
 
----comment
----@return table|unknown
+---@class ArmyData
+---@field faction Faction
+---@field name string
+---@field nickname string
+---@field color string
+---@field isAlly boolean
+---@field id integer
+---@field rating number
+---@field teamColor string
+---@field teamId integer
+
+---returns army data
+---@return ArmyData[]
 function GetArmiesFormattedTable()
     if not armiesFormattedTable then
         armiesFormattedTable = {}

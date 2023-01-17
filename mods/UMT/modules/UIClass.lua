@@ -4,17 +4,19 @@ local function IsSimpleClass(arg)
     return arg.n == 1 and getmetatable(arg[1]) == emptyMetaTable
 end
 
----@class SetupPropertyTable
----@field  set fun(class:fa-class, value:any)
----@field  get fun(class:fa-class): any
+---@generic T
+---@generic C: fa-class
+---@class SetupPropertyTable<C,T> : { set : fun(self: C, value: T), get : fun(self: C): T }
 
----@class PropertyTable
----@field  set fun(class:fa-class, value:any)
----@field  get fun(class:fa-class): any
+---@generic T
+---@generic C: fa-class
+---@class PropertyTable<C,T> : { set : fun(self: C, value: T), get : fun(self: C): T }
 ---@field __property true
 
----@param setup SetupPropertyTable
----@return PropertyTable
+---@generic T
+---@generic C: fa-class
+---@param setup SetupPropertyTable<C,T>
+---@return PropertyTable<C,T>
 function Property(setup)
     local getFunc = setup.get
     local setFunc = setup.set
@@ -43,16 +45,20 @@ local function MakeProperties(class)
     end
     if not table.empty(getProperties) then
         class.__index = function(self, key)
-            if getProperties[key] then
-                return getProperties[key](self)
+            local get = getProperties[key]
+            if get then
+                return get(self)
             end
             return class[key]
         end
     end
-    if not table.empty(setProperties) then
+    if table.empty(setProperties) then
+        class.__newindex = nil
+    else
         class.__newindex = function(self, key, value)
-            if setProperties[key] then
-                return setProperties[key](self, value)
+            local set = setProperties[key]
+            if set then
+                return set(self, value)
             end
             rawset(self, key, value)
         end
@@ -66,8 +72,10 @@ local function CacheClassFields(classes, fields)
     for _, field in fields do
         cache[field] = {}
         for i, class in ipairs(classes) do
-            cache[field][i] = class[field]
-            class[field] = nil
+            if class[field] then
+                cache[field][i] = class[field]
+                class[field] = false
+            end
         end
     end
     return cache
@@ -76,13 +84,22 @@ end
 local function RestoreClassFields(classes, cache)
     for field, data in cache do
         for i, class in ipairs(classes) do
-            class[field] = data[i]
+            if data[i] then
+                class[field] = data[i]
+            end
         end
     end
 end
 
 local function MakeUIClass(bases, spec)
     local cache = CacheClassFields(bases, { "__newindex" })
+
+    -- make those fields true, so older versions wont complain about class editting
+    if spec then
+        spec.__newindex = true
+    else
+        bases[1].__newindex = true
+    end
 
     local class = Class(unpack(bases))
     if spec then
@@ -92,6 +109,10 @@ local function MakeUIClass(bases, spec)
     return MakeProperties(class)
 end
 
+---@generic T: fa-class
+---@generic T_Base: fa-class
+---@param ... T_Base
+---@return fun(specs: T): T|T_Base
 function UIClass(...)
     if IsSimpleClass(arg) then
         return MakeUIClass(arg)

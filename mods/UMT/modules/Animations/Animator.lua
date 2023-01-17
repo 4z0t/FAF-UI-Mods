@@ -1,6 +1,7 @@
 ---@module "Animations/Animator"
 
 
+local IsDestroyed = IsDestroyed
 local Group = import('/lua/maui/group.lua').Group
 local MAX_DELTA_ALLOWED = 0.05
 
@@ -10,7 +11,7 @@ local MAX_DELTA_ALLOWED = 0.05
 Animator = Class(Group)
 {
     __init = function(self, parent)
-        Group.__init(self, parent)
+        Group.__init(self, parent or GetFrame(0))
         self._controls = {}
         self._controlsStates = {}
         self.Left:Set(0)
@@ -20,28 +21,26 @@ Animator = Class(Group)
         self:DisableHitTest()
     end,
 
-    OnFrame = function(self, delta)
+    AnimateControls = function(self, delta)
         local controlsStates = self._controlsStates
+        for control, animation in self._controls do
+            if IsDestroyed(control) then
+                self:Remove(control, true)
+            elseif animation.OnFrame(control, delta, controlsStates[control]) then
+                self:Remove(control)
+            end
+        end
+    end,
+
+    OnFrame = function(self, delta)
         if delta > MAX_DELTA_ALLOWED then
             local n = math.ceil(delta / MAX_DELTA_ALLOWED)
             delta = delta / n
             for _ = 1, n do
-                for control, animation in self._controls do
-                    if IsDestroyed(control) then
-                        self:Remove(control, true)
-                    elseif animation.OnFrame(control, delta, controlsStates[control]) then
-                        self:Remove(control)
-                    end
-                end
+                self:AnimateControls(delta)
             end
         else
-            for control, animation in self._controls do
-                if IsDestroyed(control) then
-                    self:Remove(control, true)
-                elseif animation.OnFrame(control, delta, controlsStates[control]) then
-                    self:Remove(control)
-                end
-            end
+            self:AnimateControls(delta)
         end
     end,
 
@@ -87,7 +86,7 @@ Animator = Class(Group)
 local globalAnimator
 
 function Init()
-    globalAnimator = Animator(GetFrame(0))
+    globalAnimator = Animator()
 end
 
 ---global animator applies animation to control with additional args
@@ -102,7 +101,7 @@ function ApplyAnimation(control, animation, ...)
     end
 end
 
----comment
+---Immediately remoes control from animator
 ---@param control Control
 function StopAnimation(control, skip)
     if IsDestroyed(globalAnimator) then

@@ -4,14 +4,15 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+local Options = import("/mods/4SB/modules/Options.lua")
 
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
 
 local obsTextFont = "Zeroes Three"
 local obsTextSize = 12
 
-local bgColor = "ff000000"
+local bgColor = Options.player.color.bg:Raw()
 
 
 
@@ -62,7 +63,6 @@ ObserverPanel = Class(Group)
         LayoutFor(self._bg)
             :Fill(self)
             :Color(bgColor)
-            :Alpha(0.4)
             :DisableHitTest()
 
 
@@ -83,9 +83,7 @@ ObserverPanel = Class(Group)
 
         local topLine = self:GetParent():GetArmyViews()[1]
         LayoutFor(self)
-            :Width(function()
-                return math.min(topLine.Width(), LayoutHelpers.ScaleNumber(width))
-            end)
+            :Width(UMT.Layouter.Functions.Min(topLine.Width, width))
             :Height(height)
 
     end,

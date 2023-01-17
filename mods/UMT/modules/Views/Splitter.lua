@@ -1,5 +1,5 @@
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutFor = import('../Layouter.lua').ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 Splitter = Class(Bitmap)
 {

@@ -1,4 +1,4 @@
-local LazyVar = import("/lua/lazyvar.lua")
+local LazyVar = import("/lua/lazyvar.lua").Create
 local Prefs = import("/lua/user/prefs.lua")
 
 
@@ -57,6 +57,16 @@ function OptionVarMetaTable:Raw()
     return self._lv
 end
 
+---called when option data has been changed
+---@return LazyVar
+function OptionVarMetaTable:OnChange()
+end
+
+---called when option data has been saved
+---@return LazyVar
+function OptionVarMetaTable:OnSave()
+end
+
 ---creates optionvar with default value if there is no saved one with given name
 ---@param modOptionName string
 ---@param subOption string
@@ -77,17 +87,11 @@ function Create(modOptionName, subOption, default)
         val = default
     end
 
-    local result = {
+    return setmetatable({
         _m = modOptionName,
         _o = subOption,
-        _lv = LazyVar.Create(val),
+        _lv = LazyVar(val),
         _prev = nil,
-        OnChange = function(self)
-        end,
-        OnSave = function (self)
-            
-        end
-    }
-    setmetatable(result, OptionVarMetaTable)
-    return result
+    }, OptionVarMetaTable)
+
 end

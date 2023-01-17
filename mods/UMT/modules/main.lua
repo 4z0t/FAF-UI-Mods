@@ -1,4 +1,4 @@
-function Main(isReplay)
+function TestUIClass()
     local a, b = pcall(function()
         A = UMT.Class
         {
@@ -12,6 +12,15 @@ function Main(isReplay)
                 end,
                 set = function(self, value)
                     LOG("A set method " .. value)
+                end
+            },
+
+            E = UMT.Property {
+                get = function(self)
+                    return self._f
+                end,
+                set = function(self, value)
+                    self._f = value
                 end
             }
         }
@@ -58,6 +67,57 @@ function Main(isReplay)
         bb.C = 4
         LOG(bb.D)
         bb.D = 4
+
+        bb.E = function(self)
+            LOG("E call with self: " .. tostring(self))
+        end
+        bb:E()
+        bb.E()
     end)
     if not a then return LOG(b) end
 end
+
+function TestLuaQ()
+    local LuaQ = UMT.LuaQ
+    local t = { 1, 2, 3, 4, 5 }
+        | LuaQ.foreach(LOG)
+        | LuaQ.where(function(v) return v > 3 end)
+        | LuaQ.foreach(LOG)
+        | LuaQ.sum
+    LOG(t)
+
+    local m = { 1, 2, 3, 4, 5 }
+        | LuaQ.where(function(v) return v & 1 == 1 end)
+        | LuaQ.reduce(function(val, _, v) return v * val end, 1)
+    LOG(m)
+    local c = LuaQ.From{ 1, 2, 3, 4, 5 }
+    | LuaQ.where(function(v) return v & 1 == 1 end)
+
+end
+
+function TestOptions()
+
+    local OptionVar = UMT.OptionVar.Create
+    local options = {
+        strings = OptionVar("TEST", "strings", "First")
+    }
+
+
+    UMT.Options.AddOptions("Test", "Test",
+        {
+            UMT.Options.Strings("Strings selector", { "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh" }
+                , options.strings)
+        })
+end
+
+function Main(isReplay)
+    TestUIClass()
+    TestLuaQ()
+    TestOptions()
+end
+
+function __moduleinfo.OnReload()
+    Main()
+end
+
+Main()
