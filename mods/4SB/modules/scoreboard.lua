@@ -23,10 +23,8 @@ local animationSpeed = LayoutHelpers.ScaleNumber(300)
 local slideForward = UMT.Animation.Factory.Base
     :OnStart()
     :OnFrame(function(control, delta)
-        if control.Right() < control:GetParent().Right() then
-            return true
-        end
-        control.Right:Set(control.Right() - delta * animationSpeed)
+        return control.Right() < control:GetParent().Right() or
+            control.Right:Set(control.Right() - delta * animationSpeed)
     end)
     :OnFinish(function(control)
         control.Right:Set(control:GetParent().Right)
@@ -177,13 +175,13 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     end,
 
-    
+
     GameSpeed = UMT.Property
     {
         get = function(self)
-            
+
         end,
-        
+
         set = function(self, value)
             if self._title then
                 self._title:Update(false, value)
