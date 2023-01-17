@@ -364,13 +364,9 @@ AllyView = Class(ArmyView)
 }
 
 local lastDataTextOffset = 20
-
 local dataTextOffSet = 40
 
-local lastDataTextOffsetScaled = LayoutHelpers.ScaleNumber(lastDataTextOffset)
-local dataTextOffSetScaled = LayoutHelpers.ScaleNumber(dataTextOffSet)
-
-local dataAnimationSpeed = 150
+local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl)
@@ -396,7 +392,7 @@ local expandDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - state.offset then
+        if control.Right() <= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
             return true
         end
         control.Right:Set(control.Right() - delta * dataAnimationSpeed)
@@ -448,8 +444,9 @@ ReplayArmyView = Class(ArmyView)
         end
 
         LayoutFor(self)
-            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(70) + self.Right() - first.Right() +
-                    dataTextOffSet
+            :Width(function()
+                return nameWidth() + LayoutHelpers.ScaleNumber(70 + dataTextOffSet)
+                    + self.Right() - first.Right()
             end)
 
     end,
@@ -507,12 +504,12 @@ ReplayArmyView = Class(ArmyView)
             local nextControl = self
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl, lastDataTextOffsetScaled)
+            expandDataAnimation:Apply(control, nextControl, lastDataTextOffset)
         else
             local nextControl = self._data[id + 1]
             local control = self._data[id]
 
-            expandDataAnimation:Apply(control, nextControl, dataTextOffSetScaled)
+            expandDataAnimation:Apply(control, nextControl, dataTextOffSet)
         end
 
     end,

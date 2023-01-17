@@ -18,7 +18,7 @@ local Scores = LazyImport("/lua/ui/game/score.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local animationSpeed = 300
+local animationSpeed = LayoutHelpers.ScaleNumber(300)
 
 local slideForward = UMT.Animation.Factory.Base
     :OnStart()
