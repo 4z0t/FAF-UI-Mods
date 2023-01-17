@@ -17,15 +17,13 @@ local slideAnimation = UMT.Animation.Factory.Base
             :Right(function() return GetFrame(0).Right() + width end)
     end)
     :OnFrame(function(control, delta)
-        if control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) then
-            return true
-        end
-        control.Right:Set(control.Right() - delta * animationSpeed)
+        return control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) or
+            control.Right:Set(control.Right() - delta * animationSpeed)
     end)
     :OnFinish(function(control)
         LayoutFor(control)
             :AtRightIn(GetFrame(0), 25)
-            LOG("Animation done")
+        LOG("Animation done")
     end)
     :Create()
 
