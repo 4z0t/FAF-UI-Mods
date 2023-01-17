@@ -20,4 +20,6 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             end
         end
     end
+else
+    WARN("UI MOD TOOLS NOT FOUND! 4z0t's scoreboard requires UI MOD TOOLS to function!")
 end
