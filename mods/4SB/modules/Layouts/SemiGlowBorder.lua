@@ -61,33 +61,29 @@ Layout = function(scoreboard)
         LayoutFor(scoreboard._border.tr)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtTopIn(scoreboard._border, -10)
-            :Alpha(0.5)
 
 
         LayoutFor(scoreboard._border.br)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtBottomIn(scoreboard._border, -10)
-            :Alpha(0.5)
+
 
 
         LayoutFor(scoreboard._border.r)
             :AnchorToLeft(scoreboard._border, offset + 5)
             :Top(scoreboard._border.tr.Bottom)
             :Bottom(scoreboard._border.br.Top)
-            :Alpha(0.5)
 
 
         LayoutFor(scoreboard._border.t)
             :AtTopIn(scoreboard._border.tr, 1)
             :Right(scoreboard._border.tr.Left)
             :Left(leftTop)
-            :Alpha(0.5)
 
         LayoutFor(scoreboard._border.b)
             :AtBottomIn(scoreboard._border.br, 1)
             :Right(scoreboard._border.br.Left)
             :Left(leftBottom)
-            :Alpha(0.5)
 
 
 
