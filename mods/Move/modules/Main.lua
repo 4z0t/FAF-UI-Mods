@@ -58,8 +58,8 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
     if not isMoveLocked then return end
-
-    if IsOverChargeCommandCanceled(commandModeData) and isOverCharge then
+    
+    if IsOverChargeCommand(commandModeData) and isOverCharge then
         if isOCSetting then
             ForkThread(SetOC)
             return
