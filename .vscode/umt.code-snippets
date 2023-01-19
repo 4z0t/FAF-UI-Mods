@@ -6,7 +6,7 @@
 
             "\tget = function(self)",
             "\t\treturn",
-            "\tend",
+            "\tend,",
             "",
             "\tset = function(self, value)",
             "",
