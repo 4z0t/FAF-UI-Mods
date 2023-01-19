@@ -52,7 +52,7 @@ function TestUIClass()
                 set = function(self, value)
                     LOG("B set method " .. value)
                 end
-            }
+            },
         }
         local aa = A()
         aa:A()
