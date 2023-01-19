@@ -1,0 +1,21 @@
+{
+    "Property":{
+        "body": [
+            "${1:{PropertyName} = UMT.Property",
+            "{",
+
+            "\tget = function(self)",
+            "\t\treturn",
+            "\tend",
+            "",
+            "\tset = function(self, value)",
+            "",
+            "\tend",
+
+            "}"
+        ],
+        "prefix": "umtproperty",
+        "description": "creates basic UMT property"
+
+    }
+}
