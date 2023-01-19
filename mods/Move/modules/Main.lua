@@ -11,9 +11,11 @@ function Reset()
     ConExecute 'StartCommandMode order RULEUCC_Move'
 end
 
-function Toggle()
+function Toggle(skip)
     locked = not locked
-    Reset()
+    if not skip then
+        Reset()
+    end
 end
 
 ---comment
