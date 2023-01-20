@@ -1,4 +1,5 @@
 local math = math
+local iscallable = iscallable
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 
