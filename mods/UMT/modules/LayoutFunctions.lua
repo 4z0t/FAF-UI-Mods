@@ -7,8 +7,8 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 
 
----@alias NumberFunction fun():number
 ---@alias NumberVar LazyVar<number>
+---@alias NumberFunction (fun():number) | NumberVar
 
 
 ---returns function of max between lazyvar or value
