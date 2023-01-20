@@ -55,3 +55,12 @@ function Min(n1, n2)
     if iscallable(n2) then return _MinVarOrValue(n2, n1) end
     return math.min(n1, n2)
 end
+
+
+function Diff()
+    
+end
+
+function Sum()
+    
+end
