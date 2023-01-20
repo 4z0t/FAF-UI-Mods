@@ -45,5 +45,13 @@ UnitOverlay = Class(Bitmap)
         else
             self:Hide()
         end
+    end,
+
+    OnDestroy = function(self)
+        Bitmap.OnDestroy(self)
+        self.PosX:Destroy()
+        self.PosX = nil
+        self.PosY:Destroy()
+        self.PosY = nil
     end
 }
