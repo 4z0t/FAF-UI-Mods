@@ -27,14 +27,17 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
+---@param scale number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
-function Max(n1, n2)
+function Max(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
         return function() return math.max(n1(), n2()) end
     end
-    if iscallable(n1) then return _MaxVarOrValue(n1, n2) end
-    if iscallable(n2) then return _MaxVarOrValue(n2, n1) end
-    return math.max(n1, n2)
+    if iscallable(n1) then return _MaxVarOrValue(n1, n2, scale) end
+    if iscallable(n2) then return _MaxVarOrValue(n2, n1, scale) end
+
+    scale = scale or defaultScaleFactor
+    return math.max(n1, n2) * scale
 end
 
 ---returns function of min between lazyvar or value
@@ -53,14 +56,17 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
+---@param scale number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
-function Min(n1, n2)
+function Min(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
         return function() return math.min(n1(), n2()) end
     end
-    if iscallable(n1) then return _MinVarOrValue(n1, n2) end
-    if iscallable(n2) then return _MinVarOrValue(n2, n1) end
-    return math.min(n1, n2)
+    if iscallable(n1) then return _MinVarOrValue(n1, n2, scale) end
+    if iscallable(n2) then return _MinVarOrValue(n2, n1, scale) end
+
+    scale = scale or defaultScaleFactor
+    return math.min(n1, n2) * scale
 end
 
 ---returns function of difference of lazyvar and value
@@ -91,14 +97,17 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
+---@param scale number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
-function Diff(n1, n2)
+function Diff(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
         return function() return n1() - n2() end
     end
-    if iscallable(n1) then return _DiffVarAndValue(n1, n2) end
-    if iscallable(n2) then return _DiffValueAndVar(n1, n2) end
-    return n1 - n2
+    if iscallable(n1) then return _DiffVarAndValue(n1, n2, scale) end
+    if iscallable(n2) then return _DiffValueAndVar(n1, n2, scale) end
+
+    scale = scale or defaultScaleFactor
+    return (n1 - n2) * scale
 end
 
 ---returns function of sum of lazyvar and value
@@ -119,14 +128,17 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
+---@param scale number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
-function Sum(n1, n2)
+function Sum(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
         return function() return n1() + n2() end
     end
-    if iscallable(n1) then return _SumVarAndValue(n1, n2) end
-    if iscallable(n2) then return _SumVarAndValue(n2, n1) end
-    return n1 + n2
+    if iscallable(n1) then return _SumVarAndValue(n1, n2, scale) end
+    if iscallable(n2) then return _SumVarAndValue(n2, n1, scale) end
+
+    scale = scale or defaultScaleFactor
+    return (n1 + n2) * scale
 end
 
 ---returns function of mult of lazyvar and value
