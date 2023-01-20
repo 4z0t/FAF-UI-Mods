@@ -13,6 +13,7 @@ end
 ---@class PropertyTable<C,T> : { set : fun(self: C, value: T), get : fun(self: C): T }
 ---@field __property true
 
+---Creates property for `UMT.Class`
 ---@generic T
 ---@generic C: fa-class
 ---@param setup SetupPropertyTable<C,T>
@@ -109,6 +110,7 @@ local function MakeUIClass(bases, spec)
     return MakeProperties(class)
 end
 
+---Creates class with `UMT.Property` support
 ---@generic T: fa-class
 ---@generic T_Base: fa-class
 ---@param ... T_Base
