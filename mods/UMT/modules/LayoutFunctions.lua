@@ -2,12 +2,13 @@ local math = math
 local iscallable = iscallable
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-
+---@alias NumberFunction fun():number
+---@alias NumberVar LazyVar<number>
 
 ---returns function of max between lazyvar or value
----@param var LazyVar<number>
+---@param var NumberVar
 ---@param value number
----@return fun():number
+---@return NumberFunction
 local function _MaxVarOrValue(var, value)
     return function()
         return math.max(var(), LayoutHelpers.ScaleNumber(value))
@@ -16,11 +17,11 @@ end
 
 ---returns function of max of two given lazyvars
 ---@overload fun(n1:number, n2:number):number
----@overload fun(n1:LazyVar<number>, n2:number):(fun():number)
----@overload fun(n1:number, n2:LazyVar<number>):(fun():number)
----@param n1 LazyVar<number>
----@param n2 LazyVar<number>
----@return fun():number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
 function Max(n1, n2)
     if iscallable(n1) and iscallable(n2) then
         return function() return math.max(n1(), n2()) end
@@ -31,9 +32,9 @@ function Max(n1, n2)
 end
 
 ---returns function of min between lazyvar or value
----@param var LazyVar<number>
+---@param var NumberVar
 ---@param value number
----@return fun():number
+---@return NumberFunction
 local function _MinVarOrValue(var, value)
     return function()
         return math.min(var(), LayoutHelpers.ScaleNumber(value))
@@ -42,11 +43,11 @@ end
 
 ---returns function of min of two given lazyvars
 ---@overload fun(n1:number, n2:number):number
----@overload fun(n1:LazyVar<number>, n2:number):(fun():number)
----@overload fun(n1:number, n2:LazyVar<number>):(fun():number)
----@param n1 LazyVar<number>
----@param n2 LazyVar<number>
----@return fun():number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
 function Min(n1, n2)
     if iscallable(n1) and iscallable(n2) then
         return function() return math.min(n1(), n2()) end
@@ -57,9 +58,9 @@ function Min(n1, n2)
 end
 
 ---returns function of difference of lazyvar and value
----@param var LazyVar<number>
+---@param var NumberVar
 ---@param value number
----@return fun():number
+---@return NumberFunction
 local function _DiffVarAndValue(var, value)
     return function()
         return var() - LayoutHelpers.ScaleNumber(value)
@@ -67,9 +68,9 @@ local function _DiffVarAndValue(var, value)
 end
 
 ---returns function of difference of value and lazyvar
----@param var LazyVar<number>
+---@param var NumberVar
 ---@param value number
----@return fun():number
+---@return NumberFunction
 local function _DiffValueAndVar(value, var)
     return function()
         return LayoutHelpers.ScaleNumber(value) - var()
@@ -78,11 +79,11 @@ end
 
 ---returns function of difference of two given lazyvars
 ---@overload fun(n1:number, n2:number):number
----@overload fun(n1:LazyVar<number>, n2:number):(fun():number)
----@overload fun(n1:number, n2:LazyVar<number>):(fun():number)
----@param n1 LazyVar<number>
----@param n2 LazyVar<number>
----@return fun():number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
 function Diff(n1, n2)
     if iscallable(n1) and iscallable(n2) then
         return function() return n1() - n2() end
@@ -93,9 +94,9 @@ function Diff(n1, n2)
 end
 
 ---returns function of sum of lazyvar and value
----@param var LazyVar<number>
+---@param var NumberVar
 ---@param value number
----@return fun():number
+---@return NumberFunction
 local function _SumVarAndValue(var, value)
     return function()
         return var() + LayoutHelpers.ScaleNumber(value)
@@ -104,11 +105,11 @@ end
 
 ---returns function of sum of two given lazyvars
 ---@overload fun(n1:number, n2:number):number
----@overload fun(n1:LazyVar<number>, n2:number):(fun():number)
----@overload fun(n1:number, n2:LazyVar<number>):(fun():number)
----@param n1 LazyVar<number>
----@param n2 LazyVar<number>
----@return fun():number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
 function Sum(n1, n2)
     if iscallable(n1) and iscallable(n2) then
         return function() return n1() + n2() end
