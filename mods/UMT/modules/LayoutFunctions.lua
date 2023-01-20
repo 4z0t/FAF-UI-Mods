@@ -121,3 +121,32 @@ function Sum(n1, n2)
     if iscallable(n2) then return _SumVarAndValue(n2, n1) end
     return n1 + n2
 end
+
+
+---returns function of mult of lazyvar and value
+---@param var NumberVar
+---@param value number
+---@return NumberFunction
+local function _MultVarAndValue(var, value)
+    if value == 0 then return 0 end
+    return function()
+        return var() * value
+    end
+end
+
+
+---returns function of mult of two given lazyvars
+---@overload fun(n1:number, n2:number):number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
+function Mult(n1, n2)
+    if iscallable(n1) and iscallable(n2) then
+        return function() return n1() * n2() end
+    end
+    if iscallable(n1) then return _MultVarAndValue(n1, n2) end
+    if iscallable(n2) then return _MultVarAndValue(n2, n1) end
+    return n1 * n2
+end
