@@ -12,7 +12,10 @@ description = [[Additional orders combining selection and action and some QoL on
 * Select all sensors
 * Select all radars
 * Upgrade mex, select next idle nearest
-* Loop over idle mexes]]
+* Loop over idle mexes
+
+Requires UI Mod Tools V8
+]]
 author = "4z0t"
 url = ""
 uid = "additional-orders-extension-v03"
