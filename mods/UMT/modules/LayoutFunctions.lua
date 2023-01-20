@@ -18,7 +18,7 @@ local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 ---@return NumberFunction
 local function _MaxVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
-    return function() return MathFloor(math.max(var(), value * scale)) end
+    return function() return math.max(var(), value * scale) end
 end
 
 ---returns function of max of two given lazyvars
@@ -44,7 +44,7 @@ end
 ---@return NumberFunction
 local function _MinVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
-    return function() return MathFloor(math.min(var(), value * scale)) end
+    return function() return math.min(var(), value * scale) end
 end
 
 ---returns function of min of two given lazyvars
@@ -71,7 +71,7 @@ end
 local function _DiffVarAndValue(var, value, scale)
     if value == 0 then return var end
     scale = scale or defaultScaleFactor
-    return function() return MathFloor(var() - value * scale) end
+    return function() return var() - value * scale end
 end
 
 ---returns function of difference of value and lazyvar
@@ -82,7 +82,7 @@ end
 local function _DiffValueAndVar(value, var, scale)
     if value == 0 then return var end
     scale = scale or defaultScaleFactor
-    return function() return MathFloor(value * scale - var()) end
+    return function() return value * scale - var() end
 end
 
 ---returns function of difference of two given lazyvars
@@ -110,7 +110,7 @@ local function _SumVarAndValue(var, value, scale)
     if value == 0 then return var end
 
     scale = scale or defaultScaleFactor
-    return function() return MathFloor(var() + value * scale) end
+    return function() return var() + value * scale end
 end
 
 ---returns function of sum of two given lazyvars
@@ -152,4 +152,14 @@ function Mult(n1, n2)
     if iscallable(n1) then return _MultVarAndValue(n1, n2) end
     if iscallable(n2) then return _MultVarAndValue(n2, n1) end
     return n1 * n2
+end
+
+---returns function of floor of a given lazyvar
+---@overload fun(n:number):number
+---@overload fun(n:NumberVar):NumberFunction
+---@param n NumberVar
+---@return NumberFunction
+function Floor(n)
+    if iscallable(n) then return function() return MathFloor(n()) end end
+    return MathFloor(n)
 end
