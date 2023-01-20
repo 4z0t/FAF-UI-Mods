@@ -62,6 +62,7 @@ end
 ---@param value number
 ---@return NumberFunction
 local function _DiffVarAndValue(var, value)
+    if value == 0 then return var end
     return function()
         return var() - LayoutHelpers.ScaleNumber(value)
     end
@@ -72,6 +73,7 @@ end
 ---@param value number
 ---@return NumberFunction
 local function _DiffValueAndVar(value, var)
+    if value == 0 then return var end
     return function()
         return LayoutHelpers.ScaleNumber(value) - var()
     end
@@ -98,6 +100,7 @@ end
 ---@param value number
 ---@return NumberFunction
 local function _SumVarAndValue(var, value)
+    if value == 0 then return var end
     return function()
         return var() + LayoutHelpers.ScaleNumber(value)
     end
