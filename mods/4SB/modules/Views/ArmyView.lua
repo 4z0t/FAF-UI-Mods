@@ -158,8 +158,10 @@ ArmyView = Class(Group)
         self._name:SetText(name)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, Options.player.font.name(), armyViewTextPointSize)))
-        self._name:SetFont(Options.player.font.name:Raw(), armyViewTextPointSize)
+
+        local font = GetFocusArmy() == armyId and Options.player.font.focus or Options.player.font.name
+        nameWidth:Set(math.max(nameWidth(), TextWidth(name, font(), armyViewTextPointSize)))
+        self._name:SetFont(font:Raw(), armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,

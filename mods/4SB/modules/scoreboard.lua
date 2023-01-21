@@ -40,6 +40,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
 
+        self._focusArmy = GetFocusArmy()
+
         if isTitle then
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
@@ -297,6 +299,10 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
         self._teamsContainer:Update(data)
+        if self._focusArmy ~= GetFocusArmy() then
+            self._focusArmy = GetFocusArmy()
+            self:ResetArmyData()
+        end
     end,
 
     SortArmies = function(self, func, direction)

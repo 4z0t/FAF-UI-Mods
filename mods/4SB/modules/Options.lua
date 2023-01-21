@@ -73,6 +73,7 @@ function Init(isReplay)
         Options.ColorSlider("Slider color", observer.color.line, 4),
         Options.Title("Player Fonts"),
         Options.Fonts("Name", player.font.name, 4),
+        Options.Fonts("Focus", player.font.focus, 4),
         Options.Fonts("Rating", player.font.rating, 4),
         Options.Fonts("Mass", player.font.mass, 4),
         Options.Fonts("Energy", player.font.energy, 4),
