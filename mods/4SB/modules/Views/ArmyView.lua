@@ -404,6 +404,12 @@ local expandDataAnimation = animationFactory
 
 local armyViewDataFont = Options.player.font.data:Raw()
 
+local highlightColor = "66686565"
+
+local colorAnimation = UMT.Animation.Factory.Color
+    :For(0.3)
+    :Create()
+
 ReplayArmyView = Class(ArmyView)
 {
     __init = function(self, parent)
@@ -477,6 +483,22 @@ ReplayArmyView = Class(ArmyView)
             not event.Modifiers.Ctrl then
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
         end
+
+
+        if event.Type == 'MouseExit' then
+            LayoutFor(self._bg)
+                :Color(bgColor)
+            --colorAnimation:Apply(self._bg, bgColor())
+            return true
+        elseif event.Type == 'MouseEnter' then
+            LayoutFor(self._bg)
+                :Color(highlightColor)
+            --colorAnimation:Apply(self._bg, UMT.ColorUtils.ColorMult(bgColor(), 1.4))
+            return true
+        end
+
+        return false
+
 
     end,
 
