@@ -9,6 +9,10 @@ local Utils = import("Utils.lua")
 local ArmyViews = import("Views/ArmyView.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local LuaQ = UMT.LuaQ
+
+
+
 
 local inTeamSort = Options.teamScoreSort()
 
@@ -128,11 +132,9 @@ ArmyViewsContainer = Class(Group)
         local scoreCache    = scoreData or import("/lua/ui/game/score.lua").GetScoreCache()
 
 
-        local dataTable = {}
-        for armyId, _ in self._armyViews do
-            local val = self._sortFunc(scoreCache[armyId])
-            dataTable[armyId] = val
-        end
+        local dataTable = self._armyViews
+            | LuaQ.select.keyvalue(function(armyId) return self._sortFunc(scoreCache[armyId]) end)
+            
         if self._sortDirection == 1 then
             table.sort(self._lines, function(a, b)
                 local data1 = dataTable[a.id]
