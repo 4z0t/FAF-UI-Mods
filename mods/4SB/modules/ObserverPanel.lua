@@ -82,9 +82,8 @@ ObserverPanel = Class(Group)
             :RightOf(self._slider, 5)
             :DisableHitTest()
 
-        local topLine = self:GetParent():GetArmyViews()[1]
         LayoutFor(self)
-            :Width(UMT.Layouter.Functions.Min(topLine.Width, width))
+            :Width(UMT.Layouter.Functions.Min(self:GetParent().Width, width))
             :Height(height)
 
     end,
