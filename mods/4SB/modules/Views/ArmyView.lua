@@ -420,8 +420,6 @@ ReplayArmyView = Class(ArmyView)
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
             if i == 1 then
-                LayoutFor(self._name)
-                    :AtRightIn(self._data[i], dataTextOffSet)
                 LayoutFor(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
                     :AtVerticalCenterIn(self)
