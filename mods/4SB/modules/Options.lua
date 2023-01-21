@@ -47,6 +47,7 @@ observer = {
 style = OptionVar(modName, "scoreboardStyle", "default")
 replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
 
+teamScoreSort = OptionVar(modName, "teamScoreSort", false)
 
 function Init(isReplay)
     Options.AddOptions(modName, "4z0t's ScoreBoard", {
@@ -87,5 +88,6 @@ function Init(isReplay)
         Options.ColorSlider("Quality", title.color.quality, 4),
         Options.Title("Player colors"),
         Options.ColorSlider("Background", player.color.bg, 4),
+        Options.Filter("In team score sorting", teamScoreSort, 4)
     })
 end
