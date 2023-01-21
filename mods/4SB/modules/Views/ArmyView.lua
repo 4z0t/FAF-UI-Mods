@@ -402,6 +402,8 @@ local expandDataAnimation = animationFactory
     end)
     :Create()
 
+local armyViewDataFont = Options.player.font.data:Raw()
+
 ReplayArmyView = Class(ArmyView)
 {
     __init = function(self, parent)
@@ -436,7 +438,7 @@ ReplayArmyView = Class(ArmyView)
                     :AtVerticalCenterIn(self)
                     :DisableHitTest()
             end
-            self._data[i]:SetFont(armyViewTextFont, armyViewTextPointSize)
+            self._data[i]:SetFont(armyViewDataFont, armyViewTextPointSize)
             self._data[i]:SetText("0")
             self._data[i]._contracted = false
         end

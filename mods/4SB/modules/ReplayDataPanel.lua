@@ -12,7 +12,7 @@ local LazyVar = import('/lua/lazyvar.lua').Create
 
 local Options = import("/mods/4SB/modules/Options.lua")
 
-local textFont = "Zeroes Three"
+
 local textSize = 12
 
 
@@ -91,7 +91,7 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
 }
 
 
-
+local textFont = Options.player.font.data:Raw()
 
 DataPanel = Class(Group)
 {

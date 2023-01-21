@@ -9,11 +9,12 @@ local Options = import("/mods/4SB/modules/Options.lua")
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
 
-local obsTextFont = "Zeroes Three"
+local obsTextFont = Options.observer.font:Raw()
 local obsTextSize = 12
 
 local bgColor = Options.player.color.bg:Raw()
 
+local sliderColor = Options.observer.color.line:Raw()
 
 
 local width = 300
@@ -27,7 +28,7 @@ ObserverPanel = Class(Group)
         self._bg = Bitmap(self)
 
         self._slider = ColoredIntegerSlider(self, false, -10, 10, 1,
-            "ffffffff",
+            sliderColor,
             "ffeeee00",
             "ffffff00",
             "ffffbb00",

@@ -29,10 +29,18 @@ player = {
         focus = OptionVar(modName, "player.font.focus", "Arial"),
         mass = OptionVar(modName, "player.font.mass", "Arial"),
         energy = OptionVar(modName, "player.font.energy", "Arial"),
+        data = OptionVar(modName, "player.font.data", "Arial"),
     },
 
     color = {
         bg = OptionVar(modName, "player.color.bg", "66000000"),
+    }
+}
+
+observer = {
+    font = OptionVar(modName, "observer.font", "Arial"),
+    color = {
+        line = OptionVar(modName, "observer.color.line", "ffffffff"),
     }
 }
 
@@ -60,11 +68,15 @@ function Init(isReplay)
         Options.Fonts("Quality", title.font.quality, 4),
         Options.Fonts("Map name", title.font.mapName, 4),
         Options.Fonts("Map size", title.font.mapSize, 4),
+        Options.Title("Observer Panel"),
+        Options.Fonts("Font", observer.font, 4),
+        Options.ColorSlider("Slider color", observer.color.line, 4),
         Options.Title("Player Fonts"),
         Options.Fonts("Name", player.font.name, 4),
         Options.Fonts("Rating", player.font.rating, 4),
         Options.Fonts("Mass", player.font.mass, 4),
         Options.Fonts("Energy", player.font.energy, 4),
+        Options.Fonts("Replay data", player.font.data, 4),
         Options.Column(2),
         Options.Title("Title colors"),
         --Options.ColorSlider("Background", title.color.bg, 4),
