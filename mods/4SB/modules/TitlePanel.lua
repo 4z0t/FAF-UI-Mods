@@ -4,9 +4,8 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local InfoPanel = import("InfoPanel.lua").InfoPanel
+local Options = import("Options.lua")
 
-
-local Options = import("/mods/4SB/modules/Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
@@ -79,7 +78,7 @@ local TopInfoPanel = Class(Group)
 
     SetQuality = function(self, quality)
         if quality then
-            self._quality:SetText(string.format("Q:%.2f%%", quality))
+            self._quality:SetText(("Q:%.2f%%"):format(quality))
         else
             self._quality:SetText("")
         end
@@ -89,13 +88,13 @@ local TopInfoPanel = Class(Group)
         if gameSpeed then
             self._gameSpeed = gameSpeed
         end
-        self._speed:SetText(string.format("%+d / %+d", self._gameSpeed, GetSimRate()))
+        self._speed:SetText(("%+d / %+d"):format(self._gameSpeed, GetSimRate()))
         self._time:SetText(GetGameTime())
 
         if data then
             local scoreData = data[GetFocusArmy()]
             if scoreData.general.currentcap then
-                self._unitCap:SetText(string.format("%d/%d", scoreData.general.currentunits, scoreData.general.currentcap))
+                self._unitCap:SetText(("%d/%d"):format(scoreData.general.currentunits, scoreData.general.currentcap))
             else
                 self._unitCap:SetText("")
             end

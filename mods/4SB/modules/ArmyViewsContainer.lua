@@ -3,7 +3,7 @@ local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Options = import("/mods/4SB/modules/Options.lua")
+local Options = import("Options.lua")
 
 local Utils = import("Utils.lua")
 local ArmyViews = import("Views/ArmyView.lua")

@@ -10,7 +10,7 @@ local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
 local LazyVar = import('/lua/lazyvar.lua').Create
 
-local Options = import("/mods/4SB/modules/Options.lua")
+local Options = import("Options.lua")
 
 
 local textSize = 12

@@ -6,7 +6,7 @@ local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-local Options = import("/mods/4SB/modules/Options.lua")
+local Options = import("Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
