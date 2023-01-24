@@ -22,6 +22,7 @@ local checkboxWidth = 18
 local checkboxHeight = 18
 
 local bgColor = Options.player.color.bg:Raw()
+local textFont = Options.player.font.data:Raw()
 
 local checkboxes = import("DataPanelConfig.lua").checkboxes
 local Chechbox = Class(AnimatedBorderedCheckBox)
@@ -29,13 +30,9 @@ local Chechbox = Class(AnimatedBorderedCheckBox)
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             local dropdown = self:GetParent()
-            local datePanel = dropdown:GetParent()
+            local dataPanel = dropdown:GetParent()
             local GetData = checkboxes[dropdown._id][self._id + 1].GetData
-            if event.WheelRotation > 0 then
-                datePanel._sb:SortArmies(GetData, -1)
-            else
-                datePanel._sb:SortArmies(GetData, 1)
-            end
+            dataPanel:Sort(dropdown._id, GetData, event.WheelRotation)
             return true
         end
         return AnimatedBorderedCheckBox.HandleEvent(self, event)
@@ -51,6 +48,13 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             :Color(bgColor)
             :Fill(self._expand)
             :Top(self.Bottom)
+
+        self._arrow = Text(self)
+        self._arrow:SetText("")
+        self._arrow:SetFont(textFont, textSize)
+        LayoutFor(self._arrow)
+            :AtVerticalCenterIn(self)
+            :AnchorToRight(self)
     end,
 
     AddControls = function(self, controls)
@@ -59,11 +63,11 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
 
         local function CheckBoxOnClick(control, modifiers)
             local dropdown = control:GetParent()
-            local datePanel = dropdown:GetParent()
+            local dataPanel = dropdown:GetParent()
             if modifiers.Left then
                 if dropdown._isExpanded then
                     dropdown:SetActiveControl(control._id)
-                    datePanel:UpdateDataSetup(dropdown._id, control._id + 1)
+                    dataPanel:UpdateDataSetup(dropdown._id, control._id + 1)
                     dropdown:Contract()
                 else
                     dropdown:Expand()
@@ -71,9 +75,9 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             elseif modifiers.Right and control == dropdown._active then
                 control:ToggleCheck()
                 if control._checkState == "checked" then
-                    datePanel._sb:Expand(dropdown._id)
+                    dataPanel._sb:Expand(dropdown._id)
                 else
-                    datePanel._sb:Contract(dropdown._id)
+                    dataPanel._sb:Contract(dropdown._id)
                 end
             end
         end
@@ -88,10 +92,37 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             control:SetAlpha(0)
         end
     end,
+
+    SetDirection = function(self, direction)
+
+        if not direction then
+            self._sortId = false
+            self._arrow:SetText("")
+            return
+        end
+        if direction > 0 then
+            self._arrow:SetText("↑")
+            self._direction = 1
+        else
+            self._arrow:SetText("↓")
+            self._direction = -1
+        end
+        self._sortId = self._active._id
+        self._arrow:SetColor(self._active:GetColor())
+    end,
+
+    SetActiveControl = function(self, control)
+        local new, old = ExpandableSelectionGroup.SetActiveControl(self, control)
+        if self._active._id == self._sortId then
+            self:SetDirection(self._direction)
+        else
+            self._arrow:SetText("")
+        end
+        return new, old
+    end
 }
 
 
-local textFont = Options.player.font.data:Raw()
 
 DataPanel = Class(Group)
 {
@@ -221,10 +252,22 @@ DataPanel = Class(Group)
         self._sb:SetDataSetup(self._setup)
     end,
 
+    ResetDirection = function(self)
+        for i, dropdown in self._dropdowns do
+            dropdown:SetDirection()
+        end
+    end,
+
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
             self._sb:SortArmies(nil, 0)
         end
+    end,
+
+    Sort = function(self, index, sortFun, direction)
+        self:ResetDirection()
+        self._dropdowns[index]:SetDirection(direction)
+        self._sb:SortArmies(sortFun, direction > 0 and -1 or 1)
     end
 
 
