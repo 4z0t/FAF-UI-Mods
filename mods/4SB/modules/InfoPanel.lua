@@ -20,9 +20,8 @@ function GetSizeInKM(size)
     return size / 512 * 10
 end
 
-local pattern = "neroxis_map_generator"
 function FormatMapName(name)
-    if string.find(name, pattern) then
+    if name:find "neroxis_map_generator" then
         return "Neroxis Map Generator", true
     end
     return name, false
@@ -35,9 +34,6 @@ InfoPanel = Class(Group)
 
         self._mapName = Text(self)
         self._mapSize = Text(self)
-
-
-
     end,
 
     __post_init = function(self)
@@ -75,7 +71,7 @@ InfoPanel = Class(Group)
             mapWidth = areaData[3] - areaData[1]
             mapHeight = areaData[4] - areaData[2]
         end
-        self._mapSize:SetText(string.format("%.1f x %.1f", GetSizeInKM(mapWidth), GetSizeInKM(mapHeight)))
+        self._mapSize:SetText(("%.1f x %.1f"):format(GetSizeInKM(mapWidth), GetSizeInKM(mapHeight)))
 
 
         local mapName, isMapGen = FormatMapName(sessionInfo.name)
@@ -84,8 +80,7 @@ InfoPanel = Class(Group)
             mapDescription = "No description set by the author."
         end
 
-        mapDescription = string.format(
-            "%s\r\n\r\n%s: %s\r\n%s: %s",
+        mapDescription = ("%s\r\n\r\n%s: %s\r\n%s: %s"):format(
             LOC(mapDescription),
             LOC("<LOC map_version>Map version"),
             tostring(sessionInfo.map_version),

@@ -481,13 +481,13 @@ ReplayArmyView = Class(ArmyView)
 
     HandleEvent = function(self, event)
 
-        if event.Type == 'ButtonPress' and event.Modifiers.Left and not event.Modifiers.Shift and
+        if event.Type == 'ButtonPress' and
+            event.Modifiers.Left and
+            not event.Modifiers.Shift and
             not event.Modifiers.Ctrl then
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
-        end
-
-
-        if event.Type == 'MouseExit' then
+            return true
+        elseif event.Type == 'MouseExit' then
             LayoutFor(self._bg)
                 :Color(bgColor)
             --colorAnimation:Apply(self._bg, bgColor())
