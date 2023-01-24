@@ -49,6 +49,10 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             :Fill(self._expand)
             :Top(self.Bottom)
 
+
+        self._direction = false
+        self._sortId = false
+
         self._arrow = Text(self)
         self._arrow:SetText("")
         self._arrow:SetFont(textFont, 14)
