@@ -51,10 +51,11 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
 
         self._arrow = Text(self)
         self._arrow:SetText("")
-        self._arrow:SetFont(textFont, textSize)
+        self._arrow:SetFont(textFont, 14)
         LayoutFor(self._arrow)
             :AtVerticalCenterIn(self)
             :AnchorToRight(self)
+            :DisableHitTest()
     end,
 
     AddControls = function(self, controls)
@@ -267,10 +268,6 @@ DataPanel = Class(Group)
     Sort = function(self, index, sortFun, direction)
         self:ResetDirection()
         self._dropdowns[index]:SetDirection(direction)
-        self._sb:SortArmies(sortFun, direction > 0 and -1 or 1)
+        self._sb:SortArmies(sortFun, direction > 0 and 1 or -1)
     end
-
-
-
-
 }
