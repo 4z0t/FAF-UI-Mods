@@ -147,9 +147,7 @@ checkboxes = {
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
-                if score.general.built.mass == 0 then
-                    return 0, Utils.FormatRatioNumber
-                end
+                if score.general.built.mass == 0 then return 0, Utils.FormatRatioNumber end
                 return score.general.kills.mass / score.general.built.mass, Utils.FormatRatioNumber
             end
         },
@@ -165,9 +163,7 @@ checkboxes = {
             du = RGBA "",
             dc = RGBA "",
             GetData = function(score)
-                if score.general.lost.mass == 0 then
-                    return 0, Utils.FormatRatioNumber
-                end
+                if score.general.lost.mass == 0 then return 0, Utils.FormatRatioNumber end
                 return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
             end
         },
