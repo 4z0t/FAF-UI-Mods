@@ -109,7 +109,7 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
             self._direction = -1
         end
         self._sortId = self._active._id
-        self._arrow:SetColor(self._active:GetColor())
+        self._arrow:SetColor(self._active._color)
     end,
 
     SetActiveControl = function(self, control)
