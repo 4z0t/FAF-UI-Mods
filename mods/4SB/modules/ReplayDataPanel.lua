@@ -261,6 +261,7 @@ DataPanel = Class(Group)
 
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
+            self:ResetDirection()
             self._sb:SortArmies(nil, 0)
         end
     end,
