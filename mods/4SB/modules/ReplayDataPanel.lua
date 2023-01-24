@@ -107,12 +107,15 @@ DataPanel = Class(Group)
             table.insert(self._dropdowns, dropdown)
             table.insert(self._setup, 1)
         end
+
+        self._replayId = Text(self)
     end,
 
     __post_init = function(self)
         self:_Layout()
         self:_SetupCheckBoxes()
         self._sb:SetDataSetup(self._setup)
+        self._replayId:SetText(tostring(UIUtil.GetReplayId() or ""))
     end,
 
     _Layout = function(self)
@@ -120,6 +123,7 @@ DataPanel = Class(Group)
 
         local dropdownsCount = table.getn(self._dropdowns)
 
+        local first = self._dropdowns[1]
 
         local spacing = LazyVar()
         spacing:Set(function()
@@ -135,7 +139,6 @@ DataPanel = Class(Group)
             :Color(bgColor)
             :DisableHitTest()
 
-        local first = self._dropdowns[1]
 
         LayoutFor(self)
             :Width(panelWidth)
@@ -146,21 +149,37 @@ DataPanel = Class(Group)
 
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :Right(function()
-                        return self.Right() - spacing()
+                    :Right(function() return self.Right() - spacing() end)
+            elseif i == 1 then
+                local nextDD = self._dropdowns[i + 1]
+                local dd = dropdown
+                LayoutFor(dropdown)
+                    :AtVerticalCenterIn(self)
+                    :Left(function()
+                        local left = dd.Right() - dd.Width()
+                        if left < self._replayId.Right() then
+                            self._replayId:Hide()
+                        else
+                            self._replayId:Show()
+                        end
+                        return left
                     end)
-
-
+                    :Right(function() return nextDD.Left() - spacing() end)
             else
                 local nextDD = self._dropdowns[i + 1]
                 LayoutFor(dropdown)
                     :AtVerticalCenterIn(self)
-                    :Right(function()
-                        return nextDD.Left() - spacing()
-                    end)
-                   
+                    :Right(function() return nextDD.Left() - spacing() end)
             end
+
         end
+
+        LayoutFor(self._replayId)
+            :AtVerticalCenterIn(self)
+            :Color("ffaaaaaa")
+            :DisableHitTest()
+            :AtLeftIn(self, 4)
+        self._replayId:SetFont(textFont, textSize)
     end,
 
     _SetupCheckBoxes = function(self)
