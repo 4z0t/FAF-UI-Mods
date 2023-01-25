@@ -51,7 +51,7 @@ ObserverPanel = Class(Group)
         self._slider:SetValue(0)
 
         self._observerText = Text(self)
-        self._observerText:SetText(LOC("<LOC score_0003>Observer"))
+        self._observerText:SetText(LOC "<LOC score_0003>Observer")
         self._observerText:SetFont(obsTextFont, obsTextSize)
     end,
 
@@ -94,7 +94,7 @@ ObserverPanel = Class(Group)
 
     HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
-            ConExecute('SetFocusArmy -1')
+            ConExecute 'SetFocusArmy -1'
         end
     end,
 

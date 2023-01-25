@@ -30,16 +30,16 @@ ArmyViewsContainer = Class(Group)
     __init = function(self, parent)
         Group.__init(self, parent)
 
-        self._armyDataCache = nil
+        self._armyDataCache = false
 
         self._lines = {}
-        self._armyViews = nil
+        self._armyViews = false
 
         self._top = nil
         self._bottom = nil
 
-        self._sortFunc = nil
-        self._sortDirection = nil
+        self._sortFunc = false
+        self._sortDirection = false
 
         self._dataSetup = { 1, 1, 1, 1, 1 }
     end,
@@ -104,7 +104,8 @@ ArmyViewsContainer = Class(Group)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor)
+                armyData.teamColor
+            )
             armyView.teamId = armyData.teamId
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
@@ -168,7 +169,7 @@ ArmyViewsContainer = Class(Group)
         else
 
             --reset to default
-            self._sortFunc = nil
+            self._sortFunc = false
             for i, armyData in self._armyDataCache do
                 self._lines[i] = self._armyViews[armyData.id]
             end

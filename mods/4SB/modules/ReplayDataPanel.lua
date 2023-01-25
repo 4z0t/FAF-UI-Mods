@@ -230,10 +230,7 @@ DataPanel = Class(Group)
                     checkboxData.ou,
                     checkboxData.oc,
                     checkboxData.du,
-                    checkboxData.dc,
-                    nil,
-                    nil,
-                    1
+                    checkboxData.dc
                 )
                 LayoutFor(checkbox)
                     :Width(checkboxWidth)
@@ -243,12 +240,8 @@ DataPanel = Class(Group)
                 checkbox:SetCheck(true)
                 Tooltip.AddControlTooltip(checkbox, checkboxData.tooltip, 0.5)
                 cbs[j] = checkbox
-
             end
             dropdown:AddControls(cbs)
-
-
-
         end
     end,
 

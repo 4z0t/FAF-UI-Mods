@@ -132,7 +132,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor)
+                armyData.teamColor
+            )
 
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
@@ -227,7 +228,6 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     DisplayPing = function(self, pingData)
         if pingData.Marker or pingData.Renew then return end
         self:GetArmyViews()[pingData.Owner + 1]:DisplayPing(pingData)
-
     end
 
 }

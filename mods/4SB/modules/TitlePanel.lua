@@ -110,7 +110,6 @@ local expandAnimation = animationFactory
         return state
     end)
     :OnFrame(function(control, delta, state)
-
         if control.Top() > state.target.Bottom() then
             return true
         end

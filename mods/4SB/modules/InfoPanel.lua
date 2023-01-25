@@ -82,9 +82,9 @@ InfoPanel = Class(Group)
 
         mapDescription = ("%s\r\n\r\n%s: %s\r\n%s: %s"):format(
             LOC(mapDescription),
-            LOC("<LOC map_version>Map version"),
+            LOC "<LOC map_version>Map version",
             tostring(sessionInfo.map_version),
-            LOC("<LOC replay_id>Replay ID"),
+            LOC "<LOC replay_id>Replay ID",
             tostring(UIUtil.GetReplayId())
         )
         self._mapName:SetText(mapName)
