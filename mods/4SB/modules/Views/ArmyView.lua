@@ -217,8 +217,10 @@ AllyView = Class(ArmyView)
                 if event.Modifiers.Left then
                     if event.Modifiers.Ctrl then
                         ShareManager.GiveAllMassToPlayer(self.id)
-                    else
+                    elseif event.Modifiers.Shift then
                         ShareManager.GiveMassToPlayer(self.id)
+                    else
+                        ShareManager.GiveMassToPlayer(self.id, 0.25)
                     end
                 elseif event.Modifiers.Right then
                     ShareManager.RequestMassFromPlayer(self.id)
@@ -233,8 +235,10 @@ AllyView = Class(ArmyView)
                 if event.Modifiers.Left then
                     if event.Modifiers.Ctrl then
                         ShareManager.GiveAllEnergyToPlayer(self.id)
-                    else
+                    elseif event.Modifiers.Shift then
                         ShareManager.GiveEnergyToPlayer(self.id)
+                    else
+                        ShareManager.GiveEnergyToPlayer(self.id, 0.25)
                     end
                 elseif event.Modifiers.Right then
                     ShareManager.RequestEnergyFromPlayer(self.id)

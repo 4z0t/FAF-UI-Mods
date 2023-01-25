@@ -15,9 +15,8 @@ local function SendMessage(text, to)
 end
 
 local function GiveResourcesToPlayer(resourceType, id, ratio)
-    if GetFocusArmy() == id then
-        return
-    end
+    if GetFocusArmy() == id then return end
+    
     ratio = ratio or 0.5
     local scoresCache = import("/lua/ui/game/score.lua").GetScoreCache()
     local armyScore = scoresCache[id]
@@ -49,12 +48,12 @@ local function GiveResourcesToPlayer(resourceType, id, ratio)
     SendMessage(string.format("Sent %s %s to %s", FormatNumber(sentValue), resourceType, scoresCache[id].name))
 end
 
-function GiveMassToPlayer(id)
-    GiveResourcesToPlayer("Mass", id, 0.25)
+function GiveMassToPlayer(id, ratio)
+    GiveResourcesToPlayer("Mass", id, ratio)
 end
 
-function GiveEnergyToPlayer(id)
-    GiveResourcesToPlayer("Energy", id, 0.25)
+function GiveEnergyToPlayer(id, ratio)
+    GiveResourcesToPlayer("Energy", id, ratio)
 end
 
 function GiveUnitsToPlayer(id)
