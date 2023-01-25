@@ -3,15 +3,15 @@ local armiesTable = GetArmiesTable().armiesTable
 local FormatNumber = import("Utils.lua").FormatNumber
 
 local function SendMessage(text, to)
-    to = to or "allies"
 
     SessionSendChatMessage(FindClients(),
         {
             from = GetArmiesTable().armiesTable[GetFocusArmy()].nickname,
-            to = to,
+            to = to or "allies",
             Chat = true,
             text = text
         })
+
 end
 
 local function GiveResourcesToPlayer(resourceType, id, ratio)
@@ -26,7 +26,8 @@ local function GiveResourcesToPlayer(resourceType, id, ratio)
     local econData = GetEconomyTotals()
     local resStored = econData.stored[string.upper(resourceType)]
     if resStored <= 0 then return end
-    local sentValue = armyScore.resources.storage['max' .. resourceType] - armyScore.resources.storage['stored' .. resourceType]
+    local sentValue = armyScore.resources.storage['max' .. resourceType] -
+        armyScore.resources.storage['stored' .. resourceType]
     if sentValue <= 0 then return end
     sentValue = math.min(sentValue, resStored * ratio)
 
@@ -43,7 +44,8 @@ local function GiveResourcesToPlayer(resourceType, id, ratio)
         Args = args
     })
 
-    armyScore.resources.storage['stored' .. resourceType] = armyScore.resources.storage['stored' .. resourceType] + sentValue
+    armyScore.resources.storage['stored' .. resourceType] = armyScore.resources.storage['stored' .. resourceType] +
+        sentValue
     SendMessage(string.format("Sent %s %s to %s", FormatNumber(sentValue), resourceType, scoresCache[id].name))
 end
 
@@ -106,4 +108,3 @@ end
 function GiveAllEnergyToPlayer(id)
     GiveResourcesToPlayer("Energy", id, 1)
 end
-
