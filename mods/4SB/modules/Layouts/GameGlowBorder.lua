@@ -5,9 +5,12 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ArmyViews = import("../ArmyView.lua")
+local Animations = import("../Animations.lua")
+local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
+local contractAnimation = Animations.contractAnimation
+local expandAnimation = Animations.expandAnimation
 
-
-local animationSpeed = LayoutHelpers.ScaleNumber(300)
+local animationSpeed = 500
 
 
 local slideAnimation = UMT.Animation.Factory.Base
@@ -37,6 +40,8 @@ local Clear = function(scoreboard)
     scoreboard._bracket:Destroy()
     scoreboard._bracket = nil
 
+    scoreboard._arrow:Destroy()
+    scoreboard._arrow = nil
 
     if scoreboard._title then
         LayoutFor(scoreboard._title)
@@ -65,6 +70,23 @@ Layout = function(scoreboard)
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
+
+
+    scoreboard._arrow = VerticalCollapseArrow(scoreboard)
+
+    LayoutFor(scoreboard._arrow)
+        :AtTopIn(scoreboard, 10)
+        :AtRightIn(GetFrame(0), -3)
+        :Over(scoreboard, 20)
+
+    scoreboard._arrow.OnCheck = function(arrow, checked)
+        if not checked then
+            expandAnimation:Apply(scoreboard, animationSpeed, 25)
+        else
+            contractAnimation:Apply(scoreboard, animationSpeed, 25)
+        end
+
+    end
 
 
     LayoutFor(scoreboard._bracket)

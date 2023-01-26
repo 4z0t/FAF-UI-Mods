@@ -4,17 +4,20 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
+local Animations = import("../Animations.lua")
 
+local contractAnimation = Animations.contractAnimation
+local expandAnimation = Animations.expandAnimation
 
-
-local animationSpeed = LayoutHelpers.ScaleNumber(300)
+local animationSpeed = 500
 
 
 local slideAnimation = UMT.Animation.Factory.Base
     :OnStart(function(control)
         local width = control.Width()
         LayoutFor(control)
-            :Right(function() return GetFrame(0).Right() + width end)
+            :Right(function() return GetFrame(0).Right() + width + LayoutHelpers.ScaleNumber(25) end)
     end)
     :OnFrame(function(control, delta)
         return control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) or
@@ -36,6 +39,9 @@ local Clear = function(scoreboard)
 
     scoreboard._bracket:Destroy()
     scoreboard._bracket = nil
+
+    scoreboard._arrow:Destroy()
+    scoreboard._arrow = nil
 end
 
 ---inital animation for scoreboard
@@ -43,6 +49,8 @@ end
 local InitialAnimation = function(scoreboard)
     slideAnimation:Apply(scoreboard)
 end
+
+
 
 ---A layout function for scoreboard
 ---@param scoreboard ReplayScoreBoard
@@ -56,8 +64,21 @@ Layout = function(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
 
 
+    scoreboard._arrow = VerticalCollapseArrow(scoreboard)
 
+    LayoutFor(scoreboard._arrow)
+        :AtTopIn(scoreboard, 10)
+        :AtRightIn(GetFrame(0), -3)
+        :Over(scoreboard, 20)
 
+    scoreboard._arrow.OnCheck = function(arrow, checked)
+        if not checked then
+            expandAnimation:Apply(scoreboard, animationSpeed, 25)
+        else
+            contractAnimation:Apply(scoreboard, animationSpeed, 25)
+        end
+
+    end
 
     LayoutFor(scoreboard._bracket)
         :AtTopIn(scoreboard, -13)
