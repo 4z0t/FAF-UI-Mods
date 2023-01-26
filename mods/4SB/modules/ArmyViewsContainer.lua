@@ -6,7 +6,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Options = import("Options.lua")
 
 local Utils = import("Utils.lua")
-local ArmyViews = import("Views/ArmyView.lua")
+local ArmyViews = import("ArmyView.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local LuaQ = UMT.LuaQ

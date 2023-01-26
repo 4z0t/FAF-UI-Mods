@@ -1,6 +1,6 @@
 local Utils = import("Utils.lua")
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
-local ArmyViews = import("Views/ArmyView.lua")
+local ArmyViews = import("ArmyView.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local LuaQ = UMT.LuaQ

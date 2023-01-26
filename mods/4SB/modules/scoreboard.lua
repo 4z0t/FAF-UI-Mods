@@ -1,5 +1,5 @@
 local Group = import('/lua/maui/group.lua').Group
-local ArmyViews = import("Views/ArmyView.lua")
+local ArmyViews = import("ArmyView.lua")
 local Utils = import("Utils.lua")
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text

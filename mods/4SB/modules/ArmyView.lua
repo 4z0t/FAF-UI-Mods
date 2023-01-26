@@ -5,14 +5,21 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
 
-local Options = import("/mods/4SB/modules/Options.lua")
+local Options = import("Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
 
-local PingAnimation = import("PingAnimation.lua").PingAnimation
+local PingAnimation = import("Views/PingAnimation.lua").PingAnimation
+
+local Utils = import("Utils.lua")
+local FormatNumber = Utils.FormatNumber
+local TextWidth = Utils.TextWidth
+local ShareManager = import("ShareManager.lua")
+
+local checkboxes = import("DataPanelConfig.lua").checkboxes
 
 local appearAnimation = alphaAnimationFactory
     :ToAppear()
@@ -26,14 +33,8 @@ local fadeAnimation = alphaAnimationFactory
     :EndWith(0)
     :Create(alphaAnimator)
 
----@module "4SBUtils"
-local Utils = import("../Utils.lua")
-local FormatNumber = Utils.FormatNumber
-local TextWidth = Utils.TextWidth
-local Border = import("Border.lua").Border
-local ShareManager = import("../ShareManager.lua")
 
-local checkboxes = import("../DataPanelConfig.lua").checkboxes
+
 
 local bgColor = Options.player.color.bg:Raw()
 
