@@ -43,11 +43,13 @@ local armyViewTextPointSize = 12
 local armyViewTextFont = "Zeroes Three"
 local focusArmyTextFont = 'Arial Bold'
 
-nameWidth = LazyVar(20)
+nameWidth = LazyVar()
 
 
-local armyViewWidth = 250
-local allyViewWidth = 350
+armyViewWidth = LazyVar()
+armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
+allyViewWidth = LazyVar()
+allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
 
 
 
@@ -142,7 +144,7 @@ ArmyView = Class(Group)
 
 
         LayoutFor(self)
-            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
+            :Width(armyViewWidth)
             :Height(armyViewHeight)
 
     end,
@@ -200,6 +202,8 @@ AllyView = Class(ArmyView)
 {
     __init = function(self, parent)
         ArmyView.__init(self, parent)
+
+        self.isAlly = true
 
         self._mass = Text(self)
         self._energy = Text(self)
@@ -315,7 +319,7 @@ AllyView = Class(ArmyView)
 
 
         LayoutFor(self)
-            :Width(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
+            :Width(allyViewWidth)
     end,
 
     HandleEvent = function(self, event)

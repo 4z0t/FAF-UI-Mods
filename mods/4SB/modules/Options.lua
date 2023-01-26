@@ -54,12 +54,13 @@ function Init(isReplay)
         isReplay and Options.Strings("Replay Scoreboard style",
             {
                 "default",
-                "glow border"
+                "glow border",
             },
             replayStyle, 4) or Options.Strings("Scoreboard style",
             {
                 "default",
                 "semi glow border",
+                "glow border",
             },
             style, 4),
         Options.Title("Title Fonts"),
