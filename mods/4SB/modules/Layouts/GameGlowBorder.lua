@@ -40,7 +40,7 @@ local Clear = function(scoreboard)
 
     if scoreboard._title then
         LayoutFor(scoreboard._title)
-            :ResetLeft()
+            :Width(300)
     end
 
     for i, armyView in scoreboard:GetArmyViews() do
@@ -76,7 +76,7 @@ Layout = function(scoreboard)
 
     LayoutFor(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
-        --:AtLeftIn(scoreboard, -7)
+        :AtLeftIn(scoreboard, -11)
         :Over(scoreboard)
         :DisableHitTest(true)
 
@@ -86,7 +86,7 @@ Layout = function(scoreboard)
 
     if scoreboard._title then
         LayoutFor(scoreboard._title)
-            :Left(scoreboard.Left)
+            :Width(scoreboard.Width)
     end
 
     for i, armyView in scoreboard:GetArmyViews() do

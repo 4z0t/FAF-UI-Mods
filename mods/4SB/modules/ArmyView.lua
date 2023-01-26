@@ -121,6 +121,7 @@ ArmyView = Class(Group)
             :Bottom(self.Bottom)
             :Right(self.Left)
             :Width(3)
+            :Over(self, 10)
             :DisableHitTest()
 
         LayoutFor(self._faction)
