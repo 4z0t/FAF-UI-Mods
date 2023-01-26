@@ -77,7 +77,6 @@ Layout = function(scoreboard)
         else
             contractAnimation:Apply(scoreboard, animationSpeed, 25)
         end
-
     end
 
     LayoutFor(scoreboard._bracket)
