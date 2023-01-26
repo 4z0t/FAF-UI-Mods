@@ -48,6 +48,8 @@ style = OptionVar(modName, "scoreboardStyle", "default")
 replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
 
 teamScoreSort = OptionVar(modName, "teamScoreSort", false)
+teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
+teamColorAlpha = OptionVar(modName, "teamColorAlpha", 64)
 
 function Init(isReplay)
     Options.AddOptions(modName, "4z0t's ScoreBoard", {
@@ -89,6 +91,8 @@ function Init(isReplay)
         Options.ColorSlider("Quality", title.color.quality, 4),
         Options.Title("Player colors"),
         Options.ColorSlider("Background", player.color.bg, 4),
-        Options.Filter("In team score sorting", teamScoreSort, 4)
+        Options.Filter("In team score sorting", teamScoreSort, 4),
+        Options.Filter("Display Team color as background", teamColorAsBG, 4),
+        Options.Slider("Team color alpha", 0, 255, 1, teamColorAlpha, 4)
     })
 end

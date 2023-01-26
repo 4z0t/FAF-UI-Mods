@@ -4,6 +4,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
+local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")
 
@@ -121,25 +122,27 @@ ArmyView = Class(Group)
             :Bottom(self.Bottom)
             :Right(self.Left)
             :Width(3)
-            :Over(self, 10)
+            :Over(self, 5)
             :DisableHitTest()
 
         LayoutFor(self._faction)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 4)
-            :Over(self, 5)
+            :Over(self, 10)
             :DisableHitTest()
 
         LayoutFor(self._rating)
             :AtVerticalCenterIn(self)
             :AnchorToLeft(self, -60)
             :DisableHitTest()
+            :Over(self, 10)
             :DropShadow(true)
 
 
         LayoutFor(self._name)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 70)
+            :Over(self, 10)
             :DisableHitTest()
             :DropShadow(true)
 
@@ -153,7 +156,19 @@ ArmyView = Class(Group)
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor)
         self.id = armyId
 
-        self._color:SetSolidColor(teamColor)
+        if Options.teamColorAsBG() then
+            LayoutFor(self._color)
+                :Fill(self)
+                :Color(ColorUtils.SetAlpha(teamColor, Options.teamColorAlpha()))
+        else
+            LayoutFor(self._color)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+                :Right(self.Left)
+                :ResetLeft()
+                :Width(3)
+                :Color(teamColor)
+        end
 
         self._rating:SetColor(armyColor)
         self._rating:SetText(rating)
@@ -276,7 +291,7 @@ AllyView = Class(ArmyView)
             :Texture(UIUtil.UIFile '/textures/ui/icons_strategic/commander_generic.dds')
             :Width(14)
             :Height(14)
-            :Over(self, 5)
+            :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
 
@@ -286,7 +301,7 @@ AllyView = Class(ArmyView)
             :Texture(UIUtil.UIFile '/game/build-ui/icon-energy_bmp.dds')
             :Width(14)
             :Height(14)
-            :Over(self, 5)
+            :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
 
@@ -297,7 +312,7 @@ AllyView = Class(ArmyView)
             :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
             :Width(14)
             :Height(14)
-            :Over(self, 5)
+            :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
 
@@ -305,6 +320,7 @@ AllyView = Class(ArmyView)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
+            :Over(self, 10)
             :DisableHitTest()
         self._energy:SetFont(Options.player.font.energy:Raw(), armyViewTextPointSize)
 
@@ -314,6 +330,7 @@ AllyView = Class(ArmyView)
             :AtRightIn(self, 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
+            :Over(self, 10)
             :DisableHitTest()
         self._mass:SetFont(Options.player.font.mass:Raw(), armyViewTextPointSize)
 
