@@ -57,18 +57,20 @@ function Init(isReplay)
 
     Options.AddOptions(modName .. "General", "4z0t's ScoreBoard (General)",
         {
-            isReplay and Options.Strings("Replay Scoreboard style",
-                {
-                    "default",
-                    "glow border",
-                },
-                replayStyle, 4) or Options.Strings("Scoreboard style",
-                {
-                    "default",
-                    "semi glow border",
-                    "glow border",
-                },
-                style, 4),
+            isReplay and
+                Options.Strings("Replay Scoreboard style",
+                    {
+                        "default",
+                        "glow border",
+                    },
+                    replayStyle, 4) or
+                Options.Strings("Scoreboard style",
+                    {
+                        "default",
+                        "semi glow border",
+                        "glow border",
+                    },
+                    style, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),

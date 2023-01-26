@@ -88,8 +88,18 @@ local slideBackWards = animationFactory
     :Create()
 
 ---@class ArmyView : Group
+---@field isOutOfGame boolean
+---@field id integer
+---@field _bg Bitmap
+---@field _color Bitmap
+---@field _faction Bitmap
+---@field _rating Text
+---@field _name Text
 ArmyView = Class(Group)
 {
+    ---inits armyview
+    ---@param self ArmyView
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
         self.parent = parent
@@ -98,8 +108,6 @@ ArmyView = Class(Group)
         self.isOutOfGame = false
 
         self._bg = Bitmap(self)
-
-
         self._color = Bitmap(self)
         self._faction = Bitmap(self)
         self._rating = Text(self)
@@ -110,6 +118,8 @@ ArmyView = Class(Group)
         self:_Layout()
     end,
 
+    ---Layouts ArmyView
+    ---@param self ArmyView
     _Layout = function(self)
 
         LayoutFor(self._bg)
@@ -150,9 +160,16 @@ ArmyView = Class(Group)
         LayoutFor(self)
             :Width(armyViewWidth)
             :Height(armyViewHeight)
-
     end,
 
+    ---Sets static data for view
+    ---@param self ArmyView
+    ---@param armyId integer
+    ---@param name string
+    ---@param rating number
+    ---@param faction Faction
+    ---@param armyColor Color
+    ---@param teamColor Color
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor)
         self.id = armyId
 
@@ -171,7 +188,7 @@ ArmyView = Class(Group)
         end
 
         self._rating:SetColor(armyColor)
-        self._rating:SetText(rating)
+        self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
         self._name:SetText(name)
