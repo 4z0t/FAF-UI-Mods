@@ -324,6 +324,11 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         self._teamsContainer:Contract(id)
     end,
 
+    ResetArmyData = function(self)
+        ScoreBoard.ResetArmyData(self)
+        self._teamsContainer:SetStaticData()
+    end,
+
     GetArmyViews = function(self)
         return self._armiesContainer._armyViews
     end,

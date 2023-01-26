@@ -459,20 +459,19 @@ ReplayArmyView = Class(ArmyView)
             if i == 1 then
                 LayoutFor(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
-                    :AtVerticalCenterIn(self)
-                    :DisableHitTest()
                 first = self._data[i]
             elseif i == dataSize then
                 LayoutFor(self._data[i])
                     :AtRightIn(self, lastDataTextOffset)
-                    :AtVerticalCenterIn(self)
-                    :DisableHitTest()
             else
                 LayoutFor(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
-                    :AtVerticalCenterIn(self)
-                    :DisableHitTest()
             end
+            LayoutFor(self._data[i])
+                :AtVerticalCenterIn(self)
+                :Over(self, 15)
+                :DisableHitTest()
+                :DropShadow(true)
             self._data[i]:SetFont(armyViewDataFont, armyViewTextPointSize)
             self._data[i]:SetText("0")
             self._data[i]._contracted = false
@@ -573,10 +572,7 @@ ReplayTeamView = Class(ReplayArmyView)
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
         ReplayArmyView.SetStaticData(self, teamId, name, rating, 0, "ffffffff", teamColor)
         self._armies = armies | LuaQ.toSet
-        if self._faction then
-            self._faction:Destroy()
-            self._faction = nil
-        end
+        self._faction:SetAlpha(0)
     end,
 
 
