@@ -34,13 +34,18 @@ local slideForward = UMT.Animation.Factory.Base
 
 ---@class ScoreBoard : Group
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
----@field _armyViews table<integer, ArmyView>
+---@field protected _armyViews table<integer, ArmyView>
+---@field protected _title TitlePanel
+---@field protected _mode "storage"| "maxstorage"| "income"
+---@field protected _focusArmy integer
+---@field protected _lines ArmyView[]
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
 
         self._focusArmy = GetFocusArmy()
+        self._title = false
 
         if isTitle then
             self._title = TitlePanel(self)
@@ -161,6 +166,13 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     ---@return table<integer, ArmyView>
     GetArmyViews = function(self)
         return self._armyViews
+    end,
+
+    ---comment
+    ---@param self ScoreBoard
+    ---@return TitlePanel
+    GetTitlePanel = function(self)
+        return self._title
     end,
 
     Update = function(self, data)

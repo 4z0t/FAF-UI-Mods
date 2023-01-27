@@ -155,7 +155,7 @@ local fadeAnimation = alphaAnimationFactory
     :ApplyToChildren()
     :Create(alphaAnimator)
 
-
+---@class TitlePanel : Group
 TitlePanel = Class(Group)
 {
     __init = function(self, parent)
