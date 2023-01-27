@@ -62,6 +62,7 @@ function Init(isReplay)
                     {
                         "default",
                         "glow border",
+                       
                     },
                     replayStyle, 4) or
                 Options.Strings("Scoreboard style",
@@ -69,6 +70,7 @@ function Init(isReplay)
                         "default",
                         "semi glow border",
                         "glow border",
+                        "window border",
                     },
                     style, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
