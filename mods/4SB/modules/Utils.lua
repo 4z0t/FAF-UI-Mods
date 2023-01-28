@@ -40,7 +40,7 @@ function GetArmiesFormattedTable()
                 local clanTag  = sessionInfo.Options.ClanTags[nickname] or ""
                 local name     = nickname
                 if clanTag ~= "" then
-                    name = string.format("[%s] %s", clanTag, nickname)
+                    name = ("[%s] %s"):format(clanTag, nickname)
                 end
                 local data = {
                     faction = armyData.faction,
@@ -86,9 +86,8 @@ end
 ---@param n number | nil
 ---@return string
 function FormatNumber(n)
-    if n == nil then
-        return ""
-    end
+    if n == nil then return "" end
+    
     if (math.abs(n) < 1000) then
         return string.format("%01.0f", n)
     elseif (math.abs(n) < 10000) then
@@ -114,11 +113,11 @@ function FormatRatioNumber(n)
     end
 end
 
----comment
----@param str any
----@param font any
----@param size any
----@return unknown
+---returns width of string with given font family and size
+---@param str string
+---@param font string
+---@param size integer
+---@return number
 function TextWidth(str, font, size)
     local dummy = Text(GetFrame(0))
     dummy:Hide()

@@ -7,7 +7,7 @@ local Animator = import("Animator.lua")
 ---@alias animationOnFinishFunc fun(control : Control, state: ControlState)
 
 
----@class ControlState: table
+---@class ControlState: table<any, any>
 
 ---@class Animation
 ---@field OnStart animationOnStartFunc

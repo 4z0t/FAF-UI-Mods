@@ -9,7 +9,9 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local layouts = {
         ["default"] = false,
-        ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout
+        ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout,
+        ["glow border"] = import("/mods/4SB/modules/Layouts/GameGlowBorder.lua").Layout,
+        ["window border"] = import("/mods/4SB/modules/Layouts/GameWindowFrame.lua").Layout
     }
 
     local replayLayouts = {
@@ -48,6 +50,13 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             scoreboard:ResetArmyData()
         end
 
+        Options.teamColorAsBG.OnChange = function(var)
+            scoreboard:ResetArmyData()
+        end
+
+        Options.teamColorAlpha.OnChange = function(var)
+            scoreboard:ResetArmyData()
+        end
 
         controls.scoreBoard = scoreboard
         SetLayout()

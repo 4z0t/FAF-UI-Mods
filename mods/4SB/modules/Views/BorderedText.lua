@@ -23,6 +23,10 @@ BorderedText = Class(Border)
         self._text:SetText(text)
     end,
 
+    GetText = function (self)
+        return self._text:GetText()
+    end,
+
     SetFont = function(self, fontFamily, pointSize)
         self._text:SetFont(fontFamily, pointSize)
     end,

@@ -4,9 +4,9 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
-local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
+local ArmyViews = import("../ArmyView.lua")
 local Animations = import("../Animations.lua")
-
+local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
 local contractAnimation = Animations.contractAnimation
 local expandAnimation = Animations.expandAnimation
 
@@ -17,7 +17,7 @@ local slideAnimation = UMT.Animation.Factory.Base
     :OnStart(function(control)
         local width = control.Width()
         LayoutFor(control)
-            :Right(function() return GetFrame(0).Right() + width + LayoutHelpers.ScaleNumber(25) end)
+            :Right(function() return GetFrame(0).Right() + width end)
     end)
     :OnFrame(function(control, delta)
         return control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) or
@@ -42,6 +42,16 @@ local Clear = function(scoreboard)
 
     scoreboard._arrow:Destroy()
     scoreboard._arrow = nil
+
+    if scoreboard._title then
+        LayoutFor(scoreboard._title)
+            :Width(300)
+    end
+
+    for i, armyView in scoreboard:GetArmyViews() do
+        LayoutFor(armyView)
+            :Width(armyView.isAlly and ArmyViews.allyViewWidth or ArmyViews.armyViewWidth)
+    end
 end
 
 ---inital animation for scoreboard
@@ -49,8 +59,6 @@ end
 local InitialAnimation = function(scoreboard)
     slideAnimation:Apply(scoreboard)
 end
-
-
 
 ---A layout function for scoreboard
 ---@param scoreboard ReplayScoreBoard
@@ -77,7 +85,9 @@ Layout = function(scoreboard)
         else
             contractAnimation:Apply(scoreboard, animationSpeed, 25)
         end
+
     end
+
 
     LayoutFor(scoreboard._bracket)
         :AtTopIn(scoreboard, -13)
@@ -88,18 +98,25 @@ Layout = function(scoreboard)
 
     LayoutFor(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
-        --:AtLeftIn(scoreboard, -7)
+        :AtLeftIn(scoreboard, -11)
         :Over(scoreboard)
         :DisableHitTest(true)
 
-    LayoutFor(scoreboard._dataPanel)
-        :Width(scoreboard.Width)
+    LayoutFor(scoreboard)
+        :AtRightIn(GetFrame(0), 25)
+        :Width(ArmyViews.allyViewWidth)
+
     if scoreboard._title then
         LayoutFor(scoreboard._title)
             :Width(scoreboard.Width)
     end
-    LayoutFor(scoreboard)
-        :AtRightIn(GetFrame(0), 25)
+
+    for i, armyView in scoreboard:GetArmyViews() do
+        LayoutFor(armyView)
+            :Width(ArmyViews.allyViewWidth)
+    end
+
+
 
 
 

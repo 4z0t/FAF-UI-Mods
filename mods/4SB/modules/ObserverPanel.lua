@@ -4,16 +4,17 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Options = import("/mods/4SB/modules/Options.lua")
+local Options = import("Options.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
 
-local obsTextFont = "Zeroes Three"
+local obsTextFont = Options.observer.font:Raw()
 local obsTextSize = 12
 
 local bgColor = Options.player.color.bg:Raw()
 
+local sliderColor = Options.observer.color.line:Raw()
 
 
 local width = 300
@@ -27,7 +28,7 @@ ObserverPanel = Class(Group)
         self._bg = Bitmap(self)
 
         self._slider = ColoredIntegerSlider(self, false, -10, 10, 1,
-            "ffffffff",
+            sliderColor,
             "ffeeee00",
             "ffffff00",
             "ffffbb00",
@@ -50,7 +51,7 @@ ObserverPanel = Class(Group)
         self._slider:SetValue(0)
 
         self._observerText = Text(self)
-        self._observerText:SetText(LOC("<LOC score_0003>Observer"))
+        self._observerText:SetText(LOC "<LOC score_0003>Observer")
         self._observerText:SetFont(obsTextFont, obsTextSize)
     end,
 
@@ -81,9 +82,8 @@ ObserverPanel = Class(Group)
             :RightOf(self._slider, 5)
             :DisableHitTest()
 
-        local topLine = self:GetParent():GetArmyViews()[1]
         LayoutFor(self)
-            :Width(UMT.Layouter.Functions.Min(topLine.Width, width))
+            :Width(UMT.Layouter.Functions.Min(self:GetParent().Width, width))
             :Height(height)
 
     end,
@@ -94,7 +94,7 @@ ObserverPanel = Class(Group)
 
     HandleEvent = function(self, event)
         if event.Type == 'ButtonPress' and not event.Modifiers.Shift and not event.Modifiers.Ctrl then
-            ConExecute('SetFocusArmy -1')
+            ConExecute 'SetFocusArmy -1'
         end
     end,
 

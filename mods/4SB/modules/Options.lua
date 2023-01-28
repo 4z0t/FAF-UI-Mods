@@ -29,6 +29,7 @@ player = {
         focus = OptionVar(modName, "player.font.focus", "Arial"),
         mass = OptionVar(modName, "player.font.mass", "Arial"),
         energy = OptionVar(modName, "player.font.energy", "Arial"),
+        data = OptionVar(modName, "player.font.data", "Arial"),
     },
 
     color = {
@@ -36,43 +37,73 @@ player = {
     }
 }
 
+observer = {
+    font = OptionVar(modName, "observer.font", "Arial"),
+    color = {
+        line = OptionVar(modName, "observer.color.line", "ffffffff"),
+    }
+}
+
 style = OptionVar(modName, "scoreboardStyle", "default")
 replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
 
+teamScoreSort = OptionVar(modName, "teamScoreSort", false)
+teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
+teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
 
 function Init(isReplay)
-    Options.AddOptions(modName, "4z0t's ScoreBoard", {
-        isReplay and Options.Strings("Replay Scoreboard style",
-            {
-                "default",
-                "glow border"
-            },
-            replayStyle, 4) or Options.Strings("Scoreboard style",
-            {
-                "default",
-                "semi glow border",
-            },
-            style, 4),
-        Options.Title("Title Fonts"),
+
+    local UIUtil = import('/lua/ui/uiutil.lua')
+
+    Options.AddOptions(modName .. "General", "4z0t's ScoreBoard (General)",
+        {
+            isReplay and
+                Options.Strings("Replay Scoreboard style",
+                    {
+                        "default",
+                        "glow border",
+                       
+                    },
+                    replayStyle, 4) or
+                Options.Strings("Scoreboard style",
+                    {
+                        "default",
+                        "semi glow border",
+                        "glow border",
+                        "window border",
+                    },
+                    style, 4),
+            Options.Filter("In team score sorting", teamScoreSort, 4),
+            Options.ColorSlider("Background", player.color.bg, 4),
+            Options.Filter("Display Team color as background", teamColorAsBG, 4),
+            Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4)
+        })
+
+    Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
+
+
+
+        Options.Title("Observer Panel", nil, nil, UIUtil.factionTextColor),
+        Options.Fonts("Font", observer.font, 4),
+        Options.ColorSlider("Slider color", observer.color.line, 4),
+        Options.Title("Player", nil, nil, UIUtil.factionTextColor),
+        Options.Fonts("Name", player.font.name, 4),
+        Options.Fonts("Focus", player.font.focus, 4),
+        Options.Fonts("Rating", player.font.rating, 4),
+        Options.Fonts("Mass", player.font.mass, 4),
+        Options.Fonts("Energy", player.font.energy, 4),
+        Options.Fonts("Replay data", player.font.data, 4),
+        Options.Column(2),
+        Options.Title("Title", nil, nil, UIUtil.factionTextColor),
         Options.Fonts("Game speed", title.font.gameSpeed, 4),
         Options.Fonts("Unit cap", title.font.totalUnits, 4),
         Options.Fonts("Timer", title.font.time, 4),
         Options.Fonts("Quality", title.font.quality, 4),
         Options.Fonts("Map name", title.font.mapName, 4),
         Options.Fonts("Map size", title.font.mapSize, 4),
-        Options.Title("Player Fonts"),
-        Options.Fonts("Name", player.font.name, 4),
-        Options.Fonts("Rating", player.font.rating, 4),
-        Options.Fonts("Mass", player.font.mass, 4),
-        Options.Fonts("Energy", player.font.energy, 4),
-        Options.Column(2),
-        Options.Title("Title colors"),
-        --Options.ColorSlider("Background", title.color.bg, 4),
         Options.ColorSlider("Timer", title.color.time, 4),
         Options.ColorSlider("Game speed", title.color.gameSpeed, 4),
         Options.ColorSlider("Unit cap", title.color.totalUnits, 4),
         Options.ColorSlider("Quality", title.color.quality, 4),
-        Options.Title("Player colors"),
-        Options.ColorSlider("Background", player.color.bg, 4),
     })
 end

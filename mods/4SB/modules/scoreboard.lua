@@ -1,5 +1,5 @@
 local Group = import('/lua/maui/group.lua').Group
-local ArmyViews = import("Views/ArmyView.lua")
+local ArmyViews = import("ArmyView.lua")
 local Utils = import("Utils.lua")
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Text = import("/lua/maui/text.lua").Text
@@ -34,11 +34,18 @@ local slideForward = UMT.Animation.Factory.Base
 
 ---@class ScoreBoard : Group
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
----@field _armyViews table<integer, ArmyView>
+---@field protected _armyViews table<integer, ArmyView>
+---@field protected _title TitlePanel
+---@field protected _mode "storage"| "maxstorage"| "income"
+---@field protected _focusArmy integer
+---@field protected _lines ArmyView[]
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
+
+        self._focusArmy = GetFocusArmy()
+        self._title = false
 
         if isTitle then
             self._title = TitlePanel(self)
@@ -130,7 +137,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor)
+                armyData.teamColor
+            )
 
             self._lines[i] = armyView
             self._armyViews[armyData.id] = armyView
@@ -139,7 +147,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     end,
 
     ResetArmyData = function(self)
-        ArmyViews.nameWidth:Set(20)
+        ArmyViews.nameWidth:Set(0)
         for _, armyData in Utils.GetArmiesFormattedTable() do
             self:GetArmyViews()[armyData.id]:SetStaticData(
                 armyData.id,
@@ -158,6 +166,13 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     ---@return table<integer, ArmyView>
     GetArmyViews = function(self)
         return self._armyViews
+    end,
+
+    ---comment
+    ---@param self ScoreBoard
+    ---@return TitlePanel
+    GetTitlePanel = function(self)
+        return self._title
     end,
 
     Update = function(self, data)
@@ -225,7 +240,6 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     DisplayPing = function(self, pingData)
         if pingData.Marker or pingData.Renew then return end
         self:GetArmyViews()[pingData.Owner + 1]:DisplayPing(pingData)
-
     end
 
 }
@@ -297,6 +311,10 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
         self._teamsContainer:Update(data)
+        if self._focusArmy ~= GetFocusArmy() then
+            self._focusArmy = GetFocusArmy()
+            self:ResetArmyData()
+        end
     end,
 
     SortArmies = function(self, func, direction)
@@ -316,6 +334,11 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     Contract = function(self, id)
         self._armiesContainer:Contract(id)
         self._teamsContainer:Contract(id)
+    end,
+
+    ResetArmyData = function(self)
+        ScoreBoard.ResetArmyData(self)
+        self._teamsContainer:SetStaticData()
     end,
 
     GetArmyViews = function(self)

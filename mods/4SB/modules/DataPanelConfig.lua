@@ -28,96 +28,95 @@ local normalCheckedColor = RGBA "#e0e0e0"
 local overCheckedColor = RGBA "#f0f0f0"
 
 
+---@alias CollectedCategory
+--- |"land"
+--- |"air"
+--- |"naval"
+--- |"cdr"
+--- |"experimental"
+--- |"structures"
 
 
+---@class GeneralStatsScoreData
+---@field count  integer
+---@field mass  integer
+---@field energy integer
 
---[[
--- local categoriesToCollect = {
---     land = categories.LAND,
---     air = categories.AIR,
---     naval = categories.NAVAL,
---     cdr = categories.COMMAND,
---     sacu = categories.SUBCOMMANDER,
---     engineer = categories.ENGINEER,
---     tech1 = categories.TECH1,
---     tech2 = categories.TECH2,
---     tech3 = categories.TECH3,
---     experimental = categories.EXPERIMENTAL,
---     structures = categories.STRUCTURE,
---     transportation = categories.TRANSPORTATION
--- }
-
---armyscore:
--- ArmyScore[index] = {
---     faction = brain:GetFactionIndex(),
---     name = brain.Nickname,
---     type = '',
---     general = {
---         score = 0,
---         lastupdatetick = 0,
---         kills = {
---             count = 0,
---             mass = 0,
---             energy = 0
---         },
---         built = {
---             count = 0,
---             mass = 0,
---             energy = 0
---         },
---         lost = {
---             count = 0,
---             mass = 0,
---             energy = 0
---         },
---         currentunits = 0,
---         currentcap = 0
---     },
---     blueprints = {}, -- filled dynamically below
---     units = {},      -- filled dynamically below
---     resources = {
---         massin = {
---             total = 0,
---             rate = 0,
---             reclaimed = 0,
---             reclaimRate = 0
---         },
---         massout = {
---             total = 0,
---             rate = 0,
---             excess = 0
---         },
---         energyin = {
---             total = 0,
---             rate = 0,
---             reclaimed = 0,
---             reclaimRate = 0
---         },
---         energyout = {
---             total = 0,
---             rate = 0,
---             excess = 0
---         },
---         storage = {
---             storedMass = 0,
---             storedEnergy = 0,
---             maxMass = 0,
---             maxEnergy = 0
---         }
---     }
--- }
--- for categoryName, category in categoriesToCollect do
---     ArmyScore[index].units[categoryName] = {
---         kills = 0,
---         built = 0,
---         lost = 0
---     }
--- end
-
-]]
+---@class GeneralScoreData
+---@field score number
+---@field lastupdatetick integer
+---@field kills GeneralStatsScoreData
+---@field built GeneralStatsScoreData
+---@field lost GeneralStatsScoreData
+---@field currentunits integer
+---@field currentcap integer
 
 
+---@class IncomeStats
+---@field total  number
+---@field rate  number
+---@field reclaimed  number
+---@field reclaimRate number
 
+---@class OutcomeStats
+---@field total  number
+---@field rate  number
+---@field excess number
+
+---@class StorageStats
+---@field storedMass  number
+---@field storedEnergy  number
+---@field maxMass  number
+---@field maxEnergy number
+
+---@class ResourcesStats
+---@field massin IncomeStats
+---@field massout OutcomeStats
+---@field energyin IncomeStats
+---@field energyout OutcomeStats
+---@field storage StorageStats
+
+
+---@class UnitStats
+---@field kills integer
+---@field built integer
+---@field lost integer
+
+---@class CollectedUnitsStats
+---@field land UnitStats
+---@field air UnitStats
+---@field naval UnitStats
+---@field cdr UnitStats
+---@field experimental UnitStats
+---@field structures UnitStats
+
+---@class ArmyScoreData
+---@field faction Faction
+---@field name string
+---@field type BrainType
+---@field general GeneralScoreData
+---@field units CollectedUnitsStats
+---@field resources ResourcesStats
+
+
+---@alias FormatFunc  fun(num:number) :string
+
+---@alias ScoreDataFunc fun(armyScoreData: ArmyScoreData): number, FormatFunc?
+
+---@class ScoreDataView
+---@field  tooltip string
+---@field  title string
+---@field  description string
+---@field  text string
+---@field  nu string|nil
+---@field  nc string|nil
+---@field  ou string|nil
+---@field  oc string|nil
+---@field  du string|nil
+---@field  dc string|nil
+---@field  GetData ScoreDataFunc
+
+---@type ScoreDataView[][]
 checkboxes = {
     { --scores
         {
@@ -131,6 +130,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number
             GetData = function(score)
                 return score.general.score
             end
@@ -146,10 +147,10 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
-                if score.general.built.mass == 0 then
-                    return 0, Utils.FormatRatioNumber
-                end
+                if score.general.built.mass == 0 then return 0, Utils.FormatRatioNumber end
                 return score.general.kills.mass / score.general.built.mass, Utils.FormatRatioNumber
             end
         },
@@ -164,10 +165,10 @@ checkboxes = {
             oc = RGBA "#ff2222",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
-                if score.general.lost.mass == 0 then
-                    return 0, Utils.FormatRatioNumber
-                end
+                if score.general.lost.mass == 0 then return 0, Utils.FormatRatioNumber end
                 return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
             end
         },
@@ -185,6 +186,8 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number
             GetData = function(score)
                 return score.resources.massin.rate * 10
             end
@@ -200,6 +203,8 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.massin.total
             end
@@ -215,6 +220,8 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.massin.reclaimed
             end
@@ -233,6 +240,8 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.energyin.rate * 10
             end
@@ -248,6 +257,8 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.energyin.total
             end
@@ -263,6 +274,8 @@ checkboxes = {
             oc = overEnergyColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.energyin.reclaimed
             end
@@ -281,6 +294,8 @@ checkboxes = {
             oc = RGBA "#ff2222",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.general.kills.mass
             end
@@ -296,6 +311,8 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return (score.resources.massin.rate - score.resources.massout.rate) * 10
             end
@@ -312,6 +329,8 @@ checkboxes = {
             oc = overMassColor,
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.massin.total
             end
@@ -329,6 +348,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.general.currentunits
             end
@@ -344,6 +365,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.units.naval.built - score.units.naval.lost
             end
@@ -359,6 +382,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.units.air.built - score.units.air.lost
             end
@@ -374,6 +399,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.units.land.built - score.units.land.lost
             end
@@ -404,6 +431,8 @@ checkboxes = {
             oc = RGBA "",
             du = RGBA "",
             dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
             GetData = function(score)
                 return score.units.experimental.built - score.units.experimental.lost
             end

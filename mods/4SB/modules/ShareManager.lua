@@ -3,21 +3,20 @@ local armiesTable = GetArmiesTable().armiesTable
 local FormatNumber = import("Utils.lua").FormatNumber
 
 local function SendMessage(text, to)
-    to = to or "allies"
 
     SessionSendChatMessage(FindClients(),
         {
             from = GetArmiesTable().armiesTable[GetFocusArmy()].nickname,
-            to = to,
+            to = to or "allies",
             Chat = true,
             text = text
         })
+
 end
 
 local function GiveResourcesToPlayer(resourceType, id, ratio)
-    if GetFocusArmy() == id then
-        return
-    end
+    if GetFocusArmy() == id then return end
+    
     ratio = ratio or 0.5
     local scoresCache = import("/lua/ui/game/score.lua").GetScoreCache()
     local armyScore = scoresCache[id]
@@ -26,7 +25,8 @@ local function GiveResourcesToPlayer(resourceType, id, ratio)
     local econData = GetEconomyTotals()
     local resStored = econData.stored[string.upper(resourceType)]
     if resStored <= 0 then return end
-    local sentValue = armyScore.resources.storage['max' .. resourceType] - armyScore.resources.storage['stored' .. resourceType]
+    local sentValue = armyScore.resources.storage['max' .. resourceType] -
+        armyScore.resources.storage['stored' .. resourceType]
     if sentValue <= 0 then return end
     sentValue = math.min(sentValue, resStored * ratio)
 
@@ -43,16 +43,17 @@ local function GiveResourcesToPlayer(resourceType, id, ratio)
         Args = args
     })
 
-    armyScore.resources.storage['stored' .. resourceType] = armyScore.resources.storage['stored' .. resourceType] + sentValue
+    armyScore.resources.storage['stored' .. resourceType] = armyScore.resources.storage['stored' .. resourceType] +
+        sentValue
     SendMessage(string.format("Sent %s %s to %s", FormatNumber(sentValue), resourceType, scoresCache[id].name))
 end
 
-function GiveMassToPlayer(id)
-    GiveResourcesToPlayer("Mass", id, 0.25)
+function GiveMassToPlayer(id, ratio)
+    GiveResourcesToPlayer("Mass", id, ratio)
 end
 
-function GiveEnergyToPlayer(id)
-    GiveResourcesToPlayer("Energy", id, 0.25)
+function GiveEnergyToPlayer(id, ratio)
+    GiveResourcesToPlayer("Energy", id, ratio)
 end
 
 function GiveUnitsToPlayer(id)
@@ -106,4 +107,3 @@ end
 function GiveAllEnergyToPlayer(id)
     GiveResourcesToPlayer("Energy", id, 1)
 end
-
