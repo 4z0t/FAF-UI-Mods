@@ -15,11 +15,17 @@ local textSize = 12
 local panelWidth = 300
 local panelHeight = 20
 
-
+---Retuns size in KM
+---@param size number
+---@return number
 function GetSizeInKM(size)
     return size / 512 * 10
 end
 
+---Formats map name, returns name and true if map is generated
+---@param name string
+---@return string
+---@return boolean
 function FormatMapName(name)
     if name:find "neroxis_map_generator" then
         return "Neroxis Map Generator", true
