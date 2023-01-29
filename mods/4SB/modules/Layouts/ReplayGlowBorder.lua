@@ -88,7 +88,6 @@ Layout = function(scoreboard)
 
     LayoutFor(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
-        --:AtLeftIn(scoreboard, -7)
         :Over(scoreboard)
         :DisableHitTest(true)
 
