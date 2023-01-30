@@ -404,7 +404,7 @@ OptionsWindow = Class(Window) {
 
         local entry
         if data.type == "edit" then
-            entry = TextEdit(self._optionsGroup, data.optionVar, data.name, data.chatLimit)
+            entry = TextEdit(self._optionsGroup, data.optionVar, data.name, data.charLimit)
         elseif data.type == "strings" then
             entry = StringSelector(self._optionsGroup, data.optionVar, data.name, data.items)
         else
