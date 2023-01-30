@@ -6,8 +6,8 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ArmyViews = import("../ArmyView.lua")
 local Animations = import("../Animations.lua")
-local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
-local WindowFrame = import("../Views/WindowFrame.lua").WindowFrame
+local VerticalCollapseArrow = UMT.Views.VerticalCollapseArrow
+local WindowFrame = UMT.Views.WindowFrame
 
 local contractAnimation = Animations.contractAnimation
 local expandAnimation = Animations.expandAnimation

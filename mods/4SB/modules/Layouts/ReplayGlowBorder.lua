@@ -4,7 +4,7 @@ local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
-local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
+local VerticalCollapseArrow = UMT.Views.VerticalCollapseArrow
 local Animations = import("../Animations.lua")
 
 local contractAnimation = Animations.contractAnimation

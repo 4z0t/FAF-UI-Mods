@@ -1,16 +1,13 @@
 local Group = import('/lua/maui/group.lua').Group
-local ArmyViews = import("ArmyView.lua")
+import("Views/__Init__.lua")
 local Utils = import("Utils.lua")
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
-local UIUtil = import('/lua/ui/uiutil.lua')
+local ArmyViews = import("ArmyView.lua")
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
-local InfoPanel = import("InfoPanel.lua").InfoPanel
 
 
 local LazyImport = UMT.LazyImport
