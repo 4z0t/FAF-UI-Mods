@@ -67,14 +67,15 @@ local NumberMexOverlay = Class(Overlay)
 
         local text = "0"
         if unit:IsInCategory("TECH1") then
-            text = "1"
+            text = Options.t1MexText()
         elseif unit:IsInCategory("TECH2") then
-            text = "2"
+            text = Options.t2MexText()
         elseif unit:IsInCategory("TECH3") then
-            text = "3"
+            text = Options.t3MexText()
         end
 
         self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
+
         self.progress = Bitmap(self)
 
         LayoutFor(self)
