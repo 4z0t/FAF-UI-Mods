@@ -14,6 +14,7 @@ local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local LazyVar = import("/lua/lazyvar.lua")
 local StringSelector = import("Views/StringSelector.lua").StringSelector
+local TextEdit = import("Views/TextEdit.lua").TextEdit
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -63,16 +64,6 @@ function Slider(name, min, max, inc, optionVar, indent)
         min = min,
         max = max,
         inc = inc,
-        indent = indent or 0
-    }
-end
-
--- TODO
-function TextEdit(name, optionVar, indent)
-    return {
-        type = "edit",
-        name = name,
-        optionVar = optionVar,
         indent = indent or 0
     }
 end
@@ -412,7 +403,9 @@ OptionsWindow = Class(Window) {
         end
 
         local entry
-        if data.type == "strings" then
+        if data.type == "edit" then
+            entry = TextEdit(self._optionsGroup, data.optionVar, data.name, data.chatLimit)
+        elseif data.type == "strings" then
             entry = StringSelector(self._optionsGroup, data.optionVar, data.name, data.items)
         else
             entry = CreateEntry(data)

@@ -90,8 +90,8 @@ function TestLuaQ()
         | LuaQ.where(function(v) return v & 1 == 1 end)
         | LuaQ.reduce(function(val, _, v) return v * val end, 1)
     LOG(m)
-    local c = LuaQ.From{ 1, 2, 3, 4, 5 }
-    | LuaQ.where(function(v) return v & 1 == 1 end)
+    local c = LuaQ.From { 1, 2, 3, 4, 5 }
+        | LuaQ.where(function(v) return v & 1 == 1 end)
 
 end
 
@@ -99,14 +99,18 @@ function TestOptions()
 
     local OptionVar = UMT.OptionVar.Create
     local options = {
-        strings = OptionVar("TEST", "strings", "First")
+        strings = OptionVar("TEST", "strings", "First"),
+        edit = OptionVar("TEST", "edit", "default"),
     }
 
-
+    options.edit.OnChange = function(var)
+        LOG(var())
+    end
     UMT.Options.AddOptions("Test", "Test",
         {
             UMT.Options.Strings("Strings selector", { "First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh" }
-                , options.strings)
+                , options.strings),
+            UMT.Options.TextEdit("text edit", options.edit, 20)
         })
 end
 
