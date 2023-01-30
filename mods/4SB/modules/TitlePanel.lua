@@ -167,26 +167,7 @@ TitlePanel = Class(Group)
         self._info = InfoPanel(self)
         self._info:Setup()
 
-        self._arrow = Text(self)
-        self._arrow.state = true
-        self._arrow:SetText("^")
-        self._arrow.HandleEvent = function(control, event)
-            if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
-                if control.state then
-                    contractAnimation:Apply(self._info, self._top)
-                    fadeAnimation:Apply(self._info)
-                    control:SetText("v")
-                else
-                    expandAnimation:Apply(self._info, self._top)
-                    appearAnimation:Apply(self._info)
-                    control:SetText("^")
-                end
-                control.state = not control.state
-                return true
-            end
-        end
-        self._arrow:SetFont("Arial", 16)
-
+        self._expanded = true
     end,
 
     __post_init = function(self)
@@ -208,9 +189,6 @@ TitlePanel = Class(Group)
             :Top(self._top.Bottom)
             :Right(self.Right)
 
-        LayoutFor(self._arrow)
-            :AtRightTopIn(self._top, 2, 2)
-            :Over(self._top)
 
         LayoutFor(self)
             :Width(titlePanelWidth)
@@ -219,6 +197,20 @@ TitlePanel = Class(Group)
 
     SetQuality = function(self, quality)
         self._top:SetQuality(quality)
+    end,
+
+    HandleEvent = function(self, event)
+        if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+            if self._expanded then
+                contractAnimation:Apply(self._info, self._top)
+                fadeAnimation:Apply(self._info)
+            else
+                expandAnimation:Apply(self._info, self._top)
+                appearAnimation:Apply(self._info)
+            end
+            self._expanded = not self._expanded
+            return true
+        end
     end,
 
     Update = function(self, data, gameSpeed)
