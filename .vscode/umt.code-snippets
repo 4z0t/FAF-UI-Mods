@@ -1,21 +1,33 @@
 {
-    "Property":{
-        "body": [
-            "${1:PropertyName} = UMT.Property",
-            "{",
+  "Property": {
+    "body": [
+      "${1:PropertyName} = UMT.Property",
+      "{",
 
-            "\tget = function(self)",
-            "\t\treturn",
-            "\tend,",
-            "",
-            "\tset = function(self, value)",
-            "",
-            "\tend",
+      "\tget = function(self)",
+      "\t\treturn",
+      "\tend,",
+      "",
+      "\tset = function(self, value)",
+      "",
+      "\tend",
 
-            "}"
-        ],
-        "prefix": "umtproperty",
-        "description": "creates basic UMT property"
-
-    }
+      "}"
+    ],
+    "prefix": "umtproperty",
+    "description": "creates basic UMT property"
+  },
+  "Require": {
+    "body": [
+      "local function ExistGlobal(name)",
+      "\treturn rawget(_G, name) ~= nil",
+      "end",
+      "",
+      "if ExistGlobal \"UMT\" and UMT.Version >= ${1:Version} then",
+      "",
+      "end"
+    ],
+    "prefix": "umtrequire",
+    "description": "Creates UMT condition check"
+  }
 }
