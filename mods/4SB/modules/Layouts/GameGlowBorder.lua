@@ -1,12 +1,6 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ArmyViews = import("../ArmyView.lua")
 local Animations = import("../Animations.lua")
-local VerticalCollapseArrow = UMT.Views.VerticalCollapseArrow
 local contractAnimation = Animations.contractAnimation
 local expandAnimation = Animations.expandAnimation
 
@@ -52,9 +46,7 @@ Layout = function(scoreboard)
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
-
-
-    scoreboard._arrow = VerticalCollapseArrow(scoreboard)
+    scoreboard._arrow = UMT.Views.VerticalCollapseArrow(scoreboard)
 
     LayoutFor(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
@@ -67,7 +59,6 @@ Layout = function(scoreboard)
         else
             contractAnimation:Apply(scoreboard, animationSpeed, 25)
         end
-
     end
 
 
