@@ -67,7 +67,7 @@ function Init(isReplay)
                     {
                         "default",
                         "glow border",
-
+                        "window border",
                     },
                     replayStyle, 4) or
                 Options.Strings("Scoreboard style",

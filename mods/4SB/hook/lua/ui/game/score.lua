@@ -13,10 +13,11 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         ["glow border"] = import("/mods/4SB/modules/Layouts/GameGlowBorder.lua").Layout,
         ["window border"] = import("/mods/4SB/modules/Layouts/GameWindowFrame.lua").Layout
     }
-
+    
     local replayLayouts = {
         ["default"] = false,
-        ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout
+        ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout,
+        ["window border"] = import("/mods/4SB/modules/Layouts/ReplayWindowFrame.lua").Layout
     }
     function CreateScoreUI()
         if not IsDestroyed(controls.scoreBoard) then return end
