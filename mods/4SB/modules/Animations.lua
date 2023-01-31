@@ -33,3 +33,20 @@ expandAnimation = UMT.Animation.Factory.Base
             :AtRightIn(GetFrame(0), state.offset)
     end)
     :Create()
+
+slideAnimation = UMT.Animation.Factory.Base
+    :OnStart(function(control, state, speed, offset)
+        local width = control.Width()
+        LayoutFor(control)
+            :Right(function() return GetFrame(0).Right() + width + ScaleNumber(offset) end)
+        return { speed = ScaleNumber(speed), offset = offset }
+    end)
+    :OnFrame(function(control, delta, state)
+        return control.Right() < GetFrame(0).Right() - ScaleNumber(state.offset) or
+            control.Right:Set(control.Right() - delta * state.speed)
+    end)
+    :OnFinish(function(control, state)
+        LayoutFor(control)
+            :AtRightIn(GetFrame(0), state.offset)
+    end)
+    :Create()

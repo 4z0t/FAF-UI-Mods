@@ -13,24 +13,6 @@ local expandAnimation = Animations.expandAnimation
 local animationSpeed = 500
 
 
-local slideAnimation = UMT.Animation.Factory.Base
-    :OnStart(function(control)
-        local width = control.Width()
-        LayoutFor(control)
-            :Right(function() return GetFrame(0).Right() + width + LayoutHelpers.ScaleNumber(25) end)
-    end)
-    :OnFrame(function(control, delta)
-        return control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) or
-            control.Right:Set(control.Right() - delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        LayoutFor(control)
-            :AtRightIn(GetFrame(0), 25)
-        LOG("Animation done")
-    end)
-    :Create()
-
-
 ---A clear function for additional layout
 ---@param scoreboard ScoreBoard
 local Clear = function(scoreboard)
@@ -47,7 +29,7 @@ end
 ---inital animation for scoreboard
 ---@param scoreboard ReplayScoreBoard
 local InitialAnimation = function(scoreboard)
-    slideAnimation:Apply(scoreboard)
+    Animations.slideAnimation:Apply(scoreboard, animationSpeed, 25)
 end
 
 
