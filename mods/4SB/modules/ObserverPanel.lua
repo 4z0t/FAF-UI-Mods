@@ -19,7 +19,8 @@ local sliderColor = Options.observer.color.line:Raw()
 
 local width = 300
 local height = 20
-
+---@class ObserverPanel : Group
+---@field _bg Bitmap
 ObserverPanel = Class(Group)
 {
     __init = function(self, parent)

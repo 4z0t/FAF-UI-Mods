@@ -25,6 +25,7 @@ local scoreFunction = function(score)
     return score.general.score
 end
 
+---@class ArmyViewsContainer : Group
 ArmyViewsContainer = Class(Group)
 {
     __init = function(self, parent)

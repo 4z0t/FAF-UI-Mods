@@ -23,7 +23,7 @@ local titlePanelHeight = 20
 local bgColor = Options.player.color.bg:Raw()
 
 
-
+---@class TopInfoPanel : Group
 local TopInfoPanel = Class(Group)
 {
     __init = function(self, parent)
@@ -156,6 +156,10 @@ local fadeAnimation = alphaAnimationFactory
     :Create(alphaAnimator)
 
 ---@class TitlePanel : Group
+---@field _bg Bitmap
+---@field _top TopInfoPanel
+---@field _info InfoPanel
+---@field _expanded boolean
 TitlePanel = Class(Group)
 {
     __init = function(self, parent)

@@ -33,6 +33,7 @@ function FormatMapName(name)
     return name, false
 end
 
+---@class InfoPanel : Group
 InfoPanel = Class(Group)
 {
     __init = function(self, parent)

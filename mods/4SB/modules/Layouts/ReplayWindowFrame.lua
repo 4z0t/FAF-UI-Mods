@@ -11,7 +11,7 @@ local animationSpeed = 500
 
 
 ---A clear function for additional layout
----@param scoreboard ScoreBoard
+---@param scoreboard ReplayScoreBoard
 local Clear = function(scoreboard)
     scoreboard._border:Destroy()
     scoreboard._border = nil

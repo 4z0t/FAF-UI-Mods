@@ -243,6 +243,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 
 
 ---@class ReplayScoreBoard : ScoreBoard
+---@field _dataPanel DataPanel
+---@field _obs ObserverPanel
 ReplayScoreBoard = UMT.Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)

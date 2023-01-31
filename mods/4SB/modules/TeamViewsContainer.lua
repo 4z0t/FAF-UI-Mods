@@ -6,7 +6,7 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local LuaQ = UMT.LuaQ
 
 
-
+---@class TeamViewsContainer : ArmyViewsContainer
 TeamViewsContainer = Class(ArmyViewsContainer)
 {
 
