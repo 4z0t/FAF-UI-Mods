@@ -2,12 +2,13 @@
 ---@module "Animations/Animator"
 local Animator = import("Animator.lua")
 
----@alias animationOnStartFunc fun(control : Control, state: ControlState, ...) : nil | ControlState
----@alias animationOnFrameFunc fun(control : Control, delta : number, state: ControlState) : boolean # if returns true then animation is finished
----@alias animationOnFinishFunc fun(control : Control, state: ControlState)
+---@alias ControlState table<any, any>
+
+---@alias animationOnStartFunc fun(control : Control, state: ControlState?, ...) : nil | ControlState
+---@alias animationOnFrameFunc fun(control : Control, delta : number, state: ControlState?) : boolean # if returns true then animation is finished
+---@alias animationOnFinishFunc fun(control : Control, state: ControlState?)
 
 
----@class ControlState: table<any, any>
 
 ---@class Animation
 ---@field OnStart animationOnStartFunc

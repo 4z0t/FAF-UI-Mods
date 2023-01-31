@@ -5,6 +5,9 @@ local Animation = import("Animation.lua")
 local ColorUtils = UMT.ColorUtils
 
 ---@class BaseAnimationFactory
+---@field _onFrame animationOnFrameFunc
+---@field _onStart animationOnStartFunc
+---@field _onFinish animationOnFinishFunc
 local BaseAnimationFactory = ClassSimple
 {
     __init = function(self)
@@ -225,10 +228,11 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
     ---@return Animation
     Create = function(self, animator)
         local duration = self._duration
-
+        local _endColor = self._endColor
+        
         self._onStart = function(control, state, endColor)
             local color = string.upper(control:GetColor())
-            endColor = string.upper(endColor or self._endColor)
+            endColor = string.upper(endColor or _endColor)
 
             state = {
                 startColor = color,
@@ -280,16 +284,19 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
 }
 
 ---@class DelayedAnimationFactory : BaseAnimationFactory
+---@field _delay number
 local DelayedAnimationFactory = Class(BaseAnimationFactory)
 {
+    ---comment
+    ---@param self DelayedAnimationFactory
+    ---@param delay number
+    ---@return DelayedAnimationFactory
     Delay = function(self, delay)
         self._delay = delay
+        return self
     end,
-
-
-
     ---comment
-    ---@param self ColorAnimationFactory
+    ---@param self DelayedAnimationFactory
     ---@param animator? Animator
     ---@return Animation
     Create = function(self, animator)
