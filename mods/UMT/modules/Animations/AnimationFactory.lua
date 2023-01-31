@@ -312,9 +312,7 @@ local DelayedAnimationFactory = Class(BaseAnimationFactory)
             end)
             :OnFrame(function(control, delta, state)
                 state.time = state.time + delta
-                if state.time >= state.delay then
-                    return true
-                end
+                return state.time >= state.delay
             end)
             :OnFinish(function(control, state)
                 state.animation:Apply(control)
