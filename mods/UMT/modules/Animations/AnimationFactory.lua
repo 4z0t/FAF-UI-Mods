@@ -1,5 +1,4 @@
----@module "Animations/AnimationFactory"
-
+local math = math
 local emptyFunc = function() end
 local Animation = import("Animation.lua")
 local ColorUtils = UMT.ColorUtils
@@ -229,7 +228,7 @@ local ColorAnimationFactory = Class(BaseAnimationFactory)
     Create = function(self, animator)
         local duration = self._duration
         local _endColor = self._endColor
-        
+
         self._onStart = function(control, state, endColor)
             local color = string.upper(control:GetColor())
             endColor = string.upper(endColor or _endColor)
