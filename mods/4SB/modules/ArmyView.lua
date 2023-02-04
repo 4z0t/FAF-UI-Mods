@@ -4,6 +4,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")
@@ -231,8 +232,19 @@ ArmyView = Class(Group)
 }
 
 
+
+---@class AllyView : ArmyView
+---@field isAlly boolean
+---@field _mass Text
+---@field _energy Text
+---@field _massBtn Bitmap
+---@field _energyBtn Bitmap
+---@field _unitsBtn Bitmap
 AllyView = Class(ArmyView)
 {
+    ---comment
+    ---@param self AllyView
+    ---@param parent Control
     __init = function(self, parent)
         ArmyView.__init(self, parent)
 
@@ -312,26 +324,51 @@ AllyView = Class(ArmyView)
             :EnableHitTest()
             :Alpha(0)
 
+        Tooltip.AddControlTooltipManual(self._unitsBtn,
+            "",
+            [[By left click gives selected units to this ally.
+        By right click requests engineer from this ally.
+        ]]   ,
+            0.5
+        )
+
         LayoutFor(self._energyBtn)
-            :AtHorizontalCenterIn(self._energy)
+            :Right(self._energy.Right)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile '/game/build-ui/icon-energy_bmp.dds')
-            :Width(14)
-            :Height(14)
+            :Width(35)
+            :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
 
+        Tooltip.AddControlTooltipManual(self._energyBtn,
+            "",
+            [[By left click gives 25% energy to this ally.
+        By Shift + left click gives 50% energy to this ally.
+        By Ctrl + left click gives all energy to this ally.
+        By right click requests energy from this ally.
+        ]]   ,
+            0.5
+        )
 
         LayoutFor(self._massBtn)
-            :AtHorizontalCenterIn(self._mass)
+            :Right(self._mass.Right)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-            :Width(14)
-            :Height(14)
+            :Width(35)
+            :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
+
+        Tooltip.AddControlTooltipManual(self._massBtn,
+            "",
+            [[By left click gives 25% mass to this ally.
+        By Shift + left click gives 50% mass to this ally.
+        By Ctrl + left click gives all mass to this ally.
+        By right click requests mass from this ally.
+        ]]   ,
+            0.5
+        )
 
         LayoutFor(self._energy)
             :AtRightIn(self, 10)
@@ -359,21 +396,11 @@ AllyView = Class(ArmyView)
 
     HandleEvent = function(self, event)
         if event.Type == 'MouseExit' then
-            appearAnimation:Apply(self._mass)
-            appearAnimation:Apply(self._energy)
             appearAnimation:Apply(self._faction)
-
-            fadeAnimation:Apply(self._massBtn)
-            fadeAnimation:Apply(self._energyBtn)
             fadeAnimation:Apply(self._unitsBtn)
             return true
         elseif event.Type == 'MouseEnter' and not self.isOutOfGame then
-            appearAnimation:Apply(self._massBtn)
             appearAnimation:Apply(self._unitsBtn)
-            appearAnimation:Apply(self._energyBtn)
-
-            fadeAnimation:Apply(self._mass)
-            fadeAnimation:Apply(self._energy)
             fadeAnimation:Apply(self._faction)
             return true
         end
