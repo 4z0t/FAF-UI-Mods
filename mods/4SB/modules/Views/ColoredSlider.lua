@@ -156,12 +156,11 @@ ColoredSlider = Class(Group)
     -- this will constrain your values to not exceed min or max
     SetValue = function(self, value)
         value = self:_Constrain(value)
-        if value ~= self:GetValue() then
-            self._currentValue:Set(value)
-            self:OnValueChanged(value)
-            return true
-        end
-        return false
+        if value == self:GetValue() then return false end
+        
+        self._currentValue:Set(value)
+        self:OnValueChanged(value)
+        return true
     end,
 
     GetValue = function(self)

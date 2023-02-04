@@ -87,17 +87,17 @@ BorderedCheckBox = Class(BorderedText)
     end,
 
     OnDisable = function(self)
-        if self._controlState ~= "disabled" then
-            self._controlState = "disabled"
-            self:OnStateChange()
-        end
+        if self._controlState == "disabled" then return end
+
+        self._controlState = "disabled"
+        self:OnStateChange()
     end,
 
     OnEnable = function(self)
-        if self._controlState ~= "enabled" then
-            self._controlState = "normal"
-            self:OnStateChange()
-        end
+        if self._controlState == "enabled" then return end
+
+        self._controlState = "normal"
+        self:OnStateChange()
     end,
 
     HandleEvent = function(self, event)

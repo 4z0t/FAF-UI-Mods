@@ -187,7 +187,7 @@ ArmyView = Class(Group)
                 :Color(teamColor)
         end
 
-        self._rating:SetColor(armyColor)
+        self:SetArmyColor(armyColor)
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
@@ -384,24 +384,24 @@ AllyView = Class(ArmyView)
     Update = function(self, data, mode)
         ArmyView.Update(self, data)
 
-
-        if not self.isOutOfGame then
-            local resources = data.resources
-            if resources then
-                if mode == "income" then
-                    self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
-                    self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-                elseif mode == "storage" then
-                    self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
-                    self._mass:SetText(FormatNumber(resources.storage.storedMass))
-                elseif mode == "maxstorage" then
-                    self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
-                    self._mass:SetText(FormatNumber(resources.storage.maxMass))
-                end
-            end
-        else
+        if self.isOutOfGame then
             self._energy:SetText("")
             self._mass:SetText("")
+            return
+        end
+
+        local resources = data.resources
+        if not resources then return end
+
+        if mode == "income" then
+            self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
+            self._mass:SetText(FormatNumber(resources.massin.rate * 10))
+        elseif mode == "storage" then
+            self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
+            self._mass:SetText(FormatNumber(resources.storage.storedMass))
+        elseif mode == "maxstorage" then
+            self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
+            self._mass:SetText(FormatNumber(resources.storage.maxMass))
         end
     end
 
@@ -595,8 +595,6 @@ ReplayTeamView = Class(ReplayArmyView)
 
 
     Update = function(self, playersData, setup)
-
-
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
             local color = checkboxData.nc
@@ -614,14 +612,14 @@ ReplayTeamView = Class(ReplayArmyView)
             dataText:SetColor(color)
         end
 
-        if not self.isOutOfGame then
-            local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
-            if defeated then
-                self.isOutOfGame = true
-                self._name:SetColor(outOfGameColor)
-            end
-        end
+        if self.isOutOfGame then return end
 
+        local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
+
+        if not defeated then return end
+
+        self.isOutOfGame = true
+        self._name:SetColor(outOfGameColor)
     end,
 
 }

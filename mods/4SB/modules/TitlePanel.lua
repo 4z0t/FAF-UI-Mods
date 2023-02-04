@@ -88,16 +88,17 @@ local TopInfoPanel = Class(Group)
         if gameSpeed then
             self._gameSpeed = gameSpeed
         end
+        
         self._speed:SetText(("%+d / %+d"):format(self._gameSpeed, GetSimRate()))
         self._time:SetText(GetGameTime())
 
-        if data then
-            local scoreData = data[GetFocusArmy()]
-            if scoreData.general.currentcap then
-                self._unitCap:SetText(("%d/%d"):format(scoreData.general.currentunits, scoreData.general.currentcap))
-            else
-                self._unitCap:SetText("")
-            end
+        if not data then return end
+
+        local scoreData = data[GetFocusArmy()]
+        if scoreData.general.currentcap then
+            self._unitCap:SetText(("%d/%d"):format(scoreData.general.currentunits, scoreData.general.currentcap))
+        else
+            self._unitCap:SetText("")
         end
     end
 }
