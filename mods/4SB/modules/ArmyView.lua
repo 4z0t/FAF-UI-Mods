@@ -213,9 +213,13 @@ ArmyView = Class(Group)
 
     Update = function(self, data)
         if not self.isOutOfGame and data.Defeated then
-            self.isOutOfGame = true
-            self._name:SetColor(outOfGameColor)
+            self:MarkOutOfGame()
         end
+    end,
+
+    MarkOutOfGame = function(self)
+        self.isOutOfGame = true
+        self._name:SetColor(outOfGameColor)
     end,
 
     ---comment
@@ -411,11 +415,7 @@ AllyView = Class(ArmyView)
     Update = function(self, data, mode)
         ArmyView.Update(self, data)
 
-        if self.isOutOfGame then
-            self._energy:SetText("")
-            self._mass:SetText("")
-            return
-        end
+        if self.isOutOfGame then return end
 
         local resources = data.resources
         if not resources then return end
@@ -430,7 +430,16 @@ AllyView = Class(ArmyView)
             self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
             self._mass:SetText(FormatNumber(resources.storage.maxMass))
         end
-    end
+    end,
+
+    MarkOutOfGame = function(self)
+        ArmyView.MarkOutOfGame(self)
+        self._energy:SetText("")
+        self._mass:SetText("")
+        self._massBtn:DisableHitTest()
+        self._energyBtn:DisableHitTest()
+        self._unitsBtn:DisableHitTest()
+    end,
 
 
 
@@ -531,13 +540,13 @@ ReplayArmyView = Class(ArmyView)
 
 
     Update = function(self, data, setup)
+        ArmyView.Update(self, data)
         if data.resources == nil then
             for i, dataText in self._data do
                 dataText:SetText("")
             end
             return
         end
-        ArmyView.Update(self, data)
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
             local color = checkboxData.nc
