@@ -36,6 +36,7 @@ local slideForward = UMT.Animation.Factory.Base
 ---@field protected _mode "storage"| "maxstorage"| "income"
 ---@field protected _focusArmy integer
 ---@field protected _lines ArmyView[]
+---@field protected isHovered boolean
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     __init = function(self, parent, isTitle)
@@ -43,6 +44,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 
         self._focusArmy = GetFocusArmy()
         self._title = false
+        self.isHovered = false
 
         if isTitle then
             self._title = TitlePanel(self)
@@ -201,17 +203,30 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     },
 
+    ---comment
+    ---@param self ScoreBoard
+    ---@param event KeyEvent
+    HandleEvent = function(self, event)
+        if event.Type == 'MouseExit' then
+            self.isHovered = false
+        elseif event.Type == 'MouseEnter' then
+            self.isHovered = true
+        end
+    end,
+
+    ---comment
+    ---@param self ScoreBoard
+    ---@param delta number
     OnFrame = function(self, delta)
-        local isShift = IsKeyDown("shift")
         local isCtrl = IsKeyDown("control")
         local update = false
-        if isShift and not isCtrl and self._mode ~= "storage" then
+        if not isCtrl and self.isHovered and self._mode ~= "storage" then
             self._mode = "storage"
             update = true
-        elseif isCtrl and not isShift and self._mode ~= "maxstorage" then
+        elseif isCtrl and self._mode ~= "maxstorage" then
             self._mode = "maxstorage"
             update = true
-        elseif not isCtrl and not isShift and self._mode ~= "income" then
+        elseif not isCtrl and not self.isHovered and self._mode ~= "income" then
             self._mode = "income"
             update = true
         end
@@ -342,5 +357,9 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
     GetArmyViews = function(self)
         return self._armiesContainer._armyViews
+    end,
+
+    HandleEvent = function(self, event)
+        return false
     end,
 }

@@ -367,13 +367,10 @@ AllyView = Class(ArmyView)
         if event.Type == 'MouseExit' then
             appearAnimation:Apply(self._faction)
             fadeAnimation:Apply(self._unitsBtn)
-            return true
         elseif event.Type == 'MouseEnter' and not self.isOutOfGame then
             appearAnimation:Apply(self._unitsBtn)
             fadeAnimation:Apply(self._faction)
-            return true
         end
-
         return false
     end,
 
