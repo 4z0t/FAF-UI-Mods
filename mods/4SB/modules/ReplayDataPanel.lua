@@ -128,7 +128,8 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
 }
 
 
-
+---@class DataPanel : Group
+---@field _bg Bitmap
 DataPanel = Class(Group)
 {
     __init = function(self, parent)

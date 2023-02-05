@@ -2,15 +2,20 @@ local Options = UMT.Options
 local OptionVar = UMT.OptionVar.Create
 
 local modName = "4SB"
+---@param option string
+---@return OptionVar
+local function ArialFontOptionVar(option)
+    return OptionVar(modName, option, "Arial")
+end
 
 title = {
     font = {
-        gameSpeed = OptionVar(modName, "title.font.gameSpeed", "Arial"),
-        totalUnits = OptionVar(modName, "title.font.totalUnits", "Arial"),
-        time = OptionVar(modName, "title.font.time", "Arial"),
-        mapName = OptionVar(modName, "title.font.mapName", "Arial"),
-        mapSize = OptionVar(modName, "title.font.mapSize", "Arial"),
-        quality = OptionVar(modName, "title.font.quality", "Arial"),
+        gameSpeed = ArialFontOptionVar("title.font.gameSpeed"),
+        totalUnits = ArialFontOptionVar("title.font.totalUnits"),
+        time = ArialFontOptionVar("title.font.time"),
+        mapName = ArialFontOptionVar("title.font.mapName"),
+        mapSize = ArialFontOptionVar("title.font.mapSize"),
+        quality = ArialFontOptionVar("title.font.quality"),
     },
     color = {
         time = OptionVar(modName, "title.color.time", 'ff00dbff'),
@@ -24,12 +29,12 @@ title = {
 player = {
 
     font = {
-        name = OptionVar(modName, "player.font.name", "Arial"),
-        rating = OptionVar(modName, "player.font.rating", "Arial"),
-        focus = OptionVar(modName, "player.font.focus", "Arial"),
-        mass = OptionVar(modName, "player.font.mass", "Arial"),
-        energy = OptionVar(modName, "player.font.energy", "Arial"),
-        data = OptionVar(modName, "player.font.data", "Arial"),
+        name = ArialFontOptionVar("player.font.name"),
+        rating = ArialFontOptionVar("player.font.rating"),
+        focus = ArialFontOptionVar("player.font.focus"),
+        mass = ArialFontOptionVar("player.font.mass"),
+        energy = ArialFontOptionVar("player.font.energy"),
+        data = ArialFontOptionVar("player.font.data"),
     },
 
     color = {
@@ -38,7 +43,7 @@ player = {
 }
 
 observer = {
-    font = OptionVar(modName, "observer.font", "Arial"),
+    font = ArialFontOptionVar("observer.font"),
     color = {
         line = OptionVar(modName, "observer.color.line", "ffffffff"),
     }
@@ -62,7 +67,7 @@ function Init(isReplay)
                     {
                         "default",
                         "glow border",
-                       
+                        "window border",
                     },
                     replayStyle, 4) or
                 Options.Strings("Scoreboard style",

@@ -1,34 +1,10 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
-local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ArmyViews = import("../ArmyView.lua")
 local Animations = import("../Animations.lua")
-local VerticalCollapseArrow = import("../Views/CollapseArrow.lua").VerticalCollapseArrow
 local contractAnimation = Animations.contractAnimation
 local expandAnimation = Animations.expandAnimation
 
 local animationSpeed = 500
-
-
-local slideAnimation = UMT.Animation.Factory.Base
-    :OnStart(function(control)
-        local width = control.Width()
-        LayoutFor(control)
-            :Right(function() return GetFrame(0).Right() + width end)
-    end)
-    :OnFrame(function(control, delta)
-        return control.Right() < GetFrame(0).Right() - LayoutHelpers.ScaleNumber(25) or
-            control.Right:Set(control.Right() - delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        LayoutFor(control)
-            :AtRightIn(GetFrame(0), 25)
-        LOG("Animation done")
-    end)
-    :Create()
 
 
 ---A clear function for additional layout
@@ -57,7 +33,7 @@ end
 ---inital animation for scoreboard
 ---@param scoreboard ReplayScoreBoard
 local InitialAnimation = function(scoreboard)
-    slideAnimation:Apply(scoreboard)
+    Animations.slideAnimation:Apply(scoreboard, animationSpeed, 25)
 end
 
 ---A layout function for scoreboard
@@ -70,9 +46,7 @@ Layout = function(scoreboard)
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
-
-
-    scoreboard._arrow = VerticalCollapseArrow(scoreboard)
+    scoreboard._arrow = UMT.Views.VerticalCollapseArrow(scoreboard)
 
     LayoutFor(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
@@ -85,7 +59,6 @@ Layout = function(scoreboard)
         else
             contractAnimation:Apply(scoreboard, animationSpeed, 25)
         end
-
     end
 
 
@@ -98,7 +71,6 @@ Layout = function(scoreboard)
 
     LayoutFor(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
-        :AtLeftIn(scoreboard, -11)
         :Over(scoreboard)
         :DisableHitTest(true)
 

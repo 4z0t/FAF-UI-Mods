@@ -4,6 +4,7 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
+local Tooltip = import("/lua/ui/game/tooltip.lua")
 local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")
@@ -35,57 +36,22 @@ local fadeAnimation = alphaAnimationFactory
     :Create(alphaAnimator)
 
 
-
-
 local bgColor = Options.player.color.bg:Raw()
 
 local armyViewTextPointSize = 12
 
-local armyViewTextFont = "Zeroes Three"
-local focusArmyTextFont = 'Arial Bold'
+local armyViewNameFont = Options.player.font.name:Raw()
+local focusArmyNameFont = Options.player.font.focus:Raw()
+
 
 nameWidth = LazyVar()
-
-
 armyViewWidth = LazyVar()
 armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
 allyViewWidth = LazyVar()
 allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
 
-
-
 local armyViewHeight = 20
-
-local animationSpeed = 250
-
 local outOfGameColor = "ffa0a0a0"
-
-local slideForward = animationFactory
-    :OnStart()
-    :OnFrame(function(control, delta)
-        if control.Right() <= control.parent.Right() then
-            return true
-        end
-        control.Right:Set(control.Right() - delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        control.Right:Set(control.parent.Right)
-    end)
-    :Create()
-
-local slideBackWards = animationFactory
-    :OnStart()
-    :OnFrame(function(control, delta)
-        if control.parent.Right() < control._energyBtn.Left() then
-            return true
-        end
-        control.Right:Set(control.Right() + delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        local offset = math.floor(control.Right() - control._massBtn.Left())
-        control.Right:Set(function() return control.parent.Right() + offset end)
-    end)
-    :Create()
 
 ---@class ArmyView : Group
 ---@field isOutOfGame boolean
@@ -187,7 +153,7 @@ ArmyView = Class(Group)
                 :Color(teamColor)
         end
 
-        self._rating:SetColor(armyColor)
+        self:SetArmyColor(armyColor)
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
@@ -195,9 +161,9 @@ ArmyView = Class(Group)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
 
-        local font = GetFocusArmy() == armyId and Options.player.font.focus or Options.player.font.name
+        local font = GetFocusArmy() == armyId and focusArmyNameFont or armyViewNameFont
         nameWidth:Set(math.max(nameWidth(), TextWidth(name, font(), armyViewTextPointSize)))
-        self._name:SetFont(font:Raw(), armyViewTextPointSize)
+        self._name:SetFont(font, armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
@@ -212,9 +178,13 @@ ArmyView = Class(Group)
 
     Update = function(self, data)
         if not self.isOutOfGame and data.Defeated then
-            self.isOutOfGame = true
-            self._name:SetColor(outOfGameColor)
+            self:MarkOutOfGame()
         end
+    end,
+
+    MarkOutOfGame = function(self)
+        self.isOutOfGame = true
+        self._name:SetColor(outOfGameColor)
     end,
 
     ---comment
@@ -231,8 +201,19 @@ ArmyView = Class(Group)
 }
 
 
+
+---@class AllyView : ArmyView
+---@field isAlly boolean
+---@field _mass Text
+---@field _energy Text
+---@field _massBtn Bitmap
+---@field _energyBtn Bitmap
+---@field _unitsBtn Bitmap
 AllyView = Class(ArmyView)
 {
+    ---comment
+    ---@param self AllyView
+    ---@param parent Control
     __init = function(self, parent)
         ArmyView.__init(self, parent)
 
@@ -312,26 +293,51 @@ AllyView = Class(ArmyView)
             :EnableHitTest()
             :Alpha(0)
 
+        Tooltip.AddControlTooltipManual(self._unitsBtn,
+            "",
+            [[By left click gives selected units to this ally.
+        By right click requests engineer from this ally.
+        ]]   ,
+            0.5
+        )
+
         LayoutFor(self._energyBtn)
-            :AtHorizontalCenterIn(self._energy)
+            :Right(self._energy.Right)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile '/game/build-ui/icon-energy_bmp.dds')
-            :Width(14)
-            :Height(14)
+            :Width(35)
+            :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
 
+        Tooltip.AddControlTooltipManual(self._energyBtn,
+            "",
+            [[By left click gives 25% energy to this ally.
+        By Shift + left click gives 50% energy to this ally.
+        By Ctrl + left click gives all energy to this ally.
+        By right click requests energy from this ally.
+        ]]   ,
+            0.5
+        )
 
         LayoutFor(self._massBtn)
-            :AtHorizontalCenterIn(self._mass)
+            :Right(self._mass.Right)
             :AtVerticalCenterIn(self)
-            :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-            :Width(14)
-            :Height(14)
+            :Width(35)
+            :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
             :Alpha(0)
+
+        Tooltip.AddControlTooltipManual(self._massBtn,
+            "",
+            [[By left click gives 25% mass to this ally.
+        By Shift + left click gives 50% mass to this ally.
+        By Ctrl + left click gives all mass to this ally.
+        By right click requests mass from this ally.
+        ]]   ,
+            0.5
+        )
 
         LayoutFor(self._energy)
             :AtRightIn(self, 10)
@@ -359,51 +365,43 @@ AllyView = Class(ArmyView)
 
     HandleEvent = function(self, event)
         if event.Type == 'MouseExit' then
-            appearAnimation:Apply(self._mass)
-            appearAnimation:Apply(self._energy)
             appearAnimation:Apply(self._faction)
-
-            fadeAnimation:Apply(self._massBtn)
-            fadeAnimation:Apply(self._energyBtn)
             fadeAnimation:Apply(self._unitsBtn)
-            return true
         elseif event.Type == 'MouseEnter' and not self.isOutOfGame then
-            appearAnimation:Apply(self._massBtn)
             appearAnimation:Apply(self._unitsBtn)
-            appearAnimation:Apply(self._energyBtn)
-
-            fadeAnimation:Apply(self._mass)
-            fadeAnimation:Apply(self._energy)
             fadeAnimation:Apply(self._faction)
-            return true
         end
-
         return false
     end,
 
     Update = function(self, data, mode)
         ArmyView.Update(self, data)
 
+        if self.isOutOfGame then return end
 
-        if not self.isOutOfGame then
-            local resources = data.resources
-            if resources then
-                if mode == "income" then
-                    self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
-                    self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-                elseif mode == "storage" then
-                    self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
-                    self._mass:SetText(FormatNumber(resources.storage.storedMass))
-                elseif mode == "maxstorage" then
-                    self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
-                    self._mass:SetText(FormatNumber(resources.storage.maxMass))
-                end
-            end
-        else
-            self._energy:SetText("")
-            self._mass:SetText("")
+        local resources = data.resources
+        if not resources then return end
+
+        if mode == "income" then
+            self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
+            self._mass:SetText(FormatNumber(resources.massin.rate * 10))
+        elseif mode == "storage" then
+            self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
+            self._mass:SetText(FormatNumber(resources.storage.storedMass))
+        elseif mode == "maxstorage" then
+            self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
+            self._mass:SetText(FormatNumber(resources.storage.maxMass))
         end
-    end
+    end,
+
+    MarkOutOfGame = function(self)
+        ArmyView.MarkOutOfGame(self)
+        self._energy:SetText("")
+        self._mass:SetText("")
+        self._massBtn:DisableHitTest()
+        self._energyBtn:DisableHitTest()
+        self._unitsBtn:DisableHitTest()
+    end,
 
 
 
@@ -504,13 +502,13 @@ ReplayArmyView = Class(ArmyView)
 
 
     Update = function(self, data, setup)
+        ArmyView.Update(self, data)
         if data.resources == nil then
             for i, dataText in self._data do
                 dataText:SetText("")
             end
             return
         end
-        ArmyView.Update(self, data)
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
             local color = checkboxData.nc
@@ -587,15 +585,14 @@ local LuaQ = UMT.LuaQ
 ReplayTeamView = Class(ReplayArmyView)
 {
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
-        ReplayArmyView.SetStaticData(self, teamId, name, rating, 0, "ffffffff", teamColor)
+        ReplayArmyView.SetStaticData(self, false, name, rating, 0, "ffffffff", teamColor)
+        self.id = teamId
         self._armies = armies | LuaQ.toSet
         self._faction:SetAlpha(0)
     end,
 
 
     Update = function(self, playersData, setup)
-
-
         for i, dataText in self._data do
             local checkboxData = checkboxes[i][ setup[i] ]
             local color = checkboxData.nc
@@ -613,14 +610,14 @@ ReplayTeamView = Class(ReplayArmyView)
             dataText:SetColor(color)
         end
 
-        if not self.isOutOfGame then
-            local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
-            if defeated then
-                self.isOutOfGame = true
-                self._name:SetColor(outOfGameColor)
-            end
-        end
+        if self.isOutOfGame then return end
 
+        local defeated = self._armies | LuaQ.all(function(i) return playersData[i].Defeated end)
+
+        if not defeated then return end
+
+        self.isOutOfGame = true
+        self._name:SetColor(outOfGameColor)
     end,
 
 }

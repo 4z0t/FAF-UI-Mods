@@ -16,7 +16,8 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local replayLayouts = {
         ["default"] = false,
-        ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout
+        ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout,
+        ["window border"] = import("/mods/4SB/modules/Layouts/ReplayWindowFrame.lua").Layout
     }
     function CreateScoreUI()
         if not IsDestroyed(controls.scoreBoard) then return end
@@ -131,6 +132,14 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
     end
 
 else
+    local OldCreateScoreUI = CreateScoreUI
+    function CreateScoreUI()
+        for i = 1, 10 do
+            print "UI MOD TOOLS NOT FOUND! 4z0t's scoreboard requires UI MOD TOOLS to function!"
+        end
+        return OldCreateScoreUI()
+    end
+
     WARN("UI MOD TOOLS NOT FOUND! 4z0t's scoreboard requires UI MOD TOOLS to function!")
 end
 function GetScoreCache()

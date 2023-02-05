@@ -6,7 +6,7 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local LuaQ = UMT.LuaQ
 
 
-
+---@class TeamViewsContainer : ArmyViewsContainer
 TeamViewsContainer = Class(ArmyViewsContainer)
 {
 
@@ -44,25 +44,25 @@ TeamViewsContainer = Class(ArmyViewsContainer)
     end,
 
     SetStaticData = function(self)
-        if self._teams then
-            for team, data in self._teams do
-                local teamView = self._armyViews[team]
-                teamView:SetStaticData(
-                    data.id,
-                    data.name,
-                    data.rating,
-                    data.color,
-                    data.armies
-                )
-            end
+        if not self._teams then return end
+
+        for team, data in self._teams do
+            local teamView = self._armyViews[team]
+            teamView:SetStaticData(
+                data.id,
+                data.name,
+                data.rating,
+                data.color,
+                data.armies
+            )
         end
     end,
 
     Update = function(self, data)
-        if data then
-            for i, armyView in self._armyViews do
-                armyView:Update(data, self._dataSetup)
-            end
+        if not data then return end
+
+        for i, armyView in self._armyViews do
+            armyView:Update(data, self._dataSetup)
         end
     end,
 }

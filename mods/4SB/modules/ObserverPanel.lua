@@ -19,7 +19,8 @@ local sliderColor = Options.observer.color.line:Raw()
 
 local width = 300
 local height = 20
-
+---@class ObserverPanel : Group
+---@field _bg Bitmap
 ObserverPanel = Class(Group)
 {
     __init = function(self, parent)
@@ -69,6 +70,7 @@ ObserverPanel = Class(Group)
 
         LayoutFor(self._observerText)
             :AtLeftTopIn(self, 10, 2)
+            :Over(self, 10)
             :DisableHitTest()
 
         LayoutFor(self._slider)
@@ -76,10 +78,12 @@ ObserverPanel = Class(Group)
             :AtRightIn(self, 25)
             :RightOf(self._observerText, 5)
             :Height(height - 4)
+            :Over(self, 10)
 
         LayoutFor(self._speed)
             :AtVerticalCenterIn(self)
             :RightOf(self._slider, 5)
+            :Over(self, 10)
             :DisableHitTest()
 
         LayoutFor(self)

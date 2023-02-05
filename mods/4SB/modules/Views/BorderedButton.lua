@@ -46,9 +46,8 @@ BorderedButton = Class(BorderedText)
     end,
 
     HandleEvent = function(self, event)
-        if self._isDisabled then
-            return true
-        end
+        if self._isDisabled then return true end
+        
 
         if event.Type == 'MouseEnter' then
             if self._dragger then

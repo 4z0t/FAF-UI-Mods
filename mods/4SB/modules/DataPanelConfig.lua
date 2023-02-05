@@ -211,7 +211,7 @@ checkboxes = {
         },
         {
             tooltip = "mass-reclaim",
-            title = "Reaclaimed Mass",
+            title = "Reclaimed Mass",
             description = "Total amount of reaclaimed mass by army",
             text = "R",
             nu = RGBA "",
@@ -224,6 +224,23 @@ checkboxes = {
             ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.massin.reclaimed
+            end
+        },
+        {
+            tooltip = "mass-storage",
+            title = "Mass in storage",
+            description = "Current amount of mass in storage of an army",
+            text = "S",
+            nu = RGBA "",
+            nc = normalMassColor,
+            ou = RGBA "",
+            oc = overMassColor,
+            du = RGBA "",
+            dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
+            GetData = function(score)
+                return score.resources.storage.storedMass
             end
         },
 
@@ -278,6 +295,23 @@ checkboxes = {
             ---@return number, FormatFunc?
             GetData = function(score)
                 return score.resources.energyin.reclaimed
+            end
+        },
+        {
+            tooltip = "energy-storage",
+            title = "Energy in storage",
+            description = "Current amount of energy in storage of an army",
+            text = "S",
+            nu = RGBA "",
+            nc = normalEnergyColor,
+            ou = RGBA "",
+            oc = overEnergyColor,
+            du = RGBA "",
+            dc = RGBA "",
+            ---@param score ArmyScoreData
+            ---@return number, FormatFunc?
+            GetData = function(score)
+                return score.resources.storage.storedEnergy
             end
         },
 

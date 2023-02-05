@@ -25,6 +25,7 @@ local scoreFunction = function(score)
     return score.general.score
 end
 
+---@class ArmyViewsContainer : Group
 ArmyViewsContainer = Class(Group)
 {
     __init = function(self, parent)
@@ -135,7 +136,7 @@ ArmyViewsContainer = Class(Group)
 
         local dataTable = self._armyViews
             | LuaQ.select.keyvalue(function(armyId) return self._sortFunc(scoreCache[armyId]) end)
-            
+
         if self._sortDirection == 1 then
             table.sort(self._lines, function(a, b)
                 local data1 = dataTable[a.id]
@@ -193,8 +194,9 @@ ArmyViewsContainer = Class(Group)
     Setup = function(self, setup)
         self._dataSetup = setup
         local scoreCache = import("/lua/ui/game/score.lua").GetScoreCache()
-        if scoreCache and not table.empty(scoreCache) then
-            self:Update(scoreCache)
-        end
+
+        if table.empty(scoreCache) then return end
+
+        self:Update(scoreCache)
     end
 }

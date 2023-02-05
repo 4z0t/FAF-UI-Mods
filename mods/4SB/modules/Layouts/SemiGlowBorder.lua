@@ -1,8 +1,6 @@
 local Group = import('/lua/maui/group.lua').Group
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
@@ -31,15 +29,15 @@ Layout = function(scoreboard)
 
     scoreboard._border = Group(scoreboard)
     scoreboard._border.t = Bitmap(scoreboard._border,
-        UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds"))
+        UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds")
     scoreboard._border.tr = Bitmap(scoreboard._border,
-        UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds"))
+        UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_ur.dds")
     scoreboard._border.r = Bitmap(scoreboard._border,
-        UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds"))
+        UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_vert_r.dds")
     scoreboard._border.br = Bitmap(scoreboard._border,
-        UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds"))
+        UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds")
     scoreboard._border.b = Bitmap(scoreboard._border,
-        UIUtil.SkinnableFile("/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds"))
+        UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_lm.dds")
 
     do -- border layout
 

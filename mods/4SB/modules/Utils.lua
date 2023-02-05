@@ -1,4 +1,4 @@
----@module "4SBUtils"
+local MathAbs = math.abs
 
 local Text = import("/lua/maui/text.lua").Text
 
@@ -7,9 +7,9 @@ local sessionInfo = SessionGetScenarioInfo()
 
 local armiesFormattedTable
 
----comment
----@param factionIndex any
----@return unknown
+---Returns small faction icon file path
+---@param factionIndex Faction
+---@return FileName
 function GetSmallFactionIcon(factionIndex)
     return import('/lua/factions.lua').Factions[factionIndex + 1].SmallIcon
 end
@@ -82,35 +82,34 @@ function GetArmiesFormattedTable()
     return armiesFormattedTable
 end
 
----comment
+---Formats number as large one
 ---@param n number | nil
 ---@return string
 function FormatNumber(n)
     if n == nil then return "" end
-    
-    if (math.abs(n) < 1000) then
-        return string.format("%01.0f", n)
-    elseif (math.abs(n) < 10000) then
-        return string.format("%01.1fk", n / 1000)
-    elseif (math.abs(n) < 1000000) then
-        return string.format("%01.0fk", n / 1000)
+
+    if MathAbs(n) < 1000 then
+        return ("%01.0f"):format(n)
+    elseif MathAbs(n) < 10000 then
+        return ("%01.1fk"):format(n / 1000)
+    elseif MathAbs(n) < 1000000 then
+        return ("%01.0fk"):format(n / 1000)
     else
-        return string.format("%01.1fm", n / 1000000)
+        return ("%01.1fm"):format(n / 1000000)
     end
 end
 
----comment
+---Formats number as ratio one
 ---@param n number | nil
 ---@return string
 function FormatRatioNumber(n)
-    if n == nil then
-        return ""
+    if n == nil then return "" end
+
+    if MathAbs(n) < 10 then
+        return ("%01.2f"):format(n)
     end
-    if (math.abs(n) < 10) then
-        return string.format("%01.2f", n)
-    else
-        return FormatNumber(n)
-    end
+
+    return FormatNumber(n)
 end
 
 ---returns width of string with given font family and size
