@@ -1,0 +1,15 @@
+name = "Beer"
+uid = "beer-beer-beer-v01"
+version = 1
+copyright = "Beeeeeeeeer"
+description = [[Plays beer open sound when mex starts upgrading and pour one when mex is completed]]
+author = "4z0t"
+url = ""
+icon = "/mods/Beer/icon.jpg"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requiresNames = {}
+conflicts = {}
+after = {}
