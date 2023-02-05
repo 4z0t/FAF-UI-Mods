@@ -36,57 +36,22 @@ local fadeAnimation = alphaAnimationFactory
     :Create(alphaAnimator)
 
 
-
-
 local bgColor = Options.player.color.bg:Raw()
 
 local armyViewTextPointSize = 12
 
-local armyViewTextFont = "Zeroes Three"
-local focusArmyTextFont = 'Arial Bold'
+local armyViewNameFont = Options.player.font.name:Raw()
+local focusArmyNameFont = Options.player.font.focus:Raw()
+
 
 nameWidth = LazyVar()
-
-
 armyViewWidth = LazyVar()
 armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
 allyViewWidth = LazyVar()
 allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
 
-
-
 local armyViewHeight = 20
-
-local animationSpeed = 250
-
 local outOfGameColor = "ffa0a0a0"
-
-local slideForward = animationFactory
-    :OnStart()
-    :OnFrame(function(control, delta)
-        if control.Right() <= control.parent.Right() then
-            return true
-        end
-        control.Right:Set(control.Right() - delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        control.Right:Set(control.parent.Right)
-    end)
-    :Create()
-
-local slideBackWards = animationFactory
-    :OnStart()
-    :OnFrame(function(control, delta)
-        if control.parent.Right() < control._energyBtn.Left() then
-            return true
-        end
-        control.Right:Set(control.Right() + delta * animationSpeed)
-    end)
-    :OnFinish(function(control)
-        local offset = math.floor(control.Right() - control._massBtn.Left())
-        control.Right:Set(function() return control.parent.Right() + offset end)
-    end)
-    :Create()
 
 ---@class ArmyView : Group
 ---@field isOutOfGame boolean
@@ -196,9 +161,9 @@ ArmyView = Class(Group)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
 
-        local font = GetFocusArmy() == armyId and Options.player.font.focus or Options.player.font.name
+        local font = GetFocusArmy() == armyId and focusArmyNameFont or armyViewNameFont
         nameWidth:Set(math.max(nameWidth(), TextWidth(name, font(), armyViewTextPointSize)))
-        self._name:SetFont(font:Raw(), armyViewTextPointSize)
+        self._name:SetFont(font, armyViewTextPointSize)
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
