@@ -441,19 +441,19 @@ local dataTextOffSet = 40
 local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
 
 local contractDataAnimation = animationFactory
-    :OnStart(function(control, state, nextControl)
+    :OnStart(function(control, state, nextControl, offset)
         fadeAnimation:Apply(control)
         control._contracted = true
-        return { nextControl = nextControl }
+        return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() >= state.nextControl.Right() then
+        if control.Right() >= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
             return true
         end
         control.Right:Set(control.Right() + delta * dataAnimationSpeed)
     end)
     :OnFinish(function(control, state)
-        control.Right:Set(state.nextControl.Right)
+        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
     end)
     :Create()
 
@@ -580,12 +580,12 @@ ReplayArmyView = Class(ArmyView)
             local nextControl = self
             local control = self._data[id]
 
-            contractDataAnimation:Apply(control, nextControl)
+            contractDataAnimation:Apply(control, nextControl, lastDataTextOffset - dataTextOffSet)
         else
             local nextControl = self._data[id + 1]
             local control = self._data[id]
 
-            contractDataAnimation:Apply(control, nextControl)
+            contractDataAnimation:Apply(control, nextControl, 0)
         end
 
     end,
