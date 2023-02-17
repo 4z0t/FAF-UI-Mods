@@ -29,5 +29,15 @@
     ],
     "prefix": "umtrequire",
     "description": "Creates UMT condition check"
-  }
+  },
+  "Closure": {
+    "body": [
+      "function (${args})",
+      "\t",
+      "end",
+    ],
+    "prefix": "=>",
+    "description": "Creates lua closure",
+    "scope": "lua"
+  },
 }
