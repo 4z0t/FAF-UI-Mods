@@ -5,7 +5,7 @@
 ---@field args table?
 ---@field func fun(...:any) ?
 
-
+---TODO
 function ValidateArgs(args)
     return true
 end
