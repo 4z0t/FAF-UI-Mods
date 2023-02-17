@@ -1,6 +1,3 @@
-
-
-
 ---@class SimToUIData
 ---@field fileName FileName
 ---@field functionName string

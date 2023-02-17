@@ -7,7 +7,7 @@
 
 
 function ValidateArgs(args)
-
+    return true
 end
 
 local callbacks = {}
