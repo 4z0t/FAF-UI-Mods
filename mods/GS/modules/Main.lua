@@ -1,7 +1,10 @@
 local CM = import("/lua/ui/game/commandmode.lua")
 local KeyMapper = import('/lua/keymap/keymapper.lua')
+local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
+
 
 local current = nil
+local prevSelection
 local activeSelection = nil
 local activeCommandMode
 local activeCommandModeData
@@ -17,6 +20,7 @@ end
 
 local function Reset(deselect)
     current = nil
+    prevSelection = activeSelection
     activeSelection = nil
     lastUnit = nil
     continuous = false
@@ -34,6 +38,7 @@ function Next(isManual)
         i, unit = next(activeSelection, i)
         if i == nil then
             Reset(true)
+            PlaySound(completeCycleSound)
             return
         end
     until not unit:IsDead()
@@ -50,6 +55,11 @@ end
 function Start(isContinuous)
     if not IsActive() then
         activeSelection = GetSelectedUnits()
+        if not activeSelection and prevSelection then
+            SelectUnits(prevSelection)
+            prevSelection = nil
+            return
+        end
         local cm = CM.GetCommandMode()
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
@@ -83,7 +93,7 @@ function OnCommandIssued(commandMode, commandModeData, command)
     end
 
 
-    
+
     if command.CommandType == 'Guard' then
         supress = not supress
     end
