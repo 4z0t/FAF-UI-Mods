@@ -1,7 +1,10 @@
 local CM = import("/lua/ui/game/commandmode.lua")
 local KeyMapper = import('/lua/keymap/keymapper.lua')
+local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
+
 
 local current = nil
+local prevSelection
 local activeSelection = nil
 local activeCommandMode
 local activeCommandModeData
@@ -17,6 +20,7 @@ end
 
 local function Reset(deselect)
     current = nil
+    prevSelection = activeSelection
     activeSelection = nil
     lastUnit = nil
     continuous = false
@@ -34,15 +38,14 @@ function Next(isManual)
         i, unit = next(activeSelection, i)
         if i == nil then
             Reset(true)
+            PlaySound(completeCycleSound)
             return
         end
     until not unit:IsDead()
     lastUnit = unit
-    supress = true
+
     SelectUnits { unit }
-    --TODO double next due to guard/build mode
-    --supress = not activeCommandModeData
-    --supress = unit:IsInCategory("ENGINEER")
+
     if not isManual then
         CM.StartCommandMode(activeCommandMode, activeCommandModeData)
     end
@@ -52,6 +55,11 @@ end
 function Start(isContinuous)
     if not IsActive() then
         activeSelection = GetSelectedUnits()
+        if not activeSelection and prevSelection then
+            SelectUnits(prevSelection)
+            prevSelection = nil
+            return
+        end
         local cm = CM.GetCommandMode()
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
@@ -64,16 +72,17 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
     if not IsActive() then return end
-    -- LOG("-------------start----------")
-    -- reprsl(commandMode)
-    -- reprsl(commandModeData)
+
+
     isStarted = true
 end
 
 ---comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
-function OnCommandEnded(commandMode, commandModeData)
+---@param command any
+function OnCommandIssued(commandMode, commandModeData, command)
+
     if not IsActive() then return end
     --if commandModeData and not commandModeData.isCancel then return end
     local selectedUnits = GetSelectedUnits()
@@ -82,14 +91,17 @@ function OnCommandEnded(commandMode, commandModeData)
         -- check if unit died for some reason
         if not lastUnit:IsDead() then Reset(false) return end
     end
-    -- LOG("-------------end----------")
-    -- reprsl(commandMode)
-    -- reprsl(commandModeData)
-    if supress then
-        supress = continuous
+
+
+
+    if command.CommandType == 'Guard' then
+        supress = not supress
+    end
+
+    if supress or command.CommandType == 'None' or continuous then
         return
     end
-    
+
     ForkThread(Next, false)
 end
 
@@ -97,7 +109,7 @@ function Main(isReplay)
     if isReplay then return end
 
     CM.AddStartBehavior(OnCommandStarted)
-    CM.AddEndBehavior(OnCommandEnded)
+    --CM.AddEndBehavior(OnCommandEnded)
 
 end
 
