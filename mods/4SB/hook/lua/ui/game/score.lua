@@ -62,6 +62,10 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         Options.useDivisions.OnChange = function(var)
             scoreboard:ResetArmyData()
         end
+        
+        Options.useNickNameArmyColor.OnChange = function(var)
+            scoreboard:ResetArmyData()
+        end
 
         controls.scoreBoard = scoreboard
         SetLayout()

@@ -56,6 +56,7 @@ teamScoreSort = OptionVar(modName, "teamScoreSort", false)
 teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
 teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
 useDivisions = OptionVar(modName, "useDivisions", false)
+useNickNameArmyColor = OptionVar(modName, "useNickNameArmyColor", false)
 
 function Init(isReplay)
 
@@ -80,6 +81,7 @@ function Init(isReplay)
                     },
                     style, 4),
             Options.Filter("Use divisions instead of rating", useDivisions, 4),
+            Options.Filter("Use nickname color as army color", useNickNameArmyColor, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),

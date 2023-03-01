@@ -188,10 +188,19 @@ ArmyView = Class(Group)
     end,
 
     SetArmyColor = function(self, color)
-        self._rating:SetColor(color)
+        if Options.useNickNameArmyColor() then
+            self._name:SetColor(color)
+            self._rating:SetColor("ffffffff")
+        else
+            self._name:SetColor("ffffffff")
+            self._rating:SetColor(color)
+        end
     end,
 
     GetArmyColor = function(self)
+        if Options.useNickNameArmyColor() then
+            return self._name._color()
+        end
         return self._rating._color()
     end,
 
