@@ -105,7 +105,8 @@ ArmyViewsContainer = Class(Group)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor
+                armyData.teamColor,
+                armyData.division
             )
             armyView.teamId = armyData.teamId
             self._lines[i] = armyView
