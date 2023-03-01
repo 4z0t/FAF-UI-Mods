@@ -24,6 +24,7 @@ end
 ---@field rating number
 ---@field teamColor string
 ---@field teamId integer
+---@field division string
 
 ---returns army data
 ---@return ArmyData[]
@@ -49,7 +50,8 @@ function GetArmiesFormattedTable()
                     color = armyData.color,
                     isAlly = not IsObserver() and IsAlly(focusArmy, armyIndex),
                     id = armyIndex,
-                    rating = sessionInfo.Options.Ratings[nickname] or 0
+                    rating = sessionInfo.Options.Ratings[nickname] or 0,
+                    division = sessionInfo.Options.Divisions[nickname] or ""
                 }
                 table.insert(armiesFormattedTable, data)
             end
