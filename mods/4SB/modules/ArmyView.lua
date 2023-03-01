@@ -189,11 +189,11 @@ ArmyView = Class(Group)
 
     SetArmyColor = function(self, color)
         if Options.useNickNameArmyColor() then
-            self._name:SetColor(color)
-            self._rating:SetColor(self.isOutOfGame and outOfGameColor or "ffffffff")
+            self._name:SetColor(self.isOutOfGame and outOfGameColor or color)
+            self._rating:SetColor("ffffffff")
         else
-            self._name:SetColor(self.isOutOfGame and outOfGameColor or "ffffffff")
-            self._rating:SetColor(color)
+            self._name:SetColor("ffffffff")
+            self._rating:SetColor(self.isOutOfGame and outOfGameColor or color)
         end
     end,
 
