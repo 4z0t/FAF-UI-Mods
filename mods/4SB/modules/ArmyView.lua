@@ -164,7 +164,7 @@ ArmyView = Class(Group)
                 :Color(teamColor)
         end
 
-        if division and division ~= "" and Options.useDivisions() then
+        if division and division ~= "" and division ~= "unlisted" and Options.useDivisions() then
             self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
             self._div:SetAlpha(1)
             self._rating:SetAlpha(0)
