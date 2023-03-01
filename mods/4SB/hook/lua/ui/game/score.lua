@@ -59,6 +59,10 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             scoreboard:ResetArmyData()
         end
 
+        Options.useDivisions.OnChange = function(var)
+            scoreboard:ResetArmyData()
+        end
+
         controls.scoreBoard = scoreboard
         SetLayout()
         GameMain.AddBeatFunction(Update, true)

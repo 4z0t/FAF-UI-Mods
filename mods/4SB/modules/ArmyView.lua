@@ -59,6 +59,7 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _bg Bitmap
 ---@field _color Bitmap
 ---@field _faction Bitmap
+---@field _div Bitmap
 ---@field _rating Text
 ---@field _name Text
 ArmyView = Class(Group)
@@ -74,6 +75,7 @@ ArmyView = Class(Group)
         self.isOutOfGame = false
 
         self._bg = Bitmap(self)
+        self._div = Bitmap(self)
         self._color = Bitmap(self)
         self._faction = Bitmap(self)
         self._rating = Text(self)
@@ -107,6 +109,15 @@ ArmyView = Class(Group)
             :Over(self, 10)
             :DisableHitTest()
 
+        LayoutFor(self._div)
+            :Width(40)
+            :Height(20)
+            :AtVerticalCenterIn(self)
+            :AtRightIn(self._rating, -1)
+            :Over(self, 10)
+            :DisableHitTest()
+            :Alpha(0)
+
         LayoutFor(self._rating)
             :AtVerticalCenterIn(self)
             :AnchorToLeft(self, -60)
@@ -136,7 +147,7 @@ ArmyView = Class(Group)
     ---@param faction Faction
     ---@param armyColor Color
     ---@param teamColor Color
-    SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor)
+    SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor, division)
         self.id = armyId
 
         if Options.teamColorAsBG() then
@@ -153,6 +164,14 @@ ArmyView = Class(Group)
                 :Color(teamColor)
         end
 
+        if division and division ~= "" and Options.useDivisions() then
+            self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
+            self._div:SetAlpha(1)
+            self._rating:SetAlpha(0)
+        else
+            self._rating:SetAlpha(1)
+            self._div:SetAlpha(0)
+        end
         self:SetArmyColor(armyColor)
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)

@@ -55,6 +55,7 @@ replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
 teamScoreSort = OptionVar(modName, "teamScoreSort", false)
 teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
 teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
+useDivisions = OptionVar(modName, "useDivisions", false)
 
 function Init(isReplay)
 
@@ -78,6 +79,7 @@ function Init(isReplay)
                         "window border",
                     },
                     style, 4),
+            Options.Filter("Use divisions instead of rating", useDivisions, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),

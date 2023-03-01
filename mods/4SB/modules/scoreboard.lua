@@ -136,7 +136,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor
+                armyData.teamColor,
+                armyData.division
             )
 
             self._lines[i] = armyView
@@ -154,7 +155,8 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
                 armyData.rating,
                 armyData.faction,
                 armyData.color,
-                armyData.teamColor
+                armyData.teamColor,
+                armyData.division
             )
 
         end
