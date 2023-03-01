@@ -43,8 +43,8 @@ local armyViewTextPointSize = 12
 local armyViewNameFont = Options.player.font.name:Raw()
 local focusArmyNameFont = Options.player.font.focus:Raw()
 
-
-nameWidth = LazyVar()
+minNameWidth = LayoutHelpers.ScaleNumber(75)
+nameWidth = LazyVar(minNameWidth)
 armyViewWidth = LazyVar()
 armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
 allyViewWidth = LazyVar()
