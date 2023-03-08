@@ -282,17 +282,21 @@ KeyMapper.SetUserKeyAction("Toggle repeat build of factories / OC mode", {
 
 KeyMapper.SetUserKeyAction("Order Tech upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTechUpgrade()",
-    category = "order"
+    category = "Upgrade"
+})
+KeyMapper.SetUserKeyAction("Order Engineering upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/SACUEnhancements.lua').OrderTechUpgrade()",
+    category = "Upgrade"
 })
 KeyMapper.SetUserKeyAction("Order RAS upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderRASUpgrade()",
-    category = "order"
+    category = "Upgrade"
 })
 KeyMapper.SetUserKeyAction("Order Gun upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderGunUpgrade()",
-    category = "order"
+    category = "Upgrade"
 })
 KeyMapper.SetUserKeyAction("Order Tele upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
-    category = "order"
+    category = "Upgrade"
 })

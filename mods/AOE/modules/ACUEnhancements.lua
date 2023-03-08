@@ -1,43 +1,12 @@
 local Enhancements = import("Enhancements.lua")
-local EnhanceCommon = import("/lua/enhancementcommon.lua")
-local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
-local LuaQ = UMT.LuaQ
-
-
-function ApplyToSelectedUnits(fn)
-    local selection = GetSelectedUnits()
-    if not selection then return end
-
-    UMT.Units.HiddenSelect(function()
-        for _, unit in selection do
-            SelectUnits { unit }
-            fn(unit)
-        end
-    end)
-end
-
-function HasPrerequisite(unit, prerequisite)
-
-    local id = unit:GetEntityId()
-
-    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
-    local enhancementQueue = EnhancementQueueFile.getEnhancementQueue()
-    local orderedEnhancements = enhancementQueue[id] or {}
-
-    local pre = existingEnhancements | LuaQ.contains(prerequisite)
-
-    return pre or orderedEnhancements | LuaQ.first(function(tbl)
-        return tbl.ID == prerequisite
-    end)
-end
 
 function UpgradeTech(unit)
 
     local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
     if not bpEnhancements then return end
 
-    if HasPrerequisite(unit, "AdvancedEngineering") then
+    if Enhancements.HasPrerequisite(unit, "AdvancedEngineering") then
         Enhancements.OrderUnitEnhancement(unit, "T3Engineering")
     else
         Enhancements.OrderUnitEnhancement(unit, "AdvancedEngineering")
@@ -50,7 +19,7 @@ function UpgradeRas(unit)
     local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
     if not bpEnhancements then return end
 
-    if HasPrerequisite(unit, "ResourceAllocation") then
+    if Enhancements.HasPrerequisite(unit, "ResourceAllocation") then
         Enhancements.OrderUnitEnhancement(unit, "ResourceAllocationAdvanced")
     else
         Enhancements.OrderUnitEnhancement(unit, "ResourceAllocation")
@@ -59,9 +28,6 @@ function UpgradeRas(unit)
 end
 
 function UpgradeTele(unit)
-    local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
-    if not bpEnhancements then return end
-
     Enhancements.OrderUnitEnhancement(unit, "Teleporter")
 end
 
@@ -73,7 +39,7 @@ local gunUpgradeMap =
     ["ual0001"] = "HeatSink",
 }
 
----comment
+
 ---@param unit UserUnit
 function UpgradeGun(unit)
     local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
@@ -85,19 +51,18 @@ function UpgradeGun(unit)
     Enhancements.OrderUnitEnhancement(unit, upgrade)
 end
 
-
 function OrderTechUpgrade()
-    ApplyToSelectedUnits(UpgradeTech)
+    Enhancements.ApplyToSelectedUnits(UpgradeTech)
 end
 
 function OrderRASUpgrade()
-    ApplyToSelectedUnits(UpgradeRas)
+    Enhancements.ApplyToSelectedUnits(UpgradeRas)
 end
 
 function OrderTeleUpgrade()
-    ApplyToSelectedUnits(UpgradeTele)
+    Enhancements.ApplyToSelectedUnits(UpgradeTele)
 end
 
 function OrderGunUpgrade()
-    ApplyToSelectedUnits(UpgradeGun)
+    Enhancements.ApplyToSelectedUnits(UpgradeGun)
 end

@@ -15,7 +15,7 @@ function HasOrderedUpgrades(unit)
     return false
 end
 
----comment
+
 ---@param bp Blueprint
 function GetBluePrintEnhancements(bp)
     if not bp.Enhancements then return end
@@ -27,8 +27,6 @@ function GetBluePrintEnhancements(bp)
         tbl.UnitID = bp.BlueprintId
     end)
 end
-
-
 
 ---@param unit UserUnit
 ---@param enhancement any
@@ -95,15 +93,35 @@ function OrderUnitEnhancement(unit, enhancement)
 
 end
 
-function OrderEnhancement(enhancement)
+function ApplyToSelectedUnits(fn)
     local selection = GetSelectedUnits()
     if not selection then return end
 
-
-    local unit = selection[1]
-
     UMT.Units.HiddenSelect(function()
-        SelectUnits({ unit })
+        for _, unit in selection do
+            SelectUnits { unit }
+            fn(unit)
+        end
+    end)
+end
+
+function HasPrerequisite(unit, prerequisite)
+
+    local id = unit:GetEntityId()
+
+    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
+    local enhancementQueue = EnhancementQueueFile.getEnhancementQueue()
+    local orderedEnhancements = enhancementQueue[id] or {}
+
+    local pre = existingEnhancements | LuaQ.contains(prerequisite)
+
+    return pre or orderedEnhancements | LuaQ.first(function(tbl)
+        return tbl.ID == prerequisite
+    end)
+end
+
+function OrderEnhancement(enhancement)
+    ApplyToSelectedUnits(function(unit)
         OrderUnitEnhancement(unit, enhancement)
     end)
 end
