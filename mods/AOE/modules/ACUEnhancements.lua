@@ -46,21 +46,56 @@ function UpgradeRas(unit)
 
 end
 
+function UpgradeTele(unit)
+    local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return end
+
+    Enhancements.OrderUnitEnhancement(unit, "Teleporter")
+end
+
+local gunUpgradeMap =
+{
+    ["url0001"] = "CoolingUpgrade",
+    ["uel0001"] = "HeavyAntiMatterCannon",
+    ["xsl0001"] = "RateOfFire",
+}
+
+---comment
+---@param unit UserUnit
+function UpgradeGun(unit)
+    local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return end
+
+    local upgrade = gunUpgradeMap[unit:GetBlueprint().BlueprintId:lower()]
+    if not upgrade then return end
+
+    Enhancements.OrderUnitEnhancement(unit, upgrade)
+end
 
 function ApplyToSelectedUnits(fn)
     local selection = GetSelectedUnits()
     if not selection then return end
 
-    for _, unit in selection do
-        fn(unit)
-    end
+    UMT.Units.HiddenSelect(function()
+        for _, unit in selection do
+            SelectUnits { unit }
+            fn(unit)
+        end
+    end)
 end
 
 function OrderTechUpgrade()
     ApplyToSelectedUnits(UpgradeTech)
 end
 
-
 function OrderRASUpgrade()
     ApplyToSelectedUnits(UpgradeRas)
+end
+
+function OrderTeleUpgrade()
+    ApplyToSelectedUnits(UpgradeTele)
+end
+
+function OrderGunUpgrade()
+    ApplyToSelectedUnits(UpgradeGun)
 end
