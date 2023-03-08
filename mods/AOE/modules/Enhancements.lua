@@ -4,7 +4,6 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local LuaQ = UMT.LuaQ
 
 
-
 function HasOrderedUpgrades(unit)
     if not unit:IsIdle() then
         local cmdqueue = unit:GetCommandQueue()
@@ -14,7 +13,6 @@ function HasOrderedUpgrades(unit)
     end
     return false
 end
-
 
 ---@param bp Blueprint
 function GetBluePrintEnhancements(bp)
@@ -28,6 +26,25 @@ function GetBluePrintEnhancements(bp)
     end)
 end
 
+function GetAllInstalledEnhancements(unit)
+
+    local id = unit:GetEntityId()
+
+    local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint()) or {}
+    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
+
+    local enhancements = {}
+
+    for _, enh in existingEnhancements do
+        table.insert(enhancements, enh)
+        if bpEnhancements[enh].Prerequisite then
+            table.insert(enhancements, bpEnhancements[enh].Prerequisite)
+        end
+    end
+
+    return enhancements
+end
+
 ---@param unit UserUnit
 ---@param enhancement any
 function OrderUnitEnhancement(unit, enhancement)
@@ -36,6 +53,8 @@ function OrderUnitEnhancement(unit, enhancement)
     if not bpEnhancements then return end
 
     if not bpEnhancements[enhancement] then return end
+
+    if GetAllInstalledEnhancements(unit) | LuaQ.contains(enhancement) then return end
 
     local id = unit:GetEntityId()
 
@@ -109,11 +128,11 @@ function HasPrerequisite(unit, prerequisite)
 
     local id = unit:GetEntityId()
 
-    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
+    local installedEnhancements = GetAllInstalledEnhancements(unit)
     local enhancementQueue = EnhancementQueueFile.getEnhancementQueue()
     local orderedEnhancements = enhancementQueue[id] or {}
 
-    local pre = existingEnhancements | LuaQ.contains(prerequisite)
+    local pre = installedEnhancements | LuaQ.contains(prerequisite)
 
     return pre or orderedEnhancements | LuaQ.first(function(tbl)
         return tbl.ID == prerequisite

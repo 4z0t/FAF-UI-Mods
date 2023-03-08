@@ -296,6 +296,18 @@ KeyMapper.SetUserKeyAction("Order Gun upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderGunUpgrade()",
     category = "Upgrade"
 })
+
+KeyMapper.SetUserKeyAction("Order Shield / Stealth / Nano upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderNanoUpgrade()",
+    category = "Upgrade"
+})
+
+KeyMapper.SetUserKeyAction("Order Laser / Chrono / Gun splash / Billy nuke upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderSpecialUpgrade()",
+    category = "Upgrade"
+})
+
+
 KeyMapper.SetUserKeyAction("Order Tele upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
     category = "Upgrade"
