@@ -254,16 +254,17 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         local isAllFactories = selection
             | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
 
-        if isAllFactories then
-            local isRepeatBuild = selection
-                | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
-                and 'false'
-                or 'true'
-            for _, unit in selection do
-                unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
-            end
-        else
+        if not isAllFactories then
             import("/lua/ui/game/orders.lua").EnterOverchargeMode()
+            return
+        end
+
+        local isRepeatBuild = selection
+            | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+            and 'false'
+            or 'true'
+        for _, unit in selection do
+            unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
         end
     end
 else
