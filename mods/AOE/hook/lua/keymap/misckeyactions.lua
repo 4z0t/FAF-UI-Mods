@@ -277,3 +277,18 @@ KeyMapper.SetUserKeyAction("Toggle repeat build of factories / OC mode", {
     action = "UI_Lua import('/lua/keymap/misckeyactions.lua').OCOrRepeatBuild()",
     category = "order"
 })
+
+KeyMapper.SetUserKeyAction("TEST ENHANCEMENT", {
+    action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement()",
+    category = "order"
+})
+
+
+KeyMapper.SetUserKeyAction("Order Stealth", {
+    action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement('StealthGenerator')",
+    category = "order"
+})
+KeyMapper.SetUserKeyAction("Order cloak", {
+    action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement('CloakingGenerator')",
+    category = "order"
+})
