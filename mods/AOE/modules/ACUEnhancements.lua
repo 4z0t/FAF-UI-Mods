@@ -5,6 +5,18 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 local LuaQ = UMT.LuaQ
 
 
+function ApplyToSelectedUnits(fn)
+    local selection = GetSelectedUnits()
+    if not selection then return end
+
+    UMT.Units.HiddenSelect(function()
+        for _, unit in selection do
+            SelectUnits { unit }
+            fn(unit)
+        end
+    end)
+end
+
 function HasPrerequisite(unit, prerequisite)
 
     local id = unit:GetEntityId()
@@ -58,6 +70,7 @@ local gunUpgradeMap =
     ["url0001"] = "CoolingUpgrade",
     ["uel0001"] = "HeavyAntiMatterCannon",
     ["xsl0001"] = "RateOfFire",
+    ["ual0001"] = "HeatSink",
 }
 
 ---comment
@@ -72,17 +85,6 @@ function UpgradeGun(unit)
     Enhancements.OrderUnitEnhancement(unit, upgrade)
 end
 
-function ApplyToSelectedUnits(fn)
-    local selection = GetSelectedUnits()
-    if not selection then return end
-
-    UMT.Units.HiddenSelect(function()
-        for _, unit in selection do
-            SelectUnits { unit }
-            fn(unit)
-        end
-    end)
-end
 
 function OrderTechUpgrade()
     ApplyToSelectedUnits(UpgradeTech)
