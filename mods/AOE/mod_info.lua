@@ -1,5 +1,5 @@
 name = "Additional Orders Extension"
-version = 4
+version = 5
 copyright = ""
 description = [[Additional orders combining selection and action and some QoL ones
 * Select ACU / goto ACU / OC mode
@@ -20,7 +20,7 @@ Requires UI Mod Tools V8
 ]]
 author = "4z0t"
 url = ""
-uid = "additional-orders-extension-v04"
+uid = "additional-orders-extension-v05"
 exclusive = false
 ui_only = true
 conflicts = {}
