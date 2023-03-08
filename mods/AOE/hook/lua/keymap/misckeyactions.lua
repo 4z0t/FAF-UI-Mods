@@ -292,3 +292,21 @@ KeyMapper.SetUserKeyAction("Order cloak", {
     action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement('CloakingGenerator')",
     category = "order"
 })
+
+KeyMapper.SetUserKeyAction("Order T2 engineering upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement('AdvancedEngineering')",
+    category = "order"
+})
+
+KeyMapper.SetUserKeyAction("Order T3 engineering upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/Enhancements.lua').OrderEnhancement('T3Engineering')",
+    category = "order"
+})
+KeyMapper.SetUserKeyAction("Order Tech upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTechUpgrade()",
+    category = "order"
+})
+KeyMapper.SetUserKeyAction("Order RAS upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderRASUpgrade()",
+    category = "order"
+})
