@@ -302,6 +302,12 @@ KeyMapper.SetUserKeyAction("Order Shield / Stealth / Nano upgrade", {
     category = "Upgrade"
 })
 
+KeyMapper.SetUserKeyAction("Order Laser / Chrono / Gun splash / Billy nuke upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderSpecialUpgrade()",
+    category = "Upgrade"
+})
+
+
 KeyMapper.SetUserKeyAction("Order Tele upgrade", {
     action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
     category = "Upgrade"
