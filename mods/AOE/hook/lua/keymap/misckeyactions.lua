@@ -238,3 +238,65 @@ KeyMapper.SetUserKeyAction("Upgrade mex, select next nearest", {
     category = "selection",
     order = 29
 })
+
+
+
+local function ExistGlobal(name)
+    return rawget(_G, name) ~= nil
+end
+
+if ExistGlobal "UMT" and UMT.Version >= 8 then
+    local LuaQ = UMT.LuaQ
+    function OCOrRepeatBuild()
+        local selection = GetSelectedUnits()
+        if not selection then return end
+
+        local isAllFactories = selection
+            | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
+
+        if not isAllFactories then
+            import("/lua/ui/game/orders.lua").EnterOverchargeMode()
+            return
+        end
+
+        local isRepeatBuild = selection
+            | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+            and 'false'
+            or 'true'
+        for _, unit in selection do
+            unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+        end
+    end
+else
+    function OCOrRepeatBuild()
+        print "THIS ACTION REQUIRES UI MOD TOOLS V8!"
+    end
+end
+
+KeyMapper.SetUserKeyAction("Toggle repeat build of factories / OC mode", {
+    action = "UI_Lua import('/lua/keymap/misckeyactions.lua').OCOrRepeatBuild()",
+    category = "order"
+})
+
+
+
+KeyMapper.SetUserKeyAction("Order Tech upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTechUpgrade()",
+    category = "Upgrade"
+})
+KeyMapper.SetUserKeyAction("Order Engineering upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/SACUEnhancements.lua').OrderTechUpgrade()",
+    category = "Upgrade"
+})
+KeyMapper.SetUserKeyAction("Order RAS upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderRASUpgrade()",
+    category = "Upgrade"
+})
+KeyMapper.SetUserKeyAction("Order Gun upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderGunUpgrade()",
+    category = "Upgrade"
+})
+KeyMapper.SetUserKeyAction("Order Tele upgrade", {
+    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
+    category = "Upgrade"
+})
