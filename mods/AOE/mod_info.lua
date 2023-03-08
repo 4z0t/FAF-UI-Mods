@@ -1,5 +1,5 @@
 name = "Additional Orders Extension"
-version = 3
+version = 4
 copyright = ""
 description = [[Additional orders combining selection and action and some QoL ones
 * Select ACU / goto ACU / OC mode
@@ -13,12 +13,14 @@ description = [[Additional orders combining selection and action and some QoL on
 * Select all radars
 * Upgrade mex, select next idle nearest
 * Loop over idle mexes
+* OC / Repeat build
+* ACU and SACU Enhancements
 
 Requires UI Mod Tools V8
 ]]
 author = "4z0t"
 url = ""
-uid = "additional-orders-extension-v03"
+uid = "additional-orders-extension-v04"
 exclusive = false
 ui_only = true
 conflicts = {}
