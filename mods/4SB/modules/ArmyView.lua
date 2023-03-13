@@ -168,8 +168,17 @@ ArmyView = UMT.Class(Group)
         self.TeamColor = teamColor
         self._division = division
 
-        if division and division ~= "" and division ~= "unlisted" then
-            self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
+        if division and division ~= "" then
+
+            if division ~= "unlisted" then
+                self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
+            else
+                LayoutFor(self._div)
+                    :Width(20)
+                    :Height(20)
+                    :AtRightIn(self._rating, -1 + 10)
+                    :Texture("/textures/divisions/unlisted.png", 0)
+            end
         end
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
