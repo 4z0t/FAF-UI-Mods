@@ -62,7 +62,11 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _div Bitmap
 ---@field _rating Text
 ---@field _name Text
-ArmyView = Class(Group)
+---@field _armyColor LazyVar<Color>
+---@field _teamColor LazyVar<Color>
+---@field _division string
+---@field _plainColor LazyVar<Color>
+ArmyView = UMT.Class(Group)
 {
     ---inits armyview
     ---@param self ArmyView
@@ -73,6 +77,14 @@ ArmyView = Class(Group)
 
         self.id = -1
         self.isOutOfGame = false
+
+
+        self._armyColor = LazyVar "ffffffff"
+        self._teamColor = LazyVar "ffffffff"
+        self._division = "unlisted"
+        self._plainColor = LazyVar "ffffffff"
+
+
 
         self._bg = Bitmap(self)
         self._div = Bitmap(self)
@@ -102,6 +114,7 @@ ArmyView = Class(Group)
             :Width(3)
             :Over(self, 5)
             :DisableHitTest()
+            :Color(self.TeamColor)
 
         LayoutFor(self._faction)
             :AtVerticalCenterIn(self)
@@ -124,6 +137,7 @@ ArmyView = Class(Group)
             :DisableHitTest()
             :Over(self, 10)
             :DropShadow(true)
+            :Color(self.ArmyColor)
 
 
         LayoutFor(self._name)
@@ -132,6 +146,7 @@ ArmyView = Class(Group)
             :Over(self, 10)
             :DisableHitTest()
             :DropShadow(true)
+            :Color(self.PlainColor)
 
 
         LayoutFor(self)
@@ -149,30 +164,23 @@ ArmyView = Class(Group)
     ---@param teamColor Color
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor, division)
         self.id = armyId
+        self.ArmyColor = armyColor
+        self.TeamColor = teamColor
+        self._division = division
 
-        if Options.teamColorAsBG() then
-            LayoutFor(self._color)
-                :Fill(self)
-                :Color(ColorUtils.SetAlpha(teamColor, Options.teamColorAlpha()))
-        else
-            LayoutFor(self._color)
-                :Top(self.Top)
-                :Bottom(self.Bottom)
-                :Right(self.Left)
-                :ResetLeft()
-                :Width(3)
-                :Color(teamColor)
-        end
+        if division and division ~= "" then
 
-        if division and division ~= "" and Options.useDivisions() then
-            self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
-            self._div:SetAlpha(1)
-            self._rating:SetAlpha(0)
-        else
-            self._rating:SetAlpha(1)
-            self._div:SetAlpha(0)
+            if division ~= "unlisted" then
+                LayoutFor(self._div)
+                    :Texture("/textures/divisions/" .. division .. "_medium.png", 0)
+            else
+                LayoutFor(self._div)
+                    :Width(20)
+                    :Height(20)
+                    :AtRightIn(self._rating, -1 + 10)
+                    :Texture("/textures/divisions/unlisted.png", 0)
+            end
         end
-        self:SetArmyColor(armyColor)
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
@@ -180,29 +188,81 @@ ArmyView = Class(Group)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
 
-        local font = GetFocusArmy() == armyId and focusArmyNameFont or armyViewNameFont
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, font(), armyViewTextPointSize)))
-        self._name:SetFont(font, armyViewTextPointSize)
+        self:ResetFont()
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
 
-    SetArmyColor = function(self, color)
-        if Options.useNickNameArmyColor() then
-            self._name:SetColor(color)
-            self._rating:SetColor("ffffffff")
-        else
-            self._name:SetColor("ffffffff")
-            self._rating:SetColor(color)
-        end
+    ResetFont = function(self)
+        local font = GetFocusArmy() == self.id and focusArmyNameFont or armyViewNameFont
+        nameWidth:Set(math.max(nameWidth(), TextWidth(self._name:GetText(), font(), armyViewTextPointSize)))
+        self._name:SetFont(font, armyViewTextPointSize)
     end,
 
-    GetArmyColor = function(self)
-        if Options.useNickNameArmyColor() then
-            return self._name._color()
+    ---@type Color
+    ArmyColor = UMT.Property
+    {
+        get = function(self)
+            return self._armyColor
+        end,
+
+        set = function(self, value)
+            self._armyColor:Set(value)
         end
-        return self._rating._color()
-    end,
+    },
+
+    ---@type Color
+    TeamColor = UMT.Property
+    {
+        get = function(self)
+            return self._teamColor
+        end,
+
+        set = function(self, value)
+            self._teamColor:Set(value)
+        end
+    },
+
+    ---@type Color
+    NameColor = UMT.Property
+    {
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._name:SetColor(value)
+        end
+    },
+
+    ---@type Color
+    RatingColor = UMT.Property
+    {
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._rating:SetColor(value)
+        end
+    },
+
+    Division = UMT.Property
+    {
+        get = function(self)
+            return self._division
+        end,
+    },
+
+    PlainColor = UMT.Property
+    {
+        get = function(self)
+            return self._plainColor
+        end,
+
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._plainColor:Set(value)
+        end
+    },
+
 
     Update = function(self, data)
         if not self.isOutOfGame and data.Defeated then
@@ -212,7 +272,8 @@ ArmyView = Class(Group)
 
     MarkOutOfGame = function(self)
         self.isOutOfGame = true
-        self._name:SetColor(outOfGameColor)
+        self.ArmyColor = outOfGameColor
+        self.PlainColor = outOfGameColor
     end,
 
     ---comment
@@ -237,7 +298,7 @@ ArmyView = Class(Group)
 ---@field _massBtn Bitmap
 ---@field _energyBtn Bitmap
 ---@field _unitsBtn Bitmap
-AllyView = Class(ArmyView)
+AllyView = UMT.Class(ArmyView)
 {
     ---comment
     ---@param self AllyView
@@ -441,19 +502,19 @@ local dataTextOffSet = 40
 local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
 
 local contractDataAnimation = animationFactory
-    :OnStart(function(control, state, nextControl)
+    :OnStart(function(control, state, nextControl, offset)
         fadeAnimation:Apply(control)
         control._contracted = true
-        return { nextControl = nextControl }
+        return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() >= state.nextControl.Right() then
+        if control.Right() >= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
             return true
         end
         control.Right:Set(control.Right() + delta * dataAnimationSpeed)
     end)
     :OnFinish(function(control, state)
-        control.Right:Set(state.nextControl.Right)
+        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
     end)
     :Create()
 
@@ -482,7 +543,7 @@ local colorAnimation = UMT.Animation.Factory.Color
     :For(0.3)
     :Create()
 
-ReplayArmyView = Class(ArmyView)
+ReplayArmyView = UMT.Class(ArmyView)
 {
     __init = function(self, parent)
         ArmyView.__init(self, parent)
@@ -580,12 +641,12 @@ ReplayArmyView = Class(ArmyView)
             local nextControl = self
             local control = self._data[id]
 
-            contractDataAnimation:Apply(control, nextControl)
+            contractDataAnimation:Apply(control, nextControl, lastDataTextOffset - dataTextOffSet)
         else
             local nextControl = self._data[id + 1]
             local control = self._data[id]
 
-            contractDataAnimation:Apply(control, nextControl)
+            contractDataAnimation:Apply(control, nextControl, 0)
         end
 
     end,
@@ -610,10 +671,10 @@ ReplayArmyView = Class(ArmyView)
 
 local LuaQ = UMT.LuaQ
 
-ReplayTeamView = Class(ReplayArmyView)
+ReplayTeamView = UMT.Class(ReplayArmyView)
 {
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
-        ReplayArmyView.SetStaticData(self, false, name, rating, 0, "ffffffff", teamColor)
+        ReplayArmyView.SetStaticData(self, false, name, rating, 0, "ffffffff", teamColor, "")
         self.id = teamId
         self._armies = armies | LuaQ.toSet
         self._faction:SetAlpha(0)
@@ -644,8 +705,6 @@ ReplayTeamView = Class(ReplayArmyView)
 
         if not defeated then return end
 
-        self.isOutOfGame = true
-        self._name:SetColor(outOfGameColor)
-    end,
-
+        ArmyView.MarkOutOfGame(self)
+    end
 }

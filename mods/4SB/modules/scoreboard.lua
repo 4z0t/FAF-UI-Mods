@@ -254,6 +254,14 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     DisplayPing = function(self, pingData)
         if pingData.Marker or pingData.Renew then return end
         self:GetArmyViews()[pingData.Owner + 1]:DisplayPing(pingData)
+    end,
+
+    ---@param self ScoreBoard
+    ---@param fn fun(armyId: integer, view: ArmyView)
+    ApplyToViews = function(self, fn)
+        for armyId, armyView in self:GetArmyViews() do
+            fn(armyId, armyView)
+        end
     end
 
 }
@@ -262,6 +270,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 ---@class ReplayScoreBoard : ScoreBoard
 ---@field _dataPanel DataPanel
 ---@field _obs ObserverPanel
+---@field _teamsContainer TeamViewsContainer
 ReplayScoreBoard = UMT.Class(ScoreBoard)
 {
     __init = function(self, parent, isTitle)
@@ -324,12 +333,17 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         end
     },
 
+
+    ---@param self ReplayScoreBoard
+    ---@param data any
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
         self._teamsContainer:Update(data)
         if self._focusArmy ~= GetFocusArmy() then
             self._focusArmy = GetFocusArmy()
-            self:ResetArmyData()
+            ScoreBoard.ApplyToViews(self, function(id, view)
+                view:ResetFont()
+            end)
         end
     end,
 
@@ -364,4 +378,14 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     HandleEvent = function(self, event)
         return false
     end,
+
+
+    ---@param self ReplayScoreBoard
+    ---@param fn fun(armyId: integer, view: ArmyView)
+    ApplyToViews = function(self, fn)
+        ScoreBoard.ApplyToViews(self, fn)
+        for teamId, teamView in self._teamsContainer._armyViews do
+            fn(teamId, teamView)
+        end
+    end
 }
