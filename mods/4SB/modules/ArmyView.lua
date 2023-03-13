@@ -171,7 +171,8 @@ ArmyView = UMT.Class(Group)
         if division and division ~= "" then
 
             if division ~= "unlisted" then
-                self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
+                LayoutFor(self._div)
+                    :Texture("/textures/divisions/" .. division .. "_medium.png", 0)
             else
                 LayoutFor(self._div)
                     :Width(20)
