@@ -6,6 +6,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
 
+    local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
     local layouts = {
         ["default"] = false,
@@ -54,15 +55,40 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         end
 
         Options.teamColorAsBG.OnChange = function(var)
-            scoreboard:ResetArmyData()
+
+            local _teamColorAsBG = var()
+            local _teamColorAlpha = Options.teamColorAlpha()
+            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+                if _teamColorAsBG then
+                    LayoutFor(armyView._color)
+                        :Fill(armyView)
+                        :Color(UMT.ColorUtils.SetAlpha(armyView.TeamColor(), _teamColorAlpha))
+                else
+                    LayoutFor(armyView._color)
+                        :Top(armyView.Top)
+                        :Bottom(armyView.Bottom)
+                        :Right(armyView.Left)
+                        :ResetLeft()
+                        :Width(3)
+                        :Color(armyView.TeamColor)
+                end
+            end
+
         end
 
-        Options.teamColorAlpha.OnChange = function(var)
-            scoreboard:ResetArmyData()
-        end
+        Options.teamColorAlpha.OnChange = Options.teamColorAsBG.OnChange
 
         Options.useDivisions.OnChange = function(var)
-            scoreboard:ResetArmyData()
+            local _useDivisions = var()
+            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+                if _useDivisions and armyView.Division ~= "" then
+                    armyView._div:SetAlpha(1)
+                    armyView._rating:SetAlpha(0)
+                else
+                    armyView._rating:SetAlpha(1)
+                    armyView._div:SetAlpha(0)
+                end
+            end
         end
 
         Options.useNickNameArmyColor.OnChange = function(var)
@@ -70,9 +96,9 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
                 if useNickNameColor then
                     armyView.NameColor = armyView.ArmyColor
-                    armyView.RatingColor = "ffffffff"
+                    armyView.RatingColor = armyView.PlainColor
                 else
-                    armyView.NameColor = "ffffffff"
+                    armyView.NameColor = armyView.PlainColor
                     armyView.RatingColor = armyView.ArmyColor
                 end
             end
@@ -85,6 +111,11 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         scoreboard.OnDestroy = function(self)
             GameMain.RemoveBeatFunction(Update)
         end
+
+        Options.useNickNameArmyColor:OnChange()
+        Options.teamColorAlpha:OnChange()
+        Options.teamColorAsBG:OnChange()
+        Options.useDivisions:OnChange()
 
     end
 

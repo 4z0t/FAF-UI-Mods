@@ -65,6 +65,7 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _armyColor LazyVar<Color>
 ---@field _teamColor LazyVar<Color>
 ---@field _division string
+---@field _plainColor LazyVar<Color>
 ArmyView = UMT.Class(Group)
 {
     ---inits armyview
@@ -81,6 +82,7 @@ ArmyView = UMT.Class(Group)
         self._armyColor = LazyVar "ffffffff"
         self._teamColor = LazyVar "ffffffff"
         self._division = "unlisted"
+        self._plainColor = LazyVar "ffffffff"
 
 
 
@@ -112,6 +114,7 @@ ArmyView = UMT.Class(Group)
             :Width(3)
             :Over(self, 5)
             :DisableHitTest()
+            :Color(self.TeamColor)
 
         LayoutFor(self._faction)
             :AtVerticalCenterIn(self)
@@ -134,6 +137,7 @@ ArmyView = UMT.Class(Group)
             :DisableHitTest()
             :Over(self, 10)
             :DropShadow(true)
+            :Color(self.ArmyColor)
 
 
         LayoutFor(self._name)
@@ -142,6 +146,7 @@ ArmyView = UMT.Class(Group)
             :Over(self, 10)
             :DisableHitTest()
             :DropShadow(true)
+            :Color(self.PlainColor)
 
 
         LayoutFor(self)
@@ -161,30 +166,11 @@ ArmyView = UMT.Class(Group)
         self.id = armyId
         self.ArmyColor = armyColor
         self.TeamColor = teamColor
+        self._division = division
 
-        if Options.teamColorAsBG() then
-            LayoutFor(self._color)
-                :Fill(self)
-                :Color(ColorUtils.SetAlpha(teamColor, Options.teamColorAlpha()))
-        else
-            LayoutFor(self._color)
-                :Top(self.Top)
-                :Bottom(self.Bottom)
-                :Right(self.Left)
-                :ResetLeft()
-                :Width(3)
-                :Color(teamColor)
-        end
-
-        if division and division ~= "" and division ~= "unlisted" and Options.useDivisions() then
+        if division and division ~= "" and division ~= "unlisted" then
             self._div:SetTexture("/textures/divisions/" .. division .. "_medium.png", 0)
-            self._div:SetAlpha(1)
-            self._rating:SetAlpha(0)
-        else
-            self._rating:SetAlpha(1)
-            self._div:SetAlpha(0)
         end
-        self:SetArmyColor(armyColor)
         self._rating:SetText(tostring(rating))
         self._rating:SetFont(Options.player.font.rating:Raw(), armyViewTextPointSize)
 
@@ -243,25 +229,26 @@ ArmyView = UMT.Class(Group)
         end
     },
 
+    Division = UMT.Property
+    {
+        get = function(self)
+            return self._division
+        end,
+    },
 
+    PlainColor = UMT.Property
+    {
+        get = function(self)
+            return self._plainColor
+        end,
 
-    SetArmyColor = function(self, color)
-        if Options.useNickNameArmyColor() then
-            self._name:SetColor(self.isOutOfGame and outOfGameColor or color)
-            self._rating:SetColor(self.isOutOfGame and outOfGameColor or "ffffffff")
-        else
-            self._name:SetColor(self.isOutOfGame and outOfGameColor or "ffffffff")
-            self._rating:SetColor(color)
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._plainColor:Set(value)
         end
-    end,
+    },
 
-    GetArmyColor = function(self)
-        --return self.ArmyColor()
-        if Options.useNickNameArmyColor() then
-            return self._name._color()
-        end
-        return self._rating._color()
-    end,
 
     Update = function(self, data)
         if not self.isOutOfGame and data.Defeated then
@@ -272,6 +259,7 @@ ArmyView = UMT.Class(Group)
     MarkOutOfGame = function(self)
         self.isOutOfGame = true
         self.ArmyColor = outOfGameColor
+        self.PlainColor = outOfGameColor
     end,
 
     ---comment

@@ -8,14 +8,14 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         if colorsTbl then
             for armyID, line in scoreBoard:GetArmyViews() do
                 if colorsTbl[armyID] then
-                    defaultScoreboardColors[armyID] = line:GetArmyColor()
-                    line:SetArmyColor(colorsTbl[armyID])
+                    defaultScoreboardColors[armyID] = line.ArmyColor()
+                    line.ArmyColor = colorsTbl[armyID]
                 end
             end
         else
             for armyID, line in scoreBoard:GetArmyViews() do
                 if defaultScoreboardColors[armyID] then
-                    line:SetArmyColor(defaultScoreboardColors[armyID])
+                    line.ArmyColor = defaultScoreboardColors[armyID]
                 end
             end
         end
