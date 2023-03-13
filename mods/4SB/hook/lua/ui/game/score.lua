@@ -58,7 +58,8 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
             local _teamColorAsBG = var()
             local _teamColorAlpha = Options.teamColorAlpha()
-            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+
+            scoreboard:ApplyToViews(function(armyId, armyView)
                 if _teamColorAsBG then
                     LayoutFor(armyView._color)
                         :Fill(armyView)
@@ -72,7 +73,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
                         :Width(3)
                         :Color(armyView.TeamColor)
                 end
-            end
+            end)
 
         end
 
@@ -80,7 +81,8 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
         Options.useDivisions.OnChange = function(var)
             local _useDivisions = var()
-            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+
+            scoreboard:ApplyToViews(function (armyId, armyView)
                 if _useDivisions and armyView.Division ~= "" then
                     armyView._div:SetAlpha(1)
                     armyView._rating:SetAlpha(0)
@@ -88,12 +90,13 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
                     armyView._rating:SetAlpha(1)
                     armyView._div:SetAlpha(0)
                 end
-            end
+            end)
+
         end
 
         Options.useNickNameArmyColor.OnChange = function(var)
             local useNickNameColor = var()
-            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+            scoreboard:ApplyToViews(function (armyId, armyView)
                 if useNickNameColor then
                     armyView.NameColor = armyView.ArmyColor
                     armyView.RatingColor = armyView.PlainColor
@@ -101,7 +104,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
                     armyView.NameColor = armyView.PlainColor
                     armyView.RatingColor = armyView.ArmyColor
                 end
-            end
+            end)
         end
 
         controls.scoreBoard = scoreboard

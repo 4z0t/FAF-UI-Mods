@@ -657,10 +657,10 @@ ReplayArmyView = UMT.Class(ArmyView)
 
 local LuaQ = UMT.LuaQ
 
-ReplayTeamView = Class(ReplayArmyView)
+ReplayTeamView = UMT.Class(ReplayArmyView)
 {
     SetStaticData = function(self, teamId, name, rating, teamColor, armies)
-        ReplayArmyView.SetStaticData(self, false, name, rating, 0, "ffffffff", teamColor)
+        ReplayArmyView.SetStaticData(self, false, name, rating, 0, "ffffffff", teamColor, "")
         self.id = teamId
         self._armies = armies | LuaQ.toSet
         self._faction:SetAlpha(0)
@@ -691,8 +691,7 @@ ReplayTeamView = Class(ReplayArmyView)
 
         if not defeated then return end
 
-        self.isOutOfGame = true
-        self._name:SetColor(outOfGameColor)
+        ArmyView.MarkOutOfGame(self)
     end,
 
 }
