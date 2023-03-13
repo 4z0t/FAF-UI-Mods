@@ -65,7 +65,7 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _armyColor LazyVar<Color>
 ---@field _teamColor LazyVar<Color>
 ---@field _division string
-ArmyView = Class(Group)
+ArmyView = UMT.Class(Group)
 {
     ---inits armyview
     ---@param self ArmyView
@@ -159,6 +159,8 @@ ArmyView = Class(Group)
     ---@param teamColor Color
     SetStaticData = function(self, armyId, name, rating, faction, armyColor, teamColor, division)
         self.id = armyId
+        self.ArmyColor = armyColor
+        self.TeamColor = teamColor
 
         if Options.teamColorAsBG() then
             LayoutFor(self._color)
@@ -197,6 +199,7 @@ ArmyView = Class(Group)
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
 
+    ---@type Color
     ArmyColor = UMT.Property
     {
         get = function(self)
@@ -208,6 +211,7 @@ ArmyView = Class(Group)
         end
     },
 
+    ---@type Color
     TeamColor = UMT.Property
     {
         get = function(self)
@@ -218,6 +222,28 @@ ArmyView = Class(Group)
             self._teamColor:Set(value)
         end
     },
+
+    ---@type Color
+    NameColor = UMT.Property
+    {
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._name:SetColor(value)
+        end
+    },
+
+    ---@type Color
+    RatingColor = UMT.Property
+    {
+        ---@param self ArmyView
+        ---@param value Color
+        set = function(self, value)
+            self._rating:SetColor(value)
+        end
+    },
+
+
 
     SetArmyColor = function(self, color)
         if Options.useNickNameArmyColor() then
@@ -270,7 +296,7 @@ ArmyView = Class(Group)
 ---@field _massBtn Bitmap
 ---@field _energyBtn Bitmap
 ---@field _unitsBtn Bitmap
-AllyView = Class(ArmyView)
+AllyView = UMT.Class(ArmyView)
 {
     ---comment
     ---@param self AllyView
@@ -515,7 +541,7 @@ local colorAnimation = UMT.Animation.Factory.Color
     :For(0.3)
     :Create()
 
-ReplayArmyView = Class(ArmyView)
+ReplayArmyView = UMT.Class(ArmyView)
 {
     __init = function(self, parent)
         ArmyView.__init(self, parent)

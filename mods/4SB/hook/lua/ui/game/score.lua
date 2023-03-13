@@ -31,6 +31,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
         local scoreboard
         if isReplay or IsObserver() then
+            ---@type ReplayScoreBoard
             scoreboard = ScoreBoards.ReplayScoreBoard(GetFrame(0), not isCampaign)
 
             Options.replayStyle.OnChange = function(var)
@@ -38,6 +39,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             end
             scoreboard.Layout = replayLayouts[Options.replayStyle()]
         else
+            ---@type ScoreBoard
             scoreboard = ScoreBoards.ScoreBoard(GetFrame(0), not isCampaign)
 
             Options.style.OnChange = function(var)
@@ -62,9 +64,18 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         Options.useDivisions.OnChange = function(var)
             scoreboard:ResetArmyData()
         end
-        
+
         Options.useNickNameArmyColor.OnChange = function(var)
-            scoreboard:ResetArmyData()
+            local useNickNameColor = var()
+            for armyId, armyView in pairs(scoreboard:GetArmyViews()) do
+                if useNickNameColor then
+                    armyView.NameColor = armyView.ArmyColor
+                    armyView.RatingColor = "ffffffff"
+                else
+                    armyView.NameColor = "ffffffff"
+                    armyView.RatingColor = armyView.ArmyColor
+                end
+            end
         end
 
         controls.scoreBoard = scoreboard
