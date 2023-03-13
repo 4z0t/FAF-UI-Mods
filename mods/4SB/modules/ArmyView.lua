@@ -62,6 +62,9 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _div Bitmap
 ---@field _rating Text
 ---@field _name Text
+---@field _armyColor LazyVar<Color>
+---@field _teamColor LazyVar<Color>
+---@field _division string
 ArmyView = Class(Group)
 {
     ---inits armyview
@@ -73,6 +76,13 @@ ArmyView = Class(Group)
 
         self.id = -1
         self.isOutOfGame = false
+
+
+        self._armyColor = LazyVar "ffffffff"
+        self._teamColor = LazyVar "ffffffff"
+        self._division = "unlisted"
+
+
 
         self._bg = Bitmap(self)
         self._div = Bitmap(self)
@@ -187,6 +197,28 @@ ArmyView = Class(Group)
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
     end,
 
+    ArmyColor = UMT.Property
+    {
+        get = function(self)
+            return self._armyColor
+        end,
+
+        set = function(self, value)
+            self._armyColor:Set(value)
+        end
+    },
+
+    TeamColor = UMT.Property
+    {
+        get = function(self)
+            return self._teamColor
+        end,
+
+        set = function(self, value)
+            self._teamColor:Set(value)
+        end
+    },
+
     SetArmyColor = function(self, color)
         if Options.useNickNameArmyColor() then
             self._name:SetColor(self.isOutOfGame and outOfGameColor or color)
@@ -198,6 +230,7 @@ ArmyView = Class(Group)
     end,
 
     GetArmyColor = function(self)
+        --return self.ArmyColor()
         if Options.useNickNameArmyColor() then
             return self._name._color()
         end
@@ -212,7 +245,7 @@ ArmyView = Class(Group)
 
     MarkOutOfGame = function(self)
         self.isOutOfGame = true
-        self._name:SetColor(outOfGameColor)
+        self.ArmyColor = outOfGameColor
     end,
 
     ---comment
