@@ -51,7 +51,9 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         end
 
         Options.player.font.name.OnChange = function(var)
-            scoreboard:ResetArmyData()
+            scoreboard:ApplyToViews(function(armyId, view)
+                view:ResetFont()
+            end)
         end
 
         Options.teamColorAsBG.OnChange = function(var)
@@ -82,7 +84,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         Options.useDivisions.OnChange = function(var)
             local _useDivisions = var()
 
-            scoreboard:ApplyToViews(function (armyId, armyView)
+            scoreboard:ApplyToViews(function(armyId, armyView)
                 if _useDivisions and armyView.Division ~= "" then
                     armyView._div:SetAlpha(1)
                     armyView._rating:SetAlpha(0)
@@ -96,7 +98,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
         Options.useNickNameArmyColor.OnChange = function(var)
             local useNickNameColor = var()
-            scoreboard:ApplyToViews(function (armyId, armyView)
+            scoreboard:ApplyToViews(function(armyId, armyView)
                 if useNickNameColor then
                     armyView.NameColor = armyView.ArmyColor
                     armyView.RatingColor = armyView.PlainColor

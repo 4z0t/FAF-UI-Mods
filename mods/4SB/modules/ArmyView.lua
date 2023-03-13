@@ -188,11 +188,15 @@ ArmyView = UMT.Class(Group)
         self._name:SetClipToWidth(true)
         self._name.Width:Set(nameWidth)
 
-        local font = GetFocusArmy() == armyId and focusArmyNameFont or armyViewNameFont
-        nameWidth:Set(math.max(nameWidth(), TextWidth(name, font(), armyViewTextPointSize)))
-        self._name:SetFont(font, armyViewTextPointSize)
+        self:ResetFont()
 
         self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
+    end,
+
+    ResetFont = function(self)
+        local font = GetFocusArmy() == self.id and focusArmyNameFont or armyViewNameFont
+        nameWidth:Set(math.max(nameWidth(), TextWidth(self._name:GetText(), font(), armyViewTextPointSize)))
+        self._name:SetFont(font, armyViewTextPointSize)
     end,
 
     ---@type Color
@@ -702,6 +706,5 @@ ReplayTeamView = UMT.Class(ReplayArmyView)
         if not defeated then return end
 
         ArmyView.MarkOutOfGame(self)
-    end,
-
+    end
 }

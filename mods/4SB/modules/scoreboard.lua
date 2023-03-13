@@ -333,12 +333,17 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         end
     },
 
+
+    ---@param self ReplayScoreBoard
+    ---@param data any
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
         self._teamsContainer:Update(data)
         if self._focusArmy ~= GetFocusArmy() then
             self._focusArmy = GetFocusArmy()
-            self:ResetArmyData()
+            ScoreBoard.ApplyToViews(self, function(id, view)
+                view:ResetFont()
+            end)
         end
     end,
 
