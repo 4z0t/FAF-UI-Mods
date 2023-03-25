@@ -1,5 +1,5 @@
 name = "Group Scatter"
-version = 3
+version = 4
 copyright = ""
 description = [[Adds two groups scatter actions that allow you to loop over units in selected group.
 
@@ -10,7 +10,7 @@ Makes sound when cycle is complete. You can press to select previous selection a
 ]]
 author = "4z0t"
 url = ""
-uid = "group-scatter-v03"
+uid = "group-scatter-v04"
 icon = "/mods/GS/icon.png"
 selectable = true
 enabled = true
