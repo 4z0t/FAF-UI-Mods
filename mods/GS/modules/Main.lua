@@ -10,9 +10,6 @@ local activeCommandMode
 local activeCommandModeData
 local lastUnit
 local continuous
-local isStarted
-
-local supress
 
 local function IsActive()
     return activeSelection ~= nil
@@ -24,8 +21,6 @@ local function Reset(deselect)
     activeSelection = nil
     lastUnit = nil
     continuous = false
-    supress = false
-    isStarted = false
     if deselect then
         SelectUnits(nil)
     end
@@ -74,8 +69,6 @@ end
 function OnCommandStarted(commandMode, commandModeData)
     if not IsActive() then return end
 
-
-    isStarted = true
 end
 
 ---comment
@@ -93,13 +86,11 @@ function OnCommandIssued(commandMode, commandModeData, command)
         if not lastUnit:IsDead() then Reset(false) return end
     end
 
-
-
-    if command.CommandType == 'Guard' then
-        supress = not supress
+    if command.CommandType == 'Guard' and not command.Target.EntityId then
+        return
     end
 
-    if supress or command.CommandType == 'None' or continuous then
+    if command.CommandType == 'None' or continuous then
         return
     end
 
