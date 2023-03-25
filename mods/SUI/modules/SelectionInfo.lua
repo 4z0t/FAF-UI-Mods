@@ -134,10 +134,7 @@ SelectionInfo = Class(Bitmap) {
                     energyCost = energyCost + bp.Economy.BuildCostEnergy
                 end
 
-                local unitData = UnitData[unit:GetEntityId()]
-                if unitData and unitData.totalMassKilledTrue then
-                    totalMassKilled = totalMassKilled + unitData.totalMassKilledTrue
-                end
+                totalMassKilled = totalMassKilled + unit:GetStat('VetExperience', 0).Value
 
                 local siloInfo = unit:GetMissileInfo()
                 local s = siloInfo.nukeSiloStorageCount + siloInfo.tacticalSiloStorageCount
