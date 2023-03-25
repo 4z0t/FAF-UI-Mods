@@ -4,7 +4,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import('/lua/user/prefs.lua')
 local Dragger = import('/lua/maui/dragger.lua').Dragger
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local GetEnhancements = import('/lua/enhancementcommon.lua').GetEnhancements
 
@@ -15,18 +15,19 @@ local VERTICAL_OFFSET = 10
 SelectionInfo = Class(Bitmap) {
     __init = function(self, parent)
         Bitmap.__init(self, parent)
-        LayoutHelpers.SetDimensions(self, 110, 60)
-        LayoutHelpers.DepthOverParent(self, parent, 500)
-        self:SetSolidColor('33000000')
         local pos = self:_LoadPosition()
 
-        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, VERTICAL_OFFSET)
+        LayoutFor(self)
+            :Width(110)
+            :Height(72)
+            :Over(parent, 500)
+            :Color('33000000')
+            :AtLeftTopIn(parent, pos.left, VERTICAL_OFFSET)
 
         self._massCost = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
         self._massCost:SetColor("FFB8F400")
         LayoutHelpers.AtRightTopIn(self._massCost, self, 2, 2)
         self._massCost:DisableHitTest(true)
-
 
 
         self._energyCost = UIUtil.CreateText(self, "0", 14, UIUtil.bodyFont, true)
@@ -58,6 +59,12 @@ SelectionInfo = Class(Bitmap) {
         LayoutHelpers.AtRightIn(self._massKilled, self._energyCost)
         self._massKilled:DisableHitTest(true)
 
+        self._siloCount = UIUtil.CreateText(self, "", 14, UIUtil.bodyFont, true)
+        LayoutFor(self._siloCount)
+            :Below(self._buildRate, 2)
+            :Color("ffffffff")
+            :DisableHitTest()
+
     end,
 
     HandleEvent = function(self, event)
@@ -66,9 +73,7 @@ SelectionInfo = Class(Bitmap) {
             local offX = event.MouseX - self.Left()
             drag.OnMove = function(dragself, x, y)
                 self.Left:Set(x - offX)
-
                 GetCursor():SetTexture(UIUtil.GetCursor('W_E'))
-
             end
             drag.OnRelease = function(dragself)
                 self:_SavePosition()
@@ -82,98 +87,105 @@ SelectionInfo = Class(Bitmap) {
     end,
 
     Update = function(self, units)
-
         self._units = units or self._units
         if table.empty(self._units) then
-
             self:Hide()
-        else
-            self:Show()
-            local massRate = 0
-            local energyRate = 0
-            local massCost = 0
-            local energyCost = 0
-            local totalbr = 0
-            local totalMassKilled = 0
+            return
+        end
+        self:Show()
+        local massRate = 0
+        local energyRate = 0
+        local massCost = 0
+        local energyCost = 0
+        local totalbr = 0
+        local totalMassKilled = 0
+        local totalSilo = 0
+        local totalUnitsLoaded = 0
 
-            for index, unit in self._units do
-                if not unit:IsDead() then
-                    local econData = unit:GetEconData()
-                    local bp = unit:GetBlueprint()
+        for _, unit in self._units do
+            if not unit:IsDead() then
+                local econData = unit:GetEconData()
+                local bp = unit:GetBlueprint()
 
-                    massRate = massRate - econData["massRequested"] + econData["massProduced"]
-                    energyRate = energyRate - econData["energyRequested"] + econData["energyProduced"]
-
-                    local br = 0
-                    if unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") or unit:IsInCategory("SILO") then
-                        br = bp.Economy.BuildRate
-
-                    end
-                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
-                        br = unit:GetBuildRate()
-                    end
+                massRate = massRate - econData["massRequested"] + econData["massProduced"]
+                energyRate = energyRate - econData["energyRequested"] + econData["energyProduced"]
 
 
-                    if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
-                        local enhancements = GetEnhancements(unit:GetEntityId())
-                        if enhancements then
-                            for _, ench in enhancements do
-                                if not bp.CategoriesHash[ench] then
-                                    local enhancementBp = bp.Enhancements[ench]
-                                    massCost = massCost + enhancementBp.BuildCostMass
-                                    energyCost = energyCost + enhancementBp.BuildCostEnergy
-                                end
+                if unit:IsInCategory("COMMAND") or unit:IsInCategory('SUBCOMMANDER') then
+                    totalbr = totalbr + unit:GetBuildRate()
+                    local enhancements = GetEnhancements(unit:GetEntityId())
+                    if enhancements then
+                        for _, ench in enhancements do
+                            if not bp.CategoriesHash[ench] then
+                                local enhancementBp = bp.Enhancements[ench]
+                                massCost = massCost + enhancementBp.BuildCostMass
+                                energyCost = energyCost + enhancementBp.BuildCostEnergy
                             end
                         end
                     end
-
-                    totalbr = totalbr + br
-
-                    if not unit:IsInCategory("COMMAND") then
-                        massCost = massCost + bp.Economy.BuildCostMass
-                        energyCost = energyCost + bp.Economy.BuildCostEnergy
-
-                    end
-                    local unitData = UnitData[unit:GetEntityId()]
-                    if unitData and unitData.totalMassKilledTrue then
-                        totalMassKilled = totalMassKilled + unitData.totalMassKilledTrue
-
-                    end
+                elseif unit:IsInCategory("ENGINEER") or unit:IsInCategory("FACTORY") or unit:IsInCategory("SILO") then
+                    totalbr = totalbr + bp.Economy.BuildRate
                 end
-            end
-            self._massCost:SetText(string.format("%d", massCost))
-            self._energyCost:SetText(string.format("%d", energyCost))
-
-            if massRate < 0 then
-                self._massRate:SetText(string.format("%d", massRate))
-                self._massRate:SetColor("fff30017")
-            else
-                self._massRate:SetText(string.format("+%d", massRate))
-                self._massRate:SetColor("FFB8F400")
-            end
-
-            if energyRate < 0 then
-                self._energyRate:SetText(string.format("%d", energyRate))
-                self._energyRate:SetColor("fff30017")
-            else
-                self._energyRate:SetText(string.format("+%d", energyRate))
-                self._energyRate:SetColor("FFF8C000")
-            end
 
 
-            if totalbr ~= 0 then
-                self._buildRate:SetText(string.format("%d", totalbr))
 
-            else
-                self._buildRate:Hide()
-            end
+                if not unit:IsInCategory("COMMAND") then
+                    massCost = massCost + bp.Economy.BuildCostMass
+                    energyCost = energyCost + bp.Economy.BuildCostEnergy
+                end
 
-            if totalMassKilled ~= 0 then
-                self._massKilled:SetText(string.format("%d", totalMassKilled))
-            else
-                self._massKilled:Hide()
+                totalMassKilled = totalMassKilled + unit:GetStat('VetExperience', 0).Value
+
+                local siloInfo = unit:GetMissileInfo()
+                local s = siloInfo.nukeSiloStorageCount + siloInfo.tacticalSiloStorageCount
+                if s > 0 then
+                    totalSilo = totalSilo + s
+                    totalUnitsLoaded = totalUnitsLoaded + 1
+                end
+
+
+
             end
         end
+        self._massCost:SetText(string.format("%d", massCost))
+        self._energyCost:SetText(string.format("%d", energyCost))
+
+        if massRate < 0 then
+            self._massRate:SetText(string.format("%d", massRate))
+            self._massRate:SetColor("fff30017")
+        else
+            self._massRate:SetText(string.format("+%d", massRate))
+            self._massRate:SetColor("FFB8F400")
+        end
+
+        if energyRate < 0 then
+            self._energyRate:SetText(string.format("%d", energyRate))
+            self._energyRate:SetColor("fff30017")
+        else
+            self._energyRate:SetText(string.format("+%d", energyRate))
+            self._energyRate:SetColor("FFF8C000")
+        end
+
+
+        if totalbr ~= 0 then
+            self._buildRate:SetText(string.format("%d", totalbr))
+
+        else
+            self._buildRate:Hide()
+        end
+
+        if totalMassKilled ~= 0 then
+            self._massKilled:SetText(string.format("%d", totalMassKilled))
+        else
+            self._massKilled:Hide()
+        end
+
+        if totalSilo ~= 0 then
+            self._siloCount:SetText(string.format("%d / %d", totalSilo, totalUnitsLoaded))
+        else
+            self._siloCount:Hide()
+        end
+
     end,
 
     _LoadPosition = function(self)
