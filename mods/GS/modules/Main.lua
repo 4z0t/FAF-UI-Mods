@@ -24,6 +24,7 @@ local function Reset(deselect)
     activeSelection = nil
     lastUnit = nil
     continuous = false
+    supress = false
     isStarted = false
     if deselect then
         SelectUnits(nil)
