@@ -54,11 +54,11 @@ _G.UMT = {
     Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/__Init__.lua"),
     Views        = LazyImport("/mods/UMT/modules/Views/__Init__.lua"),
     Weak         = import("/mods/UMT/modules/WeakMeta.lua"),
-    Containers   = {
-        Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
-        Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
-        Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
-    },
+    -- Containers   = {
+    --     Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
+    --     Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
+    --     Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
+    -- },
     Animation    = LazyImport("/mods/UMT/modules/Animations/__Init__.lua"),
     Class        = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property     = import("/mods/UMT/modules/UIClass.lua").Property,

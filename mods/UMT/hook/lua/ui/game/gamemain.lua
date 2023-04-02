@@ -3,7 +3,7 @@ do
     function CreateUI(isReplay)
 
         OldCreateUI(isReplay)
-        if true then
+        if false then
             UMT.Mods.Add "UMT"
         end
         UMT.Mods.Load(isReplay)
