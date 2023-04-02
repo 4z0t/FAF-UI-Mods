@@ -96,11 +96,12 @@ end
 
 ---comment
 ---@return ControlConfig
-function TextEdit(name, optionVar, indent)
+function TextEdit(name, optionVar, charLimit, indent)
     return {
         type = "edit",
         name = name,
         optionVar = optionVar,
+        charLimit = charLimit or 100,
         indent = indent or 0
     }
 end

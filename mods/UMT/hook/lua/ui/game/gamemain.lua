@@ -1,10 +1,12 @@
-if false then
+do
     local OldCreateUI = CreateUI
     function CreateUI(isReplay)
 
         OldCreateUI(isReplay)
-        
-        import('/mods/UMT/modules/Main.lua').Main(isReplay)
+        if false then
+            UMT.Mods.Add "UMT"
+        end
+        UMT.Mods.Load(isReplay)
 
     end
 end
