@@ -42,10 +42,12 @@ end
 
 local function UpdateCache()
     cached = {}
-    --    assisting = {}
     local focused = {}
 
     for id, unit in units do
+        if focused[id] then
+            continue
+        end
         if not unit:IsDead() then
             TableInsert(cached, unit)
             local focus = unit:GetFocus()
@@ -55,17 +57,6 @@ local function UpdateCache()
                     focused[focusId] = focus
                     TableInsert(cached, focus)
                 end
-                -- if EntityCategoryContains(categories.ENGINEER, unit) then
-                --     if not assisting[focusId] then
-                --         assisting[focusId] = {
-                --             engineers = {},
-                --             build_rate = 0
-                --         }
-                --     end
-
-                --     TableInsert(assisting[focusId]['engineers'], unit)
-                --     assisting[focusId]['build_rate'] = assisting[focusId]['build_rate'] + u:GetBuildRate()
-                -- end
             end
         else
             units[id] = nil
