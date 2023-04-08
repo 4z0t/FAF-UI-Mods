@@ -1,6 +1,6 @@
 name = "UI mods loader"
-uid = "ui-mod-loader-v01"
-version = 1
+uid = "ui-mod-loader-v02"
+version = 2
 copyright = ""
 description = [[]]
 author = "4z0t"
@@ -14,5 +14,5 @@ conflicts = {}
 after = {}
 icon = "/mods/UML/icon.png"
 requires = {
-    "ui-mod-tools-4z0t-v09"
+    "ui-mod-tools-4z0t-v10"
 }
