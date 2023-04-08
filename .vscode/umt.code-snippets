@@ -31,13 +31,29 @@
     "description": "Creates UMT condition check"
   },
   "Closure": {
-    "body": [
-      "function (${args})",
-      "\t",
-      "end",
-    ],
+    "body": ["function (${args})", "\t", "end"],
     "prefix": "=>",
     "description": "Creates lua closure",
     "scope": "lua"
   },
+  "MOD_INFO": {
+    "body": [
+      "name = \"${name}\"",
+      "version = ${version}",
+      "copyright = \"\"",
+      "description = [[${description}]]",
+      "author = \"${author}\"",
+      "url = \"\"",
+      "uid = \"${uid}\"",
+      "exclusive = false",
+      "ui_only = true",
+      "conflicts = {${conflicts}}",
+      "requires = {${requires}}",
+      "before = {${before}}",
+      "after = {${after}}"
+    ],
+    "prefix": "modinfo",
+    "description": "Creates mod info fields",
+    "scope": "lua"
+  }
 }
