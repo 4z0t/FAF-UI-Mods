@@ -1,0 +1,11 @@
+{
+    "configurations": [
+    {
+        "type": "node",
+        "preLaunchTask": "FAF dev",
+        "name":"FAF DEV",
+        "request": "launch",
+        "args": [],
+    },
+    ]
+}
