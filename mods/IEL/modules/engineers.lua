@@ -6,16 +6,20 @@ local Prefs = import("/lua/user/prefs.lua")
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local LazyVar = import("/lua/lazyvar.lua")
 
-local GetUnits = import("/mods/UMT/modules/units.lua").GetFast
+
+local GetUnits = UMT.Units.GetFast
 local Options = import("options.lua")
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local engineersOption = Options.engineersOption
+local engineersWithNumbersOption = Options.engineersWithNumbersOption
 local factoriesOption = Options.factoriesOption
 local supportCommanderOption = Options.supportCommanderOption
 local tacticalNukesOption = Options.tacticalNukesOption
 local massExtractorsOption = Options.massExtractorsOption
 
 local engineersOverlay = engineersOption()
+local engineersOverlayWithNumbers = engineersWithNumbersOption()
 local factoriesOverlay = factoriesOption()
 local supportCommanderOverlay = supportCommanderOption()
 local tacticalNukesOverlay = tacticalNukesOption()
@@ -58,6 +62,48 @@ local EngineerOverlay = Class(Overlay)
         self.isIdle = self.unit:IsIdle()
     end
 
+}
+
+local EngineerOverlayWithNumber = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        local text = "0"
+        if unit:IsInCategory("TECH1") then
+            text = "1"
+        elseif unit:IsInCategory("TECH2") then
+            text = "2"
+        elseif unit:IsInCategory("TECH3") then
+            text = "3"
+        end
+
+        self.text = UIUtil.CreateText(self, text, 10, "Arial")
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("black")
+            :Width(10)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not engineersOverlay then
+            self:Destroy()
+            return
+        end
+        if self.unit:IsIdle() then
+            self.text:SetColor("ffff0000")
+        else
+            self.text:SetColor("ffffffff")
+        end
+    end
 }
 
 local FactoryOverlay = Class(Overlay)
@@ -164,7 +210,14 @@ local MexOverlay = Class(Overlay)
     end
 }
 
-
+local function UpdateOverlays()
+    for _, overlay in overlays do
+        if IsDestroyed(overlay) then
+            continue
+        end
+        overlay:UpdateState()
+    end
+end
 
 local function CreateUnitOverlays()
     local allunits = GetUnits()
@@ -174,7 +227,11 @@ local function CreateUnitOverlays()
             if supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
 
             elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
-                overlays[id] = EngineerOverlay(worldView, unit)
+                if engineersOverlayWithNumbers then
+                    overlays[id] = EngineerOverlayWithNumber(worldView, unit)
+                else
+                    overlays[id] = EngineerOverlay(worldView, unit)
+                end
             elseif factoriesOverlay and unit:IsInCategory("FACTORY") then
                 overlays[id] = FactoryOverlay(worldView, unit)
             elseif tacticalNukesOverlay and unit:IsInCategory("SILO") then
@@ -185,23 +242,16 @@ local function CreateUnitOverlays()
         end
     end
 
-    for _, overlay in overlays do
-        if IsDestroyed(overlay) then
-            continue
-        end
-        overlay:UpdateState()
-    end
-
-end
-
-function UpdateOverlays()
-
+    UpdateOverlays()
 end
 
 function Init(isReplay)
     AddBeatFunction(CreateUnitOverlays, true)
     engineersOption.OnChange = function(var)
         engineersOverlay = var()
+    end
+    engineersWithNumbersOption.OnChange = function(var)
+        engineersOverlayWithNumbers = var()
     end
     factoriesOption.OnChange = function(var)
         factoriesOverlay = var()
