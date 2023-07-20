@@ -1,8 +1,15 @@
 name = "Idle Engineers Light"
-uid = "idle-engineers-light-v09"
-version = 9
+uid = "idle-engineers-light-v10"
+version = 10
 copyright = ""
-description = [[Highlights T1,T2,T3 Engineers, Upgrades, Factories, Mass Extractors and tactical/nuke silos
+description = [[Highlights
+
+- T1,T2,T3 Engineers (with numbers too)
+- Factories (with text too)
+- Upgrading Mass Extractors
+- Tactical/nuke silos
+- ACU with text
+
 Options window can be found on main tab in "UI mods options"
 requires UI mod tools]]
 author = "4z0t"
