@@ -13,6 +13,7 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local engineersOption = Options.engineersOption
 local engineersWithNumbersOption = Options.engineersWithNumbersOption
+local factoryOverlayWithTextOption = Options.factoryOverlayWithTextOption
 local factoriesOption = Options.factoriesOption
 local supportCommanderOption = Options.supportCommanderOption
 local tacticalNukesOption = Options.tacticalNukesOption
@@ -20,6 +21,7 @@ local massExtractorsOption = Options.massExtractorsOption
 
 local engineersOverlay = engineersOption()
 local engineersOverlayWithNumbers = engineersWithNumbersOption()
+local factoryOverlayWithText = factoryOverlayWithTextOption()
 local factoriesOverlay = factoriesOption()
 local supportCommanderOverlay = supportCommanderOption()
 local tacticalNukesOverlay = tacticalNukesOption()
@@ -84,7 +86,7 @@ local EngineerOverlayWithNumber = Class(Overlay)
             :DisableHitTest()
 
         LayoutFor(self)
-            :Color("black")
+            :Color("ff000000")
             :Width(10)
             :Height(10)
     end,
@@ -102,6 +104,36 @@ local EngineerOverlayWithNumber = Class(Overlay)
             self.text:SetColor("ffff0000")
         else
             self.text:SetColor("ffffffff")
+        end
+    end
+}
+
+local FactoryOverlayWithText = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        self.offsetY = -2
+
+        self.text = UIUtil.CreateText(self, "FAC", 10, "Arial")
+        LayoutFor(self.text)
+            :Color("ffffffff")
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("ff000000")
+            :Width(20)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not self.unit:IsIdle() or not engineersOverlay then
+            self:Destroy()
         end
     end
 }
@@ -233,7 +265,11 @@ local function CreateUnitOverlays()
                     overlays[id] = EngineerOverlay(worldView, unit)
                 end
             elseif factoriesOverlay and unit:IsInCategory("FACTORY") then
-                overlays[id] = FactoryOverlay(worldView, unit)
+                if factoryOverlayWithText then
+                    overlays[id] = FactoryOverlayWithText(worldView, unit)
+                else
+                    overlays[id] = FactoryOverlay(worldView, unit)
+                end
             elseif tacticalNukesOverlay and unit:IsInCategory("SILO") then
                 overlays[id] = SiloOverlay(worldView, unit)
             elseif massExtractorsOverlay and unit:IsInCategory("MASSEXTRACTION") and unit:IsInCategory("STRUCTURE") then
@@ -252,6 +288,9 @@ function Init(isReplay)
     end
     engineersWithNumbersOption.OnChange = function(var)
         engineersOverlayWithNumbers = var()
+    end
+    factoryOverlayWithTextOption.OnChange = function(var)
+        factoryOverlayWithText = var()
     end
     factoriesOption.OnChange = function(var)
         factoriesOverlay = var()
