@@ -10,6 +10,7 @@ do
     factoryOverlayWithTextOption = OptionVarCreate(modName, "factoryOverlayWithTextOption", false)
     factoriesOption = OptionVarCreate(modName, "factoriesOverlay", true)
     supportCommanderOption = OptionVarCreate(modName, "supportCommanderOverlay", true)
+    commanderOverlayOption = OptionVarCreate(modName, "commanderOverlayOption", false)
     tacticalNukesOption = OptionVarCreate(modName, "tacticalNukesOverlay", true)
     massExtractorsOption = OptionVarCreate(modName, "massExtractorsOverlay", true)
 
@@ -18,6 +19,7 @@ do
         GlobalOptions.AddOptions(modName, "Idle Engineers Light",
             {
                 OptionsUtils.Filter("Show engineers ovelays", engineersOption),
+                OptionsUtils.Filter("Show commander ovelays", commanderOverlayOption),
                 OptionsUtils.Filter("Show engineers ovelays with numbers", engineersWithNumbersOption),
                 OptionsUtils.Filter("Show factories ovelays", factoriesOption),
                 OptionsUtils.Filter("Show facrory ovelays with text", factoryOverlayWithTextOption),

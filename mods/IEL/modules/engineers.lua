@@ -16,6 +16,7 @@ local engineersWithNumbersOption = Options.engineersWithNumbersOption
 local factoryOverlayWithTextOption = Options.factoryOverlayWithTextOption
 local factoriesOption = Options.factoriesOption
 local supportCommanderOption = Options.supportCommanderOption
+local commanderOverlayOption = Options.commanderOverlayOption
 local tacticalNukesOption = Options.tacticalNukesOption
 local massExtractorsOption = Options.massExtractorsOption
 
@@ -23,6 +24,7 @@ local engineersOverlay = engineersOption()
 local engineersOverlayWithNumbers = engineersWithNumbersOption()
 local factoryOverlayWithText = factoryOverlayWithTextOption()
 local factoriesOverlay = factoriesOption()
+local commanderOverlay = commanderOverlayOption()
 local supportCommanderOverlay = supportCommanderOption()
 local tacticalNukesOverlay = tacticalNukesOption()
 local massExtractorsOverlay = massExtractorsOption()
@@ -108,6 +110,39 @@ local EngineerOverlayWithNumber = Class(Overlay)
     end
 }
 
+local CommanderOverlayWithText = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        self.text = UIUtil.CreateText(self, "C", 10, "Arial")
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("ff000000")
+            :Width(10)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not commanderOverlay then
+            self:Destroy()
+            return
+        end
+        if self.unit:IsIdle() then
+            self.text:SetColor("ffff0000")
+        else
+            self.text:SetColor("ffffffff")
+        end
+    end
+}
+
 local FactoryOverlayWithText = Class(Overlay)
 {
     __init = function(self, parent, unit)
@@ -132,7 +167,7 @@ local FactoryOverlayWithText = Class(Overlay)
     end,
 
     UpdateState = function(self)
-        if self.unit:IsDead() or not self.unit:IsIdle() or not engineersOverlay then
+        if self.unit:IsDead() or not self.unit:IsIdle() or not factoriesOverlay then
             self:Destroy()
         end
     end
@@ -258,6 +293,10 @@ local function CreateUnitOverlays()
         if IsDestroyed(overlays[id]) and not unit:IsDead() then
             if supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
 
+            elseif unit:IsInCategory("COMMAND") then
+                if commanderOverlay then
+                    overlays[id] = CommanderOverlayWithText(worldView, unit)
+                end
             elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
                 if engineersOverlayWithNumbers then
                     overlays[id] = EngineerOverlayWithNumber(worldView, unit)
@@ -285,6 +324,9 @@ function Init(isReplay)
     AddBeatFunction(CreateUnitOverlays, true)
     engineersOption.OnChange = function(var)
         engineersOverlay = var()
+    end
+    commanderOverlayOption.OnChange = function(var)
+        commanderOverlay = var()
     end
     engineersWithNumbersOption.OnChange = function(var)
         engineersOverlayWithNumbers = var()
