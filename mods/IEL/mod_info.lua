@@ -11,7 +11,7 @@ description = [[Highlights
 - ACU with text
 
 Options window can be found on main tab in "UI mods options"
-requires UI mod tools]]
+requires UI mod tools and UI  mod loader]]
 author = "4z0t"
 url = ""
 icon = "/mods/IEL/icon.png"
@@ -19,7 +19,7 @@ selectable = true
 enabled = true
 exclusive = false
 ui_only = true
-requires = {}
+requires = {"ui-mod-loader-v02"}
 requiresNames = {}
 conflicts = {}
 before = {}
