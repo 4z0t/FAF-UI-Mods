@@ -4,15 +4,18 @@ do
     local OptionVarCreate = import("/mods/UMT/modules/OptionVar.lua").Create
 
     local modName = "IEL"
+    local function IELOptionVar(name, value)
+        return OptionVarCreate(modName, name, value)
+    end
 
-    engineersOption = OptionVarCreate(modName, "engineersOverlay", true)
-    engineersWithNumbersOption = OptionVarCreate(modName, "engineersWithNumbersOption", false)
-    factoryOverlayWithTextOption = OptionVarCreate(modName, "factoryOverlayWithTextOption", false)
-    factoriesOption = OptionVarCreate(modName, "factoriesOverlay", true)
-    supportCommanderOption = OptionVarCreate(modName, "supportCommanderOverlay", true)
-    commanderOverlayOption = OptionVarCreate(modName, "commanderOverlayOption", false)
-    tacticalNukesOption = OptionVarCreate(modName, "tacticalNukesOverlay", true)
-    massExtractorsOption = OptionVarCreate(modName, "massExtractorsOverlay", true)
+    engineersOption = IELOptionVar("engineersOverlay", true)
+    engineersWithNumbersOption = IELOptionVar("engineersWithNumbersOption", false)
+    factoryOverlayWithTextOption = IELOptionVar("factoryOverlayWithTextOption", false)
+    factoriesOption = IELOptionVar("factoriesOverlay", true)
+    supportCommanderOption = IELOptionVar("supportCommanderOverlay", true)
+    commanderOverlayOption = IELOptionVar("commanderOverlayOption", false)
+    tacticalNukesOption = IELOptionVar("tacticalNukesOverlay", true)
+    massExtractorsOption = IELOptionVar("massExtractorsOverlay", true)
 
 
     function Main(isReplay)
