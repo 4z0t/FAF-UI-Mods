@@ -218,11 +218,11 @@ local function UpdateUI()
     UpdateMexOverlays(mexes)
 end
 
-function UpgradeAll(id)
-    UpgradeMexes(mexData[id].mexes)
+function UpgradeAll(id, selector)
+    UpgradeMexes(mexData[id].mexes, selector)
 end
 
-function UpgradeOnScreen(id)
+function UpgradeOnScreen(id, selector)
     Select.Hidden(function()
         local mexes = mexData[id].mexes
         mexes = From(mexes)
@@ -231,8 +231,16 @@ function UpgradeOnScreen(id)
         local result = mexes:Where(function(k, mex)
             return mexesOnScreen:Contains(mex)
         end):ToArray()
-        UpgradeMexes(result)
+        UpgradeMexes(result, selector)
     end)
+end
+
+function UpgradeAllCapped(id)
+    return UpgradeAll(id, IsCapped)
+end
+
+function UpgradeOnScreenCapped(id)
+    return UpgradeOnScreen(id, IsCapped)
 end
 
 function PauseWorst(id)
