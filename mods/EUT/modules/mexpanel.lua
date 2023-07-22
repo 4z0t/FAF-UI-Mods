@@ -5,7 +5,10 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Options = UMT.Options.Mods["EUT"]
+
+local Options = import("options.lua")
+local From = import("/mods/UMT/modules/linq.lua").From
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")
@@ -38,7 +41,11 @@ local function MexPanelHandleEvent(control, event, category)
                 end
             else
                 if event.Modifiers.Ctrl then
-                    MexManager.UpgradeOnScreen(id)
+                    if id == 4 and Options.upgradeRounded() then
+                        MexManager.UpgradeOnScreenCapped(id)
+                    else
+                        MexManager.UpgradeOnScreen(id)
+                    end
                 else
                     MexManager.SelectOnScreen(id)
                 end
@@ -52,7 +59,11 @@ local function MexPanelHandleEvent(control, event, category)
                 end
             else
                 if event.Modifiers.Ctrl then
-                    MexManager.UpgradeAll(id)
+                    if id == 4 and Options.upgradeRounded() then
+                        MexManager.UpgradeAllCapped(id)
+                    else
+                        MexManager.UpgradeAll(id)
+                    end
                 else
                     MexManager.SelectAll(id)
                 end

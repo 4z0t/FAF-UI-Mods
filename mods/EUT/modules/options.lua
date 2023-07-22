@@ -14,6 +14,7 @@ unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
 t1MexText = OptionVar(modName, "t1MexText", "1")
 t2MexText = OptionVar(modName, "t2MexText", "2")
 t3MexText = OptionVar(modName, "t3MexText", "3")
+upgradeRounded = OptionVar(modName, "upgradeRounded", false)
 
 function Init()
     Options.AddOptions(modName, "ECO UI Tools", {
@@ -24,6 +25,7 @@ function Init()
         Options.Slider("Number overlay size", 5, 25, 1, overlaySize),
         Options.Filter("Unpause mexes being assisted", unpauseAssisted),
         Options.Filter("Unpause once", unpauseOnce),
+        Options.Filter("Upgrade only rounded t2 mexes", upgradeRounded),
         Options.Slider("Assist BP threshold: mex unpauses if summary BP greater than this value", 4, 100, 1,
             unpauseAssistedBP),
         Options.TextEdit("T1 mex overlay text", t1MexText, 1, 4),
