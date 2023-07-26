@@ -1,0 +1,17 @@
+name = "Cap Structures Better"
+version = 1
+copyright = ""
+description = "adds options for each induvidual structure category"
+author = "4z0t"
+url = ""
+uid = "cap-structures-better-v01"
+icon = "/mods/CapStructures/icon.png"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
