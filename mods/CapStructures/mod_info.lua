@@ -1,7 +1,19 @@
 name = "Cap Structures Better"
 version = 1
 copyright = ""
-description = "adds options for each induvidual structure category"
+description = [[Adds options for each induvidual structure category:
+- cap mexes
+- build fabs
+- cap radars
+- cap T2 Arty
+- cap PDs
+- cap air factory
+- cap T3 arty
+- cap fabs
+
+You can find these options in menu > UI Mods Options > Cap Structures Better.
+Requires UI mod tools.
+]]
 author = "4z0t"
 url = ""
 uid = "cap-structures-better-v01"
