@@ -2,7 +2,9 @@ name = "Context Templates"
 version = 1
 copyright = ""
 description = [[
-Requires UI Mod Tools V8
+Cycles through templates based on current mouse hover context.
+
+Requires UI Mod Tools V10
 ]]
 author = "4z0t"
 url = ""
