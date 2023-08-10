@@ -30,6 +30,14 @@ local LuaQ = UMT.LuaQ
 --     end
 --     return effectiveTemplates, effectiveIcons
 -- end
+local prefixes = {
+    ["AEON"] = { "uab", "xab", "dab", "zab" },
+    ["UEF"] = { "ueb", "xeb", "deb", "zeb" },
+    ["CYBRAN"] = { "urb", "xrb", "drb", "zrb" },
+    ["SERAPHIM"] = { "xsb", "usb", "dsb", "zsb" },
+}
+
+local TemplateUtils = import("/mods/ContextTemplates/modules/TemplateUtils.lua")
 
 function buildActionTemplateContext(modifier, context)
     LOG(context)
@@ -56,12 +64,6 @@ function buildActionTemplateContext(modifier, context)
     local currentFaction = selection[1]:GetBlueprint().General.FactionName
     if options.gui_all_race_templates ~= 0 and currentFaction then
         local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"] = { "uab", "xab", "dab" },
-                ["UEF"] = { "ueb", "xeb", "deb" },
-                ["CYBRAN"] = { "urb", "xrb", "drb" },
-                ["SERAPHIM"] = { "xsb", "usb", "dsb" },
-            }
             for i, prefix in prefixes[string.upper(currentFaction)] do
                 if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
                     return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
@@ -90,15 +92,18 @@ function buildActionTemplateContext(modifier, context)
                     template.icon = ConvertID(template.icon)
                 end
                 local found = false
-                for _, entry in template.templateData do
+                local index = nil
+                for i, entry in template.templateData do
                     if type(entry) == 'table' then
                         if entry[1] == context or ConvertID(entry[1]) == ConvertID(context) then
                             found = true
+                            index = i
                             break
                         end
                     end
                 end
                 if found then
+                    template = TemplateUtils.CenterTemplateToIndex(template, index)
                     template.templateID = templateIndex
                     table.insert(effectiveTemplates, template)
                     table.insert(effectiveIcons, template.icon)
