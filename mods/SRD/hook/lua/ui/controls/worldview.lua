@@ -6,11 +6,11 @@ do
 
     local texturePath = "/mods/SRD/textures/"
     local textureTypes = {
-        ["direct"] = texturePath .. "direct.dds",
-        ["nondirect"] = texturePath .. "nondirect.dds",
-        ["antiair"] = texturePath .. "air.dds",
-        ["smd"] = texturePath .. "smd.dds",
-        ["tmd"] = texturePath .. "tmd.dds"
+        ["direct"] = "ffff2c2c",
+        ["nondirect"] = "fff2f029",
+        ["antiair"] = "ff29def2",
+        ["smd"] = "ffff8a2c",
+        ["tmd"] = "ffff8a2c"
     }
 
     local function GetBPInfo(bp)
@@ -32,6 +32,7 @@ do
         end
     end
 
+    local Ring = import("/lua/ui/game/gamemain.lua").Ring
     local oldWorldView = WorldView
     WorldView = Class(oldWorldView) {
 
@@ -49,9 +50,9 @@ do
         end,
 
         CreateRingDecal = function(type, range)
-            local ring = Decal()
-            ring:SetTexture(textureTypes[type])
-            ring:SetScale({ math.floor(2.03 * (range)), 0, math.floor(2.03 * (range)) })
+            local ring = Ring()
+            ring:SetColor(textureTypes[type])
+            ring:SetRadius(range)
             ring:SetPosition(GetMouseWorldPos())
             ring.type = type
             ring.range = range
@@ -60,11 +61,11 @@ do
 
         UpdateDecal = function(decal, type, range)
             if decal.type ~= type then
-                decal:SetTexture(textureTypes[type])
+                decal:SetColor(textureTypes[type])
                 decal.type = type
             end
             if decal.range ~= range then
-                decal:SetScale({ math.floor(2.05 * (range)), 0, math.floor(2.05 * (range)) })
+                decal:SetRadius(range)
                 decal.range = range
             end
             decal:SetPosition(GetMouseWorldPos())
