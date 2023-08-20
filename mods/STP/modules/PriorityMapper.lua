@@ -41,11 +41,14 @@ local postfixToCategory = {
         "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}"),
 
     -- structures
+    ["b2301"] = Make("Point Defenses",
+        "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
     [""] = Make("", ""),
     [""] = Make("", ""),
 }
 
 
+postfixToCategory["b2101"] = postfixToCategory["b2301"] -- t1 pds
 postfixToCategory["b3102"] = postfixToCategory["s0305"] -- t1 sonars
 postfixToCategory["b3202"] = postfixToCategory["s0305"] -- t2 sonars
 postfixToCategory['a0104'] = postfixToCategory['a0107'] -- t2 transports
@@ -65,6 +68,7 @@ local specialToCategory =
     ["xel0306"] = postfixToCategory["l0111"], -- spearhead,
     ["xsl0305"] = snipers, -- sera sniper,
     ["xal0305"] = snipers, -- aeon sniper,
+    ["xeb2306"] = postfixToCategory["b2301"], -- ravager
 
 }
 
