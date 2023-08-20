@@ -96,13 +96,13 @@ function Get(bpId)
 
     bpId = string.lower(bpId)
 
-    local postfix = string.sub(bpId, 3, 7)
-    local data = postfixToCategory[postfix]
+    data = specialToCategory[bpId]
     if data then
         return data.category, data.name
     end
 
-    data = specialToCategory[bpId]
+    local postfix = string.sub(bpId, 3, 7)
+    local data = postfixToCategory[postfix]
     if data then
         return data.category, data.name
     end
