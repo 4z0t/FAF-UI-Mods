@@ -23,9 +23,10 @@ local postfixToCategory = {
     ["a0204"] = Make("Torpedo bombers", "{categories.ANTINAVY * categories.BOMBER * categories.AIR}"),
     ["a0203"] = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - categories.EXPERIMENTAL}"),
     [""]      = Make("", ""),
-    
+
     -- land
-    [""]      = Make("", ""),
+    ["l0111"] = Make("MMLs",
+        "{categories.LAND * categories.MOBILE * categories.SILO * categories.TECH3, categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2}"),
 
     --naval
     ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
@@ -49,6 +50,7 @@ local specialToCategory =
     ["xel0209"] = postfixToCategory["l0105"], -- sparky
     ["xaa0306"] = postfixToCategory["a0204"], -- t3 torp bomber
     ["xra0105"] = postfixToCategory["a0203"], -- t1 cybran gunship
+    ["xel0306"] = postfixToCategory["l0111"], -- spearhead
 }
 
 
