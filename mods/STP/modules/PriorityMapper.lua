@@ -15,6 +15,7 @@ local postfixToCategory = {
     ["l0105"] = Make("Engineers",
         "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}"),
     ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
+    ["a0102"] = Make("Interseptors", "{categories.AIR * categories.MOBILE * categories.ANTIAIR}"),
 
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
