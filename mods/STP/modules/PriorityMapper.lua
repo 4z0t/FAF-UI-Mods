@@ -27,6 +27,7 @@ local postfixToCategory = {
     -- land
     ["l0111"] = Make("MMLs",
         "{categories.LAND * categories.MOBILE * categories.SILO * categories.TECH3, categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2}"),
+    [""] = Make("", ""),
 
     --naval
     ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
@@ -44,13 +45,18 @@ postfixToCategory['l0309'] = postfixToCategory["l0105"] -- t3 engineers
 postfixToCategory['a0305'] = postfixToCategory["a0203"] -- t3 gunships
 
 
+local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
+
 local specialToCategory =
 {
     ["xea0306"] = postfixToCategory['a0107'], -- t3 uef transport
     ["xel0209"] = postfixToCategory["l0105"], -- sparky
     ["xaa0306"] = postfixToCategory["a0204"], -- t3 torp bomber
     ["xra0105"] = postfixToCategory["a0203"], -- t1 cybran gunship
-    ["xel0306"] = postfixToCategory["l0111"], -- spearhead
+    ["xel0306"] = postfixToCategory["l0111"], -- spearhead,
+    ["xsl0305"] = snipers, -- sera sniper,
+    ["xal0305"] = snipers, -- aeon sniper,
+
 }
 
 
