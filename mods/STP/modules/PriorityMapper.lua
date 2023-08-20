@@ -1,9 +1,57 @@
+function Make(name, category)
+    return {
+        name = name,
+        category = category
+    }
+end
 
-
-
+function ToCategory(name)
+    return ("{categories.%s}"):format(name)
+end
 
 local postfixToCategory = {
-    
+    -- engineers
+    ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
+    ["l0105"] = Make("Engineers",
+        "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}"),
+    ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
+
+    --air
+    ["a0303"] = Make("ASFs", ToCategory "ASF"),
+    ["a0304"] = Make("Strat bombers", ToCategory "STRATEGICBOMBER"),
+    ["a0107"] = Make("Transports", ToCategory "TRANSPORTATION"),
+
+    -- land
+    [""] = Make("", ""),
+
+    --naval
+    ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
+    ["s0201"] = Make("Destroyers", ToCategory "DESTROYER"),
+    ["s0302"] = Make("BATTLESHIPs", ToCategory "BATTLESHIP"),
+
+    -- structures
+    [""] = Make("", ""),
+    [""] = Make("", ""),
+}
+
+postfixToCategory['a0104'] = postfixToCategory['a0107'] -- t2 transports
+postfixToCategory["l0208"] = postfixToCategory["l0105"] -- t2 engineers
+postfixToCategory['l0309'] = postfixToCategory["l0105"] -- t3 engineers
+
+
+local specialToCategory =
+{
+    ["xea0306"] = postfixToCategory['a0107'], -- t3 uef transport
+    ["xel0209"] = postfixToCategory["l0105"], -- sparky
+}
+
+
+
+local layerToCategory = {
+    ["l"] = Make("Land Units", ToCategory "LAND"),
+    ["a"] = Make("Air Units", ToCategory "AIR"),
+    ["s"] = Make("Naval Units", ToCategory "NAVAL"),
+    ["b"] = Make("Structure Units", ToCategory "STRUCTURE"),
 }
 
 
@@ -11,8 +59,31 @@ local postfixToCategory = {
 
 
 
-
-
+---@param bpId string
+---@return string?
+---@return string?
 function Get(bpId)
-    
+    if not bpId then
+        return
+    end
+
+    bpId = string.lower(bpId)
+
+    local postfix = string.sub(bpId, 3, 7)
+    local data = postfixToCategory[postfix]
+    if data then
+        return data.category, data.name
+    end
+
+    data = specialToCategory[bpId]
+    if data then
+        return data.category, data.name
+    end
+
+    local catType = string.sub(bpId, 3, 3)
+    data = layerToCategory[catType]
+    if data then
+        return data.category, data.name
+    end
+
 end

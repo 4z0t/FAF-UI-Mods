@@ -23,11 +23,11 @@ function SetWeaponPrioritiesSpecific()
                 text = "\n" .. LOC(__blueprints[bpId].Interface.HelpText)
             end
 
-            SetWeaponPriorities(("{categories.%s}"):format(bpId), text, false)
+            SetWeaponPriorities(PriorityMapper.ToCategory(bpId), text, false)
         else
             local category, text = PriorityMapper.Get(bpId)
             if category then
-                SetWeaponPriorities(category, text, false)
+                SetWeaponPriorities(category, "\n" .. text, false)
             end
         end
     elseif not prevBpId and isDoubleClick then -- double click on ground -> reset to default
