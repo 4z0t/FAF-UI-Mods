@@ -15,7 +15,6 @@ local postfixToCategory = {
     ["l0105"] = Make("Engineers",
         "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}"),
     ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
-    ["a0102"] = Make("Interseptors", "{categories.AIR * categories.MOBILE * categories.ANTIAIR}"),
 
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
@@ -23,6 +22,7 @@ local postfixToCategory = {
     ["a0107"] = Make("Transports", ToCategory "TRANSPORTATION"),
     ["a0204"] = Make("Torpedo bombers", "{categories.ANTINAVY * categories.BOMBER * categories.AIR}"),
     ["a0203"] = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - categories.EXPERIMENTAL}"),
+    ["a0102"] = Make("Interseptors", "{categories.AIR * categories.MOBILE * categories.ANTIAIR}"),
     [""]      = Make("", ""),
 
     -- land
@@ -32,14 +32,22 @@ local postfixToCategory = {
 
     --naval
     ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
+    ["s0202"] = Make("Cruisers", ToCategory "CRUISER"),
     ["s0201"] = Make("Destroyers", ToCategory "DESTROYER"),
     ["s0302"] = Make("BATTLESHIPs", ToCategory "BATTLESHIP"),
+    ["s0303"] = Make("Carriers", ToCategory "NAVALCARRIER"),
+    ["s0304"] = Make("Strategic subs", ToCategory "NUKESUB"),
+    ["s0305"] = Make("Sonars",
+        "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}"),
 
     -- structures
     [""] = Make("", ""),
     [""] = Make("", ""),
 }
 
+
+postfixToCategory["b3102"] = postfixToCategory["s0305"] -- t1 sonars
+postfixToCategory["b3202"] = postfixToCategory["s0305"] -- t2 sonars
 postfixToCategory['a0104'] = postfixToCategory['a0107'] -- t2 transports
 postfixToCategory["l0208"] = postfixToCategory["l0105"] -- t2 engineers
 postfixToCategory['l0309'] = postfixToCategory["l0105"] -- t3 engineers
