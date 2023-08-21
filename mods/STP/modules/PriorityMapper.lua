@@ -46,8 +46,10 @@ local postfixToCategory = {
     -- structures
     ["b2301"] = Make("Point Defenses",
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
-    ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE}"),
+    ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
+    ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
     ["b2303"] = Make("Artillery Installation", "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
+    ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
 
     ["b3101"] = intelligence,
     ["b3201"] = intelligence,
