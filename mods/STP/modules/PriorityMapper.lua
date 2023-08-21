@@ -17,6 +17,12 @@ local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 local antiAir = Make("AA", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIAIR}")
 local mobileAntiAir = Make("MAA", "{categories.LAND * categories.MOBILE * categories.ANTIAIR}")
 
+local fabsCats = "MASSFABRICATION * STRUCTURE * TECH3, MASSFABRICATION * STRUCTURE * TECH2"
+local mexesCats = "MASSEXTRACTION * STRUCTURE * TECH3, MASSEXTRACTION * STRUCTURE * TECH2, MASSEXTRACTION * STRUCTURE * TECH1"
+
+local massExtractors = Make("Mass (mexes)", "{" .. fabsCats .. "," .. mexesCats .. "}")
+local massFabs = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
@@ -52,7 +58,11 @@ local postfixToCategory = {
 
     -- structures
     ["b1105"] = Make("Energy storages", ToCategory "ENERGYSTORAGE"),
-
+    ["b1103"] = massExtractors,
+    ["b1202"] = massExtractors,
+    ["b1302"] = massExtractors,
+    ["b1104"] = massFabs,
+    ["b1303"] = massFabs,
 
     ["b2301"] = Make("Point Defenses",
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
