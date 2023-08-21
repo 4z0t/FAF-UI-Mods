@@ -12,6 +12,8 @@ end
 local intelligence = Make("Intelligence", "{STRUCTURE * INTELLIGENCE * OMNI, STRUCTURE * INTELLIGENCE * RADAR}")
 local torpedoDefenses = Make("Torpedo defenses", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY}")
 
+local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
@@ -44,6 +46,9 @@ local postfixToCategory = {
         "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}"),
 
     -- structures
+    ["b1105"] = Make("Energy storages", ToCategory "ENERGYSTORAGE"),
+
+
     ["b2301"] = Make("Point Defenses",
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
     ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
@@ -71,7 +76,6 @@ postfixToCategory['l0309'] = postfixToCategory["l0105"] -- t3 engineers
 postfixToCategory['a0305'] = postfixToCategory["a0203"] -- t3 gunships
 
 
-local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 
 local specialToCategory =
 {
