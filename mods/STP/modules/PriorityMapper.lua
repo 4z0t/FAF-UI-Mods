@@ -5,6 +5,8 @@ function Make(name, category)
     }
 end
 
+local fabsCats = "MASSFABRICATION * STRUCTURE * TECH3, MASSFABRICATION * STRUCTURE * TECH2"
+local mexesCats = "MASSEXTRACTION * STRUCTURE * TECH3, MASSEXTRACTION * STRUCTURE * TECH2, MASSEXTRACTION * STRUCTURE * TECH1"
 function ToCategory(name)
     return ("{categories.%s}"):format(name)
 end
@@ -16,9 +18,6 @@ local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 
 local antiAir = Make("AA", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIAIR}")
 local mobileAntiAir = Make("MAA", "{categories.LAND * categories.MOBILE * categories.ANTIAIR}")
-
-local fabsCats = "MASSFABRICATION * STRUCTURE * TECH3, MASSFABRICATION * STRUCTURE * TECH2"
-local mexesCats = "MASSEXTRACTION * STRUCTURE * TECH3, MASSEXTRACTION * STRUCTURE * TECH2, MASSEXTRACTION * STRUCTURE * TECH1"
 
 local massExtractors = Make("Mass (mexes)", "{" .. fabsCats .. "," .. mexesCats .. "}")
 local massFabs = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
