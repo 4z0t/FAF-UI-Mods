@@ -9,12 +9,14 @@ function ToCategory(name)
     return ("{categories.%s}"):format(name)
 end
 
+local intelligence = Make("Intelligence", "{STRUCTURE * INTELLIGENCE * OMNI, STRUCTURE * INTELLIGENCE * RADAR}")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
+    ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
     ["l0105"] = Make("Engineers",
         "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}"),
-    ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
 
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
@@ -43,7 +45,9 @@ local postfixToCategory = {
     -- structures
     ["b2301"] = Make("Point Defenses",
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
-    [""] = Make("", ""),
+    ["b3101"] = intelligence,
+    ["b3201"] = intelligence,
+    ["b3104"] = intelligence,
     [""] = Make("", ""),
 }
 
@@ -69,7 +73,6 @@ local specialToCategory =
     ["xsl0305"] = snipers, -- sera sniper,
     ["xal0305"] = snipers, -- aeon sniper,
     ["xeb2306"] = postfixToCategory["b2301"], -- ravager
-
 }
 
 
