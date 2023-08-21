@@ -46,7 +46,7 @@ local postfixToCategory = {
     ["s0201"] = Make("Destroyers", ToCategory "DESTROYER"),
     ["s0302"] = Make("BATTLESHIPs", ToCategory "BATTLESHIP"),
     ["s0303"] = Make("Carriers", ToCategory "NAVALCARRIER"),
-    ["s0304"] = Make("Strategic subs", ToCategory "NUKESUB"),
+    ["s0304"] = Make("Nuke subs", ToCategory "NUKESUB"),
     ["s0305"] = Make("Sonars",
         "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}"),
 
@@ -58,7 +58,8 @@ local postfixToCategory = {
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
     ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
     ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
-    ["b2303"] = Make("Artillery Installation", "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
+    ["b2303"] = Make("Artillery Installation",
+        "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
     ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
 
     ["b2104"] = antiAir,
@@ -86,6 +87,10 @@ postfixToCategory['a0305'] = postfixToCategory["a0203"] -- t3 gunships
 
 
 
+
+local landExps = Make("Land Exps", "{categories.LAND * categories.EXPERIMENTAL}")
+local airExps = Make("Air Exps", "{categories.AIR * categories.EXPERIMENTAL}")
+
 local specialToCategory =
 {
     ["xea0306"] = postfixToCategory['a0107'], -- t3 uef transport
@@ -101,6 +106,16 @@ local specialToCategory =
     ["dflk002"] = mobileAntiAir,
     ["dalk003"] = mobileAntiAir,
     ["dslk004"] = mobileAntiAir,
+
+    ["uel0401"] = landExps, -- fatty
+    ["url0402"] = landExps, -- ml
+    ["url0403"] = landExps, -- mega
+    ["xsl0401"] = landExps, -- chicken
+    ["ual0401"] = landExps, -- gc
+
+    ["uaa0310"] = airExps, -- czar
+    ["ura0401"] = airExps, -- bug
+    ["xsa0402"] = airExps, -- ahwassa
 }
 
 
