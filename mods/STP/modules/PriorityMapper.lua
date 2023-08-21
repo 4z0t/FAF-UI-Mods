@@ -10,6 +10,7 @@ function ToCategory(name)
 end
 
 local intelligence = Make("Intelligence", "{STRUCTURE * INTELLIGENCE * OMNI, STRUCTURE * INTELLIGENCE * RADAR}")
+local torpedoDefenses = Make("Torpedo defenses", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTINAVY}")
 
 local postfixToCategory = {
     -- engineers
@@ -45,13 +46,20 @@ local postfixToCategory = {
     -- structures
     ["b2301"] = Make("Point Defenses",
         "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
+    ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE}"),
+    ["b2303"] = Make("Artillery Installation", "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
+
     ["b3101"] = intelligence,
     ["b3201"] = intelligence,
     ["b3104"] = intelligence,
+    ["b2109"] = torpedoDefenses,
+    ["b2205"] = torpedoDefenses,
+
     [""] = Make("", ""),
 }
 
 
+postfixToCategory["b2302"] = postfixToCategory["b2303"] -- t3 arty inst
 postfixToCategory["b2101"] = postfixToCategory["b2301"] -- t1 pds
 postfixToCategory["b3102"] = postfixToCategory["s0305"] -- t1 sonars
 postfixToCategory["b3202"] = postfixToCategory["s0305"] -- t2 sonars
@@ -73,6 +81,7 @@ local specialToCategory =
     ["xsl0305"] = snipers, -- sera sniper,
     ["xal0305"] = snipers, -- aeon sniper,
     ["xeb2306"] = postfixToCategory["b2301"], -- ravager
+    ["xrb2308"] = torpedoDefenses, -- harms
 }
 
 
