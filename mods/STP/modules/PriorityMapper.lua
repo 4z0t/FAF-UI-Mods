@@ -14,6 +14,9 @@ local torpedoDefenses = Make("Torpedo defenses", "{categories.STRUCTURE * catego
 
 local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 
+local antiAir = Make("AA", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIAIR}")
+local mobileAntiAir = Make("MAA", "{categories.LAND * categories.MOBILE * categories.ANTIAIR}")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
@@ -33,7 +36,9 @@ local postfixToCategory = {
     -- land
     ["l0111"] = Make("MMLs",
         "{categories.LAND * categories.MOBILE * categories.SILO * categories.TECH3, categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2}"),
-    [""] = Make("", ""),
+    ["l0205"] = mobileAntiAir,
+    ["l0104"] = mobileAntiAir,
+
 
     --naval
     ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
@@ -55,6 +60,10 @@ local postfixToCategory = {
     ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
     ["b2303"] = Make("Artillery Installation", "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
     ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
+
+    ["b2104"] = antiAir,
+    ["b2204"] = antiAir,
+    ["b2304"] = antiAir,
 
     ["b3101"] = intelligence,
     ["b3201"] = intelligence,
@@ -83,11 +92,15 @@ local specialToCategory =
     ["xel0209"] = postfixToCategory["l0105"], -- sparky
     ["xaa0306"] = postfixToCategory["a0204"], -- t3 torp bomber
     ["xra0105"] = postfixToCategory["a0203"], -- t1 cybran gunship
-    ["xel0306"] = postfixToCategory["l0111"], -- spearhead,
-    ["xsl0305"] = snipers, -- sera sniper,
-    ["xal0305"] = snipers, -- aeon sniper,
+    ["xel0306"] = postfixToCategory["l0111"], -- spearhead
+    ["xsl0305"] = snipers, -- sera sniper
+    ["xal0305"] = snipers, -- aeon sniper
     ["xeb2306"] = postfixToCategory["b2301"], -- ravager
     ["xrb2308"] = torpedoDefenses, -- harms
+    ["drlk001"] = mobileAntiAir,
+    ["dflk002"] = mobileAntiAir,
+    ["dalk003"] = mobileAntiAir,
+    ["dslk004"] = mobileAntiAir,
 }
 
 
