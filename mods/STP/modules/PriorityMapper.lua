@@ -45,6 +45,7 @@ local postfixToCategory = {
     ["l0105"] = engineers,
     ["l0208"] = engineers,
     ['l0309'] = engineers,
+
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
     ["a0304"] = Make("Strat bombers", ToCategory "STRATEGICBOMBER"),
@@ -73,7 +74,10 @@ local postfixToCategory = {
     ["s0305"] = sonars,
     ["b3102"] = sonars,
     ["b3202"] = sonars,
+
     -- structures
+
+    --economy
     ["b1105"] = Make("Energy storages", ToCategory "ENERGYSTORAGE"),
     ["b1103"] = massExtractors,
     ["b1202"] = massExtractors,
@@ -81,23 +85,28 @@ local postfixToCategory = {
     ["b1104"] = massFabs,
     ["b1303"] = massFabs,
 
+    -- defense
     ["b2301"] = pds,
     ["b2101"] = pds,
     ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
     ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
-    ["b2303"] = staticArty,
-    ["b2302"] = staticArty,
-    ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
 
     ["b2104"] = antiAir,
     ["b2204"] = antiAir,
     ["b2304"] = antiAir,
 
+    ["b2109"] = torpedoDefenses,
+    ["b2205"] = torpedoDefenses,
+
+    -- strategic
+    ["b2302"] = staticArty,
+    ["b2303"] = staticArty,
+    ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
+
+    -- intelligence
     ["b3101"] = intelligence,
     ["b3201"] = intelligence,
     ["b3104"] = intelligence,
-    ["b2109"] = torpedoDefenses,
-    ["b2205"] = torpedoDefenses,
 
     [""] = Make("", ""),
 }
