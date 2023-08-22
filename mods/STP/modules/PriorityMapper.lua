@@ -25,7 +25,6 @@ local massFabs = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
 local engineers = Make("Engineers",
     "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}")
 
-
 local transports = Make("Transports", ToCategory "TRANSPORTATION")
 
 local pds = Make("Point Defenses",
@@ -35,6 +34,9 @@ local sonars = Make("Sonars",
     "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}")
 
 local gunships = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - categories.EXPERIMENTAL}")
+
+local staticArty = Make("Artillery Installation",
+    "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}")
 
 local postfixToCategory = {
     -- engineers
@@ -83,8 +85,8 @@ local postfixToCategory = {
     ["b2101"] = pds,
     ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
     ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
-    ["b2303"] = Make("Artillery Installation",
-        "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}"),
+    ["b2303"] = staticArty,
+    ["b2302"] = staticArty,
     ["b2305"] = Make("Nukes", "{categories.STRUCTURE * categories.NUKE}"),
 
     ["b2104"] = antiAir,
@@ -99,9 +101,6 @@ local postfixToCategory = {
 
     [""] = Make("", ""),
 }
-
-
-postfixToCategory["b2302"] = postfixToCategory["b2303"] -- t3 arty inst
 
 local landExps = Make("Land Exps", "{categories.LAND * categories.EXPERIMENTAL}")
 local airExps = Make("Air Exps", "{categories.AIR * categories.EXPERIMENTAL}")
