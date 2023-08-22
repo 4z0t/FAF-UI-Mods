@@ -22,19 +22,35 @@ local mobileAntiAir = Make("MAA", "{categories.LAND * categories.MOBILE * catego
 local massExtractors = Make("Mass (mexes)", "{" .. fabsCats .. "," .. mexesCats .. "}")
 local massFabs = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
 
+local engineers = Make("Engineers",
+    "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}")
+
+
+local transports = Make("Transports", ToCategory "TRANSPORTATION")
+
+local pds = Make("Point Defenses",
+    "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}")
+
+local sonars = Make("Sonars",
+    "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}")
+
+local gunships = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - categories.EXPERIMENTAL}")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
     ["l0301"] = Make("SACUs", ToCategory "SUBCOMMANDER"),
-    ["l0105"] = Make("Engineers",
-        "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}"),
-
+    ["l0105"] = engineers,
+    ["l0208"] = engineers,
+    ['l0309'] = engineers,
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
     ["a0304"] = Make("Strat bombers", ToCategory "STRATEGICBOMBER"),
-    ["a0107"] = Make("Transports", ToCategory "TRANSPORTATION"),
+    ["a0107"] = transports,
+    ['a0104'] = transports,
     ["a0204"] = Make("Torpedo bombers", "{categories.ANTINAVY * categories.BOMBER * categories.AIR}"),
-    ["a0203"] = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - categories.EXPERIMENTAL}"),
+    ["a0203"] = gunships,
+    ['a0305'] = gunships,
     ["a0102"] = Make("Interseptors", "{categories.AIR * categories.MOBILE * categories.ANTIAIR}"),
     [""]      = Make("", ""),
 
@@ -52,9 +68,9 @@ local postfixToCategory = {
     ["s0302"] = Make("BATTLESHIPs", ToCategory "BATTLESHIP"),
     ["s0303"] = Make("Carriers", ToCategory "NAVALCARRIER"),
     ["s0304"] = Make("Nuke subs", ToCategory "NUKESUB"),
-    ["s0305"] = Make("Sonars",
-        "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}"),
-
+    ["s0305"] = sonars,
+    ["b3102"] = sonars,
+    ["b3202"] = sonars,
     -- structures
     ["b1105"] = Make("Energy storages", ToCategory "ENERGYSTORAGE"),
     ["b1103"] = massExtractors,
@@ -63,8 +79,8 @@ local postfixToCategory = {
     ["b1104"] = massFabs,
     ["b1303"] = massFabs,
 
-    ["b2301"] = Make("Point Defenses",
-        "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}"),
+    ["b2301"] = pds,
+    ["b2101"] = pds,
     ["b4201"] = Make("TMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH2}"),
     ["b4302"] = Make("SMDs", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIMISSILE * categories.TECH3}"),
     ["b2303"] = Make("Artillery Installation",
@@ -86,30 +102,20 @@ local postfixToCategory = {
 
 
 postfixToCategory["b2302"] = postfixToCategory["b2303"] -- t3 arty inst
-postfixToCategory["b2101"] = postfixToCategory["b2301"] -- t1 pds
-postfixToCategory["b3102"] = postfixToCategory["s0305"] -- t1 sonars
-postfixToCategory["b3202"] = postfixToCategory["s0305"] -- t2 sonars
-postfixToCategory['a0104'] = postfixToCategory['a0107'] -- t2 transports
-postfixToCategory["l0208"] = postfixToCategory["l0105"] -- t2 engineers
-postfixToCategory['l0309'] = postfixToCategory["l0105"] -- t3 engineers
-postfixToCategory['a0305'] = postfixToCategory["a0203"] -- t3 gunships
-
-
-
 
 local landExps = Make("Land Exps", "{categories.LAND * categories.EXPERIMENTAL}")
 local airExps = Make("Air Exps", "{categories.AIR * categories.EXPERIMENTAL}")
 
 local specialToCategory =
 {
-    ["xea0306"] = postfixToCategory['a0107'], -- t3 uef transport
-    ["xel0209"] = postfixToCategory["l0105"], -- sparky
+    ["xea0306"] = transports, -- t3 uef transport
+    ["xel0209"] = engineers, -- sparky
     ["xaa0306"] = postfixToCategory["a0204"], -- t3 torp bomber
-    ["xra0105"] = postfixToCategory["a0203"], -- t1 cybran gunship
+    ["xra0105"] = gunships, -- t1 cybran gunship
     ["xel0306"] = postfixToCategory["l0111"], -- spearhead
     ["xsl0305"] = snipers, -- sera sniper
     ["xal0305"] = snipers, -- aeon sniper
-    ["xeb2306"] = postfixToCategory["b2301"], -- ravager
+    ["xeb2306"] = pds, -- ravager
     ["xrb2308"] = torpedoDefenses, -- harms
     ["drlk001"] = mobileAntiAir,
     ["dflk002"] = mobileAntiAir,
