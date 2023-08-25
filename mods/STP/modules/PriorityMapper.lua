@@ -19,8 +19,8 @@ local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 local antiAir = Make("AA", "{categories.STRUCTURE * categories.DEFENSE * categories.ANTIAIR}")
 local mobileAntiAir = Make("MAA", "{categories.LAND * categories.MOBILE * categories.ANTIAIR}")
 
-local massExtractors = Make("Mass (mexes)", "{" .. fabsCats .. "," .. mexesCats .. "}")
-local massFabs = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
+local massFabs = Make("Mass (mexes)", "{" .. fabsCats .. "," .. mexesCats .. "}")
+local massExtractors = Make("Mass (fabs)", "{" .. mexesCats .. "," .. fabsCats .. "}")
 
 local engineers = Make("Engineers",
     "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}")
