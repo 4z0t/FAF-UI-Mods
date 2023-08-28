@@ -164,6 +164,8 @@ local postfixToCategory = {
 local landExps = Make("Land Exps", "{categories.LAND * categories.EXPERIMENTAL}")
 local airExps = Make("Air Exps", "{categories.AIR * categories.EXPERIMENTAL}")
 
+local droneStations = Make("Drone stations", "{XEB0204 + XRB0304, XRB0204 + XEB0104, XRB0104}")
+
 local specialToCategory =
 {
     ["xea0306"] = transports, -- t3 uef transport
@@ -176,10 +178,10 @@ local specialToCategory =
     ["xeb2306"] = pds, -- ravager
     ["xrb2308"] = torpedoDefenses, -- harms
 
-    ["urb4204"] = staticShield,
-    ["urb4205"] = staticShield,
-    ["urb4206"] = staticShield,
-    ["urb4207"] = staticShield,
+    ["urb4204"] = staticShield, -- cybran shield stage
+    ["urb4205"] = staticShield, -- cybran shield stage
+    ["urb4206"] = staticShield, -- cybran shield stage
+    ["urb4207"] = staticShield, -- cybran shield stage
 
     ["drlk001"] = mobileAntiAir,
     ["dflk002"] = mobileAntiAir,
@@ -195,6 +197,13 @@ local specialToCategory =
     ["uaa0310"] = airExps, -- czar
     ["ura0401"] = airExps, -- bug
     ["xsa0402"] = airExps, -- ahwassa
+
+    ["xeb0104"] = droneStations, -- kennel t1
+    ["xeb0204"] = droneStations, -- kennel t2
+
+    ["xrb0104"] = droneStations, -- hive t1
+    ["xrb0204"] = droneStations, -- hive t2
+    ["xrb0304"] = droneStations, -- hive t3
 }
 
 
