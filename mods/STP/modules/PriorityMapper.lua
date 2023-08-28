@@ -51,6 +51,8 @@ local factory = Make("Factories", "FACTORY * STRUCTURE * TECH3, FACTORY * STRUCT
 
 local scouts = Make("Scouts", ToCategory "SCOUT")
 
+local staticShield = Make("Static Shields", "STRUCTURE * SHIELD")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
@@ -101,8 +103,6 @@ local postfixToCategory = {
     ["l0304"] = mobileArty,
     ["l0101"] = scouts,
 
-
-
     --naval
     ["s0103"] = Make("Frigates", ToCategory "FRIGATE"),
     ["s0202"] = Make("Cruisers", ToCategory "CRUISER"),
@@ -145,6 +145,9 @@ local postfixToCategory = {
 
     ["b2108"] = Make("TMLs", "STRUCTURE * SILO * TECH2"),
 
+    ["b4301"] = staticShield,
+    ["b4202"] = staticShield,
+
     -- strategic
     ["b2302"] = staticArty,
     ["b2303"] = staticArty,
@@ -172,6 +175,12 @@ local specialToCategory =
     ["xal0305"] = snipers, -- aeon sniper
     ["xeb2306"] = pds, -- ravager
     ["xrb2308"] = torpedoDefenses, -- harms
+
+    ["urb4204"] = staticShield,
+    ["urb4205"] = staticShield,
+    ["urb4206"] = staticShield,
+    ["urb4207"] = staticShield,
+
     ["drlk001"] = mobileAntiAir,
     ["dflk002"] = mobileAntiAir,
     ["dalk003"] = mobileAntiAir,
