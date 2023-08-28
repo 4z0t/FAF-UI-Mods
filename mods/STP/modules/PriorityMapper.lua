@@ -184,7 +184,7 @@ local specialToCategory =
     ["urb4207"] = staticShield, -- cybran shield stage
 
     ["drlk001"] = mobileAntiAir,
-    ["dflk002"] = mobileAntiAir,
+    ["delk002"] = mobileAntiAir,
     ["dalk003"] = mobileAntiAir,
     ["dslk004"] = mobileAntiAir,
 
