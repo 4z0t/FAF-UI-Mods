@@ -10,7 +10,6 @@ local mexesCats = "MASSEXTRACTION * STRUCTURE * TECH3, MASSEXTRACTION * STRUCTUR
 local maaCat = "categories.LAND * categories.MOBILE * categories.ANTIAIR"
 local aaCat = "categories.STRUCTURE * categories.DEFENSE * categories.ANTIAIR"
 
-
 function ToCategory(name)
     return ("{categories.%s}"):format(name)
 end
@@ -49,6 +48,7 @@ local staticArty = Make("Artillery Installation",
 
 local mobileArty = Make("Mobile Artillery", "{categories.Mobile * categories.ARTILLERY}")
 
+local factory = Make("Factories", "FACTORY * STRUCTURE * TECH3, FACTORY * STRUCTURE * TECH2, FACTORY * STRUCTURE * TECH1")
 
 local postfixToCategory = {
     -- engineers
@@ -57,6 +57,27 @@ local postfixToCategory = {
     ["l0105"] = engineers,
     ["l0208"] = engineers,
     ['l0309'] = engineers,
+
+    ["b0101"] = factory,
+    ["b0102"] = factory,
+    ["b0103"] = factory,
+
+    ["b0201"] = factory,
+    ["b0202"] = factory,
+    ["b0203"] = factory,
+
+    ["b0301"] = factory,
+    ["b0302"] = factory,
+    ["b0303"] = factory,
+    ["b0304"] = factory, -- gate
+
+    ["b9501"] = factory, -- t2 hq land
+    ["b9502"] = factory, -- t2 hq air
+    ["b9503"] = factory, -- t2 hq naval
+
+    ["b9601"] = factory, -- t3 hq land
+    ["b9602"] = factory, -- t3 hq air
+    ["b9603"] = factory, -- t3 hq naval
 
     --air
     ["a0303"] = Make("ASFs", ToCategory "ASF"),
@@ -102,6 +123,7 @@ local postfixToCategory = {
     ["b1101"] = power,
     ["b1201"] = power,
     ["b1301"] = power,
+
 
     -- defense
     ["b2301"] = pds,
