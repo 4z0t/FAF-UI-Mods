@@ -19,7 +19,6 @@ local torpedoDefenses = Make("Torpedo defenses", "{categories.STRUCTURE * catego
 
 local snipers = Make("Snipers", "{categories.XSL0305 + categories.XAL0305}")
 
-
 local antiAir = Make("AA", "{" .. aaCat .. "," .. maaCat .. "}")
 local mobileAntiAir = Make("MAA", "{" .. maaCat .. "," .. aaCat .. "}")
 
@@ -119,6 +118,7 @@ local postfixToCategory = {
 
     --economy
     ["b1105"] = Make("Energy storages", ToCategory "ENERGYSTORAGE"),
+    ["b1106"] = Make("Mass storages", ToCategory "MASSSTORAGE"),
     ["b1103"] = massExtractors,
     ["b1202"] = massExtractors,
     ["b1302"] = massExtractors,
