@@ -24,7 +24,7 @@ function SetWeaponPrioritiesSpecific()
             end
 
             SetWeaponPriorities(PriorityMapper.ToCategory(bpId), text, false)
-        else
+        else -- find common category for that unit
             local category, text = PriorityMapper.Get(bpId)
             if category then
                 SetWeaponPriorities(category, "\n" .. text, false)
