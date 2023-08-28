@@ -143,6 +143,8 @@ local postfixToCategory = {
     ["b2109"] = torpedoDefenses,
     ["b2205"] = torpedoDefenses,
 
+    ["b2108"] = Make("TMLs", "STRUCTURE * SILO * TECH2"),
+
     -- strategic
     ["b2302"] = staticArty,
     ["b2303"] = staticArty,
