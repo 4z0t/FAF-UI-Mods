@@ -50,6 +50,8 @@ local mobileArty = Make("Mobile Artillery", "{categories.Mobile * categories.ART
 
 local factory = Make("Factories", "FACTORY * STRUCTURE * TECH3, FACTORY * STRUCTURE * TECH2, FACTORY * STRUCTURE * TECH1")
 
+local scouts = Make("Scouts", ToCategory "SCOUT")
+
 local postfixToCategory = {
     -- engineers
     ["l0001"] = Make("ACUs", ToCategory "COMMAND"),
@@ -88,7 +90,9 @@ local postfixToCategory = {
     ["a0203"] = gunships,
     ['a0305'] = gunships,
     ["a0102"] = Make("Interseptors", "{categories.AIR * categories.MOBILE * categories.ANTIAIR}"),
-    [""]      = Make("", ""),
+
+    ["a0101"] = scouts, -- air scout
+    ["a0302"] = scouts, -- spy plane
 
     -- land
     ["l0111"] = Make("MMLs",
@@ -96,6 +100,7 @@ local postfixToCategory = {
     ["l0205"] = mobileAntiAir,
     ["l0104"] = mobileAntiAir,
     ["l0304"] = mobileArty,
+    ["l0101"] = scouts,
 
 
 
