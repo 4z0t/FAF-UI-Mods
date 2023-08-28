@@ -27,6 +27,9 @@ local mobileAntiAir = Make("MAA", "{" .. maaCat .. "," .. aaCat .. "}")
 local massFabs = Make("Mass (fabs)", "{" .. fabsCats .. "," .. mexesCats .. "}")
 local massExtractors = Make("Mass (mexes)", "{" .. mexesCats .. "," .. fabsCats .. "}")
 
+local power = Make("Power",
+    "{ENERGYPRODUCTION * STRUCTURE * TECH3, ENERGYPRODUCTION * STRUCTURE * TECH2, ENERGYPRODUCTION * STRUCTURE * TECH1}")
+
 local engineers = Make("Engineers",
     "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}")
 
@@ -42,6 +45,10 @@ local gunships = Make("Gunships", "{categories.AIR * categories.GROUNDATTACK - c
 
 local staticArty = Make("Artillery Installation",
     "{categories.STRUCTURE * categories.ARTILLERY * categories.TECH3, categories.STRUCTURE * categories.ARTILLERY * categories.TECH2}")
+
+
+local mobileArty = Make("Mobile Artillery", "{categories.Mobile * categories.ARTILLERY}")
+
 
 local postfixToCategory = {
     -- engineers
@@ -67,6 +74,8 @@ local postfixToCategory = {
         "{categories.LAND * categories.MOBILE * categories.SILO * categories.TECH3, categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2}"),
     ["l0205"] = mobileAntiAir,
     ["l0104"] = mobileAntiAir,
+    ["l0304"] = mobileArty,
+
 
 
     --naval
@@ -89,6 +98,10 @@ local postfixToCategory = {
     ["b1302"] = massExtractors,
     ["b1104"] = massFabs,
     ["b1303"] = massFabs,
+    ["b1102"] = power,
+    ["b1101"] = power,
+    ["b1201"] = power,
+    ["b1301"] = power,
 
     -- defense
     ["b2301"] = pds,
