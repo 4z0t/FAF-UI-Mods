@@ -190,7 +190,7 @@ local specialToCategory =
 
     ["uel0401"] = landExps, -- fatty
     ["url0402"] = landExps, -- ml
-    ["url0403"] = landExps, -- mega
+    ["xrl0403"] = landExps, -- mega
     ["xsl0401"] = landExps, -- chicken
     ["ual0401"] = landExps, -- gc
 
