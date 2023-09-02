@@ -3,6 +3,15 @@ local KeyMapper = import('/lua/keymap/keymapper.lua')
 local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
 
 
+local templateData = nil
+do
+    local _SetActiveBuildTemplate = SetActiveBuildTemplate
+    function _G.SetActiveBuildTemplate(template)
+        templateData = template
+        _SetActiveBuildTemplate(template)
+    end
+end
+
 local current = nil
 local prevSelection
 local activeSelection = nil
@@ -21,6 +30,7 @@ local function Reset(deselect)
     activeSelection = nil
     lastUnit = nil
     continuous = false
+    templateData = nil
     if deselect then
         SelectUnits(nil)
     end
@@ -44,6 +54,9 @@ function Next(isManual)
 
     if not isManual then
         CM.StartCommandMode(activeCommandMode, activeCommandModeData)
+        if templateData then
+            SetActiveBuildTemplate(templateData)
+        end
     end
     current = i
 end
@@ -63,7 +76,6 @@ function Start(isContinuous)
     Next(true)
 end
 
----comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
@@ -71,7 +83,6 @@ function OnCommandStarted(commandMode, commandModeData)
 
 end
 
----comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 ---@param command any
