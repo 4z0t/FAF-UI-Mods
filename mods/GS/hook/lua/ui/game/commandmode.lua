@@ -3,9 +3,9 @@ function IsIgnoredSelection()
 end
 
 do
-    local OldOnCommandIssued = OnCommandIssued
+    local _OnCommandIssued = OnCommandIssued
     function OnCommandIssued(command)
-        OldOnCommandIssued(command)
+        _OnCommandIssued(command)
 
         if not command.Clear then return end
 

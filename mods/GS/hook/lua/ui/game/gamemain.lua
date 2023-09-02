@@ -1,8 +1,8 @@
 do
-    local OldCreateUI = CreateUI
+    local _CreateUI = CreateUI
     function CreateUI(isReplay)
 
-        OldCreateUI(isReplay)
+        _CreateUI(isReplay)
         import('/mods/GS/modules/Main.lua').Main(isReplay)
 
     end
