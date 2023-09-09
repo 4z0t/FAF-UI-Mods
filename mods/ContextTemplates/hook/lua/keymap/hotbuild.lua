@@ -158,8 +158,10 @@ function buildActionTemplate(modifier)
 
     local info = GetRolloverInfo()
     if info and info.blueprintId ~= "unknown" then
-        buildActionTemplateContext(modifier, info.blueprintId)
-        return
+        if __blueprints[info.blueprintId].CategoriesHash["STRUCTURE"] then
+            buildActionTemplateContext(modifier, info.blueprintId)
+            return
+        end
     end
 
     _buildActionTemplate(modifier)
