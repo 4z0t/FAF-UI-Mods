@@ -2,6 +2,19 @@
 
 Ecosystem of UI mods for [FAF](https://www.faforever.com/).
 
+## 4z0t's ScoreBoard
+
+![icon](./mods/4SB/icon.png)
+
+A mod replacing default scoreboard with a new one with its own features:
+
+* Minimalistic and simple design
+* Animations
+* Flexible replay ScoreBoard
+* Coop support
+
+See [Full doc about it](./mods/4SB/README.md) for more info.
+
 ## UI Mod Tools
 
 A library for all other mods.
@@ -14,6 +27,8 @@ A mod sharing data between teammates about nuke/smd silo counts, progress, etas 
 Mod has options for positioning of timers, counters and progress. Each timer can be disabled, but data would be sent to teammate anyway.
 
 ## Selected Units Info
+
+![icon](./mods/SUI/icon.png)
 
 A mod displaying totals of selected units, such as total mass and energy used, build power, mass and energy consumption, mass killed.
 
@@ -34,7 +49,9 @@ Unpack textures of the mod before using it.
 
 ## Idle Engineers Light
 
-A mod displaying units' states with various icons over them. 
+![icon](./mods/IEL/icon.png)
+
+A mod displaying units' states with various icons over them.
 
 * Engineers being idle
 * Factories being idle, upgrading, building in loop or only engineers
@@ -45,8 +62,10 @@ All these icons can be disabled/enabled separately.
 
 ## HotBuild Overhaul
 
+![icon](./mods/HBO/icon.png)
+
 A mod for creating custom hotbuild actions.
-See [forum post](https://forum.faforever.com/topic/3712/hotbuild-overhaul/1?_=1669191703421) for more info.
+See [full doc about it](./mods/HBO/README.md) for more info.
 
 ## EzReclaim
 
@@ -107,14 +126,3 @@ A mod allowing selection of engineers when holding Alt key.
 ## Additional Orders Extension
 
 A mod adding various QoL key actions.
-
-## 4z0t's ScoreBoard
-
-A mod replacing default scoreboard with a new one with its own features:
-
-* Minimalistic and simple design
-* Animations
-* Flexible replay ScoreBoard
-* Coop support
-
-See [forum post](https://forum.faforever.com/topic/4391/new-scoreboard?_=1669035632876) for more info.
