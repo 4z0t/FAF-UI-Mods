@@ -28,6 +28,8 @@ Mod has options for positioning of timers, counters and progress. Each timer can
 
 ## Selected Units Info
 
+![icon](./mods/SUI/icon.png)
+
 A mod displaying totals of selected units, such as total mass and energy used, build power, mass and energy consumption, mass killed.
 
 Panel is located on top of UI and can be moved horizonally with middle mouse button.
@@ -47,6 +49,8 @@ Unpack textures of the mod before using it.
 
 ## Idle Engineers Light
 
+![icon](./mods/IEL/icon.png)
+
 A mod displaying units' states with various icons over them.
 
 * Engineers being idle
@@ -57,6 +61,8 @@ A mod displaying units' states with various icons over them.
 All these icons can be disabled/enabled separately.
 
 ## HotBuild Overhaul
+
+![icon](./mods/HBO/icon.png)
 
 A mod for creating custom hotbuild actions.
 See [forum post](https://forum.faforever.com/topic/3712/hotbuild-overhaul/1?_=1669191703421) for more info.
