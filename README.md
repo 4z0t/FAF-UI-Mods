@@ -65,7 +65,7 @@ All these icons can be disabled/enabled separately.
 ![icon](./mods/HBO/icon.png)
 
 A mod for creating custom hotbuild actions.
-See [forum post](https://forum.faforever.com/topic/3712/hotbuild-overhaul/1?_=1669191703421) for more info.
+See [full doc about it](./mods/HBO/README.md) for more info.
 
 ## EzReclaim
 
