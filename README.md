@@ -2,6 +2,19 @@
 
 Ecosystem of UI mods for [FAF](https://www.faforever.com/).
 
+## 4z0t's ScoreBoard
+
+![icon](./mods/4SB/icon.png)
+
+A mod replacing default scoreboard with a new one with its own features:
+
+* Minimalistic and simple design
+* Animations
+* Flexible replay ScoreBoard
+* Coop support
+
+See [Full doc about it](./mods/4SB/README.md) for more info.
+
 ## UI Mod Tools
 
 A library for all other mods.
@@ -34,7 +47,7 @@ Unpack textures of the mod before using it.
 
 ## Idle Engineers Light
 
-A mod displaying units' states with various icons over them. 
+A mod displaying units' states with various icons over them.
 
 * Engineers being idle
 * Factories being idle, upgrading, building in loop or only engineers
@@ -107,14 +120,3 @@ A mod allowing selection of engineers when holding Alt key.
 ## Additional Orders Extension
 
 A mod adding various QoL key actions.
-
-## 4z0t's ScoreBoard
-
-A mod replacing default scoreboard with a new one with its own features:
-
-* Minimalistic and simple design
-* Animations
-* Flexible replay ScoreBoard
-* Coop support
-
-See [forum post](https://forum.faforever.com/topic/4391/new-scoreboard?_=1669035632876) for more info.
