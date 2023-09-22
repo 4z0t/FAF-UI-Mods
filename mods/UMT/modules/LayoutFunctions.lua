@@ -18,6 +18,9 @@ local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 ---@return NumberFunction
 local function _MaxVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return math.max(var(), value * scale()) end
+    end
     return function() return math.max(var(), value * scale) end
 end
 
@@ -36,8 +39,12 @@ function Max(n1, n2, scale)
     if iscallable(n1) then return _MaxVarOrValue(n1, n2, scale) end
     if iscallable(n2) then return _MaxVarOrValue(n2, n1, scale) end
 
+    local maxv = math.max(n1, n2)
     scale = scale or defaultScaleFactor
-    return math.max(n1, n2) * scale
+    if iscallable(scale) then
+        return function() return maxv * scale() end
+    end
+    return maxv * scale
 end
 
 ---returns function of min between lazyvar or value
@@ -47,6 +54,9 @@ end
 ---@return NumberFunction
 local function _MinVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return math.min(var(), value * scale()) end
+    end
     return function() return math.min(var(), value * scale) end
 end
 
@@ -65,8 +75,12 @@ function Min(n1, n2, scale)
     if iscallable(n1) then return _MinVarOrValue(n1, n2, scale) end
     if iscallable(n2) then return _MinVarOrValue(n2, n1, scale) end
 
+    local minv = math.min(n1, n2)
     scale = scale or defaultScaleFactor
-    return math.min(n1, n2) * scale
+    if iscallable(scale) then
+        return function() return minv * scale() end
+    end
+    return minv * scale
 end
 
 ---returns function of difference of lazyvar and value
@@ -77,6 +91,9 @@ end
 local function _DiffVarAndValue(var, value, scale)
     if value == 0 then return var end
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return var() - value * scale() end
+    end
     return function() return var() - value * scale end
 end
 
@@ -88,6 +105,9 @@ end
 local function _DiffValueAndVar(value, var, scale)
     if value == 0 then return var end
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return value * scale() - var() end
+    end
     return function() return value * scale - var() end
 end
 
@@ -107,6 +127,9 @@ function Diff(n1, n2, scale)
     if iscallable(n2) then return _DiffValueAndVar(n1, n2, scale) end
 
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return (n1 - n2) * scale() end
+    end
     return (n1 - n2) * scale
 end
 
@@ -119,6 +142,9 @@ local function _SumVarAndValue(var, value, scale)
     if value == 0 then return var end
 
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return var() + value * scale() end
+    end
     return function() return var() + value * scale end
 end
 
@@ -128,7 +154,7 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale NumberVar|number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Sum(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
@@ -138,6 +164,9 @@ function Sum(n1, n2, scale)
     if iscallable(n2) then return _SumVarAndValue(n2, n1, scale) end
 
     scale = scale or defaultScaleFactor
+    if iscallable(scale) then
+        return function() return (n1 + n2) * scale() end
+    end
     return (n1 + n2) * scale
 end
 
