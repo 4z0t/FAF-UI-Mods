@@ -120,7 +120,7 @@ end
 ---@param scale number? # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _DiffValueAndVar(value, var, scale)
-    if value == 0 then return var end
+    if value == 0 then return function() return -var() end end
     scale = scale or defaultScaleFactor
     if iscallable(scale) then
         return function() return value * scale() - var() end
