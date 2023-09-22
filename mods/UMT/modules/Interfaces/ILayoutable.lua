@@ -1,3 +1,5 @@
+local Layouter = UMT.Layouter.ReusedLayoutFor
+
 ---@class ILayoutable
 ---@field _clearLayout fun(control: ILayoutable)?
 ---@field _layout fun(control: ILayoutable) : fun(control: ILayoutable)?
@@ -25,6 +27,17 @@ ILayoutable = ClassSimple
         ---@return fun(control: ILayoutable)
         get = function(self)
             return self._layout or self._Layout
+        end
+    },
+
+    Layouter = UMT.Property
+    {
+        get = function(self)
+            return self._layouter or Layouter
+        end,
+
+        set = function(self, value)
+            self._layouter = value
         end
     },
 
