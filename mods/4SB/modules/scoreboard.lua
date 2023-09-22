@@ -29,7 +29,7 @@ local slideForward = UMT.Animation.Factory.Base
     :Create()
 
 
----@class ScoreBoard : Group
+---@class ScoreBoard : Group, ILayoutable
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
 ---@field protected _armyViews table<integer, ArmyView>
 ---@field protected _title TitlePanel
@@ -39,6 +39,9 @@ local slideForward = UMT.Animation.Factory.Base
 ---@field protected isHovered boolean
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
+    ---@param self ScoreBoard
+    ---@param parent Control
+    ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
 
@@ -54,17 +57,20 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 
     end,
 
+    ---@param self ScoreBoard
     __post_init = function(self)
 
         self:_InitArmyViews()
-        self:_Layout()
+        self:_Layout(self.Layouter)
 
         self._mode = "income"
     end,
 
-    _Layout = function(self)
+    ---@param self ScoreBoard
+    ---@param layouter LayouterFunctor
+    _Layout = function(self, layouter)
         if self._title then
-            LayoutFor(self._title)
+            layouter(self._title)
                 :AtRightTopIn(self)
         end
         local last
@@ -72,16 +78,16 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         for i, armyView in self._lines do
             if i == 1 then
                 if self._title then
-                    LayoutFor(armyView)
+                    layouter(armyView)
                         :AnchorToBottom(self._title)
                         :Right(self.Right)
                 else
-                    LayoutFor(armyView)
+                    layouter(armyView)
                         :AtRightTopIn(self)
                 end
                 first = armyView
             else
-                LayoutFor(armyView)
+                layouter(armyView)
                     :AnchorToBottom(self._lines[i - 1])
                     :Right(self.Right)
             end
@@ -90,8 +96,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         if last then
             self.Bottom:Set(last.Bottom)
         end
-
-        LayoutFor(self)
+        layouter(self)
             :Width(100)
             :Over(GetFrame(0), 1000)
             :AtRightIn(GetFrame(0))
