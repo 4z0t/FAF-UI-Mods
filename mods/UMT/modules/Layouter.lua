@@ -25,9 +25,68 @@ Layouter = ClassSimple
         self.c = control or false
     end,
 
+    ScaleNumber = function(self, value)
+        return Functions.Mult(value, self._scale)
+    end,
 
+    Sum = function(self, n1, n2)
+        return Functions.Sum(n1, n2, self._scale)
+    end,
 
+    Diff = function(self, n1, n2)
+        return Functions.Diff(n1, n2, self._scale)
+    end,
 
+    Max = function(self, n1, n2)
+        return Functions.Max(n1, n2, self._scale)
+    end,
+
+    Min = function(self, n1, n2)
+        return Functions.Min(n1, n2, self._scale)
+    end,
+
+    _ScaleValue = function(self, value)
+        if iscallable(value) then
+            return value
+        else
+            return self:ScaleNumber(value)
+        end
+    end,
+
+    Width = function(self, width)
+        self.c.Width:Set(self:_ScaleValue(width))
+        return self
+    end,
+
+    Height = function(self, height)
+        self.c.Height:Set(self:_ScaleValue(height))
+        return self
+    end,
+
+    AtLeftIn = function(self, parent, leftOffset)
+        self.c.Left:Set(self:Sum(parent.Left, leftOffset or 0))
+        return self
+    end,
+
+    AtTopIn = function(self, parent, topOffset)
+        self.c.Top:Set(self:Sum(parent.Top, topOffset or 0))
+        return self
+    end,
+
+    -- Fill = function (self, parent)
+    --     LayoutHelpers.FillParent(self.c, parent)
+    --     return self
+    -- end,
+
+    Disable = function(self)
+        self.c:Disable()
+        return self
+    end,
+
+    Hide = function(self)
+        self.c:Hide()
+        return self
+    end,
 }
 
 ---Disables control
