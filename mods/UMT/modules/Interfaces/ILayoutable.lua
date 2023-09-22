@@ -14,32 +14,34 @@ ILayoutable = ClassSimple
         self.Layouter = parent.Layouter
     end,
 
-    ---@type fun(control:ILayoutable)
+    ---@type fun(control: ILayoutable, layouter?:LayouterFunctor)
     Layout = UMT.Property
     {
         ---@param self ILayoutable
-        ---@param value fun(control: ILayoutable, layouter:LayouterFunctor) : fun(control: ILayoutable)?
-        set = function(self, value)
+        ---@param layout fun(control: ILayoutable, layouter:LayouterFunctor) : fun(control: ILayoutable)?
+        set = function(self, layout)
             if self._clearLayout then
                 self:_clearLayout(self.Layouter)
                 self._clearLayout = nil
             end
 
-            self._layout = value
+            self._layout = nil
 
-            if self._layout then
-                self._clearLayout = self:_layout(self.Layouter)
+            if layout then
+                self._clearLayout = layout(self, self.Layouter)
+                self._layout = layout
             else
                 self:_Layout(self.Layouter)
             end
         end,
         ---@param self ILayoutable
-        ---@return fun(control: ILayoutable)
+        ---@return fun(control: ILayoutable, layouter?:LayouterFunctor)
         get = function(self)
             local layout = self._layout or self._Layout
             ---@param control ILayoutable
-            return function (control)
-                layout(control, self.Layouter)
+            ---@param layouter? LayouterFunctor
+            return function(control, layouter)
+                return layout(control, layouter or control.Layouter)
             end
         end
     },

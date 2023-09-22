@@ -46,7 +46,7 @@ end
 ---@return fun(scoreboard : ScoreBoard)
 Layout = function(scoreboard, layouter)
 
-    scoreboard:_Layout(layouter)
+    scoreboard:Layout()
     scoreboard.InitialAnimation = InitialAnimation
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)

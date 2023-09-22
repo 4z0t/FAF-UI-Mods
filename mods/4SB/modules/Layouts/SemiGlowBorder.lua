@@ -18,11 +18,11 @@ end
 
 ---A layout function for scoreboard
 ---@param scoreboard ScoreBoard
+---@param layouter LayouterFunctor
 ---@return fun(scoreboard:ScoreBoard)
-Layout = function(scoreboard)
+Layout = function(scoreboard, layouter)
 
-    scoreboard:_Layout()
-
+    scoreboard:Layout()
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
 
 

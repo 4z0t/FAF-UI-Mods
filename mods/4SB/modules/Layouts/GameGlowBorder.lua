@@ -38,10 +38,11 @@ end
 
 ---A layout function for scoreboard
 ---@param scoreboard ReplayScoreBoard
+---@param layouter LayouterFunctor
 ---@return fun(scoreboard : ReplayScoreBoard)
-Layout = function(scoreboard)
+Layout = function(scoreboard, layouter)
 
-    scoreboard:_Layout()
+    scoreboard:Layout()
     scoreboard.InitialAnimation = InitialAnimation
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)

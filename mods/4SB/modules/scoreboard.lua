@@ -61,7 +61,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     __post_init = function(self)
 
         self:_InitArmyViews()
-        self:_Layout(self.Layouter)
+        self:Layout()
 
         self._mode = "income"
     end,
