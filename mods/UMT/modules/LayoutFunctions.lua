@@ -192,3 +192,20 @@ function Floor(n)
     end
     return MathFloor(n)
 end
+
+function AtCenterOffset(base, baseLen, len, offset, scale)
+    if offset ~= 0 then
+        if iscallable(scale) then
+            return function()
+                return base() + 0.5 * (baseLen() - len()) + offset * scale()
+            end
+        else
+            return function()
+                return base() + 0.5 * (baseLen() - len()) + offset * scale
+            end
+        end
+    end
+    return function()
+        return base() + 0.5 * (baseLen() - len())
+    end
+end
