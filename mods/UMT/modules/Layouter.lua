@@ -137,7 +137,21 @@ Layouter = ClassSimple
             :AtRightBottomIn(parent, right, bottom)
     end,
 
+    AtVerticalCenterIn = function(self, parent, topOffset)
+        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset, self._scale))
+        return self
+    end,
 
+    AtHorizontalCenterIn = function(self, parent, leftOffset)
+        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset, self._scale))
+        return self
+    end,
+
+    AtCenterIn = function(self, parent, top, left)
+        return self
+            :AtHorizontalCenterIn(parent, left)
+            :AtVerticalCenterIn(parent, top)
+    end,
 
     Disable = function(self)
         self.c:Disable()
