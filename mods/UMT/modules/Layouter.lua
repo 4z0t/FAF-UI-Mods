@@ -73,10 +73,33 @@ Layouter = ClassSimple
         return self
     end,
 
-    -- Fill = function (self, parent)
-    --     LayoutHelpers.FillParent(self.c, parent)
-    --     return self
-    -- end,
+    AtRightIn = function(self, parent, rightOffset)
+        self.c.Right:Set(self:Diff(parent.Right, rightOffset or 0))
+        return self
+    end,
+
+    AtBottomIn = function(self, parent, bottomOffset)
+        self.c.Bottom:Set(self:Diff(parent.Bottom, bottomOffset or 0))
+        return self
+    end,
+
+    FillHorizontally = function(self, parent)
+        return self
+            :AtLeftIn(parent)
+            :AtRightIn(parent)
+    end,
+    
+    FillVertically = function(self, parent)
+        return self
+            :AtTopIn(parent)
+            :AtBottomIn(parent)
+    end,
+
+    Fill = function(self, parent)
+        return self
+            :FillHorizontally(parent)
+            :FillVertically(parent)
+    end,
 
     Disable = function(self)
         self.c:Disable()
