@@ -187,6 +187,8 @@ end
 ---@param n NumberVar
 ---@return NumberFunction
 function Floor(n)
-    if iscallable(n) then return function() return MathFloor(n()) end end
+    if iscallable(n) then
+        return function() return MathFloor(n()) end
+    end
     return MathFloor(n)
 end

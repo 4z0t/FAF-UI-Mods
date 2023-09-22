@@ -6,6 +6,30 @@ Functions = import("LayoutFunctions.lua")
 local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
+
+---@class Layouter
+---@field c Control|boolean
+---@field _scale NumberVar
+Layouter = ClassSimple
+{
+    ---@param self Layouter
+    ---@param scale NumberVar
+    __init = function(self, scale)
+        self.c = false
+        self._scale = scale
+    end,
+
+    ---@param self Layouter
+    ---@param control Control
+    __call = function(self, control)
+        self.c = control or false
+    end,
+
+
+
+
+}
+
 ---Disables control
 ---@return Layouter
 function LayouterMetaTable:Disable()
@@ -52,7 +76,6 @@ function LayouterMetaTable:Texture(texture, border)
     self.c:SetTexture(texture, border)
     return self
 end
-
 
 function LayouterMetaTable:EnableHitTest(recursive)
     self.c:EnableHitTest(recursive)
@@ -351,11 +374,9 @@ function LayouterMetaTable:End()
         WARN("incorrect layout for Left-Width-Right")
         WARN(debug.traceback())
     end
-    
+
     return self.c
 end
-
-
 
 ---Creates Layouter for given control
 ---@param control Control
@@ -367,7 +388,6 @@ function LayoutFor(control)
     setmetatable(result, LayouterMetaTable)
     return result
 end
-
 
 local layouter = {
     c = false
