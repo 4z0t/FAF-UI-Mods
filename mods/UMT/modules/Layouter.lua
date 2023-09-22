@@ -19,6 +19,12 @@ Layouter = ClassSimple
         self._scale = scale
     end,
 
+    SetScale = function(self, scale)
+        assert(self._scale, "No scale LazyVar provided during contruction!")
+        self._scale:Set(scale)
+        return self
+    end,
+
     ---@param self Layouter
     ---@param control Control
     __call = function(self, control)
@@ -88,7 +94,7 @@ Layouter = ClassSimple
             :AtLeftIn(parent)
             :AtRightIn(parent)
     end,
-    
+
     FillVertically = function(self, parent)
         return self
             :AtTopIn(parent)
@@ -100,6 +106,38 @@ Layouter = ClassSimple
             :FillHorizontally(parent)
             :FillVertically(parent)
     end,
+
+    AtLeftTopIn = function(self, parent, left, top)
+        return self
+            :AtLeftIn(parent, left)
+            :AtTopIn(parent, top)
+    end,
+
+    AtRightTopIn = function(self, parent, right, top)
+        return self
+            :AtRightIn(parent, right)
+            :AtTopIn(parent, top)
+    end,
+
+    AtRightBottomIn = function(self, parent, right, bottom)
+        return self
+            :AtRightIn(parent, right)
+            :AtBottomIn(parent, bottom)
+    end,
+
+    AtLeftBottomIn = function(self, parent, left, bottom)
+        return self
+            :AtLeftIn(parent, left)
+            :AtBottomIn(parent, bottom)
+    end,
+
+    OffsetIn = function(self, parent, left, top, right, bottom)
+        return self
+            :AtLeftTopIn(parent, left, top)
+            :AtRightBottomIn(parent, right, bottom)
+    end,
+
+
 
     Disable = function(self)
         self.c:Disable()
