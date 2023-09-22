@@ -64,12 +64,8 @@ function Max(n1, n2, scale)
     if iscallable(n1) then return _MaxVarOrValue(n1, n2, scale) end
     if iscallable(n2) then return _MaxVarOrValue(n2, n1, scale) end
 
-    local maxv = math.max(n1, n2)
     scale = scale or defaultScaleFactor
-    if iscallable(scale) then
-        return function() return maxv * scale() end
-    end
-    return maxv * scale
+    return Mult(math.max(n1, n2), scale)
 end
 
 ---returns function of min between lazyvar or value
@@ -100,12 +96,8 @@ function Min(n1, n2, scale)
     if iscallable(n1) then return _MinVarOrValue(n1, n2, scale) end
     if iscallable(n2) then return _MinVarOrValue(n2, n1, scale) end
 
-    local minv = math.min(n1, n2)
     scale = scale or defaultScaleFactor
-    if iscallable(scale) then
-        return function() return minv * scale() end
-    end
-    return minv * scale
+    return Mult(math.min(n1, n2), scale)
 end
 
 ---returns function of difference of lazyvar and value
@@ -152,10 +144,7 @@ function Diff(n1, n2, scale)
     if iscallable(n2) then return _DiffValueAndVar(n1, n2, scale) end
 
     scale = scale or defaultScaleFactor
-    if iscallable(scale) then
-        return function() return (n1 - n2) * scale() end
-    end
-    return (n1 - n2) * scale
+    return Mult(n1 - n2, scale)
 end
 
 ---returns function of sum of lazyvar and value
@@ -189,13 +178,8 @@ function Sum(n1, n2, scale)
     if iscallable(n2) then return _SumVarAndValue(n2, n1, scale) end
 
     scale = scale or defaultScaleFactor
-    if iscallable(scale) then
-        return function() return (n1 + n2) * scale() end
-    end
-    return (n1 + n2) * scale
+    return Mult(n1 + n2, scale)
 end
-
-
 
 ---returns function of floor of a given lazyvar
 ---@overload fun(n:number):number
