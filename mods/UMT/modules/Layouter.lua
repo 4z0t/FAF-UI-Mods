@@ -12,7 +12,7 @@ LayouterMetaTable.__index = LayouterMetaTable
 ---@class Layouter
 ---@field c Control|boolean
 ---@field _scale NumberVar
-Layouter = ClassSimple
+Layouter = UMT.Class()
 {
     ---@param self Layouter
     ---@param scale NumberVar
@@ -26,7 +26,7 @@ Layouter = ClassSimple
         get = function(self)
             return self._scale
         end,
-    
+
         set = function(self, value)
             assert(self._scale, "No scale LazyVar provided during contruction!")
             self._scale:Set(value)
@@ -173,6 +173,38 @@ Layouter = ClassSimple
         else
             error "Unable to set color for control"
         end
+        return self
+    end,
+
+
+    DropShadow = function(self, state)
+        self.c:SetDropShadow(state)
+        return self
+    end,
+
+
+    Texture = function(self, texture, border)
+        self.c:SetTexture(texture, border)
+        return self
+    end,
+
+    EnableHitTest = function(self, recursive)
+        self.c:EnableHitTest(recursive)
+        return self
+    end,
+
+    DisableHitTest = function(self, recursive)
+        self.c:DisableHitTest(recursive)
+        return self
+    end,
+
+    NeedsFrameUpdate = function(self, state)
+        self.c:SetNeedsFrameUpdate(state)
+        return self
+    end,
+
+    Alpha = function(self, alpha, applyToChildren)
+        self.c:SetAlpha(alpha, applyToChildren)
         return self
     end,
 
