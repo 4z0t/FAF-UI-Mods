@@ -345,6 +345,30 @@ Layouter = UMT.Class()
             :AtHorizontalCenterIn(parent, leftOffset)
     end,
 
+    ResetLeft = function(self)
+        return self:Left(Functions.Diff(self.c.Right, self.c.Width))
+    end,
+
+    ResetTop = function(self)
+        return self:Top(Functions.Diff(self.c.Bottom, self.c.Height))
+    end,
+
+    ResetRight = function(self)
+        return self:Right(Functions.Sum(self.c.Left, self.c.Width))
+    end,
+
+    ResetBottom = function(self)
+        return self:Bottom(Functions.Sum(self.c.Top, self.c.Height))
+    end,
+
+    ResetWidth = function(self)
+        return self:Width(Functions.Diff(self.c.Right, self.c.Left))
+    end,
+
+    ResetHeight = function(self)
+        return self:Height(Functions.Diff(self.c.Bottom, self.c.Top))
+    end,
+
     ---@param self UMT.Layouter
     ---@param color Color
     ---@return UMT.Layouter
@@ -499,4 +523,3 @@ end
 
 ---@type UMT.Layouter
 ReusedLayoutFor = Layouter()
-
