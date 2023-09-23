@@ -67,6 +67,26 @@ Layouter = UMT.Class()
         end
     end,
 
+    Left = function(self, left)
+        self.c.Left:Set(left)
+        return self
+    end,
+
+    Right = function(self, right)
+        self.c.Right:Set(right)
+        return self
+    end,
+
+    Top = function(self, top)
+        self.c.Top:Set(top)
+        return self
+    end,
+
+    Bottom = function(self, bottom)
+        self.c.Bottom:Set(bottom)
+        return self
+    end,
+
     Width = function(self, width)
         self.c.Width:Set(self:_ScaleValue(width))
         return self
@@ -78,23 +98,19 @@ Layouter = UMT.Class()
     end,
 
     AtLeftIn = function(self, parent, leftOffset)
-        self.c.Left:Set(self:Sum(parent.Left, leftOffset or 0))
-        return self
+        return self:Left(self:Sum(parent.Left, leftOffset or 0))
     end,
 
     AtTopIn = function(self, parent, topOffset)
-        self.c.Top:Set(self:Sum(parent.Top, topOffset or 0))
-        return self
+        return self:Top(self:Sum(parent.Top, topOffset or 0))
     end,
 
     AtRightIn = function(self, parent, rightOffset)
-        self.c.Right:Set(self:Diff(parent.Right, rightOffset or 0))
-        return self
+        return self:Right(self:Diff(parent.Right, rightOffset or 0))
     end,
 
     AtBottomIn = function(self, parent, bottomOffset)
-        self.c.Bottom:Set(self:Diff(parent.Bottom, bottomOffset or 0))
-        return self
+        return self:Bottom(self:Diff(parent.Bottom, bottomOffset or 0))
     end,
 
     FillHorizontally = function(self, parent)
@@ -146,13 +162,11 @@ Layouter = UMT.Class()
     end,
 
     AtVerticalCenterIn = function(self, parent, topOffset)
-        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0, self.Scale))
-        return self
+        return self:Top(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0, self.Scale))
     end,
 
     AtHorizontalCenterIn = function(self, parent, leftOffset)
-        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0, self.Scale))
-        return self
+        return self:Left(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0, self.Scale))
     end,
 
     AtCenterIn = function(self, parent, top, left)
