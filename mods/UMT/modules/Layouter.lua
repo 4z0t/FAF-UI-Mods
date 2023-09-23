@@ -81,7 +81,6 @@ Layouter = UMT.Class()
         return Functions.Min(n1, n2, self.Scale)
     end,
 
-    ---comment
     ---@param self Layouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
@@ -93,48 +92,82 @@ Layouter = UMT.Class()
         end
     end,
 
+    ---@param self Layouter
+    ---@param left FunctionalNumber
+    ---@return Layouter
     Left = function(self, left)
         self.c.Left:Set(left)
         return self
     end,
 
+    ---@param self Layouter
+    ---@param right FunctionalNumber
+    ---@return Layouter
     Right = function(self, right)
         self.c.Right:Set(right)
         return self
     end,
 
+    ---@param self Layouter
+    ---@param top FunctionalNumber
+    ---@return Layouter
     Top = function(self, top)
         self.c.Top:Set(top)
         return self
     end,
 
+    ---@param self Layouter
+    ---@param bottom FunctionalNumber
+    ---@return Layouter
     Bottom = function(self, bottom)
         self.c.Bottom:Set(bottom)
         return self
     end,
 
+    ---@param self Layouter
+    ---@param width FunctionalNumber
+    ---@return Layouter
     Width = function(self, width)
         self.c.Width:Set(self:_ScaleValue(width))
         return self
     end,
 
+    ---@param self Layouter
+    ---@param height FunctionalNumber
+    ---@return Layouter
     Height = function(self, height)
         self.c.Height:Set(self:_ScaleValue(height))
         return self
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param leftOffset? FunctionalNumber
+    ---@return Layouter
     AtLeftIn = function(self, parent, leftOffset)
         return self:Left(self:Sum(parent.Left, leftOffset or 0))
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param topOffset? FunctionalNumber
+    ---@return Layouter
     AtTopIn = function(self, parent, topOffset)
         return self:Top(self:Sum(parent.Top, topOffset or 0))
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param rightOffset? FunctionalNumber
+    ---@return Layouter
     AtRightIn = function(self, parent, rightOffset)
         return self:Right(self:Diff(parent.Right, rightOffset or 0))
     end,
-
+    
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param bottomOffset? FunctionalNumber
+    ---@return Layouter
     AtBottomIn = function(self, parent, bottomOffset)
         return self:Bottom(self:Diff(parent.Bottom, bottomOffset or 0))
     end,
