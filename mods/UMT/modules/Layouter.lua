@@ -141,7 +141,7 @@ Layouter = UMT.Class()
     ---@param parent Control
     ---@param depth FunctionalNumber
     ---@return Layouter
-    Over = function (self, parent, depth)
+    Over = function(self, parent, depth)
         self.c.Depth:Set(self:Sum(parent.Depth, depth or 0))
         return self
     end,
@@ -150,11 +150,11 @@ Layouter = UMT.Class()
     ---@param parent Control
     ---@param depth FunctionalNumber
     ---@return Layouter
-    Under = function (self, parent, depth)
+    Under = function(self, parent, depth)
         self.c.Depth:Set(self:Diff(parent.Depth, depth or 0))
         return self
     end,
-    
+
     ---@param self Layouter
     ---@param parent Control
     ---@param leftOffset? FunctionalNumber
@@ -292,6 +292,30 @@ Layouter = UMT.Class()
         return self
             :AtHorizontalCenterIn(parent, left)
             :AtVerticalCenterIn(parent, top)
+    end,
+
+    LeftOf = function(self, parent, padding)
+        return self
+            :AnchorToLeft(parent, padding)
+            :AtTopIn(parent)
+    end,
+
+    RightOf = function(self, parent, padding)
+        return self
+            :AnchorToRight(parent, padding)
+            :AtTopIn(parent)
+    end,
+
+    Above = function(self, parent, padding)
+        return self
+            :AtLeftIn(parent)
+            :AnchorToTop(parent, padding)
+    end,
+
+    Below = function(self, parent, padding)
+        return self
+            :AtLeftIn(parent)
+            :AnchorToBottom(parent, padding)
     end,
 
     Color = function(self, color)
