@@ -52,9 +52,9 @@ local function _MaxVarOrValue(var, value, scale)
 end
 
 ---returns function of max of two given lazyvars
----@overload fun(n1:number, n2:number):number
----@overload fun(n1:NumberVar, n2:number):NumberFunction
----@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@overload fun(n1:number, n2:number, scale?:FunctionalNumber):number
+---@overload fun(n1:NumberVar, n2:number, scale?:FunctionalNumber):NumberFunction
+---@overload fun(n1:number, n2:NumberVar, scale?:FunctionalNumber):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
@@ -84,9 +84,9 @@ local function _MinVarOrValue(var, value, scale)
 end
 
 ---returns function of min of two given lazyvars
----@overload fun(n1:number, n2:number):number
----@overload fun(n1:NumberVar, n2:number):NumberFunction
----@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@overload fun(n1:number, n2:number, scale?:FunctionalNumber):number
+---@overload fun(n1:NumberVar, n2:number, scale?:FunctionalNumber):NumberFunction
+---@overload fun(n1:number, n2:NumberVar, scale?:FunctionalNumber):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
@@ -131,9 +131,9 @@ local function _DiffValueAndVar(value, var, scale)
 end
 
 ---returns function of difference of two given lazyvars
----@overload fun(n1:number, n2:number):number
----@overload fun(n1:NumberVar, n2:number):NumberFunction
----@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@overload fun(n1:number, n2:number, scale?:FunctionalNumber):number
+---@overload fun(n1:NumberVar, n2:number, scale?:FunctionalNumber):NumberFunction
+---@overload fun(n1:number, n2:NumberVar, scale?:FunctionalNumber):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
@@ -165,9 +165,9 @@ local function _SumVarAndValue(var, value, scale)
 end
 
 ---returns function of sum of two given lazyvars
----@overload fun(n1:number, n2:number):number
----@overload fun(n1:NumberVar, n2:number):NumberFunction
----@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@overload fun(n1:number, n2:number, scale?:FunctionalNumber):number
+---@overload fun(n1:NumberVar, n2:number, scale?:FunctionalNumber):NumberFunction
+---@overload fun(n1:number, n2:NumberVar, scale?:FunctionalNumber):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options

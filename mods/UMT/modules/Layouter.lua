@@ -48,7 +48,6 @@ Layouter = UMT.Class()
         return Functions.Mult(value, self.Scale)
     end,
 
-    ---comment
     ---@param self Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
