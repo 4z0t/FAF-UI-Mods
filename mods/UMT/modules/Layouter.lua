@@ -162,7 +162,7 @@ Layouter = UMT.Class()
     AtRightIn = function(self, parent, rightOffset)
         return self:Right(self:Diff(parent.Right, rightOffset or 0))
     end,
-    
+
     ---@param self Layouter
     ---@param parent Control
     ---@param bottomOffset? FunctionalNumber
@@ -171,18 +171,27 @@ Layouter = UMT.Class()
         return self:Bottom(self:Diff(parent.Bottom, bottomOffset or 0))
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@return Layouter
     FillHorizontally = function(self, parent)
         return self
             :AtLeftIn(parent)
             :AtRightIn(parent)
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@return Layouter
     FillVertically = function(self, parent)
         return self
             :AtTopIn(parent)
             :AtBottomIn(parent)
     end,
 
+    ---@param self Layouter
+    ---@param parent Control
+    ---@return Layouter
     Fill = function(self, parent)
         return self
             :FillHorizontally(parent)
