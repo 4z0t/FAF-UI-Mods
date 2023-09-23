@@ -465,37 +465,6 @@ function LayouterMetaTable:CenteredBelow(parent, offset)
     return self
 end
 
--- reset--
-
-function LayouterMetaTable:ResetLeft()
-    LayoutHelpers.ResetLeft(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetRight()
-    LayoutHelpers.ResetRight(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetBottom()
-    LayoutHelpers.ResetBottom(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetHeight()
-    LayoutHelpers.ResetHeight(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetTop()
-    LayoutHelpers.ResetTop(self.c)
-    return self
-end
-
-function LayouterMetaTable:ResetWidth()
-    LayoutHelpers.ResetWidth(self.c)
-    return self
-end
 
 -- get control --
 
