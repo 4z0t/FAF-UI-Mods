@@ -1,6 +1,8 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 Functions = import("LayoutFunctions.lua")
 
+local defaultScale = LayoutHelpers.GetPixelScaleFactor()
+
 ---@class Layouter
 ---@field c Control
 local LayouterMetaTable = {}
@@ -16,14 +18,20 @@ Layouter = ClassSimple
     ---@param scale NumberVar
     __init = function(self, scale)
         self.c = false
-        self._scale = scale
+        self._scale = scale or false
     end,
 
-    SetScale = function(self, scale)
-        assert(self._scale, "No scale LazyVar provided during contruction!")
-        self._scale:Set(scale)
-        return self
-    end,
+    Scale = UMT.Property
+    {
+        get = function(self)
+            return self._scale
+        end,
+    
+        set = function(self, value)
+            assert(self._scale, "No scale LazyVar provided during contruction!")
+            self._scale:Set(value)
+        end
+    },
 
     ---@param self Layouter
     ---@param control Control
@@ -32,23 +40,23 @@ Layouter = ClassSimple
     end,
 
     ScaleNumber = function(self, value)
-        return Functions.Mult(value, self._scale)
+        return Functions.Mult(value, self.Scale)
     end,
 
     Sum = function(self, n1, n2)
-        return Functions.Sum(n1, n2, self._scale)
+        return Functions.Sum(n1, n2, self.Scale)
     end,
 
     Diff = function(self, n1, n2)
-        return Functions.Diff(n1, n2, self._scale)
+        return Functions.Diff(n1, n2, self.Scale)
     end,
 
     Max = function(self, n1, n2)
-        return Functions.Max(n1, n2, self._scale)
+        return Functions.Max(n1, n2, self.Scale)
     end,
 
     Min = function(self, n1, n2)
-        return Functions.Min(n1, n2, self._scale)
+        return Functions.Min(n1, n2, self.Scale)
     end,
 
     _ScaleValue = function(self, value)
@@ -138,12 +146,12 @@ Layouter = ClassSimple
     end,
 
     AtVerticalCenterIn = function(self, parent, topOffset)
-        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset, self._scale))
+        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset, self.Scale))
         return self
     end,
 
     AtHorizontalCenterIn = function(self, parent, leftOffset)
-        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset, self._scale))
+        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset, self.Scale))
         return self
     end,
 
@@ -151,6 +159,21 @@ Layouter = ClassSimple
         return self
             :AtHorizontalCenterIn(parent, left)
             :AtVerticalCenterIn(parent, top)
+    end,
+
+    Color = function(self, color)
+        if type(color) == "string" and string.len(color) == 6 then
+            color = "ff" .. color
+        end
+
+        if self.c.SetSolidColor then
+            self.c:SetSolidColor(color)
+        elseif self.c.SetColor then
+            self.c:SetColor(color)
+        else
+            error "Unable to set color for control"
+        end
+        return self
     end,
 
     Disable = function(self)
