@@ -10,6 +10,8 @@ local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 ---@alias NumberVar LazyVar<number>
 ---@alias NumberFunction (fun():number) | NumberVar
 
+---@alias FunctionalNumber NumberFunction|number
+
 
 ---returns function of mult of lazyvar and value
 ---@param var NumberVar
@@ -39,7 +41,7 @@ end
 ---returns function of max between lazyvar or value
 ---@param var NumberVar
 ---@param value number
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _MaxVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
@@ -55,7 +57,7 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Max(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
@@ -71,7 +73,7 @@ end
 ---returns function of min between lazyvar or value
 ---@param var NumberVar
 ---@param value number
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _MinVarOrValue(var, value, scale)
     scale = scale or defaultScaleFactor
@@ -87,7 +89,7 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Min(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
@@ -103,7 +105,7 @@ end
 ---returns function of difference of lazyvar and value
 ---@param var NumberVar
 ---@param value number
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _DiffVarAndValue(var, value, scale)
     if value == 0 then return var end
@@ -117,7 +119,7 @@ end
 ---returns function of difference of value and lazyvar
 ---@param var NumberVar
 ---@param value number
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _DiffValueAndVar(value, var, scale)
     if value == 0 then return function() return -var() end end
@@ -134,7 +136,7 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Diff(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then
@@ -150,7 +152,7 @@ end
 ---returns function of sum of lazyvar and value
 ---@param var NumberVar
 ---@param value number
----@param scale number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 local function _SumVarAndValue(var, value, scale)
     if value == 0 then return var end
@@ -168,7 +170,7 @@ end
 ---@overload fun(n1:number, n2:NumberVar):NumberFunction
 ---@param n1 NumberVar
 ---@param n2 NumberVar
----@param scale NumberVar|number? # defaults to pixel scale factor defined in interface options
+---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Sum(n1, n2, scale)
     if iscallable(n1) and iscallable(n2) then

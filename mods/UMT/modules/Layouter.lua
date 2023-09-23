@@ -21,6 +21,7 @@ Layouter = UMT.Class()
         self._scale = scale or false
     end,
 
+    ---@type FunctionalNumber
     Scale = UMT.Property
     {
         get = function(self)
@@ -28,7 +29,7 @@ Layouter = UMT.Class()
         end,
 
         set = function(self, value)
-            assert(self._scale, "No scale LazyVar provided during contruction!")
+            assert(type(self._scale) == "table", "No scale LazyVar provided during contruction!")
             self._scale:Set(value)
         end
     },
@@ -39,26 +40,51 @@ Layouter = UMT.Class()
         self.c = control or false
     end,
 
+    ---Scales given number / Numbervar
+    ---@param self Layouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
     ScaleNumber = function(self, value)
         return Functions.Mult(value, self.Scale)
     end,
 
+    ---comment
+    ---@param self Layouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
     Sum = function(self, n1, n2)
         return Functions.Sum(n1, n2, self.Scale)
     end,
 
+    ---@param self Layouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
     Diff = function(self, n1, n2)
         return Functions.Diff(n1, n2, self.Scale)
     end,
 
+    ---@param self Layouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
     Max = function(self, n1, n2)
         return Functions.Max(n1, n2, self.Scale)
     end,
 
+    ---@param self Layouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
     Min = function(self, n1, n2)
         return Functions.Min(n1, n2, self.Scale)
     end,
 
+    ---comment
+    ---@param self Layouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
     _ScaleValue = function(self, value)
         if iscallable(value) then
             return value
