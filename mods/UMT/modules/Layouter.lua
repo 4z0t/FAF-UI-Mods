@@ -171,6 +171,38 @@ Layouter = UMT.Class()
 
     ---@param self Layouter
     ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return Layouter
+    AnchorToLeft = function(self, parent, padding)
+        return self:Right(self:Diff(parent.Left, padding or 0))
+    end,
+
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return Layouter
+    AnchorToTop = function(self, parent, padding)
+        return self:Bottom(self:Diff(parent.Top, padding or 0))
+    end,
+
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return Layouter
+    AnchorToRight = function(self, parent, padding)
+        return self:Left(self:Sum(parent.Right, padding or 0))
+    end,
+
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return Layouter
+    AnchorToBottom = function(self, parent, padding)
+        return self:Top(self:Sum(parent.Bottom, padding or 0))
+    end,
+
+    ---@param self Layouter
+    ---@param parent Control
     ---@return Layouter
     FillHorizontally = function(self, parent)
         return self
@@ -224,6 +256,10 @@ Layouter = UMT.Class()
         return self
             :AtLeftTopIn(parent, left, top)
             :AtRightBottomIn(parent, right, bottom)
+    end,
+
+    FillFixedBorder = function(self, parent, offset)
+        return self:OffsetIn(parent, offset, offset, offset, offset)
     end,
 
     AtVerticalCenterIn = function(self, parent, topOffset)
