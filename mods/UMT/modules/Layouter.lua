@@ -139,6 +139,24 @@ Layouter = UMT.Class()
 
     ---@param self Layouter
     ---@param parent Control
+    ---@param depth FunctionalNumber
+    ---@return Layouter
+    Over = function (self, parent, depth)
+        self.c.Depth:Set(self:Sum(parent.Depth, depth or 0))
+        return self
+    end,
+
+    ---@param self Layouter
+    ---@param parent Control
+    ---@param depth FunctionalNumber
+    ---@return Layouter
+    Under = function (self, parent, depth)
+        self.c.Depth:Set(self:Diff(parent.Depth, depth or 0))
+        return self
+    end,
+    
+    ---@param self Layouter
+    ---@param parent Control
     ---@param leftOffset? FunctionalNumber
     ---@return Layouter
     AtLeftIn = function(self, parent, leftOffset)
@@ -332,6 +350,7 @@ Layouter = UMT.Class()
         self.c:Hide()
         return self
     end,
+
 }
 
 ---Disables control
