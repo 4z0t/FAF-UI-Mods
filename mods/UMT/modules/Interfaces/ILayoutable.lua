@@ -1,11 +1,11 @@
 local Layouter = UMT.Layouter.ReusedLayoutFor
 
----@alias LayouterFunctor fun(control:ILayoutable|Control):Layouter
+---@alias LayouterFunctor fun(control:ILayoutable|Control):UMT.Layouter
 
 ---@class ILayoutable
 ---@field _clearLayout fun(control: ILayoutable, layouter:LayouterFunctor)?
 ---@field _layout fun(control: ILayoutable, layouter:LayouterFunctor) : fun(control: ILayoutable)?
----@field _layouter fun(control:ILayoutable):Layouter
+---@field _layouter fun(control:ILayoutable):UMT.Layouter
 ILayoutable = ClassSimple
 {
     ---@param self ILayoutable

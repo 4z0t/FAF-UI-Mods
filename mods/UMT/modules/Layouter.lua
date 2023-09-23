@@ -7,13 +7,13 @@ local LayouterMetaTable = {}
 LayouterMetaTable.__index = LayouterMetaTable
 
 
----@class Layouter
+---@class UMT.Layouter
 ---@field c Control|false
 ---@field _scale NumberVar|false
----@operator call(Control):Layouter
+---@operator call(Control):UMT.Layouter
 Layouter = UMT.Class()
 {
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param scale NumberVar
     __init = function(self, scale)
         self.c = false
@@ -33,23 +33,23 @@ Layouter = UMT.Class()
         end
     },
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param control Control
-    ---@return Layouter
+    ---@return UMT.Layouter
     __call = function(self, control)
         self.c = control or false
         return self
     end,
 
     ---Scales given number / Numbervar
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
     ScaleNumber = function(self, value)
         return Functions.Mult(value, self.Scale)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
@@ -57,7 +57,7 @@ Layouter = UMT.Class()
         return Functions.Sum(n1, n2, self.Scale)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
@@ -65,7 +65,7 @@ Layouter = UMT.Class()
         return Functions.Diff(n1, n2, self.Scale)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
@@ -73,7 +73,7 @@ Layouter = UMT.Class()
         return Functions.Max(n1, n2, self.Scale)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
@@ -81,7 +81,7 @@ Layouter = UMT.Class()
         return Functions.Min(n1, n2, self.Scale)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
     _ScaleValue = function(self, value)
@@ -92,157 +92,157 @@ Layouter = UMT.Class()
         end
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param left FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Left = function(self, left)
         self.c.Left:Set(left)
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param right FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Right = function(self, right)
         self.c.Right:Set(right)
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param top FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Top = function(self, top)
         self.c.Top:Set(top)
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param bottom FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Bottom = function(self, bottom)
         self.c.Bottom:Set(bottom)
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param width FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Width = function(self, width)
         self.c.Width:Set(self:_ScaleValue(width))
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param height FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Height = function(self, height)
         self.c.Height:Set(self:_ScaleValue(height))
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param depth FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Over = function(self, parent, depth)
         self.c.Depth:Set(self:Sum(parent.Depth, depth or 0))
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param depth FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     Under = function(self, parent, depth)
         self.c.Depth:Set(self:Diff(parent.Depth, depth or 0))
         return self
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param leftOffset? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AtLeftIn = function(self, parent, leftOffset)
         return self:Left(self:Sum(parent.Left, leftOffset or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param topOffset? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AtTopIn = function(self, parent, topOffset)
         return self:Top(self:Sum(parent.Top, topOffset or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param rightOffset? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AtRightIn = function(self, parent, rightOffset)
         return self:Right(self:Diff(parent.Right, rightOffset or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param bottomOffset? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AtBottomIn = function(self, parent, bottomOffset)
         return self:Bottom(self:Diff(parent.Bottom, bottomOffset or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param padding? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AnchorToLeft = function(self, parent, padding)
         return self:Right(self:Diff(parent.Left, padding or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param padding? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AnchorToTop = function(self, parent, padding)
         return self:Bottom(self:Diff(parent.Top, padding or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param padding? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AnchorToRight = function(self, parent, padding)
         return self:Left(self:Sum(parent.Right, padding or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
     ---@param padding? FunctionalNumber
-    ---@return Layouter
+    ---@return UMT.Layouter
     AnchorToBottom = function(self, parent, padding)
         return self:Top(self:Sum(parent.Bottom, padding or 0))
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
-    ---@return Layouter
+    ---@return UMT.Layouter
     FillHorizontally = function(self, parent)
         return self
             :AtLeftIn(parent)
             :AtRightIn(parent)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
-    ---@return Layouter
+    ---@return UMT.Layouter
     FillVertically = function(self, parent)
         return self
             :AtTopIn(parent)
             :AtBottomIn(parent)
     end,
 
-    ---@param self Layouter
+    ---@param self UMT.Layouter
     ---@param parent Control
-    ---@return Layouter
+    ---@return UMT.Layouter
     Fill = function(self, parent)
         return self
             :FillHorizontally(parent)
@@ -345,8 +345,9 @@ Layouter = UMT.Class()
             :AtHorizontalCenterIn(parent, leftOffset)
     end,
 
-
-
+    ---@param self UMT.Layouter
+    ---@param color Color
+    ---@return UMT.Layouter
     Color = function(self, color)
         if type(color) == "string" and string.len(color) == 6 then
             color = "ff" .. color
@@ -362,7 +363,9 @@ Layouter = UMT.Class()
         return self
     end,
 
-
+    ---@param self UMT.Layouter
+    ---@param state boolean
+    ---@return UMT.Layouter
     DropShadow = function(self, state)
         self.c:SetDropShadow(state)
         return self
@@ -405,21 +408,6 @@ Layouter = UMT.Class()
     end,
 
 }
-
-function LayouterMetaTable:Color(color)
-    if type(color) == "string" and string.len(color) == 6 then
-        color = "ff" .. color
-    end
-
-    if self.c.SetSolidColor then
-        self.c:SetSolidColor(color)
-    elseif self.c.SetColor then
-        self.c:SetColor(color)
-    else
-        error("Unable to set color for control")
-    end
-    return self
-end
 
 function LayouterMetaTable:TextColor(color)
     self.c:SetColor(color)
@@ -492,7 +480,7 @@ function LayouterMetaTable:Get()
 end
 
 function LayouterMetaTable:__newindex(key, value)
-    error("attempt to set new index for a Layouter object")
+    error("attempt to set new index for a UMT.Layouter object")
 end
 
 function LayouterMetaTable:End()
@@ -509,6 +497,6 @@ function LayouterMetaTable:End()
     return self.c
 end
 
----@type Layouter
+---@type UMT.Layouter
 ReusedLayoutFor = Layouter()
 
