@@ -10,6 +10,7 @@ LayouterMetaTable.__index = LayouterMetaTable
 ---@class Layouter
 ---@field c Control|false
 ---@field _scale NumberVar|false
+---@operator call(Control):Layouter
 Layouter = UMT.Class()
 {
     ---@param self Layouter
@@ -34,8 +35,10 @@ Layouter = UMT.Class()
 
     ---@param self Layouter
     ---@param control Control
+    ---@return Layouter
     __call = function(self, control)
         self.c = control or false
+        return self
     end,
 
     ---Scales given number / Numbervar
@@ -342,6 +345,8 @@ Layouter = UMT.Class()
             :AtHorizontalCenterIn(parent, leftOffset)
     end,
 
+
+
     Color = function(self, color)
         if type(color) == "string" and string.len(color) == 6 then
             color = "ff" .. color
@@ -401,18 +406,6 @@ Layouter = UMT.Class()
 
 }
 
----Disables control
----@return Layouter
-function LayouterMetaTable:Disable()
-    self.c:Disable()
-    return self
-end
-
-function LayouterMetaTable:Hide()
-    self.c:Hide()
-    return self
-end
-
 function LayouterMetaTable:Color(color)
     if type(color) == "string" and string.len(color) == 6 then
         color = "ff" .. color
@@ -438,120 +431,6 @@ function LayouterMetaTable:BitmapColor(color)
     return self
 end
 
-function LayouterMetaTable:DropShadow(state)
-    self.c:SetDropShadow(state)
-    return self
-end
-
-function LayouterMetaTable:Texture(texture, border)
-    self.c:SetTexture(texture, border)
-    return self
-end
-
-function LayouterMetaTable:EnableHitTest(recursive)
-    self.c:EnableHitTest(recursive)
-    return self
-end
-
-function LayouterMetaTable:DisableHitTest(recursive)
-    self.c:DisableHitTest(recursive)
-    return self
-end
-
-function LayouterMetaTable:HitTest(state, recursive)
-    if state == nil then
-        error(":HitTest requires 1 positional argument \"state\"")
-    end
-    if state then
-        self.c:EnableHitTest(recursive)
-    else
-        self.c:DisableHitTest(recursive)
-    end
-    return self
-end
-
-function LayouterMetaTable:NeedsFrameUpdate(state)
-    self.c:SetNeedsFrameUpdate(state)
-    return self
-end
-
-function LayouterMetaTable:Alpha(alpha, applyToChildren)
-    self.c:SetAlpha(alpha, applyToChildren)
-    return self
-end
-
--- raw setting
-
-function LayouterMetaTable:Left(left)
-    self.c.Left:Set(left)
-    return self
-end
-
-function LayouterMetaTable:Right(right)
-    self.c.Right:Set(right)
-    return self
-end
-
-function LayouterMetaTable:Top(top)
-    self.c.Top:Set(top)
-    return self
-end
-
-function LayouterMetaTable:Bottom(bottom)
-    self.c.Bottom:Set(bottom)
-    return self
-end
-
-function LayouterMetaTable:Width(width)
-    if iscallable(width) then
-        self.c.Width:SetFunction(width)
-    else
-        self.c.Width:SetValue(LayoutHelpers.ScaleNumber(width))
-    end
-    return self
-end
-
-function LayouterMetaTable:Height(height)
-    if iscallable(height) then
-        self.c.Height:SetFunction(height)
-    else
-        self.c.Height:SetValue(LayoutHelpers.ScaleNumber(height))
-    end
-    return self
-end
-
-function LayouterMetaTable:Fill(parent)
-    LayoutHelpers.FillParent(self.c, parent)
-    return self
-end
-
-function LayouterMetaTable:FillFixedBorder(parent, offset)
-    LayoutHelpers.FillParentFixedBorder(self.c, parent, offset)
-    return self
-end
-
--- double-based positioning
-
-function LayouterMetaTable:AtLeftTopIn(parent, leftOffset, topOffset)
-    LayoutHelpers.AtLeftTopIn(self.c, parent, leftOffset, topOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightBottomIn(parent, rightOffset, bottomOffset)
-    LayoutHelpers.AtRightBottomIn(self.c, parent, rightOffset, bottomOffset)
-    return self
-end
-
-function LayouterMetaTable:AtLeftBottomIn(parent, leftOffset, bottomOffset)
-    LayoutHelpers.AtLeftBottomIn(self.c, parent, leftOffset, bottomOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightTopIn(parent, rightOffset, topOffset)
-    LayoutHelpers.AtRightTopIn(self.c, parent, rightOffset, topOffset)
-    return self
-end
-
 -- centered--
 
 function LayouterMetaTable:CenteredLeftOf(parent, offset)
@@ -571,125 +450,6 @@ end
 
 function LayouterMetaTable:CenteredBelow(parent, offset)
     LayoutHelpers.CenteredBelow(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtHorizontalCenterIn(parent, offset)
-    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtVerticalCenterIn(parent, offset)
-    LayoutHelpers.AtVerticalCenterIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtCenterIn(parent, vertOffset, horzOffset)
-    LayoutHelpers.AtCenterIn(self.c, parent, vertOffset, horzOffset)
-    return self
-end
-
--- single-in positioning
-
-function LayouterMetaTable:AtLeftIn(parent, offset)
-    LayoutHelpers.AtLeftIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtRightIn(parent, offset)
-    LayoutHelpers.AtRightIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtTopIn(parent, offset)
-    LayoutHelpers.AtTopIn(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomIn(parent, offset)
-    LayoutHelpers.AtBottomIn(self.c, parent, offset)
-    return self
-end
-
--- center-in positioning
-
-function LayouterMetaTable:AtLeftCenterIn(parent, offset, verticalOffset)
-    LayoutHelpers.AtLeftIn(self.c, parent, offset)
-    LayoutHelpers.AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtRightCenterIn(parent, offset, verticalOffset)
-    LayoutHelpers.AtRightIn(self.c, parent, offset)
-    LayoutHelpers.AtVerticalCenterIn(self.c, parent, verticalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtTopCenterIn(parent, offset, horizonalOffset)
-    LayoutHelpers.AtTopIn(self.c, parent, offset)
-    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
-function LayouterMetaTable:AtBottomCenterIn(parent, offset, horizonalOffset)
-    LayoutHelpers.AtBottomIn(self.c, parent, offset)
-    LayoutHelpers.AtHorizontalCenterIn(self.c, parent, horizonalOffset)
-    return self
-end
-
--- out-of positioning
-
-function LayouterMetaTable:Below(parent, offset)
-    LayoutHelpers.Below(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:Above(parent, offset)
-    LayoutHelpers.Above(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:RightOf(parent, offset)
-    LayoutHelpers.RightOf(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:LeftOf(parent, offset)
-    LayoutHelpers.LeftOf(self.c, parent, offset)
-    return self
-end
-
--- depth--
-
-function LayouterMetaTable:Over(parent, depth)
-    LayoutHelpers.DepthOverParent(self.c, parent, depth)
-    return self
-end
-
-function LayouterMetaTable:Under(parent, depth)
-    LayoutHelpers.DepthUnderParent(self.c, parent, depth)
-    return self
-end
-
--- anchor--
-
-function LayouterMetaTable:AnchorToTop(parent, offset)
-    LayoutHelpers.AnchorToTop(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AnchorToLeft(parent, offset)
-    LayoutHelpers.AnchorToLeft(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AnchorToRight(parent, offset)
-    LayoutHelpers.AnchorToRight(self.c, parent, offset)
-    return self
-end
-
-function LayouterMetaTable:AnchorToBottom(parent, offset)
-    LayoutHelpers.AnchorToBottom(self.c, parent, offset)
     return self
 end
 
@@ -749,26 +509,6 @@ function LayouterMetaTable:End()
     return self.c
 end
 
----Creates Layouter for given control
----@param control Control
----@return Layouter
-function LayoutFor(control)
-    local result = {
-        c = control
-    }
-    setmetatable(result, LayouterMetaTable)
-    return result
-end
+---@type Layouter
+ReusedLayoutFor = Layouter()
 
-local layouter = {
-    c = false
-}
-setmetatable(layouter, LayouterMetaTable)
-
----returns Reused Layouter
----@param control Control
----@return Layouter
-function ReusedLayoutFor(control)
-    layouter.c = control or false
-    return layouter
-end
