@@ -318,6 +318,30 @@ Layouter = UMT.Class()
             :AnchorToBottom(parent, padding)
     end,
 
+    AtLeftCenterIn = function(self, parent, leftOffset, topOffset)
+        return self
+            :AtLeftIn(parent, leftOffset)
+            :AtVerticalCenterIn(parent, topOffset)
+    end,
+
+    AtTopCenterIn = function(self, parent, topOffset, leftOffset)
+        return self
+            :AtTopIn(parent, topOffset)
+            :AtHorizontalCenterIn(parent, leftOffset)
+    end,
+
+    AtRightCenterIn = function(self, parent, rightOffset, topOffset)
+        return self
+            :AtRightIn(parent, rightOffset)
+            :AtVerticalCenterIn(parent, topOffset)
+    end,
+
+    AtBottomCenterIn = function(self, parent, bottomOffset, leftOffset)
+        return self
+            :AtBottomIn(parent, bottomOffset)
+            :AtHorizontalCenterIn(parent, leftOffset)
+    end,
+
     Color = function(self, color)
         if type(color) == "string" and string.len(color) == 6 then
             color = "ff" .. color
