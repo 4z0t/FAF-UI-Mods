@@ -146,12 +146,12 @@ Layouter = ClassSimple
     end,
 
     AtVerticalCenterIn = function(self, parent, topOffset)
-        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset, self.Scale))
+        self.c.Top:Set(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0, self.Scale))
         return self
     end,
 
     AtHorizontalCenterIn = function(self, parent, leftOffset)
-        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset, self.Scale))
+        self.c.Left:Set(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0, self.Scale))
         return self
     end,
 
