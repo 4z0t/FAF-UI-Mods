@@ -17,14 +17,14 @@ Layouter = UMT.Class()
     ---@param scale NumberVar
     __init = function(self, scale)
         self.c = false
-        self._scale = scale or false
+        self._scale = scale
     end,
 
     ---@type FunctionalNumber
     Scale = UMT.Property
     {
         get = function(self)
-            return self._scale
+            return self._scale or defaultScale
         end,
 
         set = function(self, value)
@@ -39,6 +39,10 @@ Layouter = UMT.Class()
     __call = function(self, control)
         self.c = control or false
         return self
+    end,
+
+    AtCenterOffset = function(self, base, baseLen, len, offset)
+        return Functions.AtCenterOffset(base, baseLen, len, offset, self.Scale)
     end,
 
     ---Scales given number / Numbervar
@@ -142,7 +146,7 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param depth FunctionalNumber
+    ---@param depth? FunctionalNumber
     ---@return UMT.Layouter
     Over = function(self, parent, depth)
         self.c.Depth:Set(self:Sum(parent.Depth, depth or 0))
@@ -151,7 +155,7 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param depth FunctionalNumber
+    ---@param depth? FunctionalNumber
     ---@return UMT.Layouter
     Under = function(self, parent, depth)
         self.c.Depth:Set(self:Diff(parent.Depth, depth or 0))
@@ -284,11 +288,11 @@ Layouter = UMT.Class()
     end,
 
     AtVerticalCenterIn = function(self, parent, topOffset)
-        return self:Top(Functions.AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0, self.Scale))
+        return self:Top(self:AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0))
     end,
 
     AtHorizontalCenterIn = function(self, parent, leftOffset)
-        return self:Left(Functions.AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0, self.Scale))
+        return self:Left(self:AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0))
     end,
 
     AtCenterIn = function(self, parent, top, left)
@@ -433,15 +437,53 @@ Layouter = UMT.Class()
 
 }
 
-function LayouterMetaTable:TextColor(color)
-    self.c:SetColor(color)
-    return self
-end
+---@class FloorLayouter:UMT.Layouter
+FloorLayouter = UMT.Class(Layouter)
+{
+    AtCenterOffset = function(self, base, baseLen, len, offset)
+        return Functions.Floor(Layouter.AtCenterOffset(self, base, baseLen, len, offset))
+    end,
+    ---Scales given number / Numbervar
+    ---@param self FloorLayouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
+    ScaleNumber = function(self, value)
+        return Functions.Floor(Layouter.ScaleNumber(self, value))
+    end,
 
-function LayouterMetaTable:BitmapColor(color)
-    self.c:SetSolidColor(color)
-    return self
-end
+    ---@param self FloorLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Sum = function(self, n1, n2)
+        return Functions.Floor(Layouter.Sum(self, n1, n2))
+    end,
+
+    ---@param self FloorLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Diff = function(self, n1, n2)
+        return Functions.Floor(Layouter.Diff(self, n1, n2))
+    end,
+
+    ---@param self FloorLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Max = function(self, n1, n2)
+        return Functions.Floor(Layouter.Max(self, n1, n2))
+    end,
+
+    ---@param self FloorLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Min = function(self, n1, n2)
+        return Functions.Floor(Layouter.Min(self, n1, n2))
+    end,
+}
+
 
 -- centered--
 
@@ -464,7 +506,6 @@ function LayouterMetaTable:CenteredBelow(parent, offset)
     LayoutHelpers.CenteredBelow(self.c, parent, offset)
     return self
 end
-
 
 -- get control --
 
@@ -491,4 +532,4 @@ function LayouterMetaTable:End()
 end
 
 ---@type UMT.Layouter
-ReusedLayoutFor = Layouter()
+ReusedLayoutFor = FloorLayouter()
