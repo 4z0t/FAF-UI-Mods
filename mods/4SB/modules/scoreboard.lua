@@ -53,8 +53,9 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
-
-
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleNumber(75))
+        ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
+        ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
     end,
 
     ---@param self ScoreBoard
@@ -152,7 +153,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     end,
 
     ResetArmyData = function(self)
-        ArmyViews.nameWidth:Set(ArmyViews.minNameWidth)
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleNumber(75))
         for _, armyData in Utils.GetArmiesFormattedTable() do
             self:GetArmyViews()[armyData.id]:SetStaticData(
                 armyData.id,

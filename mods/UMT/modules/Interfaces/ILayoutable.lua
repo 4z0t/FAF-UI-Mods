@@ -46,7 +46,7 @@ ILayoutable = ClassSimple
         end
     },
 
-    ---@type LayouterFunctor
+    ---@type UMT.Layouter
     Layouter = UMT.Property
     {
         ---@param self ILayoutable

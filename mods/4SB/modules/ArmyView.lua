@@ -43,12 +43,10 @@ local armyViewTextPointSize = 12
 local armyViewNameFont = Options.player.font.name:Raw()
 local focusArmyNameFont = Options.player.font.focus:Raw()
 
-minNameWidth = LayoutHelpers.ScaleNumber(75)
-nameWidth = LazyVar(minNameWidth)
+nameWidth = LazyVar()
 armyViewWidth = LazyVar()
-armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
 allyViewWidth = LazyVar()
-allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
+
 
 local armyViewHeight = 20
 local outOfGameColor = "ffa0a0a0"
