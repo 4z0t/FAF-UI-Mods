@@ -231,7 +231,7 @@ OptionsWindow = Class(Window) {
         end
         local function CreateSplitter()
             local splitter = Bitmap(self._optionsGroup)
-            LayoutFor(splitter):BitmapColor("ff000000"):Left(self._optionsGroup.Left):Right(self._optionsGroup.Right)
+            LayoutFor(splitter):Color("ff000000"):Left(self._optionsGroup.Left):Right(self._optionsGroup.Right)
                 :Height(2)
             return splitter
         end
@@ -306,8 +306,11 @@ OptionsWindow = Class(Window) {
                 LayoutHelpers.AtLeftTopIn(group.name, group)
 
                 group.colorBitmap = Bitmap(group)
-                LayoutFor(group.colorBitmap):Below(group.name, 1):Height(5):Right(group.Right):BitmapColor(
-                    group.colorValue)
+                LayoutFor(group.colorBitmap)
+                    :Below(group.name, 1)
+                    :Height(5)
+                    :Right(group.Right)
+                    :Color(group.colorValue)
 
                 group.alphaText = UIUtil.CreateText(group, "A", 14, "Arial")
                 group.redText = UIUtil.CreateText(group, "R", 14, "Arial")

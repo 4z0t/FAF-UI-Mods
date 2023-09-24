@@ -48,7 +48,7 @@ end
 _G.UMT = {
     Info         = import("/mods/UMT/mod_info.lua"),
     Version      = import("/mods/UMT/mod_info.lua").version,
-    Layouter     = import("/mods/UMT/modules/Layouter.lua"),
+    Layouter     = LazyImport("/mods/UMT/modules/Layouter.lua"),
     OptionVar    = import("/mods/UMT/modules/OptionVar.lua"),
     Select       = LazyImport("/mods/UMT/modules/select.lua"),
     Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/__Init__.lua"),

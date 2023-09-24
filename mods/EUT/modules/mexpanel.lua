@@ -84,7 +84,7 @@ MexPanel = Class(Group) {
             :Width(170)
             :Height(60)
             :AtLeftTopIn(parent, pos.left, pos.top)
-            :HitTest(true)
+            :EnableHitTest()
             :Over(parent, 100)
         self.contents = Group(self)
         LayoutFor(self.contents)
@@ -114,7 +114,7 @@ MexPanel = Class(Group) {
         local group = Bitmap(parent)
 
         LayoutFor(group)
-            :HitTest(true)
+            :EnableHitTest()
             :Color("aa000000")
             :Width(22)
             :Height(50)
@@ -126,7 +126,7 @@ MexPanel = Class(Group) {
         group.stratIcon = Bitmap(group)
 
         LayoutFor(group.stratIcon)
-            :HitTest(false)
+            :DisableHitTest()
             :Texture(iconName)
             :Alpha(0.3)
             :AtTopCenterIn(group, 11)
@@ -134,7 +134,7 @@ MexPanel = Class(Group) {
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
             LayoutFor(group.pauseIcon)
-                :HitTest(false)
+                :DisableHitTest()
                 :Texture(pausedTexture)
                 :Width(24)
                 :Height(24)
@@ -146,7 +146,7 @@ MexPanel = Class(Group) {
             group.upgrIcon = Bitmap(group)
 
             LayoutFor(group.upgrIcon)
-                :HitTest(false)
+                :DisableHitTest()
                 :Texture(upgradeTexture)
                 :Width(8)
                 :Height(8)
@@ -157,7 +157,7 @@ MexPanel = Class(Group) {
         group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
         LayoutFor(group.countLabel)
             :Color("ffaaaaaa")
-            :HitTest(false)
+            :DisableHitTest()
             :AtTopCenterIn(group, 1)
 
         if category.isUpgrading then
@@ -167,7 +167,7 @@ MexPanel = Class(Group) {
 
                 local progress = Bitmap(group)
                 LayoutFor(progress)
-                    :HitTest(false)
+                    :DisableHitTest()
                     :Color("3300ff00")
                     :Width(group.Width)
                     :Height(2)
@@ -177,7 +177,7 @@ MexPanel = Class(Group) {
                 local bg = Bitmap(group)
 
                 LayoutFor(bg)
-                    :HitTest(false)
+                    :DisableHitTest()
                     :Color("1100ff00")
                     :Width(group.Width)
                     :Height(2)
