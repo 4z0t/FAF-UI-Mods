@@ -41,6 +41,12 @@ Layouter = UMT.Class()
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@param base FunctionalNumber
+    ---@param baseLen FunctionalNumber
+    ---@param len FunctionalNumber
+    ---@param offset number
+    ---@return FunctionalNumber
     AtCenterOffset = function(self, base, baseLen, len, offset)
         return Functions.AtCenterOffset(base, baseLen, len, offset, self.Scale)
     end,
@@ -440,6 +446,12 @@ Layouter = UMT.Class()
 ---@class FloorLayouter:UMT.Layouter
 FloorLayouter = UMT.Class(Layouter)
 {
+    ---@param self FloorLayouter
+    ---@param base FunctionalNumber
+    ---@param baseLen FunctionalNumber
+    ---@param len FunctionalNumber
+    ---@param offset number
+    ---@return FunctionalNumber
     AtCenterOffset = function(self, base, baseLen, len, offset)
         return Functions.Floor(Layouter.AtCenterOffset(self, base, baseLen, len, offset))
     end,
