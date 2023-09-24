@@ -8,7 +8,7 @@ local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 
 
 ---@alias NumberVar LazyVar<number>
----@alias NumberFunction (fun():number) | NumberVar
+---@alias NumberFunction fun():number | NumberVar
 
 ---@alias FunctionalNumber NumberFunction|number
 

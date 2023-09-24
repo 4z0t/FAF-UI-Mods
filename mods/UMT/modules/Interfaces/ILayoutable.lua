@@ -1,11 +1,13 @@
 local Layouter = UMT.Layouter.ReusedLayoutFor
 
----@alias LayouterFunctor fun(control:ILayoutable|Control):UMT.Layouter
+
+---@alias ULayouter UMT.Layouter
+---@alias LayouterFunctor fun(control:ILayoutable|Control) : ULayouter
 
 ---@class ILayoutable
----@field _clearLayout fun(control: ILayoutable, layouter:LayouterFunctor)?
----@field _layout fun(control: ILayoutable, layouter:LayouterFunctor) : fun(control: ILayoutable)?
----@field _layouter fun(control:ILayoutable):UMT.Layouter
+---@field _clearLayout fun(control: ILayoutable, layouter:ULayouter)?
+---@field _layout fun(control: ILayoutable, layouter:ULayouter) : fun(control: ILayoutable)?
+---@field _layouter ULayouter
 ILayoutable = ClassSimple
 {
     ---@param self ILayoutable
@@ -14,11 +16,11 @@ ILayoutable = ClassSimple
         self.Layouter = parent.Layouter
     end,
 
-    ---@type fun(control: ILayoutable, layouter?:LayouterFunctor)
+    ---@type fun(control: ILayoutable, layouter?:ULayouter)
     Layout = UMT.Property
     {
         ---@param self ILayoutable
-        ---@param layout fun(control: ILayoutable, layouter:LayouterFunctor) : fun(control: ILayoutable)?
+        ---@param layout fun(control: ILayoutable, layouter:ULayouter) : fun(control: ILayoutable)?
         set = function(self, layout)
             if self._clearLayout then
                 self:_clearLayout(self.Layouter)
@@ -35,11 +37,11 @@ ILayoutable = ClassSimple
             end
         end,
         ---@param self ILayoutable
-        ---@return fun(control: ILayoutable, layouter?:LayouterFunctor)
+        ---@return fun(control: ILayoutable, layouter?:ULayouter)
         get = function(self)
             local layout = self._layout or self._Layout
             ---@param control ILayoutable
-            ---@param layouter? LayouterFunctor
+            ---@param layouter? ULayouter
             return function(control, layouter)
                 return layout(control, layouter or control.Layouter)
             end
@@ -50,20 +52,20 @@ ILayoutable = ClassSimple
     Layouter = UMT.Property
     {
         ---@param self ILayoutable
-        ---@return LayouterFunctor
+        ---@return ULayouter
         get = function(self)
             return self._layouter or Layouter
         end,
 
         ---@param self ILayoutable
-        ---@param value LayouterFunctor
+        ---@param value ULayouter
         set = function(self, value)
             self._layouter = value
         end
     },
 
     ---@param self ILayoutable
-    ---@param layouter LayouterFunctor
+    ---@param layouter ULayouter
     _Layout = function(self, layouter)
         error "Not implemented _Layout method!"
     end
