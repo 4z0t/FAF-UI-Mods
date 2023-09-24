@@ -494,37 +494,57 @@ Layouter = UMT.Class()
         return self
     end,
 
-
+    ---@param self UMT.Layouter
+    ---@param texture string
+    ---@param border? number
+    ---@return UMT.Layouter
     Texture = function(self, texture, border)
         self.c:SetTexture(texture, border)
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@param recursive? boolean
+    ---@return UMT.Layouter
     EnableHitTest = function(self, recursive)
         self.c:EnableHitTest(recursive)
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@param recursive? boolean
+    ---@return UMT.Layouter
     DisableHitTest = function(self, recursive)
         self.c:DisableHitTest(recursive)
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@param state boolean
+    ---@return UMT.Layouter
     NeedsFrameUpdate = function(self, state)
         self.c:SetNeedsFrameUpdate(state)
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@param alpha number
+    ---@param applyToChildren? boolean
+    ---@return UMT.Layouter
     Alpha = function(self, alpha, applyToChildren)
         self.c:SetAlpha(alpha, applyToChildren)
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     Disable = function(self)
         self.c:Disable()
         return self
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     Hide = function(self)
         self.c:Hide()
         return self
