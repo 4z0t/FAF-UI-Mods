@@ -3,10 +3,6 @@ Functions = import("LayoutFunctions.lua")
 
 local defaultScale = LayoutHelpers.GetPixelScaleFactor()
 
-local LayouterMetaTable = {}
-LayouterMetaTable.__index = LayouterMetaTable
-
-
 ---@class UMT.Layouter
 ---@field c Control|false
 ---@field _scale NumberVar|false
