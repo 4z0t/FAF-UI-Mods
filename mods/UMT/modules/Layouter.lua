@@ -256,122 +256,214 @@ Layouter = UMT.Class()
             :FillVertically(parent)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param left FunctionalNumber
+    ---@param top FunctionalNumber
+    ---@return UMT.Layouter
     AtLeftTopIn = function(self, parent, left, top)
         return self
             :AtLeftIn(parent, left)
             :AtTopIn(parent, top)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param right FunctionalNumber
+    ---@param top FunctionalNumber
+    ---@return UMT.Layouter
     AtRightTopIn = function(self, parent, right, top)
         return self
             :AtRightIn(parent, right)
             :AtTopIn(parent, top)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param right FunctionalNumber
+    ---@param bottom FunctionalNumber
+    ---@return UMT.Layouter
     AtRightBottomIn = function(self, parent, right, bottom)
         return self
             :AtRightIn(parent, right)
             :AtBottomIn(parent, bottom)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param left FunctionalNumber
+    ---@param bottom FunctionalNumber
+    ---@return UMT.Layouter
     AtLeftBottomIn = function(self, parent, left, bottom)
         return self
             :AtLeftIn(parent, left)
             :AtBottomIn(parent, bottom)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param left FunctionalNumber
+    ---@param top FunctionalNumber
+    ---@param right FunctionalNumber
+    ---@param bottom FunctionalNumber
+    ---@return UMT.Layouter
     OffsetIn = function(self, parent, left, top, right, bottom)
         return self
             :AtLeftTopIn(parent, left, top)
             :AtRightBottomIn(parent, right, bottom)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param offset FunctionalNumber
+    ---@return UMT.Layouter
     FillFixedBorder = function(self, parent, offset)
         return self:OffsetIn(parent, offset, offset, offset, offset)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param topOffset? number
+    ---@return UMT.Layouter
     AtVerticalCenterIn = function(self, parent, topOffset)
         return self:Top(self:AtCenterOffset(parent.Top, parent.Height, self.c.Height, topOffset or 0))
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param leftOffset? number
+    ---@return UMT.Layouter
     AtHorizontalCenterIn = function(self, parent, leftOffset)
         return self:Left(self:AtCenterOffset(parent.Left, parent.Width, self.c.Width, leftOffset or 0))
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param top? number
+    ---@param left? number
+    ---@return UMT.Layouter
     AtCenterIn = function(self, parent, top, left)
         return self
             :AtHorizontalCenterIn(parent, left)
             :AtVerticalCenterIn(parent, top)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return UMT.Layouter
     LeftOf = function(self, parent, padding)
         return self
             :AnchorToLeft(parent, padding)
             :AtTopIn(parent)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return UMT.Layouter
     RightOf = function(self, parent, padding)
         return self
             :AnchorToRight(parent, padding)
             :AtTopIn(parent)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return UMT.Layouter
     Above = function(self, parent, padding)
         return self
             :AtLeftIn(parent)
             :AnchorToTop(parent, padding)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param padding? FunctionalNumber
+    ---@return UMT.Layouter
     Below = function(self, parent, padding)
         return self
             :AtLeftIn(parent)
             :AnchorToBottom(parent, padding)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param leftOffset? FunctionalNumber
+    ---@param topOffset? number
+    ---@return UMT.Layouter
     AtLeftCenterIn = function(self, parent, leftOffset, topOffset)
         return self
             :AtLeftIn(parent, leftOffset)
             :AtVerticalCenterIn(parent, topOffset)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param topOffset? FunctionalNumber
+    ---@param leftOffset? number
+    ---@return UMT.Layouter
     AtTopCenterIn = function(self, parent, topOffset, leftOffset)
         return self
             :AtTopIn(parent, topOffset)
             :AtHorizontalCenterIn(parent, leftOffset)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param rightOffset? FunctionalNumber
+    ---@param topOffset? number
+    ---@return UMT.Layouter
     AtRightCenterIn = function(self, parent, rightOffset, topOffset)
         return self
             :AtRightIn(parent, rightOffset)
             :AtVerticalCenterIn(parent, topOffset)
     end,
 
+    ---@param self UMT.Layouter
+    ---@param parent Control
+    ---@param bottomOffset? FunctionalNumber
+    ---@param leftOffset? number
+    ---@return UMT.Layouter
     AtBottomCenterIn = function(self, parent, bottomOffset, leftOffset)
         return self
             :AtBottomIn(parent, bottomOffset)
             :AtHorizontalCenterIn(parent, leftOffset)
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetLeft = function(self)
         return self:Left(Functions.Diff(self.c.Right, self.c.Width))
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetTop = function(self)
         return self:Top(Functions.Diff(self.c.Bottom, self.c.Height))
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetRight = function(self)
         return self:Right(Functions.Sum(self.c.Left, self.c.Width))
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetBottom = function(self)
         return self:Bottom(Functions.Sum(self.c.Top, self.c.Height))
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetWidth = function(self)
         return self:Width(Functions.Diff(self.c.Right, self.c.Left))
     end,
 
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
     ResetHeight = function(self)
         return self:Height(Functions.Diff(self.c.Bottom, self.c.Top))
     end,
