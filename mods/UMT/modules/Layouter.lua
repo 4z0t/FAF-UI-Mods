@@ -258,8 +258,8 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param left FunctionalNumber
-    ---@param top FunctionalNumber
+    ---@param left? FunctionalNumber
+    ---@param top? FunctionalNumber
     ---@return UMT.Layouter
     AtLeftTopIn = function(self, parent, left, top)
         return self
@@ -269,8 +269,8 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param right FunctionalNumber
-    ---@param top FunctionalNumber
+    ---@param right? FunctionalNumber
+    ---@param top? FunctionalNumber
     ---@return UMT.Layouter
     AtRightTopIn = function(self, parent, right, top)
         return self
@@ -280,8 +280,8 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param right FunctionalNumber
-    ---@param bottom FunctionalNumber
+    ---@param right? FunctionalNumber
+    ---@param bottom? FunctionalNumber
     ---@return UMT.Layouter
     AtRightBottomIn = function(self, parent, right, bottom)
         return self
@@ -291,8 +291,8 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param left FunctionalNumber
-    ---@param bottom FunctionalNumber
+    ---@param left? FunctionalNumber
+    ---@param bottom? FunctionalNumber
     ---@return UMT.Layouter
     AtLeftBottomIn = function(self, parent, left, bottom)
         return self
@@ -302,10 +302,10 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param left FunctionalNumber
-    ---@param top FunctionalNumber
-    ---@param right FunctionalNumber
-    ---@param bottom FunctionalNumber
+    ---@param left? FunctionalNumber
+    ---@param top? FunctionalNumber
+    ---@param right? FunctionalNumber
+    ---@param bottom? FunctionalNumber
     ---@return UMT.Layouter
     OffsetIn = function(self, parent, left, top, right, bottom)
         return self
@@ -315,7 +315,7 @@ Layouter = UMT.Class()
 
     ---@param self UMT.Layouter
     ---@param parent Control
-    ---@param offset FunctionalNumber
+    ---@param offset? FunctionalNumber
     ---@return UMT.Layouter
     FillFixedBorder = function(self, parent, offset)
         return self:OffsetIn(parent, offset, offset, offset, offset)
