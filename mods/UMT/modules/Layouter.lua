@@ -17,7 +17,7 @@ Layouter = UMT.Class()
     ---@param scale NumberVar
     __init = function(self, scale)
         self.c = false
-        self._scale = scale
+        self._scale = scale or false
     end,
 
     ---@type FunctionalNumber
