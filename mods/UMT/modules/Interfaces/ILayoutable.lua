@@ -9,7 +9,7 @@ local Layouter = UMT.Layouter.ReusedLayoutFor
 ILayoutable = ClassSimple
 {
     ---@param self ILayoutable
-    ---@param parent ILayoutable
+    ---@param parent ILayoutable|Control
     InitLayouter = function(self, parent)
         self.Layouter = parent.Layouter
     end,

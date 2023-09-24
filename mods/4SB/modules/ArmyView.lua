@@ -51,7 +51,7 @@ allyViewWidth = LazyVar()
 local armyViewHeight = 20
 local outOfGameColor = "ffa0a0a0"
 
----@class ArmyView : Group
+---@class ArmyView : Group, ILayoutable
 ---@field isOutOfGame boolean
 ---@field id integer
 ---@field _bg Bitmap
@@ -64,13 +64,14 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _teamColor LazyVar<Color>
 ---@field _division string
 ---@field _plainColor LazyVar<Color>
-ArmyView = UMT.Class(Group)
+ArmyView = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     ---inits armyview
     ---@param self ArmyView
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+        self:InitLayouter(parent)
         self.parent = parent
 
         self.id = -1
@@ -92,20 +93,21 @@ ArmyView = UMT.Class(Group)
         self._name = Text(self)
     end,
 
+    ---@param self ArmyView
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
     ---Layouts ArmyView
     ---@param self ArmyView
-    _Layout = function(self)
-
-        LayoutFor(self._bg)
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
             :DisableHitTest()
 
-        LayoutFor(self._color)
+        layouter(self._color)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
@@ -114,13 +116,13 @@ ArmyView = UMT.Class(Group)
             :DisableHitTest()
             :Color(self.TeamColor)
 
-        LayoutFor(self._faction)
+        layouter(self._faction)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 4)
             :Over(self, 10)
             :DisableHitTest()
 
-        LayoutFor(self._div)
+        layouter(self._div)
             :Width(40)
             :Height(20)
             :AtVerticalCenterIn(self)
@@ -129,7 +131,7 @@ ArmyView = UMT.Class(Group)
             :DisableHitTest()
             :Alpha(0)
 
-        LayoutFor(self._rating)
+        layouter(self._rating)
             :AtVerticalCenterIn(self)
             :AnchorToLeft(self, -60)
             :DisableHitTest()
@@ -138,7 +140,7 @@ ArmyView = UMT.Class(Group)
             :Color(self.ArmyColor)
 
 
-        LayoutFor(self._name)
+        layouter(self._name)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 70)
             :Over(self, 10)
@@ -147,7 +149,7 @@ ArmyView = UMT.Class(Group)
             :Color(self.PlainColor)
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(armyViewWidth)
             :Height(armyViewHeight)
     end,
@@ -169,10 +171,10 @@ ArmyView = UMT.Class(Group)
         if division and division ~= "" then
 
             if division ~= "unlisted" then
-                LayoutFor(self._div)
+                self.Layouter(self._div)
                     :Texture("/textures/divisions/" .. division .. "_medium.png", 0)
             else
-                LayoutFor(self._div)
+                self.Layouter(self._div)
                     :Width(20)
                     :Height(20)
                     :AtRightIn(self._rating, -1 + 10)
@@ -274,12 +276,11 @@ ArmyView = UMT.Class(Group)
         self.PlainColor = outOfGameColor
     end,
 
-    ---comment
     ---@param self ArmyView
     ---@param pingData PingData
     DisplayPing = function(self, pingData)
         local ping = PingAnimation(self, pingData.ArrowColor, pingData.Location)
-        LayoutFor(ping)
+        self.Layouter(ping)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
@@ -298,7 +299,6 @@ ArmyView = UMT.Class(Group)
 ---@field _unitsBtn Bitmap
 AllyView = UMT.Class(ArmyView)
 {
-    ---comment
     ---@param self AllyView
     ---@param parent Control
     __init = function(self, parent)
@@ -367,10 +367,12 @@ AllyView = UMT.Class(ArmyView)
         end
     end,
 
-    _Layout = function(self)
-        ArmyView._Layout(self)
+    ---@param self AllyView
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        ArmyView._Layout(self, layouter)
 
-        LayoutFor(self._unitsBtn)
+        layouter(self._unitsBtn)
             :AtHorizontalCenterIn(self._faction)
             :AtVerticalCenterIn(self)
             :Texture(UIUtil.UIFile '/textures/ui/icons_strategic/commander_generic.dds')
@@ -388,7 +390,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._energyBtn)
+        layouter(self._energyBtn)
             :Right(self._energy.Right)
             :AtVerticalCenterIn(self)
             :Width(35)
@@ -407,7 +409,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._massBtn)
+        layouter(self._massBtn)
             :Right(self._mass.Right)
             :AtVerticalCenterIn(self)
             :Width(35)
@@ -426,7 +428,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._energy)
+        layouter(self._energy)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
@@ -436,7 +438,7 @@ AllyView = UMT.Class(ArmyView)
 
 
 
-        LayoutFor(self._mass)
+        layouter(self._mass)
             :AtRightIn(self, 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
@@ -446,7 +448,7 @@ AllyView = UMT.Class(ArmyView)
 
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(allyViewWidth)
     end,
 
@@ -541,6 +543,8 @@ local colorAnimation = UMT.Animation.Factory.Color
     :For(0.3)
     :Create()
 
+---@class ReplayArmyView : ArmyView
+---@field _data Text[]
 ReplayArmyView = UMT.Class(ArmyView)
 {
     __init = function(self, parent)
@@ -552,24 +556,26 @@ ReplayArmyView = UMT.Class(ArmyView)
         end
     end,
 
-    _Layout = function(self)
-        ArmyView._Layout(self)
+    ---@param self ReplayArmyView
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        ArmyView._Layout(self, layouter)
 
         local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
             if i == 1 then
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
                 first = self._data[i]
             elseif i == dataSize then
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self, lastDataTextOffset)
             else
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
             end
-            LayoutFor(self._data[i])
+            layouter(self._data[i])
                 :AtVerticalCenterIn(self)
                 :Over(self, 15)
                 :DisableHitTest()
@@ -579,12 +585,11 @@ ReplayArmyView = UMT.Class(ArmyView)
             self._data[i]._contracted = false
         end
 
-        LayoutFor(self)
-            :Width(function()
-                return nameWidth() + LayoutHelpers.ScaleNumber(70 + dataTextOffSet)
-                    + self.Right() - first.Right()
-            end)
-
+        layouter(self)
+            :Width(layouter:Sum(
+                layouter:Sum(nameWidth, 70 + dataTextOffSet),
+                layouter:Diff(self.Right, first.Right)
+            ))
     end,
 
 
@@ -616,12 +621,12 @@ ReplayArmyView = UMT.Class(ArmyView)
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
             return true
         elseif event.Type == 'MouseExit' then
-            LayoutFor(self._bg)
+            self.Layouter(self._bg)
                 :Color(bgColor)
             --colorAnimation:Apply(self._bg, bgColor())
             return true
         elseif event.Type == 'MouseEnter' then
-            LayoutFor(self._bg)
+            self.Layouter(self._bg)
                 :Color(highlightColor)
             --colorAnimation:Apply(self._bg, UMT.ColorUtils.ColorMult(bgColor(), 1.4))
             return true

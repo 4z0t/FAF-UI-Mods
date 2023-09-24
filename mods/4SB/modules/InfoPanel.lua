@@ -33,35 +33,40 @@ function FormatMapName(name)
     return name, false
 end
 
----@class InfoPanel : Group
-InfoPanel = Class(Group)
+---@class InfoPanel : Group, ILayoutable
+InfoPanel = Class(Group, UMT.Interfaces.ILayoutable)
 {
+    ---@param self InfoPanel
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+        self:InitLayouter(parent)
 
         self._mapName = Text(self)
         self._mapSize = Text(self)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    ---@param self InfoPanel
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
         local parent = self:GetParent()
 
         self._mapName:SetFont(Options.title.font.mapName:Raw(), textSize)
-        LayoutFor(self._mapName)
+        layouter(self._mapName)
             :AtCenterIn(self)
 
 
         self._mapSize:SetFont(Options.title.font.mapSize:Raw(), textSize)
-        LayoutFor(self._mapSize)
+        layouter(self._mapSize)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, 10)
             :DisableHitTest()
 
-        LayoutFor(self)
+        layouter(self)
             :Width(parent.Width)
             :Height(panelHeight)
             :DisableHitTest()
