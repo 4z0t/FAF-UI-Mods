@@ -1,4 +1,4 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group =  UMT.Controls.Group
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
@@ -51,7 +51,7 @@ allyViewWidth = LazyVar()
 local armyViewHeight = 20
 local outOfGameColor = "ffa0a0a0"
 
----@class ArmyView : Group, ILayoutable
+---@class ArmyView : UMT.Group
 ---@field isOutOfGame boolean
 ---@field id integer
 ---@field _bg Bitmap
@@ -64,14 +64,14 @@ local outOfGameColor = "ffa0a0a0"
 ---@field _teamColor LazyVar<Color>
 ---@field _division string
 ---@field _plainColor LazyVar<Color>
-ArmyView = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+ArmyView = UMT.Class(Group)
 {
     ---inits armyview
     ---@param self ArmyView
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:InitLayouter(parent)
+
         self.parent = parent
 
         self.id = -1

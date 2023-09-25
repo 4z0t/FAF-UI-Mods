@@ -43,7 +43,7 @@ Layout = function(scoreboard, layouter)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
     scoreboard._arrow = UMT.Views.VerticalCollapseArrow(scoreboard)
 
-    LayoutFor(scoreboard._arrow)
+    layouter(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
         :AtRightIn(GetFrame(0), -3)
         :Over(scoreboard, 20)
@@ -56,25 +56,25 @@ Layout = function(scoreboard, layouter)
         end
     end
 
-    LayoutFor(scoreboard._bracket)
+    layouter(scoreboard._bracket)
         :AtTopIn(scoreboard, -13)
         :AtBottomIn(scoreboard, -13)
         :AtRightIn(scoreboard, -26)
         :Over(scoreboard, 10)
 
 
-    LayoutFor(scoreboard._border)
+    layouter(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
         :Over(scoreboard)
         :DisableHitTest(true)
 
-    LayoutFor(scoreboard._dataPanel)
+    layouter(scoreboard._dataPanel)
         :Width(scoreboard.Width)
     if scoreboard._title then
-        LayoutFor(scoreboard._title)
+        layouter(scoreboard._title)
             :Width(scoreboard.Width)
     end
-    LayoutFor(scoreboard)
+    layouter(scoreboard)
         :AtRightIn(GetFrame(0), 25)
 
 

@@ -1,7 +1,7 @@
 local ExpandableGroup = import("ExpandableGroup.lua").ExpandableGroup
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
-ExpandableSelectionGroup = Class(ExpandableGroup)
+ExpandableSelectionGroup = UMT.Class(ExpandableGroup)
 {
     AddControls = function(self, controls)
         ExpandableGroup.AddControls(self, controls)

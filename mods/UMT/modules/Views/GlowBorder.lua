@@ -1,5 +1,5 @@
 local Bitmap = UMT.Controls.Bitmap
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -15,14 +15,13 @@ local textures = {
     br = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'),
 }
 
----@class GlowBorder : Group, ILayoutable
-GlowBorder = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+---@class GlowBorder : UMT.Group, ILayoutable
+GlowBorder = UMT.Class(Group)
 {
     ---@param self GlowBorder
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:InitLayouter(parent)
 
         self.tl = Bitmap(self, textures.tl)
         self.tr = Bitmap(self, textures.tr)

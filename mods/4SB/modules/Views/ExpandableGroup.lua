@@ -1,5 +1,5 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
@@ -75,32 +75,45 @@ local fadeAnimation = alphaAnimationFactory
     :EndWith(0)
     :ApplyToChildren()
     :OnFinish(function(control)
-        LayoutHelpers.AtCenterIn(control, control:GetParent())
+        control.Layouter(control)
+            :AtCenterIn(control:GetParent())
         control:Hide()
     end)
     :Create()
 
 
-ExpandableGroup = Class(Group)
+ExpandableGroup = UMT.Class(Group)
 {
     __init = function(self, parent, width, height)
         Group.__init(self, parent)
-        LayoutHelpers.SetDimensions(self, width, height)
+
         self._expand = Group(self)
-        LayoutHelpers.AtLeftTopIn(self._expand, self)
-        LayoutHelpers.SetDimensions(self._expand, width, height)
+
         self._controls       = {}
         self._active         = false
         self._animationIndex = 1
         self._isExpanded     = false
     end,
 
+    __post_init = function(self, parent, width, height)
+        local layouter = self.Layouter
+        layouter(self)
+            :Width(width)
+            :Height(height)
+
+        layouter(self._expand)
+            :Width(width)
+            :Height(height)
+            :AtLeftTopIn(self)
+    end,
+
+
     AddControls = function(self, controls, default)
         default = default or 1
 
         self._controls = {}
         for i, control in controls do
-            LayoutHelpers.DepthOverParent(control, self, 5)
+            self.Layouter(control):Over(self, 5)
             if i == default then
                 self._active = control
                 control:Show()
@@ -108,7 +121,7 @@ ExpandableGroup = Class(Group)
                 table.insert(self._controls, control)
                 control:Hide()
             end
-            LayoutHelpers.AtCenterIn(control, self)
+            self.Layouter(control):AtCenterIn(self)
         end
 
     end,
@@ -133,8 +146,9 @@ ExpandableGroup = Class(Group)
         local index = self._animationIndex
         local control = self._controls[index]
         local indexOffset = (index + 0.5)
-        LayoutHelpers.AtHorizontalCenterIn(control, self)
-        control.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * control.Height() end)
+        self.Layouter(control)
+            :AtHorizontalCenterIn(self)
+            :Top(function() return self.Top() + indexOffset * self.Height() - 0.5 * control.Height() end)
         control:Show()
         appearAnimation:Apply(control)
     end,

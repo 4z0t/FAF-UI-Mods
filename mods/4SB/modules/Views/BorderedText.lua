@@ -1,10 +1,10 @@
 local Border = import("Border.lua").Border
-local Text = import("/lua/maui/text.lua").Text
+local Text = UMT.Controls.Text
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 ---@class BorderedText : BorderColored
-BorderedText = Class(Border)
+BorderedText = UMT.Class(Border)
 {
     __init = function(self, parent, color, borderWidth)
         Border.__init(self, parent, color, borderWidth)
@@ -14,7 +14,7 @@ BorderedText = Class(Border)
             self:SetTextColor(color)
         end
 
-        LayoutFor(self._text)
+        self.Layouter(self._text)
             :AtCenterIn(self)
             :DisableHitTest()
     end,

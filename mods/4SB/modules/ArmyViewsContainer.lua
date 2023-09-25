@@ -1,8 +1,4 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
-local UIUtil = import('/lua/ui/uiutil.lua')
+local Group = UMT.Controls.Group
 local Options = import("Options.lua")
 
 local Utils = import("Utils.lua")
@@ -25,8 +21,8 @@ local scoreFunction = function(score)
     return score.general.score
 end
 
----@class ArmyViewsContainer : Group
-ArmyViewsContainer = Class(Group)
+---@class ArmyViewsContainer : UMT.Group
+ArmyViewsContainer = UMT.Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -47,26 +43,26 @@ ArmyViewsContainer = Class(Group)
 
     __post_init = function(self)
         self:_InitArmyViews()
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
         local last
         local first
         for i, armyView in self._lines do
             if i == 1 then
-                LayoutFor(armyView)
+                layouter(armyView)
                     :AtRightTopIn(self)
                 first = armyView
             else
-                LayoutFor(armyView)
+                layouter(armyView)
                     :AnchorToBottom(self._lines[i - 1])
                     :Right(self.Right)
             end
             last = armyView
         end
         if not first then
-            LayoutFor(self)
+            layouter(self)
                 :Height(0)
                 :Width(0)
                 :DisableHitTest()
@@ -77,7 +73,7 @@ ArmyViewsContainer = Class(Group)
         end
         self._top = self._lines[1]
         self._bottom = last
-        LayoutFor(self)
+        layouter(self)
             :Width(self._top.Width)
             :DisableHitTest()
     end,
@@ -177,7 +173,7 @@ ArmyViewsContainer = Class(Group)
             end
         end
 
-        self:_Layout()
+        self:Layout()
     end,
 
     Expand = function(self, id)

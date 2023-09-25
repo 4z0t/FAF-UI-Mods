@@ -9,7 +9,7 @@ local Dragger = import("/lua/maui/dragger.lua").Dragger
 local colorAnimationFactory = UMT.Animation.Factory.Color
 
 ---@class BorderedCheckBox : BorderedText
-BorderedCheckBox = Class(BorderedText)
+BorderedCheckBox = UMT.Class(BorderedText)
 {
     __init = function(self,
                       parent,
@@ -150,7 +150,7 @@ local colorAnimation = colorAnimationFactory
     :Create(colorAnimator)
 
 ---@class AnimatedBorderedCheckBox : BorderedCheckBox
-AnimatedBorderedCheckBox = Class(BorderedCheckBox)
+AnimatedBorderedCheckBox = UMT.Class(BorderedCheckBox)
 {
     OnStateChange = function(self)
         colorAnimation:Apply(self, self._states[self._controlState][self._checkState])

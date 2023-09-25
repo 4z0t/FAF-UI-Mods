@@ -7,7 +7,7 @@ local LuaQ = UMT.LuaQ
 
 
 ---@class TeamViewsContainer : ArmyViewsContainer
-TeamViewsContainer = Class(ArmyViewsContainer)
+TeamViewsContainer = UMT.Class(ArmyViewsContainer)
 {
 
     _InitArmyViews = function(self)

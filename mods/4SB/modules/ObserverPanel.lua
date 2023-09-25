@@ -1,4 +1,4 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -20,15 +20,14 @@ local sliderColor = Options.observer.color.line:Raw()
 local width = 300
 local height = 20
 
----@class ObserverPanel : Group, ILayoutable
+---@class ObserverPanel : UMT.Group
 ---@field _bg Bitmap
-ObserverPanel = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+ObserverPanel = UMT.Class(Group)
 {
     ---@param self ObserverPanel
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:InitLayouter(parent)
 
         self._bg = Bitmap(self)
 

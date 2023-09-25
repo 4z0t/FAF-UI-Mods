@@ -38,6 +38,34 @@ function Mult(n1, n2)
     return n1 * n2
 end
 
+---returns function of mult of two given lazyvars
+---@overload fun(n1:number, n2:number):number
+---@overload fun(n1:NumberVar, n2:number):NumberFunction
+---@overload fun(n1:number, n2:NumberVar):NumberFunction
+---@param n1 NumberVar
+---@param n2 NumberVar
+---@return NumberFunction
+function Div(n1, n2)
+    if iscallable(n1) and iscallable(n2) then
+        return function() return n1() / n2() end
+    end
+    if iscallable(n1) then
+        assert(n2 ~= 0, "Attempt to diveide by zero")
+        return function()
+            return n1() / n2
+        end
+    end
+    if iscallable(n2) then
+        if n1 == 0 then
+            return 0
+        end
+        return function()
+            return n1 / n2()
+        end
+    end
+    return n1 / n2
+end
+
 ---returns function of max between lazyvar or value
 ---@param var NumberVar
 ---@param value number

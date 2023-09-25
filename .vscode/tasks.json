@@ -9,7 +9,7 @@
         "init-dev.lua",
         "/nobugreport",
         "/log",
-        ".\\logs\\game.log",
+        "C:\\ProgramData\\FAForever\\bin\\logs\\game.log",
         "/EnableDiskWatch",
         "/showlog",
 

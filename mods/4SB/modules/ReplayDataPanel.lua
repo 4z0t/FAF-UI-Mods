@@ -1,7 +1,7 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
+local Text = UMT.Controls.Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
@@ -9,6 +9,8 @@ local ExpandableSelectionGroup = import("Views/ExpandableSelectionGroup.lua").Ex
 local ExpandableGroup = import("Views/ExpandableGroup.lua").ExpandableGroup
 local AnimatedBorderedCheckBox = import("Views/BorderedCheckBox.lua").AnimatedBorderedCheckBox
 local LazyVar = import('/lua/lazyvar.lua').Create
+
+local Functions = UMT.Layouter.Functions
 
 local Options = import("Options.lua")
 
@@ -25,7 +27,7 @@ local bgColor = Options.player.color.bg:Raw()
 local textFont = Options.player.font.data:Raw()
 
 local checkboxes = import("DataPanelConfig.lua").checkboxes
-local Chechbox = Class(AnimatedBorderedCheckBox)
+local Chechbox = UMT.Class(AnimatedBorderedCheckBox)
 {
     HandleEvent = function(self, event)
         if event.Type == 'WheelRotation' then
@@ -39,16 +41,11 @@ local Chechbox = Class(AnimatedBorderedCheckBox)
     end
 }
 
-local CheckboxDropDown = Class(ExpandableSelectionGroup)
+local CheckboxDropDown = UMT.Class(ExpandableSelectionGroup)
 {
     __init = function(self, parent, width, height)
         ExpandableSelectionGroup.__init(self, parent, width, height)
         self._bg = Bitmap(self)
-        LayoutFor(self._bg)
-            :Color(bgColor)
-            :Fill(self._expand)
-            :Top(self.Bottom)
-
 
         self._direction = false
         self._sortId = false
@@ -56,7 +53,13 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
         self._arrow = Text(self)
         self._arrow:SetText("")
         self._arrow:SetFont(textFont, 14)
-        LayoutFor(self._arrow)
+
+        self.Layouter(self._bg)
+            :Color(bgColor)
+            :Fill(self._expand)
+            :Top(self.Bottom)
+
+        self.Layouter(self._arrow)
             :AtVerticalCenterIn(self)
             :AnchorToRight(self)
             :DisableHitTest()
@@ -128,9 +131,9 @@ local CheckboxDropDown = Class(ExpandableSelectionGroup)
 }
 
 
----@class DataPanel : Group
+---@class DataPanel : UMT.Group
 ---@field _bg Bitmap
-DataPanel = Class(Group)
+DataPanel = UMT.Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -149,13 +152,16 @@ DataPanel = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
         self:_SetupCheckBoxes()
         self._sb:SetDataSetup(self._setup)
         self._replayId:SetText(tostring(UIUtil.GetReplayId() or ""))
     end,
 
-    _Layout = function(self)
+
+    ---@param self DataPanel
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
 
 
         local dropdownsCount = table.getn(self._dropdowns)
@@ -163,34 +169,34 @@ DataPanel = Class(Group)
         local first = self._dropdowns[1]
 
         local spacing = LazyVar()
-        spacing:Set(function()
-            return math.min(
-                math.floor((self.Width() - LayoutHelpers.ScaleNumber(dropdownsCount * checkboxWidth)) /
-                    (1 + dropdownsCount)),
-                LayoutHelpers.ScaleNumber(20)
-            )
-        end)
 
-        LayoutFor(self._bg)
+        spacing:Set(
+            layouter:Min(
+                20,
+                Functions.Div(layouter:Diff(self.Width, dropdownsCount * checkboxWidth), 1 + dropdownsCount)
+            )
+        )
+
+        layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
             :DisableHitTest()
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(panelWidth)
             :Height(panelHeight)
 
         for i, dropdown in self._dropdowns do
             if i == dropdownsCount then
 
-                LayoutFor(dropdown)
+                layouter(dropdown)
                     :AtVerticalCenterIn(self)
-                    :Right(function() return self.Right() - spacing() end)
+                    :Right(Functions.Diff(self.Right, spacing))
             elseif i == 1 then
                 local nextDD = self._dropdowns[i + 1]
                 local dd = dropdown
-                LayoutFor(dropdown)
+                layouter(dropdown)
                     :AtVerticalCenterIn(self)
                     :Left(function()
                         local left = dd.Right() - dd.Width()
@@ -201,17 +207,17 @@ DataPanel = Class(Group)
                         end
                         return left
                     end)
-                    :Right(function() return nextDD.Left() - spacing() end)
+                    :Right(Functions.Diff(nextDD.Left, spacing))
             else
                 local nextDD = self._dropdowns[i + 1]
-                LayoutFor(dropdown)
+                layouter(dropdown)
                     :AtVerticalCenterIn(self)
-                    :Right(function() return nextDD.Left() - spacing() end)
+                    :Right(Functions.Diff(nextDD.Left, spacing))
             end
 
         end
 
-        LayoutFor(self._replayId)
+        layouter(self._replayId)
             :AtVerticalCenterIn(self)
             :Color("ffaaaaaa")
             :DisableHitTest()
@@ -220,7 +226,7 @@ DataPanel = Class(Group)
     end,
 
     _SetupCheckBoxes = function(self)
-
+        local layouter = self.Layouter
         for i, dropdown in self._dropdowns do
             local cbs = {}
             for j, checkboxData in checkboxes[i] do
@@ -233,7 +239,7 @@ DataPanel = Class(Group)
                     checkboxData.du,
                     checkboxData.dc
                 )
-                LayoutFor(checkbox)
+                layouter(checkbox)
                     :Width(checkboxWidth)
                     :Height(checkboxHeight)
                 checkbox:SetText(checkboxData.text)

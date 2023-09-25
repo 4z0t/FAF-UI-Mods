@@ -1,16 +1,15 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = UMT.Controls.Bitmap
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
----@class FactionRightBracket: Group, ILayoutable
-FactionRightBracket = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+---@class FactionRightBracket: UMT.Group
+FactionRightBracket = UMT.Class(Group)
 {
     ---@param self FactionRightBracket
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:InitLayouter(parent)
 
         self.top = Bitmap(self, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_t.dds"))
         self.middle = Bitmap(self, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_m.dds"))
