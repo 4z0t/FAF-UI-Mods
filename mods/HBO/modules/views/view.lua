@@ -44,11 +44,13 @@ function CreateUI(parent)
     ViewModel.SetActive()
     local group = Group(parent)
 
-    group.popup = Popup(parent, group)
     LayoutFor(group)
         :Width(1300)
         :Height(900)
         :AtCenterIn(parent)
+
+    group.popup = Popup(parent, group)
+    LayoutFor(group)
         :Over(group.popup, 10)
 
 
@@ -143,7 +145,7 @@ function CreateUI(parent)
         :Below(group.construction, 10)
         :Height(500)
         :Width(group.construction.Width)
-    
+
     local function CreateSingleCategory(category, catParent)
         local categoryGroup = Group(catParent)
         local name = UIUtil.CreateText(categoryGroup, category, 20, UIUtil.titleFont, true)
