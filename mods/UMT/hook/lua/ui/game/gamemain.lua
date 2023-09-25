@@ -1,6 +1,12 @@
+do
+    local OldCreateUI = CreateUI
+    function CreateUI(isReplay)
 
-local originalCreateUI = CreateUI
-function CreateUI(isReplay, parent)
-    originalCreateUI(isReplay)
-    import("/mods/UMT/modules/main.lua").init(isReplay)
+        OldCreateUI(isReplay)
+        if false then
+            UMT.Mods.Add "UMT"
+        end
+        UMT.Mods.Load(isReplay)
+
+    end
 end

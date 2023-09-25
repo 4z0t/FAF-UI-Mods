@@ -1,42 +1,71 @@
 -- upvalue for performance
 local TableInsert = table.insert
-local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryContains = EntityCategoryContains
 local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
+local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
-local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
-
-local Select = import("/mods/UMT/modules/select.lua")
-local GetUnits = import("/mods/UMT/modules/units.lua").Get
+local Select = UMT.Select
+local GetUnits = UMT.Units.Get
 local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local UpdateMexPanel = import("mexpanel.lua").Update
+local Options = import("options.lua")
+
 
 local mexCategories = import("mexcategories.lua").mexCategories
+
+local upgradeT1 = Options.upgradeT1Option()
+local upgradeT2 = Options.upgradeT2Option()
+local unpauseAssisted = Options.unpauseAssisted()
+local unpauseAssistedBP = Options.unpauseAssistedBP()
+local unpauseOnce = Options.unpauseOnce()
+
 local mexData = {}
-
 local toBePaused = {}
+local unPaused = UMT.Weak.Key {}
 
-local function UpgradeMexes(mexes)
+local function UpgradeMexes(mexes, selector)
 
     local upgrades = {}
+    if not selector then
+        for _, m in mexes do
+            if not toBePaused[m:GetEntityId()] then
+                toBePaused[m:GetEntityId()] = true
+                local bp = m:GetBlueprint()
+                local upgradesTo = bp.General.UpgradesTo
 
-    for _, m in mexes do
-        toBePaused[m:GetEntityId()] = true
-        local bp = m:GetBlueprint()
-        local upgrades_to = bp.General.UpgradesTo
+                if not upgrades[upgradesTo] then
+                    upgrades[upgradesTo] = { m }
+                else
+                    TableInsert(upgrades[upgradesTo], m)
+                end
 
-        upgrades[upgrades_to] = upgrades[upgrades_to] or {}
+            end
+        end
+    else
+        for _, m in mexes do
+            if not toBePaused[m:GetEntityId()] and selector(m) then
+                toBePaused[m:GetEntityId()] = true
+                local bp = m:GetBlueprint()
+                local upgradesTo = bp.General.UpgradesTo
 
-        table.insert(upgrades[upgrades_to], m)
+                if not upgrades[upgradesTo] then
+                    upgrades[upgradesTo] = { m }
+                else
+                    TableInsert(upgrades[upgradesTo], m)
+                end
+
+            end
+        end
     end
 
     if not table.empty(upgrades) then
         Select.Hidden(function()
-            for upgrades_to, up_mexes in upgrades do
-                SelectUnits(up_mexes)
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgrades_to, 1, false)
+            for upgradesTo, upMexes in upgrades do
+                SelectUnits(upMexes)
+                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgradesTo, 1, false)
             end
         end)
     end
@@ -58,7 +87,7 @@ local function MatchCategory(category, unit)
     end
 
     if category.isPaused ~= nil then
-        if GetIsPaused({unit}) ~= category.isPaused then
+        if GetIsPaused({ unit }) ~= category.isPaused then
             return false
         end
     end
@@ -66,8 +95,30 @@ local function MatchCategory(category, unit)
     return true
 end
 
+local function GetCappingBonus(mex)
+    local productionPerSecondMass = mex:GetBlueprint().Economy.ProductionPerSecondMass
+    local massProduced = mex:GetEconData().massProduced
+
+    if productionPerSecondMass > 0 then
+        return massProduced / productionPerSecondMass
+    else
+        return 1
+    end
+end
+
+local function IsCapped(mex)
+    return GetCappingBonus(mex) >= 1.5
+end
+
+local function CheckCapped(mexes)
+    for _, mex in mexes do
+        mex.isCapped = IsCapped(mex)
+    end
+end
+
 local function UpdateUI()
     local mexes = GetUnits(categoryMex)
+
 
     for id, category in mexCategories do
         mexData[id] = {
@@ -78,7 +129,26 @@ local function UpdateUI()
     for _, mex in mexes do
         mex.isUpgraded = false
         mex.isUpgrader = false
+        mex.assistBP   = 0
     end
+
+
+    if unpauseAssisted then
+        local engies = GetUnits(categoryEngineer)
+        for _, engy in engies do
+            local assistedUnit = engy:GetGuardedEntity()
+            local focusedUnit = engy:GetFocus()
+            if assistedUnit and
+                focusedUnit and --check if we are really assisiting mex now
+                EntityCategoryContains(categoryMex, assistedUnit) and
+                not GetIsPaused { engy }
+            then
+                assistedUnit.assistBP = (assistedUnit.assistBP or 0) + engy:GetBlueprint().Economy.BuildRate
+            end
+        end
+    end
+
+
     for _, mex in mexes do
         local f = mex:GetFocus()
         if f ~= nil and f:IsInCategory("STRUCTURE") then
@@ -86,7 +156,16 @@ local function UpdateUI()
             f.isUpgraded = true
             if toBePaused[mex:GetEntityId()] then
                 toBePaused[mex:GetEntityId()] = nil
-                SetPaused({mex}, true)
+                SetPaused({ mex }, true)
+            end
+
+            if unpauseAssisted and
+                not (unpauseOnce and unPaused[mex]) and
+                mex.assistBP > unpauseAssistedBP and
+                GetIsPaused { mex }
+            then
+                SetPaused({ mex }, false)
+                unPaused[mex] = true
             end
         end
     end
@@ -100,15 +179,33 @@ local function UpdateUI()
         end
     end
 
-    for id, category in mexCategories do
+    if upgradeT1 and not table.empty(mexData[1].mexes) then
+        UpgradeMexes(mexData[1].mexes)
+    end
+    if upgradeT2 and not table.empty(mexData[4].mexes) then
+        UpgradeMexes(mexData[4].mexes, IsCapped)
+    end
 
+    -- T2 mexes
+    if not table.empty(mexData[4].mexes) then
+        CheckCapped(mexData[4].mexes)
+    end
+
+    -- T3 mexes
+    if not table.empty(mexData[7].mexes) then
+        CheckCapped(mexData[7].mexes)
+    end
+
+    for id, category in mexCategories do
         if category.isUpgrading and not table.empty(mexData[id].mexes) then
             local sortedMexes = From(mexData[id].mexes):Sort(function(a, b)
                 return a:GetWorkProgress() > b:GetWorkProgress()
             end)
 
             local sorted = sortedMexes:Map(function(k, m)
-                return m:GetWorkProgress()
+                local wp = m:GetWorkProgress()
+                m.progress = wp
+                return wp
             end):ToDictionary()
 
             mexData[id].progress = sorted
@@ -143,8 +240,12 @@ function PauseWorst(id)
     if table.empty(mexes) then
         return
     end
-    SetPaused({mexes[table.getn(mexes)]}, true)
+    SetPaused({ mexes[table.getn(mexes)] }, true)
     UpdateUI()
+end
+
+function GetMexes(id)
+    return mexData[id].mexes
 end
 
 function UnPauseBest(id)
@@ -152,13 +253,13 @@ function UnPauseBest(id)
     if table.empty(mexes) then
         return
     end
-    SetPaused({mexes[1]}, false)
+    SetPaused({ mexes[1] }, false)
     UpdateUI()
 end
 
 function SelectBest(id)
     local mexes = mexData[id].mexes
-    SelectUnits({mexes[1]})
+    SelectUnits({ mexes[1] })
 end
 
 function SelectAll(id)
@@ -184,6 +285,22 @@ function SelectOnScreen(id)
 end
 
 function init()
-    AddBeatFunction(UpdateUI, true)
-end
 
+    Options.upgradeT1Option.OnChange = function(var)
+        upgradeT1 = var()
+    end
+    Options.upgradeT2Option.OnChange = function(var)
+        upgradeT2 = var()
+    end
+
+    Options.unpauseAssisted.OnChange = function(var)
+        unpauseAssisted = var()
+    end
+    Options.unpauseAssistedBP.OnChange = function(var)
+        unpauseAssistedBP = var()
+    end
+    Options.unpauseOnce.OnChange = function(var)
+        unpauseOnce = var()
+    end
+    import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
+end

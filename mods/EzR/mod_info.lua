@@ -1,0 +1,10 @@
+name = "EzReclaim"
+version = 3
+copyright = ""
+description = "Shows reclaim labels in reclaim mode."
+author = "4z0t"
+url = ""
+uid = "EzReclaim-4z0t-v03"
+exclusive = false
+ui_only = true
+icon = "/mods/EzR/icon.png"

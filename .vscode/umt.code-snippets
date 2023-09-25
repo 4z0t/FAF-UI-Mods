@@ -1,0 +1,59 @@
+{
+  "Property": {
+    "body": [
+      "${1:PropertyName} = UMT.Property",
+      "{",
+
+      "\tget = function(self)",
+      "\t\treturn",
+      "\tend,",
+      "",
+      "\tset = function(self, value)",
+      "",
+      "\tend",
+
+      "}"
+    ],
+    "prefix": "umtproperty",
+    "description": "creates basic UMT property"
+  },
+  "Require": {
+    "body": [
+      "local function ExistGlobal(name)",
+      "\treturn rawget(_G, name) ~= nil",
+      "end",
+      "",
+      "if ExistGlobal \"UMT\" and UMT.Version >= ${1:Version} then",
+      "",
+      "end"
+    ],
+    "prefix": "umtrequire",
+    "description": "Creates UMT condition check"
+  },
+  "Closure": {
+    "body": ["function (${args})", "\t", "end"],
+    "prefix": "=>",
+    "description": "Creates lua closure",
+    "scope": "lua"
+  },
+  "MOD_INFO": {
+    "body": [
+      "name = \"${name}\"",
+      "version = ${version}",
+      "copyright = \"\"",
+      "description = [[${description}]]",
+      "author = \"${author}\"",
+      "url = \"\"",
+      "uid = \"${uid}\"",
+      "exclusive = false",
+      "ui_only = true",
+      "conflicts = {${conflicts}}",
+      "requires = {${requires}}",
+      "before = {${before}}",
+      "after = {${after}}"
+    ],
+    "prefix": "modinfo",
+    "description": "Creates mod info fields",
+    "scope": "lua"
+  }
+}

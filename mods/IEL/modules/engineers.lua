@@ -4,255 +4,346 @@ local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
-local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 local LazyVar = import("/lua/lazyvar.lua")
 
-local GetUnits = import("/mods/UMT/modules/units.lua").Get
-local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
-local OptionsUtils = import("/mods/UMT/modules/OptionsWindow.lua")
-local OptionVarCreate = import("/mods/UMT/modules/OptionVar.lua").Create
 
-local modName = "IEL"
+local GetUnits = UMT.Units.GetFast
+local Options = import("options.lua")
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local engineersOption = OptionVarCreate(modName, "engineersOverlay", true)
-local factoriesOption = OptionVarCreate(modName, "factoriesOverlay", true)
-local supportCommanderOption = OptionVarCreate(modName, "supportCommanderOverlay", true)
-local tacticalNukesOption = OptionVarCreate(modName, "tacticalNukesOverlay", true)
-local massExtractorsOption = OptionVarCreate(modName, "massExtractorsOverlay", true)
+local engineersOption = Options.engineersOption
+local engineersWithNumbersOption = Options.engineersWithNumbersOption
+local factoryOverlayWithTextOption = Options.factoryOverlayWithTextOption
+local factoriesOption = Options.factoriesOption
+local supportCommanderOption = Options.supportCommanderOption
+local commanderOverlayOption = Options.commanderOverlayOption
+local tacticalNukesOption = Options.tacticalNukesOption
+local massExtractorsOption = Options.massExtractorsOption
 
 local engineersOverlay = engineersOption()
+local engineersOverlayWithNumbers = engineersWithNumbersOption()
+local factoryOverlayWithText = factoryOverlayWithTextOption()
 local factoriesOverlay = factoriesOption()
+local commanderOverlay = commanderOverlayOption()
 local supportCommanderOverlay = supportCommanderOption()
 local tacticalNukesOverlay = tacticalNukesOption()
 local massExtractorsOverlay = massExtractorsOption()
 
-local overlays = {}
-local overlayGroup
+local overlays = UMT.Weak.Value {}
 
-function CreateUnitOverlayControl(unit)
-    -- creates an empty overlay control for a unit
-    local id = unit:GetEntityId()
-    local overlay = Bitmap(worldView)
-    overlay:Hide()
-    overlay:DisableHitTest()
-    overlay.id = unit:GetEntityId()
-    overlay.unit = unit
-    overlay.offsetX = 0
-    overlay.offsetY = 0
-    overlay.PosX = LazyVar.Create()
-    overlay.PosY = LazyVar.Create()
-    overlay.Left:Set(function()
-        return worldView.Left() + overlay.PosX() - overlay.Width() / 2 + 1 + overlay.offsetX
-    end)
-    overlay.Top:Set(function()
-        return worldView.Top() + overlay.PosY() - overlay.Height() / 2 + 1 + overlay.offsetY
-    end)
-    overlay:SetNeedsFrameUpdate(true)
-    overlay.Update = function(self)
-        local pos = worldView:GetScreenPos(self.unit)
-        if pos then
-            self:Show()
-            self.PosX:Set(pos.x)
-            self.PosY:Set(pos.y)
-        else
-            self:Hide()
+local Overlay = UMT.Views.UnitOverlay
+
+local EngineerOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 1
+        self.offsetY = 1
+        self.isIdle = false
+        if unit:IsInCategory("TECH1") then
+            self:SetTexture("/mods/IEL/textures/t1_idle_bold.dds", 0)
+        elseif unit:IsInCategory("TECH2") then
+            self:SetTexture("/mods/IEL/textures/t2_idle_bold.dds", 0)
+        elseif unit:IsInCategory("TECH3") then
+            self:SetTexture("/mods/IEL/textures/t3_idle_bold.dds", 0)
         end
-    end
-    return overlay
-end
+    end,
 
--- function (self, delta)
-
--- end
--- Engineers
-function CreateEngineerOverlay(unit)
-    local id = unit:GetEntityId()
-    overlays[id] = CreateUnitOverlayControl(unit)
-    local overlay = overlays[id]
-    if unit:IsInCategory("TECH1") then
-        overlay:SetTexture("/mods/IEL/textures/t1_idle_bold.dds", 0)
-    elseif unit:IsInCategory("TECH2") then
-        overlay:SetTexture("/mods/IEL/textures/t2_idle_bold.dds", 0)
-    elseif unit:IsInCategory("TECH3") then
-        overlay:SetTexture("/mods/IEL/textures/t3_idle_bold.dds", 0)
-    end
-    overlay.OnFrame = OnFrameEngineer
-end
-
-function OnFrameEngineer(self, delta)
-    if not self.unit:IsDead() and engineersOverlay then
-        if self.unit:IsIdle() then
+    OnFrame = function(self, delta)
+        if self.isIdle then
             self:Update()
         else
             self:Hide()
         end
-    else
-        Remove(self.id)
+    end,
+
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not engineersOverlay then
+            self:Destroy()
+            return
+        end
+        self.isIdle = self.unit:IsIdle()
     end
-end
 
-function CreateFactoryOverlay(unit)
-    local id = unit:GetEntityId()
-    overlays[id] = CreateUnitOverlayControl(unit)
-    local overlay = overlays[id]
+}
 
-    overlay.offsetX = 5
-    overlay.offsetY = -10
-    overlay.idleTexture = 1
-    overlay.repeatTexture = 2
-    -- LayoutHelpers.SetDimensions(overlay,12,12)
-    -- overlay.Width:Set(12)
-    -- overlay.Height:Set(12)
-    overlay:SetTexture({"/mods/IEL/textures/repeat.dds", "/mods/IEL/textures/idle_fac.dds",
-                        "/mods/IEL/textures/upgrading.dds"})
-    LayoutHelpers.SetDimensions(overlay, 8, 8)
-    overlay.OnFrame = OnFrameFactory
-end
-function OnFrameFactory(self, delta)
-    if not self.unit:IsDead() and factoriesOverlay then
+local EngineerOverlayWithNumber = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        local text = "0"
+        if unit:IsInCategory("TECH1") then
+            text = "1"
+        elseif unit:IsInCategory("TECH2") then
+            text = "2"
+        elseif unit:IsInCategory("TECH3") then
+            text = "3"
+        end
+
+        self.text = UIUtil.CreateText(self, text, 10, "Arial")
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("ff000000")
+            :Width(10)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not engineersOverlay then
+            self:Destroy()
+            return
+        end
+        if self.unit:IsIdle() then
+            self.text:SetColor("ffff0000")
+        else
+            self.text:SetColor("ffffffff")
+        end
+    end
+}
+
+local CommanderOverlayWithText = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        self.text = UIUtil.CreateText(self, "C", 10, "Arial")
+        LayoutFor(self.text)
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("ff000000")
+            :Width(10)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not commanderOverlay then
+            self:Destroy()
+            return
+        end
+        if self.unit:IsIdle() then
+            self.text:SetColor("ffff0000")
+        else
+            self.text:SetColor("ffffffff")
+        end
+    end
+}
+
+local FactoryOverlayWithText = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+
+        self.offsetY = -2
+
+        self.text = UIUtil.CreateText(self, "FAC", 10, "Arial")
+        LayoutFor(self.text)
+            :Color("ffffffff")
+            :AtCenterIn(self)
+            :DisableHitTest()
+
+        LayoutFor(self)
+            :Color("ff000000")
+            :Width(20)
+            :Height(10)
+    end,
+
+    OnFrame = function(self, delta)
+        self:Update()
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not self.unit:IsIdle() or not factoriesOverlay then
+            self:Destroy()
+        end
+    end
+}
+
+local FactoryOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 6
+        self.offsetY = -9
+        self.showState = false
+        self:SetTexture {
+            "/mods/IEL/textures/repeat.dds",
+            "/mods/IEL/textures/idle_fac.dds",
+            "/mods/IEL/textures/upgrading.dds",
+            "/mods/IEL/textures/engi.dds"
+        }
+        LayoutHelpers.SetDimensions(self, 8, 8)
+    end,
+
+    OnFrame = function(self, delta)
+        if self.showState then
+            self:Update()
+        else
+            self:Hide()
+        end
+    end,
+
+    UpdateState = function(self)
+        if self.unit:IsDead() or not factoriesOverlay then
+            self:Destroy()
+            return
+        end
         if self.unit:IsIdle() then
             self:SetFrame(1)
-            -- LayoutHelpers.SetDimensions(self,8,8)
-            self:Update()
-        elseif (self.unit:IsRepeatQueue()) then
+            self.showState = true
+        elseif self.unit:IsRepeatQueue() and self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("ENGINEER") then
+            self:SetFrame(3)
+            self.showState = true
+        elseif self.unit:IsRepeatQueue() then
             self:SetFrame(0)
-            -- LayoutHelpers.SetDimensions(self,8,8)
-            self:Update()
+            self.showState = true
         elseif self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("FACTORY") then
             self:SetFrame(2)
-            -- LayoutHelpers.SetDimensions(self,8,8)
+            self.showState = true
+        else
+            self.showState = false
+        end
+    end
+}
+
+
+local SiloOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 5
+        self.offsetY = 1
+        self.hasSilo = false
+        self:SetTexture("/mods/IEL/textures/loaded.dds", 0)
+        LayoutHelpers.SetDimensions(self, 12, 12)
+    end,
+
+    OnFrame = function(self, delta)
+        if self.hasSilo then
             self:Update()
         else
             self:Hide()
         end
-    else
-        Remove(self.id)
-    end
-end
+    end,
 
-function CreateSiloOverlay(unit)
-    local id = unit:GetEntityId()
-    overlays[id] = CreateUnitOverlayControl(unit)
-    local overlay = overlays[id]
-
-    overlay.offsetX = 4
-    overlay.offsetY = 0
-    -- LayoutHelpers.SetDimensions(overlay,12,12)
-    -- overlay.Width:Set(12)
-    -- overlay.Height:Set(12)
-    overlay:SetTexture("/mods/IEL/textures/loaded.dds", 0)
-    LayoutHelpers.SetDimensions(overlay, 12, 12)
-    overlay.OnFrame = OnFrameSilo
-end
-
-function OnFrameSilo(self, delta)
-    if not self.unit:IsDead() and tacticalNukesOverlay then
+    UpdateState = function(self)
+        if self.unit:IsDead() or not tacticalNukesOverlay then
+            self:Destroy()
+            return
+        end
         local mi = self.unit:GetMissileInfo()
-        if (mi.nukeSiloStorageCount > 0) or (mi.tacticalSiloStorageCount > 0) then
+        self.hasSilo = (mi.nukeSiloStorageCount > 0) or (mi.tacticalSiloStorageCount > 0)
+    end
+}
+local MexOverlay = Class(Overlay)
+{
+    __init = function(self, parent, unit)
+        Overlay.__init(self, parent, unit)
+        self.offsetX = 5
+        self.offsetY = -7
+        self.isUpgrading = false
+        self:SetTexture("/mods/IEL/textures/up.dds", 0)
+        LayoutHelpers.SetDimensions(self, 12, 16)
+    end,
+
+    OnFrame = function(self, delta)
+        if self.isUpgrading then
             self:Update()
         else
             self:Hide()
         end
-    else
-        Remove(self.id)
-    end
-end
+    end,
 
-function CreateMexOverlay(unit)
-    local id = unit:GetEntityId()
-    overlays[id] = CreateUnitOverlayControl(unit)
-    local overlay = overlays[id]
-
-    overlay.offsetX = 4
-    overlay.offsetY = -8
-    overlay:SetTexture("/mods/IEL/textures/up.dds", 0)
-    LayoutHelpers.SetDimensions(overlay, 12, 16)
-    overlay.OnFrame = OnFrameMex
-end
-
-function OnFrameMex(self, delta)
-    if not self.unit:IsDead() and massExtractorsOverlay then
-        if self.unit:GetWorkProgress() > 0 then
-            self:Update()
-        else
-            self:Hide()
+    UpdateState = function(self)
+        if self.unit:IsDead() or not massExtractorsOverlay then
+            self:Destroy()
+            return
         end
-    else
-        Remove(self.id)
+        self.isUpgrading = self.unit:GetWorkProgress() > 0
+    end
+}
+
+local function UpdateOverlays()
+    for _, overlay in overlays do
+        if IsDestroyed(overlay) then
+            continue
+        end
+        overlay:UpdateState()
     end
 end
 
-function VerifyWV()
-    if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft 
-    then
-        worldView = import("/lua/ui/game/worldview.lua").viewLeft
-        overlays = {}
-    end
-end
-
-function CreateUnitOverlays()
+local function CreateUnitOverlays()
     local allunits = GetUnits()
-    VerifyWV()
-    for _, unit in allunits do
-        if not overlays[unit:GetEntityId()] then
+    local worldView = import("/lua/ui/game/worldview.lua").viewLeft
+    for id, unit in allunits do
+        if IsDestroyed(overlays[id]) and not unit:IsDead() then
             if supportCommanderOverlay and unit:IsInCategory("SUBCOMMANDER") then
-                
-            elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
-                CreateEngineerOverlay(unit)
-            elseif factoriesOverlay ~= 0 and unit:IsInCategory("FACTORY") then
-                CreateFactoryOverlay(unit)
 
+            elseif unit:IsInCategory("COMMAND") then
+                if commanderOverlay then
+                    overlays[id] = CommanderOverlayWithText(worldView, unit)
+                end
+            elseif engineersOverlay and unit:IsInCategory("ENGINEER") then
+                if engineersOverlayWithNumbers then
+                    overlays[id] = EngineerOverlayWithNumber(worldView, unit)
+                else
+                    overlays[id] = EngineerOverlay(worldView, unit)
+                end
+            elseif factoriesOverlay and unit:IsInCategory("FACTORY") then
+                if factoryOverlayWithText then
+                    overlays[id] = FactoryOverlayWithText(worldView, unit)
+                else
+                    overlays[id] = FactoryOverlay(worldView, unit)
+                end
             elseif tacticalNukesOverlay and unit:IsInCategory("SILO") then
-                CreateSiloOverlay(unit)
+                overlays[id] = SiloOverlay(worldView, unit)
             elseif massExtractorsOverlay and unit:IsInCategory("MASSEXTRACTION") and unit:IsInCategory("STRUCTURE") then
-                CreateMexOverlay(unit)
+                overlays[id] = MexOverlay(worldView, unit)
             end
         end
     end
+
+    UpdateOverlays()
 end
 
-function UpdateOverlays()
-
-end
-
-function initOverlayGroup()
-    overlayGroup = Group(worldView)
-    LayoutHelpers.FillParent(overlayGroup, worldView)
-    -- overlayGroup.OnDestroy = function(self)
-    --    ForkThread(initOverlayGroup)
-    -- end
-    -- prepare for updating overlays
-end
-
-function init(isReplay)
-
-    --initOverlayGroup()
+function Init(isReplay)
     AddBeatFunction(CreateUnitOverlays, true)
-    engineersOption.OnChange = function(self)
-        engineersOverlay = self()
+    engineersOption.OnChange = function(var)
+        engineersOverlay = var()
     end
-    factoriesOption.OnChange = function(self)
-        factoriesOverlay = self()
+    commanderOverlayOption.OnChange = function(var)
+        commanderOverlay = var()
     end
-    supportCommanderOption.OnChange = function(self)
-        supportCommanderOverlay = self()
+    engineersWithNumbersOption.OnChange = function(var)
+        engineersOverlayWithNumbers = var()
     end
-    tacticalNukesOption.OnChange = function(self)
-        tacticalNukesOverlay = self()
+    factoryOverlayWithTextOption.OnChange = function(var)
+        factoryOverlayWithText = var()
     end
-    massExtractorsOption.OnChange = function(self)
-        massExtractorsOverlay = self()
+    factoriesOption.OnChange = function(var)
+        factoriesOverlay = var()
     end
-
-    GlobalOptions.AddOptions(modName, "Idle Engineers Light",
-        {OptionsUtils.Filter("Show engineers ovelays", engineersOption),
-         OptionsUtils.Filter("Show factories ovelays", factoriesOption),
-         OptionsUtils.Filter("Show Nukes and TMLs ovelays", tacticalNukesOption),
-         OptionsUtils.Filter("Show Mex ovelays", massExtractorsOption)})
-
-end
-
-function Remove(id)
-    overlays[id]:Destroy()
-    overlays[id] = nil
+    supportCommanderOption.OnChange = function(var)
+        supportCommanderOverlay = var()
+    end
+    tacticalNukesOption.OnChange = function(var)
+        tacticalNukesOverlay = var()
+    end
+    massExtractorsOption.OnChange = function(var)
+        massExtractorsOverlay = var()
+    end
 end

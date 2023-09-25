@@ -13,10 +13,12 @@ local Tooltip = import("/lua/ui/game/tooltip.lua")
 local BitmapCombo = import("/lua/ui/controls/combo.lua").BitmapCombo
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local LazyVar = import("/lua/lazyvar.lua")
+local StringSelector = import("Views/StringSelector.lua").StringSelector
+local TextEdit = import("Views/TextEdit.lua").TextEdit
 
-local LayoutFor = import("Layouter.lua").ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local colors = {"ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42"}
+local colors = { "ffffffff", "ffff4242", "ffefff42", "ff4fff42", "ff42fff8", "ff424fff", "ffff42eb", "ffff9f42" }
 
 local splitterTable = {
     type = "splitter"
@@ -66,16 +68,6 @@ function Slider(name, min, max, inc, optionVar, indent)
     }
 end
 
--- TODO
-function TextEdit(name, optionVar, indent)
-    return {
-        type = "edit",
-        name = name,
-        optionVar = optionVar,
-        indent = indent or 0
-    }
-end
-
 function ColorSlider(name, optionVar, indent)
     return {
         type = "colorslider",
@@ -85,7 +77,7 @@ function ColorSlider(name, optionVar, indent)
     }
 end
 
--- extend group for options 
+-- extend group for options
 -- TODO:
 function Extend()
     return nil
@@ -142,11 +134,13 @@ local windowTextures = {
     br = UIUtil.SkinnableFile("/game/panel/panel_brd_lr.dds"),
     borderColor = "00415055"
 }
+
+---@class OptionsWindow : Window
 OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
         Window.__init(self, parent, title, nil, false, false, true, false, options .. "window", {
             Left = 100,
-            Right = 600,
+            Right = 400,
             Top = 100,
             Bottom = 800
         }, windowTextures)
@@ -170,6 +164,8 @@ OptionsWindow = Class(Window) {
         end
         self._okBtn = okBtn
         self._colors = colors
+        self.WidthColoumns = LazyVar.Create(1)
+
 
         local cancelBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Cancel>', 16)
         LayoutFor(cancelBtn)
@@ -178,6 +174,11 @@ OptionsWindow = Class(Window) {
             :ResetLeft()
             :Over(self._optionsGroup)
             :End()
+        LayoutFor(self)
+            :ResetRight()
+            :Width(function()
+                return LayoutHelpers.ScaleNumber(math.max(self.WidthColoumns() * 300, 400))
+            end)
 
         cancelBtn.OnClick = function(control)
             self:OnClose()
@@ -185,9 +186,16 @@ OptionsWindow = Class(Window) {
         self._optionVars = {}
         self._options = options
         self._previous = false
+        self._column = 1
         if buildTable then
             for _, entry in buildTable do
-                self:Add(entry, true)
+                if entry.type ~= "column" then
+                    self:Add(entry, true)
+                else
+                    self._column = entry.index
+                    self.WidthColoumns:Set(math.max(self.WidthColoumns(), self._column))
+                    self._previous = false
+                end
             end
             if self._previous then
                 self._optionsGroup.Bottom:Set(self._previous.Bottom)
@@ -210,6 +218,11 @@ OptionsWindow = Class(Window) {
         return self
     end,
 
+    ---comment
+    ---@param self OptionsWindow
+    ---@param data ControlConfig
+    ---@param passSizing boolean
+    ---@return OptionsWindow
     Add = function(self, data, passSizing)
         local option
         if data.optionVar then
@@ -222,6 +235,7 @@ OptionsWindow = Class(Window) {
                 :Height(2)
             return splitter
         end
+
         local function CreateEntry(data)
             local group = Group(self._optionsGroup)
             if data.type == "filter" then
@@ -388,7 +402,14 @@ OptionsWindow = Class(Window) {
             return group
         end
 
-        local entry = CreateEntry(data)
+        local entry
+        if data.type == "edit" then
+            entry = TextEdit(self._optionsGroup, data.optionVar, data.name, data.charLimit)
+        elseif data.type == "strings" then
+            entry = StringSelector(self._optionsGroup, data.optionVar, data.name, data.items)
+        else
+            entry = CreateEntry(data)
+        end
         self:_addEntry(entry, data.indent)
         if not passSizing then
             self._optionsGroup.Bottom:Set(self._previous.Bottom)
@@ -400,9 +421,9 @@ OptionsWindow = Class(Window) {
     _addEntry = function(self, entry, indent)
         if self._previous then
             LayoutHelpers.Below(entry, self._previous, 5)
-            LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent)
+            LayoutHelpers.AtLeftIn(entry, self._optionsGroup, indent + (self._column - 1) * 300)
         else
-            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup, indent)
+            LayoutHelpers.AtLeftTopIn(entry, self._optionsGroup, indent + (self._column - 1) * 300)
         end
         LayoutHelpers.DepthOverParent(entry, self._optionsGroup)
         self._previous = entry

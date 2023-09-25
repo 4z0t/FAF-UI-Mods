@@ -7,7 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 local From = import("/mods/UMT/modules/linq.lua").From
-local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")
@@ -112,14 +112,14 @@ MexPanel = Class(Group) {
 
     CreateMexCategoryPanel = function(self, parent, category)
         local group = Bitmap(parent)
-        
+
         LayoutFor(group)
             :HitTest(true)
             :Color("aa000000")
             :Width(22)
             :Height(50)
 
-        
+
         group.category = category
         local iconName = "/textures/ui/common/game/strategicicons/" .. category.icon .. "_rest.dds"
 
@@ -130,7 +130,7 @@ MexPanel = Class(Group) {
             :Texture(iconName)
             :Alpha(0.3)
             :AtTopCenterIn(group, 11)
-        
+
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
             LayoutFor(group.pauseIcon)

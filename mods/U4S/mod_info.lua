@@ -1,0 +1,17 @@
+name = "UI 4 Sim"
+version = 1
+copyright = ""
+description = "UI-sim better communication"
+author = "4z0t"
+url = ""
+uid = "UI-for-Sim-v01"
+icon = "/mods/U4S/icon.png"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = false
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}

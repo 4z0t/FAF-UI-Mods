@@ -1,8 +1,42 @@
 local TableInsert = table.insert
 local TableRemove = table.remove
 
+---@class LinqFromMetaTable
+---@field private t table
 local LinqFromMetaTable = {}
 LinqFromMetaTable.__index = LinqFromMetaTable
+
+---creates wrapper around table to perform operations on it
+---@deprecated
+---@param t table?
+---@return LinqFromMetaTable
+---@nodiscard
+function from(t)
+    local result = {
+        t = t or {}
+    }
+    setmetatable(result, LinqFromMetaTable)
+    return result
+end
+From = from
+
+---creates wrapper around table with integers from startValue to endValue including both
+---@deprecated
+---@param startValue integer
+---@param endValue integer
+---@return LinqFromMetaTable
+---@nodiscard
+function range(startValue, endValue)
+    local result = {}
+    local i = startValue
+    repeat
+        TableInsert(result, i)
+        i = i + 1
+    until i >= endValue + 1
+    return from(result)
+end
+Range = range
+
 
 function LinqFromMetaTable:Select(p)
     local result = {}
@@ -236,49 +270,3 @@ end
 function LinqFromMetaTable:__newindex(key, value)
     error('attempt to set new index for a Linq object')
 end
-
--- local WrapperLinqFromMetaTable = table.deepcopy(LinqFromMetaTable)
-
--- function WrapperLinqFromMetaTable:__index(key)
---     if key == 't' then
---         return rawget(self, key)
---     end
---     return function(...)
---         local t = self.t
---         return rawget(t.__index, key)(t, unpack(arg))
---     end
--- end
-
--- function WrapperLinqFromMetaTable:__newindex(key, value)
---     error('attemt to set value for linq table')
--- end
-
-function from(t)
-    local result = {
-        t = t or {}
-    }
-    setmetatable(result, LinqFromMetaTable)
-    return result
-end
-From = from
-
--- function from_(t)
---     local result = {}
---     setmetatable(result, LinqFromMetaTable)
---     result.t = t or {}
---     local wrapper = {}
---     wrapper.t = result
---     setmetatable(wrapper, WrapperLinqFromMetaTable)
---     return wrapper
--- end
-
-function range(startValue, endValue)
-    local result = {}
-    local i = startValue
-    repeat
-        TableInsert(result, i)
-        i = i + 1
-    until i >= endValue + 1
-    return from(result)
-end
-Range = range
