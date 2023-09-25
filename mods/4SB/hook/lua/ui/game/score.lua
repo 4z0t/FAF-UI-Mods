@@ -5,6 +5,7 @@ end
 if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
+    local ArmyViews = import("/mods/4SB/modules/ArmyView.lua")
 
     local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -54,7 +55,15 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             return Options.scoreboardScale() / 100
         end
 
+        Options.scoreboardScale.OnChange = function()
+            scoreboard:ResetWidthComponents()
+            scoreboard:ApplyToViews(function(armyId, view)
+                view:ResetFont()
+            end)
+        end
+
         Options.player.font.name.OnChange = function(var)
+            scoreboard:ResetWidthComponents()
             scoreboard:ApplyToViews(function(armyId, view)
                 view:ResetFont()
             end)

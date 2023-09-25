@@ -1,6 +1,6 @@
 local MathAbs = math.abs
 
-local Text = import("/lua/maui/text.lua").Text
+local Text = UMT.Controls.Text
 
 local isReplay = import("/lua/ui/game/gamemain.lua").GetReplayState()
 local sessionInfo = SessionGetScenarioInfo()
@@ -119,8 +119,8 @@ end
 ---@param font string
 ---@param size integer
 ---@return number
-function TextWidth(str, font, size)
-    local dummy = Text(GetFrame(0))
+function TextWidth(parent, str, font, size)
+    local dummy = Text(parent)
     dummy:Hide()
     dummy:SetFont(font, size)
     dummy:SetText(str)

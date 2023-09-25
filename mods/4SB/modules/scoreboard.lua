@@ -55,6 +55,10 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
+        self:ResetWidthComponents()
+    end,
+
+    ResetWidthComponents = function(self)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleNumber(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
         ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))

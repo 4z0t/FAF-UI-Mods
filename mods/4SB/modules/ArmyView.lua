@@ -195,8 +195,12 @@ ArmyView = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 
     ResetFont = function(self)
         local font = GetFocusArmy() == self.id and focusArmyNameFont or armyViewNameFont
-        nameWidth:Set(math.max(nameWidth(), TextWidth(self._name:GetText(), font(), armyViewTextPointSize)))
         self._name:SetFont(font, armyViewTextPointSize)
+        nameWidth:Set(
+            math.max(
+                nameWidth(),
+                TextWidth(self._name, self._name:GetText(), font(), armyViewTextPointSize)
+            ))
     end,
 
     ---@type Color

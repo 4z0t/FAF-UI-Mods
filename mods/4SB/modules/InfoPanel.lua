@@ -1,8 +1,8 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
@@ -33,14 +33,13 @@ function FormatMapName(name)
     return name, false
 end
 
----@class InfoPanel : Group, ILayoutable
-InfoPanel = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+---@class InfoPanel : UMT.Group
+InfoPanel = UMT.Class(Group)
 {
     ---@param self InfoPanel
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self:InitLayouter(parent)
 
         self._mapName = Text(self)
         self._mapSize = Text(self)

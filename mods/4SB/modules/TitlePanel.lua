@@ -1,7 +1,6 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local InfoPanel = import("InfoPanel.lua").InfoPanel
 local Options = import("Options.lua")
@@ -23,8 +22,8 @@ local titlePanelHeight = 20
 local bgColor = Options.player.color.bg:Raw()
 
 
----@class TopInfoPanel : Group
-local TopInfoPanel = Class(Group)
+---@class TopInfoPanel : UMT.Group
+local TopInfoPanel = UMT.Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -39,12 +38,12 @@ local TopInfoPanel = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
         local parent = self:GetParent()
-        LayoutFor(self._time)
+        layouter(self._time)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color(Options.title.color.time:Raw())
@@ -52,26 +51,26 @@ local TopInfoPanel = Class(Group)
         self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
 
 
-        LayoutFor(self._speed)
+        layouter(self._speed)
             :AtCenterIn(self, 0, -30)
             :Color(Options.title.color.gameSpeed:Raw())
             :DisableHitTest()
         self._speed:SetFont(Options.title.font.gameSpeed:Raw(), qualityTextSize)
 
-        LayoutFor(self._quality)
+        layouter(self._quality)
             :AtCenterIn(self, 0, 30)
             :Color(Options.title.color.quality:Raw())
             :DisableHitTest()
         self._quality:SetFont(Options.title.font.quality:Raw(), qualityTextSize)
 
-        LayoutFor(self._unitCap)
+        layouter(self._unitCap)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color(Options.title.color.totalUnits:Raw())
             :DisableHitTest()
         self._unitCap:SetFont(Options.title.font.totalUnits:Raw(), unitCapTextSize)
 
-        LayoutFor(self)
+        layouter(self)
             :Width(parent.Width)
             :Height(titlePanelHeight)
     end,
@@ -88,7 +87,7 @@ local TopInfoPanel = Class(Group)
         if gameSpeed then
             self._gameSpeed = gameSpeed
         end
-        
+
         self._speed:SetText(("%+d / %+d"):format(self._gameSpeed, GetSimRate()))
         self._time:SetText(GetGameTime())
 
@@ -156,12 +155,12 @@ local fadeAnimation = alphaAnimationFactory
     :ApplyToChildren()
     :Create(alphaAnimator)
 
----@class TitlePanel : Group
+---@class TitlePanel : UMT.Group
 ---@field _bg Bitmap
 ---@field _top TopInfoPanel
 ---@field _info InfoPanel
 ---@field _expanded boolean
-TitlePanel = Class(Group)
+TitlePanel = UMT.Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
@@ -176,26 +175,26 @@ TitlePanel = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
 
 
-        LayoutFor(self._bg)
+        layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
             :DisableHitTest()
 
-        LayoutFor(self._top)
+        layouter(self._top)
             :AtRightTopIn(self)
 
-        LayoutFor(self._info)
+        layouter(self._info)
             :Top(self._top.Bottom)
             :Right(self.Right)
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(titlePanelWidth)
             :Bottom(self._info.Bottom)
     end,
