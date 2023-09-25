@@ -52,8 +52,20 @@ Layouter = UMT.Class()
     ---@param self UMT.Layouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
-    ScaleNumber = function(self, value)
+    ScaleVar = function(self, value)
         return Functions.Mult(value, self.Scale)
+    end,
+
+    ---Scales given number
+    ---@param self UMT.Layouter
+    ---@param value number
+    ---@return number
+    ScaleNumber = function(self, value)
+        local scale = self.Scale
+        if iscallable(scale) then
+            return scale() * value
+        end
+        return scale * value
     end,
 
     ---@param self UMT.Layouter
@@ -95,7 +107,7 @@ Layouter = UMT.Class()
         if iscallable(value) then
             return value
         else
-            return self:ScaleNumber(value)
+            return self:ScaleVar(value)
         end
     end,
 
@@ -580,6 +592,14 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param self FloorLayouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
+    ScaleVar = function(self, value)
+        return Functions.Floor(Layouter.ScaleVar(self, value))
+    end,
+
+    ---Scales given number
+    ---@param self FloorLayouter
+    ---@param value number
+    ---@return number
     ScaleNumber = function(self, value)
         return Functions.Floor(Layouter.ScaleNumber(self, value))
     end,

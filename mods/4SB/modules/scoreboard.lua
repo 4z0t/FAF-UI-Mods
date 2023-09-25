@@ -58,8 +58,9 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         self:ResetWidthComponents()
     end,
 
+     ---@param self ScoreBoard
     ResetWidthComponents = function(self)
-        ArmyViews.nameWidth:Set(self.Layouter:ScaleNumber(75))
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
         ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
     end,
@@ -159,7 +160,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     end,
 
     ResetArmyData = function(self)
-        ArmyViews.nameWidth:Set(self.Layouter:ScaleNumber(75))
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         for _, armyData in Utils.GetArmiesFormattedTable() do
             self:GetArmyViews()[armyData.id]:SetStaticData(
                 armyData.id,

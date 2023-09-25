@@ -511,10 +511,10 @@ local contractDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() >= state.nextControl.Right() - Functions.Calculate(control.Layouter:ScaleNumber(state.offset)) then
+        if control.Right() >= state.nextControl.Right() - control.Layouter:ScaleNumber(state.offset) then
             return true
         end
-        control.Right:Set(control.Right() + delta * Functions.Calculate(control.Layouter:ScaleNumber(dataAnimationSpeed)))
+        control.Right:Set(control.Right() + delta * control.Layouter:ScaleNumber(dataAnimationSpeed))
     end)
     :OnFinish(function(control, state)
         control.Layouter(control)
@@ -529,10 +529,10 @@ local expandDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - Functions.Calculate(control.Layouter:ScaleNumber(state.offset)) then
+        if control.Right() <= state.nextControl.Right() - control.Layouter:ScaleNumber(state.offset) then
             return true
         end
-        control.Right:Set(control.Right() - delta * Functions.Calculate(control.Layouter:ScaleNumber(dataAnimationSpeed)))
+        control.Right:Set(control.Right() - delta * control.Layouter:ScaleNumber(dataAnimationSpeed))
     end)
     :OnFinish(function(control, state)
         control.Layouter(control)
