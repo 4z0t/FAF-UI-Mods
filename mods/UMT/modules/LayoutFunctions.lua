@@ -240,3 +240,13 @@ function AtCenterOffset(base, baseLen, len, offset, scale)
         end
     end
 end
+
+---@overload fun(value:number):number
+---@param value FunctionalNumber
+---@return number
+function Calculate(value)
+    if iscallable(value) then
+        return value()
+    end
+    return value
+end

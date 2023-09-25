@@ -1,5 +1,4 @@
-local Group =  UMT.Controls.Group
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
 local Tooltip = import("/lua/ui/game/tooltip.lua")
@@ -9,7 +8,7 @@ local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")
 
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local Functions = UMT.Layouter.Functions
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
@@ -503,7 +502,7 @@ AllyView = UMT.Class(ArmyView)
 local lastDataTextOffset = 20
 local dataTextOffSet = 40
 
-local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
+local dataAnimationSpeed = 150
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl, offset)
@@ -512,13 +511,14 @@ local contractDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() >= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
+        if control.Right() >= state.nextControl.Right() - Functions.Calculate(control.Layouter:ScaleNumber(state.offset)) then
             return true
         end
-        control.Right:Set(control.Right() + delta * dataAnimationSpeed)
+        control.Right:Set(control.Right() + delta * Functions.Calculate(control.Layouter:ScaleNumber(dataAnimationSpeed)))
     end)
     :OnFinish(function(control, state)
-        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
+        control.Layouter(control)
+            :AtRightIn(state.nextControl, state.offset)
     end)
     :Create()
 
@@ -529,13 +529,14 @@ local expandDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
+        if control.Right() <= state.nextControl.Right() - Functions.Calculate(control.Layouter:ScaleNumber(state.offset)) then
             return true
         end
-        control.Right:Set(control.Right() - delta * dataAnimationSpeed)
+        control.Right:Set(control.Right() - delta * Functions.Calculate(control.Layouter:ScaleNumber(dataAnimationSpeed)))
     end)
     :OnFinish(function(control, state)
-        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
+        control.Layouter(control)
+            :AtRightIn(state.nextControl, state.offset)
     end)
     :Create()
 
