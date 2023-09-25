@@ -58,7 +58,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         self:ResetWidthComponents()
     end,
 
-     ---@param self ScoreBoard
+    ---@param self ScoreBoard
     ResetWidthComponents = function(self)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
