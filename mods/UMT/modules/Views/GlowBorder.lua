@@ -1,4 +1,4 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Bitmap = UMT.Controls.Bitmap
 local Group = import('/lua/maui/group.lua').Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
@@ -16,7 +16,7 @@ local textures = {
 }
 
 ---@class GlowBorder : Group, ILayoutable
-GlowBorder = Class(Group, UMT.Interfaces.ILayoutable)
+GlowBorder = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     ---@param self GlowBorder
     ---@param parent Control
