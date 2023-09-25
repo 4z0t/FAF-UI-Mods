@@ -22,7 +22,7 @@ local height = 20
 
 ---@class ObserverPanel : Group, ILayoutable
 ---@field _bg Bitmap
-ObserverPanel = Class(Group, UMT.Interfaces.ILayoutable)
+ObserverPanel = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     ---@param self ObserverPanel
     ---@param parent Control

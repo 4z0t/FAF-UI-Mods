@@ -1,10 +1,10 @@
 local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
 local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")

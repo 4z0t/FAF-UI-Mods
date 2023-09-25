@@ -34,7 +34,7 @@ function FormatMapName(name)
 end
 
 ---@class InfoPanel : Group, ILayoutable
-InfoPanel = Class(Group, UMT.Interfaces.ILayoutable)
+InfoPanel = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
     ---@param self InfoPanel
     ---@param parent Control
