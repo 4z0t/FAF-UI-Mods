@@ -8,6 +8,7 @@ local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
+local LazyVar = import('/lua/lazyvar.lua').Create
 
 
 local LazyImport = UMT.LazyImport
@@ -44,7 +45,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
-        self.Layouter = UMT.Layouter.FloorLayouter(2)
+        self.Layouter = UMT.Layouter.FloorLayouter(LazyVar(1))
 
         self._focusArmy = GetFocusArmy()
         self._title = false

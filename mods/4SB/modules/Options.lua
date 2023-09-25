@@ -58,6 +58,8 @@ teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
 useDivisions = OptionVar(modName, "useDivisions", false)
 useNickNameArmyColor = OptionVar(modName, "useNickNameArmyColor", false)
 
+scoreboardScale = OptionVar(modName, "scoreboardScale", 100)
+
 function Init(isReplay)
 
     local UIUtil = import('/lua/ui/uiutil.lua')
@@ -85,7 +87,8 @@ function Init(isReplay)
             Options.Filter("In team score sorting", teamScoreSort, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
-            Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4)
+            Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
+            Options.Slider("ScoreBoard scale, %", 10, 200, 10, scoreboardScale, 4)
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {

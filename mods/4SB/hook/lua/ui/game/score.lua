@@ -50,6 +50,10 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
         end
 
+        scoreboard.Layouter.Scale = function()
+            return Options.scoreboardScale() / 100
+        end
+
         Options.player.font.name.OnChange = function(var)
             scoreboard:ApplyToViews(function(armyId, view)
                 view:ResetFont()
