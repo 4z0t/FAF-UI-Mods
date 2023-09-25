@@ -1,12 +1,10 @@
 local Group = UMT.Controls.Group
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local Options = import("Options.lua")
 
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColoredIntegerSlider = import("Views/ColoredSlider.lua").ColoredIntegerSlider
 
 local obsTextFont = Options.observer.font:Raw()

@@ -1,14 +1,14 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 local Border = import("Border.lua").Border
 local LazyVar = import('/lua/lazyvar.lua').Create
-local Text = import("/lua/maui/text.lua").Text
+local Text = UMT.Controls.Text
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
-ColoredSlider = Class(Group)
+ColoredSlider = UMT.Class(Group)
 {
     __init = function(self, parent,
                       isVertical,
@@ -204,7 +204,7 @@ ColoredSlider = Class(Group)
 }
 
 
-ColoredIntegerSlider = Class(ColoredSlider)
+ColoredIntegerSlider = UMT.Class(ColoredSlider)
 {
     __init = function(self, parent,
                       isVertical,
