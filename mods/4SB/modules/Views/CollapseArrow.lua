@@ -1,7 +1,7 @@
 local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-VerticalCollapseArrow = Class(Checkbox)
+VerticalCollapseArrow = UMT.Class(Checkbox)
 {
     __init = function(self, parent)
         Checkbox.__init(self, parent)
