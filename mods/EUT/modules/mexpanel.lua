@@ -14,7 +14,8 @@ local mexPanel
 local upgradeTexture = "/mods/EUT/textures/upgrade.dds"
 local pausedTexture = "/textures/ui/common/game/strategicicons/pause_rest.dds"
 
-function init(parent)
+function init()
+    local parent = import("/lua/ui/game/gamemain.lua").controls.status
     if not IsDestroyed(mexPanel) then
         mexPanel:Destroy()
     end
@@ -83,7 +84,7 @@ MexPanel = UMT.Class(Group) {
 
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
-        
+
         self.Layouter(self)
             :Width(170)
             :Height(60)
