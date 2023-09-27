@@ -49,8 +49,8 @@ observer = {
     }
 }
 
-style = OptionVar(modName, "scoreboardStyle", "default")
-replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
+style = OptionVar(modName, "scoreboardStyle", "glow border")
+replayStyle = OptionVar(modName, "scoreboardReplayStyle", "glow border")
 
 teamScoreSort = OptionVar(modName, "teamScoreSort", false)
 teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
@@ -69,14 +69,14 @@ function Init(isReplay)
             isReplay and
                 Options.Strings("Replay Scoreboard style",
                     {
-                        "default",
+                        "minimalictic",
                         "glow border",
                         "window border",
                     },
                     replayStyle, 4) or
                 Options.Strings("Scoreboard style",
                     {
-                        "default",
+                        "minimalictic",
                         "semi glow border",
                         "glow border",
                         "window border",

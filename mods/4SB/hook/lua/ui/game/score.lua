@@ -5,19 +5,17 @@ end
 if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
-    local ArmyViews = import("/mods/4SB/modules/ArmyView.lua")
-
     local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
     local layouts = {
-        ["default"] = false,
+        ["minimalictic"] = false,
         ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout,
         ["glow border"] = import("/mods/4SB/modules/Layouts/GameGlowBorder.lua").Layout,
         ["window border"] = import("/mods/4SB/modules/Layouts/GameWindowFrame.lua").Layout
     }
 
     local replayLayouts = {
-        ["default"] = false,
+        ["minimalictic"] = false,
         ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout,
         ["window border"] = import("/mods/4SB/modules/Layouts/ReplayWindowFrame.lua").Layout
     }
