@@ -3,16 +3,19 @@ do
     local OptionVar = UMT.OptionVar.Create
 
     local modName = "EUT"
+    local function EUTOption(name, default)
+        return OptionVar(modName, name, default)
+    end
 
-    overlayOption = OptionVar(modName, "MexOverlay", true)
-    useNumberOverlay = OptionVar(modName, "NumberOverlay", false)
-    overlaySize = OptionVar(modName, "OverlaySize", 10)
-    upgradeT1Option = OptionVar(modName, "UpgradeT1", false)
-    upgradeT2Option = OptionVar(modName, "UpgradeT2", false)
-    unpauseAssisted = OptionVar(modName, "UnpauseAssisted", false)
-    unpauseOnce = OptionVar(modName, "UnpauseOnce", false)
-    unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
-    panelScale = OptionVar(modName, "panelScale", 100)
+    overlayOption = EUTOption("MexOverlay", true)
+    useNumberOverlay = EUTOption("NumberOverlay", false)
+    overlaySize = EUTOption("OverlaySize", 10)
+    upgradeT1Option = EUTOption("UpgradeT1", false)
+    upgradeT2Option = EUTOption("UpgradeT2", false)
+    unpauseAssisted = EUTOption("UnpauseAssisted", false)
+    unpauseOnce = EUTOption("UnpauseOnce", false)
+    unpauseAssistedBP = EUTOption("unpauseAssistedBP", 4)
+    panelScale = EUTOption("panelScale", 100)
 
     function Init()
         Options.AddOptions(modName, "ECO UI Tools", {
