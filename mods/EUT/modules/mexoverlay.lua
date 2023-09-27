@@ -32,39 +32,7 @@ local idleNotCappedColor = "FFE21313"
 
 local progressColor = "3300ff00"
 
-local Overlay = Class(Bitmap)
-{
-    __init = function(self, parent, unit)
-        Bitmap.__init(self, parent)
-        self:Hide()
-        self:DisableHitTest()
-        self.id = unit:GetEntityId()
-        self.unit = unit
-        self.offsetX = 0
-        self.offsetY = 0
-        self.PosX = LazyVar()
-        self.PosY = LazyVar()
-        self.Left:Set(function()
-            return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
-        end)
-        self.Top:Set(function()
-            return worldView.Top() + self.PosY() - self.Height() / 2 + self.offsetY
-        end)
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-
-    Update = function(self)
-        local pos = worldView:GetScreenPos(self.unit)
-        if pos then
-            self:Show()
-            self.PosX:Set(pos.x)
-            self.PosY:Set(pos.y)
-        else
-            self:Hide()
-        end
-    end
-}
+local Overlay = UMT.Views.UnitOverlay
 
 local MexOverlay = Class(Overlay)
 {
