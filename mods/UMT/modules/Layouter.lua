@@ -492,6 +492,18 @@ Layouter = UMT.Class()
             :ResetHeight()
     end,
 
+    ---applies default scale in callback function
+    ---@param self UMT.Layouter
+    ---@param callback fun(layouter: UMT.Layouter)
+    ---@return UMT.Layouter
+    NoScale = function(self, callback)
+        local scale = self._scale
+        self._scale = false
+        callback(self)
+        self._scale = scale
+        return self
+    end,
+
     ---@param self UMT.Layouter
     ---@param color Color
     ---@return UMT.Layouter

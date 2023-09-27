@@ -52,7 +52,9 @@ Layout = function(scoreboard, layouter)
 
     layouter(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
-        :AtRightIn(GetFrame(0), -3)
+        :NoScale(function(_layouter)
+            _layouter:AtRightIn(GetFrame(0), -3)
+        end)
         :Over(scoreboard, 20)
 
     scoreboard._arrow.OnCheck = function(arrow, checked)

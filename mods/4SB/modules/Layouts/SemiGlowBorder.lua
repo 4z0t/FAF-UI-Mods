@@ -92,7 +92,9 @@ Layout = function(scoreboard, layouter)
         :Over(scoreboard, 10)
 
     layouter(scoreboard)
-        :AtRightIn(GetFrame(0), 20)
+        :NoScale(function(_layouter)
+            _layouter:AtRightIn(GetFrame(0), 20)
+        end)
 
 
     return Clear
