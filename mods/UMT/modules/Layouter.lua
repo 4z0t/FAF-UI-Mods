@@ -164,7 +164,7 @@ Layouter = UMT.Class()
     ---@param depth? FunctionalNumber
     ---@return UMT.Layouter
     Over = function(self, parent, depth)
-        self.c.Depth:Set(self:Sum(parent.Depth, depth or 1))
+        self.c.Depth:Set(Functions.Sum(parent.Depth, depth or 1))
         return self
     end,
 
@@ -173,7 +173,7 @@ Layouter = UMT.Class()
     ---@param depth? FunctionalNumber
     ---@return UMT.Layouter
     Under = function(self, parent, depth)
-        self.c.Depth:Set(self:Diff(parent.Depth, depth or 1))
+        self.c.Depth:Set(Functions.Diff(parent.Depth, depth or 1))
         return self
     end,
 
