@@ -88,7 +88,7 @@ function Init(isReplay)
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
             Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
-            Options.Slider("ScoreBoard scale, %", 10, 200, 10, scoreboardScale, 4)
+            Options.Slider("ScoreBoard scale, %", 50, 300, 10, scoreboardScale, 4)
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
