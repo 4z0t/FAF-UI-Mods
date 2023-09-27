@@ -25,8 +25,6 @@ Layout = function(scoreboard, layouter)
     scoreboard:Layout()
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
 
-
-
     scoreboard._border = Group(scoreboard)
     scoreboard._border.t = Bitmap(scoreboard._border,
         UIUtil.SkinnableFile "/game/mini-map-glow-brd/mini-map-glow_brd_horz_um.dds")
@@ -48,7 +46,7 @@ Layout = function(scoreboard, layouter)
         end
 
         local offset = -10
-        LayoutFor(scoreboard._border)
+        layouter(scoreboard._border)
             :Top(scoreboard.Top)
             :Left(scoreboard.Right)
             :Bottom(scoreboard.Bottom)
@@ -56,29 +54,29 @@ Layout = function(scoreboard, layouter)
             :Over(scoreboard, 5)
             :DisableHitTest(true)
 
-        LayoutFor(scoreboard._border.tr)
+        layouter(scoreboard._border.tr)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtTopIn(scoreboard._border, -10)
 
 
-        LayoutFor(scoreboard._border.br)
+        layouter(scoreboard._border.br)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtBottomIn(scoreboard._border, -10)
 
 
 
-        LayoutFor(scoreboard._border.r)
+        layouter(scoreboard._border.r)
             :AnchorToLeft(scoreboard._border, offset + 5)
             :Top(scoreboard._border.tr.Bottom)
             :Bottom(scoreboard._border.br.Top)
 
 
-        LayoutFor(scoreboard._border.t)
+        layouter(scoreboard._border.t)
             :AtTopIn(scoreboard._border.tr, 1)
             :Right(scoreboard._border.tr.Left)
             :Left(leftTop)
 
-        LayoutFor(scoreboard._border.b)
+        layouter(scoreboard._border.b)
             :AtBottomIn(scoreboard._border.br, 1)
             :Right(scoreboard._border.br.Left)
             :Left(leftBottom)
@@ -87,13 +85,13 @@ Layout = function(scoreboard, layouter)
 
     end
 
-    LayoutFor(scoreboard._bracket)
+    layouter(scoreboard._bracket)
         :AtTopIn(scoreboard, -15)
         :AtBottomIn(scoreboard, -15)
         :AtRightIn(scoreboard, -21)
         :Over(scoreboard, 10)
 
-    LayoutFor(scoreboard)
+    layouter(scoreboard)
         :AtRightIn(GetFrame(0), 20)
 
 

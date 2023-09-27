@@ -10,7 +10,8 @@ local animationSpeed = 500
 
 ---A clear function for additional layout
 ---@param scoreboard ScoreBoard
-local Clear = function(scoreboard)
+---@param layouter UMT.Layouter
+local Clear = function(scoreboard, layouter)
     scoreboard._border:Destroy()
     scoreboard._border = nil
 
@@ -21,13 +22,13 @@ local Clear = function(scoreboard)
     scoreboard._arrow = nil
 
     if scoreboard._title then
-        LayoutFor(scoreboard._title)
+        layouter(scoreboard._title)
             :Width(300)
         scoreboard._title._bg:Show()
     end
 
     for i, armyView in scoreboard:GetArmyViews() do
-        LayoutFor(armyView)
+        layouter(armyView)
             :Width(armyView.isAlly and ArmyViews.allyViewWidth or ArmyViews.armyViewWidth)
         armyView._bg:Show()
     end
@@ -50,10 +51,10 @@ Layout = function(scoreboard, layouter)
     scoreboard.InitialAnimation = InitialAnimation
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
-    scoreboard._border =  UMT.Views.WindowFrame(scoreboard)
+    scoreboard._border = UMT.Views.WindowFrame(scoreboard)
     scoreboard._arrow = UMT.Views.VerticalCollapseArrow(scoreboard)
 
-    LayoutFor(scoreboard._arrow)
+    layouter(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
         :AtRightIn(GetFrame(0), -3)
         :Over(scoreboard, 20)
@@ -68,33 +69,33 @@ Layout = function(scoreboard, layouter)
     end
 
 
-    LayoutFor(scoreboard._bracket)
+    layouter(scoreboard._bracket)
         :AtTopIn(scoreboard, -11)
         :AtBottomIn(scoreboard, -12)
         :AtRightIn(scoreboard, -27)
         :Over(scoreboard, 10)
 
 
-    LayoutFor(scoreboard._border)
+    layouter(scoreboard._border)
         :FillFixedBorder(scoreboard, -7)
         :Over(scoreboard)
         :DisableHitTest(true)
 
-    LayoutFor(scoreboard)
+    layouter(scoreboard)
         :AtRightIn(GetFrame(0), 25)
         :Width(ArmyViews.allyViewWidth)
 
     if scoreboard._title then
-        LayoutFor(scoreboard._title)
+        layouter(scoreboard._title)
             :Width(scoreboard.Width)
-        LayoutFor(scoreboard._title._bg)
+        layouter(scoreboard._title._bg)
             :Hide()
     end
 
     for i, armyView in scoreboard:GetArmyViews() do
-        LayoutFor(armyView)
+        layouter(armyView)
             :Width(ArmyViews.allyViewWidth)
-        LayoutFor(armyView._bg)
+        layouter(armyView._bg)
             :Hide()
     end
 
