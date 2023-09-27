@@ -58,12 +58,9 @@ Layout = function(scoreboard, layouter)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtTopIn(scoreboard._border, -10)
 
-
         layouter(scoreboard._border.br)
             :AnchorToLeft(scoreboard._border, offset + 3)
             :AtBottomIn(scoreboard._border, -10)
-
-
 
         layouter(scoreboard._border.r)
             :AnchorToLeft(scoreboard._border, offset + 5)
@@ -80,9 +77,6 @@ Layout = function(scoreboard, layouter)
             :AtBottomIn(scoreboard._border.br, 1)
             :Right(scoreboard._border.br.Left)
             :Left(leftBottom)
-
-
-
     end
 
     layouter(scoreboard._bracket)
@@ -92,10 +86,7 @@ Layout = function(scoreboard, layouter)
         :Over(scoreboard, 10)
 
     layouter(scoreboard)
-        :NoScale(function(_layouter)
-            _layouter:AtRightIn(GetFrame(0), 20)
-        end)
-
+        :AtRightIn(GetFrame(0), 20)
 
     return Clear
 end
