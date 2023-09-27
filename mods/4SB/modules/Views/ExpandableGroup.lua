@@ -1,6 +1,7 @@
 local Group = UMT.Controls.Group
 local Bitmap = UMT.Controls.Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Functions = UMT.Layouter.Functions
 
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
@@ -21,12 +22,11 @@ local expandAnimation = animationFactory
         if n * height < expandHeight then
             return true
         end
-        control._expand.Height:Set(expandHeight + delta * expandSpeed)
+        control._expand.Height:Set(expandHeight + delta * control.Layouter:ScaleNumber(expandSpeed))
     end)
     :OnFinish(function(control)
         local n = table.getn(control._controls) + 1
-        local height = control.Height()
-        control._expand.Height:Set(n * height)
+        control._expand.Height:Set(Functions.Mult(n, control.Height))
         control._isExpanded = true
     end)
     :Create()
@@ -44,12 +44,11 @@ local contractAnimation = animationFactory
         if height > expandHeight then
             return true
         end
-        control._expand.Height:Set(expandHeight - delta * expandSpeed)
+        control._expand.Height:Set(expandHeight - delta * control.Layouter:ScaleNumber(expandSpeed))
 
     end)
     :OnFinish(function(control)
-        local height = control.Height()
-        control._expand.Height:Set(height)
+        control._expand.Height:Set(control.Height)
         control._isExpanded = false
     end)
     :Create()
