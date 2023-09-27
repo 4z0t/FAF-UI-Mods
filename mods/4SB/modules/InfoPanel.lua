@@ -3,7 +3,6 @@ local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = UMT.Controls.Bitmap
 local Text = UMT.Controls.Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 local Options = import("Options.lua")

@@ -2,7 +2,6 @@ local Group = import('/lua/maui/group.lua').Group
 import("Views/__Init__.lua")
 local Utils = import("Utils.lua")
 local ArmyViews = import("ArmyView.lua")
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel

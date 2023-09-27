@@ -1,5 +1,4 @@
 local ExpandableGroup = import("ExpandableGroup.lua").ExpandableGroup
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 ExpandableSelectionGroup = UMT.Class(ExpandableGroup)
 {
@@ -53,9 +52,12 @@ ExpandableSelectionGroup = UMT.Class(ExpandableGroup)
         local indexOffset = (index + 0.5)
 
         if self._isExpanded then
-            LayoutHelpers.AtCenterIn(newActive, self)
-            LayoutHelpers.AtHorizontalCenterIn(oldActive, self)
-            oldActive.Top:Set(function() return self.Top() + indexOffset * self.Height() - 0.5 * oldActive.Height() end)
+            self.Layouter(newActive)
+                :AtCenterIn(self)
+
+            self.Layouter(oldActive)
+                :AtHorizontalCenterIn(self)
+                :Top(function() return self.Top() + indexOffset * self.Height() - 0.5 * oldActive.Height() end)
         else
             newActive:Enable()
             newActive:Show()

@@ -1,7 +1,6 @@
 local Group = UMT.Controls.Group
 local Bitmap = UMT.Controls.Bitmap
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
