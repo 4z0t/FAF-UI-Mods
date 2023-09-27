@@ -40,8 +40,11 @@ local MexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 5
         self.offsetY = 6
-        self:SetTexture("/mods/EUT/textures/upgrade.dds")
-        LayoutHelpers.SetDimensions(self, 8, 8)
+
+        LayoutFor(self)
+            :Width(8)
+            :Height(8)
+            :Texture("/mods/EUT/textures/upgrade.dds")
     end,
 
     OnFrame = function(self, delta)
