@@ -10,8 +10,8 @@ local armiesFormattedTable
 ---Returns small faction icon file path
 ---@param factionIndex Faction
 ---@return FileName
-function GetSmallFactionIcon(factionIndex)
-    return import('/lua/factions.lua').Factions[factionIndex + 1].SmallIcon
+function GetFactionIcon(factionIndex)
+    return import('/lua/factions.lua').Factions[factionIndex + 1].LargeIcon
 end
 
 ---@class ArmyData

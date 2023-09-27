@@ -118,6 +118,8 @@ ArmyView = UMT.Class(Group)
         layouter(self._faction)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 4)
+            :Width(16)
+            :Height(16)
             :Over(self, 10)
             :DisableHitTest()
 
@@ -189,7 +191,7 @@ ArmyView = UMT.Class(Group)
 
         self:ResetFont()
 
-        self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
+        self._faction:SetTexture(UIUtil.UIFile(Utils.GetFactionIcon(faction)), 0)
     end,
 
     ResetFont = function(self)
