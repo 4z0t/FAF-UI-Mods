@@ -1,5 +1,5 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -69,7 +69,7 @@ local pingColors = {
 }
 
 
-PingAnimation = Class(Group)
+PingAnimation = UMT.Class(Group)
 {
     __init = function(self, parent, color, location)
         Group.__init(self, parent)
@@ -79,12 +79,12 @@ PingAnimation = Class(Group)
     end,
 
     __post_init = function(self, parent)
-        self:_Layout()
+        self:Layout()
 
     end,
 
-    _Layout = function(self)
-        self:_LayoutLayers()
+    _Layout = function(self, layouter)
+        self:_LayoutLayers(layouter)
     end,
 
 
@@ -97,17 +97,17 @@ PingAnimation = Class(Group)
 
     end,
 
-    _LayoutLayers = function(self)
+    _LayoutLayers = function(self, layouter)
         local prev
         for i, layer in self._layers do
             if prev then
-                LayoutFor(layer)
+                layouter(layer)
                     :Right(prev.Left)
             else
-                LayoutFor(layer)
+                layouter(layer)
                     :Right(self.Right)
             end
-            LayoutFor(layer)
+            layouter(layer)
                 :Top(self.Top)
                 :Bottom(self.Bottom)
                 :Width(1)
@@ -117,13 +117,12 @@ PingAnimation = Class(Group)
             layer.id = i
             prev = layer
         end
-        LayoutFor(self)
+        layouter(self)
             :Left(prev.Left)
             :EnableHitTest()
 
     end,
 
-    ---comment
     ---@param self any
     ---@param event KeyEvent
     ---@return boolean
@@ -134,6 +133,7 @@ PingAnimation = Class(Group)
             GetCamera('WorldCamera'):RestoreSettings(currentCamSettings)
             return true
         end
+        return false
     end,
 
     Animate = function(self)
