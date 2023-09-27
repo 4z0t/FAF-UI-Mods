@@ -50,7 +50,7 @@ function Div(n1, n2)
         return function() return n1() / n2() end
     end
     if iscallable(n1) then
-        assert(n2 ~= 0, "Attempt to diveide by zero")
+        assert(n2 ~= 0, "Attempt to divide by zero")
         return function()
             return n1() / n2
         end
@@ -76,7 +76,8 @@ local function _MaxVarOrValue(var, value, scale)
     if iscallable(scale) then
         return function() return math.max(var(), value * scale()) end
     end
-    return function() return math.max(var(), value * scale) end
+    local offset = value * scale
+    return function() return math.max(var(), offset) end
 end
 
 ---returns function of max of two given lazyvars
@@ -108,7 +109,8 @@ local function _MinVarOrValue(var, value, scale)
     if iscallable(scale) then
         return function() return math.min(var(), value * scale()) end
     end
-    return function() return math.min(var(), value * scale) end
+    local offset = value * scale
+    return function() return math.min(var(), offset) end
 end
 
 ---returns function of min of two given lazyvars
@@ -141,7 +143,8 @@ local function _DiffVarAndValue(var, value, scale)
     if iscallable(scale) then
         return function() return var() - value * scale() end
     end
-    return function() return var() - value * scale end
+    local offset = value * scale
+    return function() return var() - offset end
 end
 
 ---returns function of difference of value and lazyvar
@@ -155,7 +158,8 @@ local function _DiffValueAndVar(value, var, scale)
     if iscallable(scale) then
         return function() return value * scale() - var() end
     end
-    return function() return value * scale - var() end
+    local offset = value * scale
+    return function() return offset - var() end
 end
 
 ---returns function of difference of two given lazyvars
@@ -189,7 +193,8 @@ local function _SumVarAndValue(var, value, scale)
     if iscallable(scale) then
         return function() return var() + value * scale() end
     end
-    return function() return var() + value * scale end
+    local offset = value * scale
+    return function() return var() + offset end
 end
 
 ---returns function of sum of two given lazyvars
@@ -235,8 +240,9 @@ function AtCenterOffset(base, baseLen, len, offset, scale)
             return base() + 0.5 * (baseLen() - len()) + offset * scale()
         end
     else
+        local _offset = offset * scale
         return function()
-            return base() + 0.5 * (baseLen() - len()) + offset * scale
+            return base() + 0.5 * (baseLen() - len()) + _offset
         end
     end
 end
