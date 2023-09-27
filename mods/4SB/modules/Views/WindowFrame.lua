@@ -1,5 +1,5 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = UMT.Controls.Bitmap
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -16,7 +16,7 @@ local textures = {
 }
 
 
-WindowFrame = Class(Group)
+WindowFrame = UMT.Class(Group)
 {
 
     __init = function(self, parent)
@@ -36,58 +36,52 @@ WindowFrame = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
 
-        LayoutFor(self.tl)
+        layouter(self.tl)
             :Left(self.Left)
             :Top(self.Top)
 
-        LayoutFor(self.tr)
+        layouter(self.tr)
             :Top(self.Top)
             :Right(self.Right)
 
-        LayoutFor(self.bl)
+        layouter(self.bl)
             :Left(self.Left)
             :Bottom(self.Bottom)
 
-        LayoutFor(self.br)
+        layouter(self.br)
             :Bottom(self.Bottom)
             :Right(self.Right)
 
-        LayoutFor(self.tm)
+        layouter(self.tm)
             :Left(self.tl.Right)
             :Right(self.tr.Left)
             :AtTopIn(self)
 
-
-        LayoutFor(self.bm)
+        layouter(self.bm)
             :Left(self.bl.Right)
             :Right(self.br.Left)
             :AtBottomIn(self)
 
-
-
-        LayoutFor(self.mr)
+        layouter(self.mr)
             :Top(self.tr.Bottom)
             :Bottom(self.br.Top)
             :AtRightIn(self)
 
-
-        LayoutFor(self.ml)
+        layouter(self.ml)
             :Top(self.tl.Bottom)
             :Bottom(self.bl.Top)
             :AtLeftIn(self)
 
-        LayoutFor(self.m)
+        layouter(self.m)
             :Top(self.tm.Bottom)
             :Bottom(self.bm.Top)
             :Left(self.ml.Right)
             :Right(self.mr.Left)
-
-
     end,
 
 }
