@@ -17,7 +17,6 @@ local useNumberOverlay = Options.useNumberOverlay()
 local overlaySize = Options.overlaySize:Raw()
 
 function init()
-
     Options.overlayOption.OnChange = function(var)
         showOverlay = var()
     end
@@ -25,8 +24,6 @@ function init()
     Options.useNumberOverlay.OnChange = function(var)
         useNumberOverlay = var()
     end
-
-
 end
 
 local upgradeColor = "ff00ff00"
@@ -165,16 +162,17 @@ local function VerifyWV()
 end
 
 function UpdateOverlays(mexes)
-    if showOverlay then
-        VerifyWV()
-        for _, mex in mexes do
-            local id = mex:GetEntityId()
-            if IsDestroyed(overlays[id]) then
-                if useNumberOverlay then
-                    overlays[id] = NumberMexOverlay(worldView, mex)
-                else
-                    overlays[id] = MexOverlay(worldView, mex)
-                end
+    if not showOverlay then
+        return
+    end
+    VerifyWV()
+    for _, mex in mexes do
+        local id = mex:GetEntityId()
+        if IsDestroyed(overlays[id]) then
+            if useNumberOverlay then
+                overlays[id] = NumberMexOverlay(worldView, mex)
+            else
+                overlays[id] = MexOverlay(worldView, mex)
             end
         end
     end
