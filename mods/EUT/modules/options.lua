@@ -12,6 +12,7 @@ do
     unpauseAssisted = OptionVar(modName, "UnpauseAssisted", false)
     unpauseOnce = OptionVar(modName, "UnpauseOnce", false)
     unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
+    panelScale = OptionVar(modName, "panelScale", 100)
 
     function Init()
         Options.AddOptions(modName, "ECO UI Tools", {
@@ -23,7 +24,8 @@ do
             Options.Filter("Unpause mexes being assisted", unpauseAssisted),
             Options.Filter("Unpause once", unpauseOnce),
             Options.Slider("Assist BP threshold: mex unpauses if summary BP greater than this value", 4, 100, 1,
-                unpauseAssistedBP)
+                unpauseAssistedBP),
+            Options.Slider("Panel scale, %", 10, 200, 10, panelScale)
         })
     end
 end

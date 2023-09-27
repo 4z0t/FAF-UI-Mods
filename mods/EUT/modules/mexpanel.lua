@@ -1,13 +1,11 @@
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local Group = import("/lua/maui/group.lua").Group
-local Text = import("/lua/maui/text.lua").Text
+local Bitmap = UMT.Controls.Bitmap
+local Group = UMT.Controls.Group
+local Text = UMT.Controls.Text
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-
-local From = import("/mods/UMT/modules/linq.lua").From
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local Options = import("Options.lua")
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")
@@ -75,22 +73,30 @@ function Update(data)
     end
 end
 
-MexPanel = Class(Group) {
+MexPanel = UMT.Class(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
+        self.Layouter = UMT.Layouter.FloorLayouter(function()
+            return Options.panelScale() / 100
+        end)
+
         local pos = self:_LoadPosition()
-        LayoutFor(self)
+        LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
+        
+        self.Layouter(self)
             :Width(170)
             :Height(60)
-            :AtLeftTopIn(parent, pos.left, pos.top)
             :EnableHitTest()
             :Over(parent, 100)
+
         self.contents = Group(self)
-        LayoutFor(self.contents)
+
+        self.Layouter(self.contents)
             :Width(168)
             :Height(50)
             :AtCenterIn(self)
+
         self:InitMexPanels(self.contents)
     end,
 
@@ -100,9 +106,9 @@ MexPanel = Class(Group) {
         for i, category in mexCategories do
             local panel = self:CreateMexCategoryPanel(parent, category)
             if previous then
-                LayoutHelpers.RightOf(panel, previous, 2)
+                self.Layouter(panel):RightOf(previous, 2)
             else
-                LayoutHelpers.AtLeftTopIn(panel, parent)
+                self.Layouter(panel):AtLeftTopIn(parent)
             end
             panel.id = i
             previous = panel
@@ -112,8 +118,9 @@ MexPanel = Class(Group) {
 
     CreateMexCategoryPanel = function(self, parent, category)
         local group = Bitmap(parent)
+        local layouter = self.Layouter
 
-        LayoutFor(group)
+        layouter(group)
             :EnableHitTest()
             :Color("aa000000")
             :Width(22)
@@ -125,7 +132,7 @@ MexPanel = Class(Group) {
 
         group.stratIcon = Bitmap(group)
 
-        LayoutFor(group.stratIcon)
+        layouter(group.stratIcon)
             :DisableHitTest()
             :Texture(iconName)
             :Alpha(0.3)
@@ -133,7 +140,7 @@ MexPanel = Class(Group) {
 
         if category.isPaused then
             group.pauseIcon = Bitmap(group)
-            LayoutFor(group.pauseIcon)
+            layouter(group.pauseIcon)
                 :DisableHitTest()
                 :Texture(pausedTexture)
                 :Width(24)
@@ -145,7 +152,7 @@ MexPanel = Class(Group) {
         if category.isUpgrading then
             group.upgrIcon = Bitmap(group)
 
-            LayoutFor(group.upgrIcon)
+            layouter(group.upgrIcon)
                 :DisableHitTest()
                 :Texture(upgradeTexture)
                 :Width(8)
@@ -154,11 +161,13 @@ MexPanel = Class(Group) {
                 :AtTopCenterIn(group, 20, 5)
         end
 
-        group.countLabel = UIUtil.CreateText(group, "0", 9, UIUtil.bodyFont)
-        LayoutFor(group.countLabel)
+        group.countLabel = Text(group)
+        layouter(group.countLabel)
             :Color("ffaaaaaa")
             :DisableHitTest()
             :AtTopCenterIn(group, 1)
+        group.countLabel:SetFont(UIUtil.bodyFont, 9)
+        group.countLabel:SetText("0")
 
         if category.isUpgrading then
             group.ProgressBars = {}
@@ -166,7 +175,7 @@ MexPanel = Class(Group) {
             for i = 0, 9 do
 
                 local progress = Bitmap(group)
-                LayoutFor(progress)
+                layouter(progress)
                     :DisableHitTest()
                     :Color("3300ff00")
                     :Width(group.Width)
@@ -176,7 +185,7 @@ MexPanel = Class(Group) {
 
                 local bg = Bitmap(group)
 
-                LayoutFor(bg)
+                layouter(bg)
                     :DisableHitTest()
                     :Color("1100ff00")
                     :Width(group.Width)

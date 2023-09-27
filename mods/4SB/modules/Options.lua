@@ -92,9 +92,6 @@ function Init(isReplay)
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
-
-
-
         Options.Title("Observer Panel", nil, nil, UIUtil.factionTextColor),
         Options.Fonts("Font", observer.font, 4),
         Options.ColorSlider("Slider color", observer.color.line, 4),

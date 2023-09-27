@@ -1,7 +1,3 @@
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
-
-
 contractAnimation = UMT.Animation.Factory.Base
     :OnStart(function(control, state, speed, offset)
         PlaySound(Sound { Cue = "UI_Score_Window_Close", Bank = "Interface" })
