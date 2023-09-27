@@ -3,6 +3,10 @@ local function ExistGlobal(name)
 end
 
 function Main(isReplay)
+    if UMT.Version < 11 then
+        WARN("EUT requires UMT Version 11 or higher")
+        return
+    end
     local Options = import("options.lua")
     local MexManager = import("mexmanager.lua")
     local MexPanel = import("mexpanel.lua")

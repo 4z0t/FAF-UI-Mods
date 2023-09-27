@@ -1,6 +1,6 @@
 name = "UI mod tools"
-uid = "ui-mod-tools-4z0t-v10"
-version = 10
+uid = "ui-mod-tools-4z0t-v11"
+version = 11
 copyright = ""
 description = [[Tools for UI modding.
 IF YOU EXPERIENCE ANY ISSUES WITH SELECTION SOUNDS TRY "Selection Fix"]]
