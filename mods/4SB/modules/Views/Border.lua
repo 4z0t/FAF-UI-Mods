@@ -1,8 +1,6 @@
 local Bitmap = UMT.Controls.Bitmap
 local Group = UMT.Controls.Group
 local LazyVar = import('/lua/lazyvar.lua').Create
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
-
 
 ---@class BorderColored : UMT.Group
 Border = UMT.Class(Group)

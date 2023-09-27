@@ -1,7 +1,6 @@
 local Bitmap = UMT.Controls.Bitmap
 local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local textures = {
     tl = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_ul.dds'),
@@ -15,7 +14,7 @@ local textures = {
     br = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'),
 }
 
----@class GlowBorder : UMT.Group, ILayoutable
+---@class GlowBorder : UMT.Group
 GlowBorder = UMT.Class(Group)
 {
     ---@param self GlowBorder

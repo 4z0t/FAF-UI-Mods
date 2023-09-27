@@ -1,6 +1,5 @@
 local Border = import("Border.lua").Border
 local Text = UMT.Controls.Text
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 
 ---@class BorderedText : BorderColored

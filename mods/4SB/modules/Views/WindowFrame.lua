@@ -1,7 +1,6 @@
 local Bitmap = UMT.Controls.Bitmap
 local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local textures = {
     tl = UIUtil.SkinnableFile("/game/panel/panel_brd_ul.dds"),

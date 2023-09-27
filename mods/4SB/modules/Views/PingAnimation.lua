@@ -1,8 +1,6 @@
 local Group = UMT.Controls.Group
 local Bitmap = UMT.Controls.Bitmap
 
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
-
 local count = 30
 
 local offset = 0
