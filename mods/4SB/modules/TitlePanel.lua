@@ -180,7 +180,6 @@ TitlePanel = UMT.Class(Group)
 
     _Layout = function(self, layouter)
 
-
         layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
@@ -192,7 +191,6 @@ TitlePanel = UMT.Class(Group)
         layouter(self._info)
             :Top(self._top.Bottom)
             :Right(self.Right)
-
 
         layouter(self)
             :Width(titlePanelWidth)

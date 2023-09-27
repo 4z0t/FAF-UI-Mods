@@ -12,9 +12,7 @@ local Functions = UMT.Layouter.Functions
 
 local Options = import("Options.lua")
 
-
 local textSize = 12
-
 
 local panelWidth = 300
 local panelHeight = 20
@@ -156,7 +154,6 @@ DataPanel = UMT.Class(Group)
         self._replayId:SetText(tostring(UIUtil.GetReplayId() or ""))
     end,
 
-
     ---@param self DataPanel
     ---@param layouter UMT.Layouter
     _Layout = function(self, layouter)
@@ -171,7 +168,10 @@ DataPanel = UMT.Class(Group)
         spacing:Set(
             layouter:Min(
                 20,
-                Functions.Div(layouter:Diff(self.Width, dropdownsCount * checkboxWidth), 1 + dropdownsCount)
+                Functions.Div(
+                    layouter:Diff(self.Width, dropdownsCount * checkboxWidth),
+                    dropdownsCount + 1
+                )
             )
         )
 
