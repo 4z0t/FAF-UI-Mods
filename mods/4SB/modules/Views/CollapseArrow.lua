@@ -1,4 +1,4 @@
-local Checkbox = import("/lua/maui/checkbox.lua").Checkbox
+local Checkbox = UMT.Controls.Checkbox
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 VerticalCollapseArrow = UMT.Class(Checkbox)
