@@ -15,7 +15,7 @@ local upgradeTexture = "/mods/EUT/textures/upgrade.dds"
 local pausedTexture = "/textures/ui/common/game/strategicicons/pause_rest.dds"
 
 function init()
-    local parent = import("/lua/ui/game/gamemain.lua").controls.status
+    local parent = import("/lua/ui/game/gamemain.lua").GetStatusCluster()
     if not IsDestroyed(mexPanel) then
         mexPanel:Destroy()
     end

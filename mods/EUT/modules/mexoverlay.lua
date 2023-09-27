@@ -56,8 +56,6 @@ local MexOverlay = Class(Overlay)
             self:Destroy()
         end
     end
-
-
 }
 
 local NumberMexOverlay = Class(Overlay)
@@ -66,7 +64,6 @@ local NumberMexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 0
         self.offsetY = 0
-
 
         local text = "0"
         if unit:IsInCategory("TECH1") then
