@@ -2,21 +2,20 @@ local function ExistGlobal(name)
     return rawget(_G, name) ~= nil
 end
 
-if ExistGlobal "UMT" and UMT.Version >= 8 then
+if ExistGlobal "UMT" and UMT.Version >= 11 then
 
     local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")
-
     local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
     local layouts = {
-        ["default"] = false,
+        ["minimalictic"] = false,
         ["semi glow border"] = import("/mods/4SB/modules/Layouts/SemiGlowBorder.lua").Layout,
         ["glow border"] = import("/mods/4SB/modules/Layouts/GameGlowBorder.lua").Layout,
         ["window border"] = import("/mods/4SB/modules/Layouts/GameWindowFrame.lua").Layout
     }
 
     local replayLayouts = {
-        ["default"] = false,
+        ["minimalictic"] = false,
         ["glow border"] = import("/mods/4SB/modules/Layouts/ReplayGlowBorder.lua").Layout,
         ["window border"] = import("/mods/4SB/modules/Layouts/ReplayWindowFrame.lua").Layout
     }
@@ -50,7 +49,19 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
         end
 
+        scoreboard.Layouter.Scale = function()
+            return Options.scoreboardScale() / 100
+        end
+
+        Options.scoreboardScale.OnChange = function()
+            scoreboard:ResetWidthComponents()
+            scoreboard:ApplyToViews(function(armyId, view)
+                view:ResetFont()
+            end)
+        end
+
         Options.player.font.name.OnChange = function(var)
+            scoreboard:ResetWidthComponents()
             scoreboard:ApplyToViews(function(armyId, view)
                 view:ResetFont()
             end)

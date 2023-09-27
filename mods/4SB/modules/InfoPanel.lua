@@ -1,9 +1,8 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Text = import("/lua/maui/text.lua").Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
 local Options = import("Options.lua")
@@ -33,9 +32,11 @@ function FormatMapName(name)
     return name, false
 end
 
----@class InfoPanel : Group
-InfoPanel = Class(Group)
+---@class InfoPanel : UMT.Group
+InfoPanel = UMT.Class(Group)
 {
+    ---@param self InfoPanel
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -44,24 +45,26 @@ InfoPanel = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    ---@param self InfoPanel
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
         local parent = self:GetParent()
 
         self._mapName:SetFont(Options.title.font.mapName:Raw(), textSize)
-        LayoutFor(self._mapName)
+        layouter(self._mapName)
             :AtCenterIn(self)
 
 
         self._mapSize:SetFont(Options.title.font.mapSize:Raw(), textSize)
-        LayoutFor(self._mapSize)
+        layouter(self._mapSize)
             :AtVerticalCenterIn(self)
             :AtRightIn(self, 10)
             :DisableHitTest()
 
-        LayoutFor(self)
+        layouter(self)
             :Width(parent.Width)
             :Height(panelHeight)
             :DisableHitTest()

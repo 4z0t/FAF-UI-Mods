@@ -1,11 +1,9 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = UMT.Controls.Bitmap
+local Group = UMT.Controls.Group
 local LazyVar = import('/lua/lazyvar.lua').Create
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-
----@class BorderColored : Group
-Border = Class(Group)
+---@class BorderColored : UMT.Group
+Border = UMT.Class(Group)
 {
     __init = function(self, parent, color, borderWidth)
         borderWidth = borderWidth or 1
@@ -29,28 +27,29 @@ Border = Class(Group)
             self._color:Set(color)
         end
 
-        LayoutFor(self._leftBitmap)
+        local layouter = self.Layouter
+        layouter(self._leftBitmap)
             :Left(self.Left)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Width(borderWidth)
             :DisableHitTest()
 
-        LayoutFor(self._topBitmap)
+        layouter(self._topBitmap)
             :Left(self.Left)
             :Top(self.Top)
             :Right(self.Right)
             :Height(borderWidth)
             :DisableHitTest()
 
-        LayoutFor(self._rightBitmap)
+        layouter(self._rightBitmap)
             :Right(self.Right)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Width(borderWidth)
             :DisableHitTest()
 
-        LayoutFor(self._bottomBitmap)
+        layouter(self._bottomBitmap)
             :Left(self.Left)
             :Bottom(self.Bottom)
             :Right(self.Right)

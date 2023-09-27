@@ -2,12 +2,12 @@ local Group = import('/lua/maui/group.lua').Group
 import("Views/__Init__.lua")
 local Utils = import("Utils.lua")
 local ArmyViews = import("ArmyView.lua")
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local TitlePanel = import("TitlePanel.lua").TitlePanel
 local ObserverPanel = import("ObserverPanel.lua").ObserverPanel
 local DataPanel = import("ReplayDataPanel.lua").DataPanel
 local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
+local LazyVar = import('/lua/lazyvar.lua').Create
 
 
 local LazyImport = UMT.LazyImport
@@ -15,13 +15,13 @@ local Scores = LazyImport("/lua/ui/game/score.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local animationSpeed = LayoutHelpers.ScaleNumber(300)
+local animationSpeed = 300
 
 local slideForward = UMT.Animation.Factory.Base
     :OnStart()
     :OnFrame(function(control, delta)
         return control.Right() < control:GetParent().Right() or
-            control.Right:Set(control.Right() - delta * animationSpeed)
+            control.Right:Set(control.Right() - delta * control.Layouter:ScaleNumber(animationSpeed))
     end)
     :OnFinish(function(control)
         control.Right:Set(control:GetParent().Right)
@@ -29,7 +29,7 @@ local slideForward = UMT.Animation.Factory.Base
     :Create()
 
 
----@class ScoreBoard : Group
+---@class ScoreBoard : Group, ILayoutable
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
 ---@field protected _armyViews table<integer, ArmyView>
 ---@field protected _title TitlePanel
@@ -39,8 +39,12 @@ local slideForward = UMT.Animation.Factory.Base
 ---@field protected isHovered boolean
 ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
 {
+    ---@param self ScoreBoard
+    ---@param parent Control
+    ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
+        self.Layouter = UMT.Layouter.FloorLayouter(LazyVar(1))
 
         self._focusArmy = GetFocusArmy()
         self._title = false
@@ -50,21 +54,30 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
             self._title = TitlePanel(self)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
-
-
+        self:ResetWidthComponents()
     end,
 
+    ---@param self ScoreBoard
+    ResetWidthComponents = function(self)
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
+        ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
+        ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
+    end,
+
+    ---@param self ScoreBoard
     __post_init = function(self)
 
         self:_InitArmyViews()
-        self:_Layout()
+        self:Layout()
 
         self._mode = "income"
     end,
 
-    _Layout = function(self)
+    ---@param self ScoreBoard
+    ---@param layouter LayouterFunctor
+    _Layout = function(self, layouter)
         if self._title then
-            LayoutFor(self._title)
+            layouter(self._title)
                 :AtRightTopIn(self)
         end
         local last
@@ -72,16 +85,16 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         for i, armyView in self._lines do
             if i == 1 then
                 if self._title then
-                    LayoutFor(armyView)
+                    layouter(armyView)
                         :AnchorToBottom(self._title)
                         :Right(self.Right)
                 else
-                    LayoutFor(armyView)
+                    layouter(armyView)
                         :AtRightTopIn(self)
                 end
                 first = armyView
             else
-                LayoutFor(armyView)
+                layouter(armyView)
                     :AnchorToBottom(self._lines[i - 1])
                     :Right(self.Right)
             end
@@ -90,8 +103,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         if last then
             self.Bottom:Set(last.Bottom)
         end
-
-        LayoutFor(self)
+        layouter(self)
             :Width(100)
             :Over(GetFrame(0), 1000)
             :AtRightIn(GetFrame(0))
@@ -147,7 +159,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     end,
 
     ResetArmyData = function(self)
-        ArmyViews.nameWidth:Set(ArmyViews.minNameWidth)
+        ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         for _, armyData in Utils.GetArmiesFormattedTable() do
             self:GetArmyViews()[armyData.id]:SetStaticData(
                 armyData.id,

@@ -3,15 +3,19 @@ do
     local OptionVar = UMT.OptionVar.Create
 
     local modName = "EUT"
+    local function EUTOption(name, default)
+        return OptionVar(modName, name, default)
+    end
 
-    overlayOption = OptionVar(modName, "MexOverlay", true)
-    useNumberOverlay = OptionVar(modName, "NumberOverlay", false)
-    overlaySize = OptionVar(modName, "OverlaySize", 10)
-    upgradeT1Option = OptionVar(modName, "UpgradeT1", false)
-    upgradeT2Option = OptionVar(modName, "UpgradeT2", false)
-    unpauseAssisted = OptionVar(modName, "UnpauseAssisted", false)
-    unpauseOnce = OptionVar(modName, "UnpauseOnce", false)
-    unpauseAssistedBP = OptionVar(modName, "unpauseAssistedBP", 4)
+    overlayOption = EUTOption("MexOverlay", true)
+    useNumberOverlay = EUTOption("NumberOverlay", false)
+    overlaySize = EUTOption("OverlaySize", 10)
+    upgradeT1Option = EUTOption("UpgradeT1", false)
+    upgradeT2Option = EUTOption("UpgradeT2", false)
+    unpauseAssisted = EUTOption("UnpauseAssisted", false)
+    unpauseOnce = EUTOption("UnpauseOnce", false)
+    unpauseAssistedBP = EUTOption("unpauseAssistedBP", 4)
+    panelScale = EUTOption("panelScale", 100)
 
     function Init()
         Options.AddOptions(modName, "ECO UI Tools", {
@@ -23,7 +27,8 @@ do
             Options.Filter("Unpause mexes being assisted", unpauseAssisted),
             Options.Filter("Unpause once", unpauseOnce),
             Options.Slider("Assist BP threshold: mex unpauses if summary BP greater than this value", 4, 100, 1,
-                unpauseAssistedBP)
+                unpauseAssistedBP),
+            Options.Slider("Panel scale, %", 50, 300, 10, panelScale)
         })
     end
 end

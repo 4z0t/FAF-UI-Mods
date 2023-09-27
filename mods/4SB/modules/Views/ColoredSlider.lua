@@ -1,14 +1,11 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 local Border = import("Border.lua").Border
 local LazyVar = import('/lua/lazyvar.lua').Create
-local Text = import("/lua/maui/text.lua").Text
+local Text = UMT.Controls.Text
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
-
-
-ColoredSlider = Class(Group)
+ColoredSlider = UMT.Class(Group)
 {
     __init = function(self, parent,
                       isVertical,
@@ -96,12 +93,9 @@ ColoredSlider = Class(Group)
                            thumbOver,
                            thumbDown,
                            lineWidth)
-        self:_Layout(lineColor, thumbColor, lineWidth)
-    end,
-
-    _Layout = function(self, lineColor, thumbColor, lineWidth)
+        local layouter = self.Layouter
         if self._isVertical then
-            LayoutFor(self._line)
+            layouter(self._line)
                 :AtHorizontalCenterIn(self)
                 :Width(lineWidth)
                 :Top(self.Top)
@@ -109,14 +103,14 @@ ColoredSlider = Class(Group)
                 :Color(lineColor)
                 :DisableHitTest()
 
-            LayoutFor(self._center)
+            layouter(self._center)
                 :AtCenterIn(self)
                 :Width(function() return self.Width() / 2 end)
                 :Height(lineWidth)
                 :Color(lineColor)
                 :DisableHitTest()
 
-            LayoutFor(self._thumb)
+            layouter(self._thumb)
                 :Height(lineWidth * 5)
                 :Width(self.Width)
                 :AtHorizontalCenterIn(self)
@@ -126,7 +120,7 @@ ColoredSlider = Class(Group)
                             (self.Height())) - self._thumb.Height() / 2)
                 end)
         else
-            LayoutFor(self._line)
+            layouter(self._line)
                 :AtVerticalCenterIn(self)
                 :Height(lineWidth)
                 :Left(self.Left)
@@ -134,14 +128,14 @@ ColoredSlider = Class(Group)
                 :Color(lineColor)
                 :DisableHitTest()
 
-            LayoutFor(self._center)
+            layouter(self._center)
                 :AtCenterIn(self)
                 :Width(lineWidth)
                 :Height(function() return self.Height() / 2 end)
                 :Color(lineColor)
                 :DisableHitTest()
 
-            LayoutFor(self._thumb)
+            layouter(self._thumb)
                 :Height(self.Height)
                 :Width(lineWidth * 5)
                 :AtVerticalCenterIn(self)
@@ -157,7 +151,7 @@ ColoredSlider = Class(Group)
     SetValue = function(self, value)
         value = self:_Constrain(value)
         if value == self:GetValue() then return false end
-        
+
         self._currentValue:Set(value)
         self:OnValueChanged(value)
         return true
@@ -204,7 +198,7 @@ ColoredSlider = Class(Group)
 }
 
 
-ColoredIntegerSlider = Class(ColoredSlider)
+ColoredIntegerSlider = UMT.Class(ColoredSlider)
 {
     __init = function(self, parent,
                       isVertical,

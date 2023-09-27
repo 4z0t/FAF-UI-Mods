@@ -1,7 +1,5 @@
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
-local LazyVar = import("/lua/lazyvar.lua").Create
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local Options = import("options.lua")
@@ -17,7 +15,6 @@ local useNumberOverlay = Options.useNumberOverlay()
 local overlaySize = Options.overlaySize:Raw()
 
 function init()
-
     Options.overlayOption.OnChange = function(var)
         showOverlay = var()
     end
@@ -25,8 +22,6 @@ function init()
     Options.useNumberOverlay.OnChange = function(var)
         useNumberOverlay = var()
     end
-
-
 end
 
 local upgradeColor = "ff00ff00"
@@ -35,39 +30,7 @@ local idleNotCappedColor = "FFE21313"
 
 local progressColor = "3300ff00"
 
-local Overlay = Class(Bitmap)
-{
-    __init = function(self, parent, unit)
-        Bitmap.__init(self, parent)
-        self:Hide()
-        self:DisableHitTest()
-        self.id = unit:GetEntityId()
-        self.unit = unit
-        self.offsetX = 0
-        self.offsetY = 0
-        self.PosX = LazyVar()
-        self.PosY = LazyVar()
-        self.Left:Set(function()
-            return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
-        end)
-        self.Top:Set(function()
-            return worldView.Top() + self.PosY() - self.Height() / 2 + self.offsetY
-        end)
-        self:SetNeedsFrameUpdate(true)
-    end,
-
-
-    Update = function(self)
-        local pos = worldView:GetScreenPos(self.unit)
-        if pos then
-            self:Show()
-            self.PosX:Set(pos.x)
-            self.PosY:Set(pos.y)
-        else
-            self:Hide()
-        end
-    end
-}
+local Overlay = UMT.Views.UnitOverlay
 
 local MexOverlay = Class(Overlay)
 {
@@ -75,8 +38,11 @@ local MexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 5
         self.offsetY = 6
-        self:SetTexture("/mods/EUT/textures/upgrade.dds")
-        LayoutHelpers.SetDimensions(self, 8, 8)
+
+        LayoutFor(self)
+            :Width(8)
+            :Height(8)
+            :Texture("/mods/EUT/textures/upgrade.dds")
     end,
 
     OnFrame = function(self, delta)
@@ -90,8 +56,6 @@ local MexOverlay = Class(Overlay)
             self:Destroy()
         end
     end
-
-
 }
 
 local NumberMexOverlay = Class(Overlay)
@@ -100,7 +64,6 @@ local NumberMexOverlay = Class(Overlay)
         Overlay.__init(self, parent, unit)
         self.offsetX = 0
         self.offsetY = 0
-
 
         local text = "0"
         if unit:IsInCategory("TECH1") then
@@ -154,8 +117,6 @@ local NumberMexOverlay = Class(Overlay)
             self:Destroy()
         end
     end
-
-
 }
 
 local function VerifyWV()
@@ -165,16 +126,17 @@ local function VerifyWV()
 end
 
 function UpdateOverlays(mexes)
-    if showOverlay then
-        VerifyWV()
-        for _, mex in mexes do
-            local id = mex:GetEntityId()
-            if IsDestroyed(overlays[id]) then
-                if useNumberOverlay then
-                    overlays[id] = NumberMexOverlay(worldView, mex)
-                else
-                    overlays[id] = MexOverlay(worldView, mex)
-                end
+    if not showOverlay then
+        return
+    end
+    VerifyWV()
+    for _, mex in mexes do
+        local id = mex:GetEntityId()
+        if IsDestroyed(overlays[id]) then
+            if useNumberOverlay then
+                overlays[id] = NumberMexOverlay(worldView, mex)
+            else
+                overlays[id] = MexOverlay(worldView, mex)
             end
         end
     end

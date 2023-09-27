@@ -78,7 +78,7 @@ end
 ---@return Color
 function ColorRGBA(r, g, b, a)
     if a then
-        return string.format("%02x%02x%02x%02x", r, g, b, a)
+        return string.format("%02x%02x%02x%02x", a, r, g, b)
     else
         return string.format("FF%02x%02x%02x", r, g, b)
     end

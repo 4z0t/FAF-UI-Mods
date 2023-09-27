@@ -1,11 +1,13 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Bitmap = UMT.Controls.Bitmap
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-FactionRightBracket = Class(Group)
+---@class FactionRightBracket: UMT.Group
+FactionRightBracket = UMT.Class(Group)
 {
-
+    ---@param self FactionRightBracket
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -15,30 +17,28 @@ FactionRightBracket = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
 
-
-
-        LayoutFor(self.top)
+        layouter(self.top)
             :Right(self.Right)
             :Top(self.Top)
             :DisableHitTest()
 
-        LayoutFor(self.bottom)
+        layouter(self.bottom)
             :Right(self.Right)
             :Bottom(self.Bottom)
             :DisableHitTest()
 
-        LayoutFor(self.middle)
+        layouter(self.middle)
             :AtRightIn(self, 7)
             :Top(self.top.Bottom)
             :Bottom(self.bottom.Top)
             :DisableHitTest()
 
-        LayoutFor(self)
+        layouter(self)
             :Width(0)
             :DisableHitTest()
     end,

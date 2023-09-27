@@ -49,14 +49,16 @@ observer = {
     }
 }
 
-style = OptionVar(modName, "scoreboardStyle", "default")
-replayStyle = OptionVar(modName, "scoreboardReplayStyle", "default")
+style = OptionVar(modName, "scoreboardStyle", "glow border")
+replayStyle = OptionVar(modName, "scoreboardReplayStyle", "glow border")
 
 teamScoreSort = OptionVar(modName, "teamScoreSort", false)
 teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
 teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
 useDivisions = OptionVar(modName, "useDivisions", false)
 useNickNameArmyColor = OptionVar(modName, "useNickNameArmyColor", false)
+
+scoreboardScale = OptionVar(modName, "scoreboardScale", 100)
 
 function Init(isReplay)
 
@@ -67,14 +69,14 @@ function Init(isReplay)
             isReplay and
                 Options.Strings("Replay Scoreboard style",
                     {
-                        "default",
+                        "minimalictic",
                         "glow border",
                         "window border",
                     },
                     replayStyle, 4) or
                 Options.Strings("Scoreboard style",
                     {
-                        "default",
+                        "minimalictic",
                         "semi glow border",
                         "glow border",
                         "window border",
@@ -85,13 +87,11 @@ function Init(isReplay)
             Options.Filter("In team score sorting", teamScoreSort, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
-            Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4)
+            Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
+            Options.Slider("ScoreBoard scale, %", 50, 300, 10, scoreboardScale, 4)
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
-
-
-
         Options.Title("Observer Panel", nil, nil, UIUtil.factionTextColor),
         Options.Fonts("Font", observer.font, 4),
         Options.ColorSlider("Slider color", observer.color.line, 4),

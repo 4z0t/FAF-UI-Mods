@@ -11,7 +11,7 @@ end
 
 local LazyImport
 if ExistsGlobal "lazyimport" then
-    LOG("UMT: using lazyimport")
+    LOG "UMT: using lazyimport"
     LazyImport = lazyimport
 else
     local LazyImportMetaTable = {
@@ -48,17 +48,13 @@ end
 _G.UMT = {
     Info         = import("/mods/UMT/mod_info.lua"),
     Version      = import("/mods/UMT/mod_info.lua").version,
-    Layouter     = import("/mods/UMT/modules/Layouter.lua"),
+    Controls     = LazyImport("/mods/UMT/modules/Controls/__Init__.lua"),
+    Layouter     = LazyImport("/mods/UMT/modules/Layouter.lua"),
     OptionVar    = import("/mods/UMT/modules/OptionVar.lua"),
     Select       = LazyImport("/mods/UMT/modules/select.lua"),
     Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/__Init__.lua"),
     Views        = LazyImport("/mods/UMT/modules/Views/__Init__.lua"),
     Weak         = import("/mods/UMT/modules/WeakMeta.lua"),
-    -- Containers   = {
-    --     Set = import("/mods/UMT/modules/Containers/Set.lua").Set,
-    --     Array = import("/mods/UMT/modules/Containers/Array.lua").Array,
-    --     Dict = import("/mods/UMT/modules/Containers/Dict.lua").Dict,
-    -- },
     Animation    = LazyImport("/mods/UMT/modules/Animations/__Init__.lua"),
     Class        = import("/mods/UMT/modules/UIClass.lua").UIClass,
     Property     = import("/mods/UMT/modules/UIClass.lua").Property,
@@ -69,7 +65,7 @@ _G.UMT = {
     ExistsGlobal = ExistsGlobal,
     LuaQ         = import("/mods/UMT/modules/LuaQ.lua"),
     ColorUtils   = import("/mods/UMT/modules/ColorUtils.lua"),
-    Mods = import("/mods/UMT/modules/Mods.lua")
+    Mods         = import("/mods/UMT/modules/Mods.lua")
 }
 
 _G.UMT = UMT.Prevent.EditOf(_G.UMT)

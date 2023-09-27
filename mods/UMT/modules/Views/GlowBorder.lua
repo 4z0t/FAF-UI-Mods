@@ -1,7 +1,6 @@
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Group = import('/lua/maui/group.lua').Group
+local Bitmap = UMT.Controls.Bitmap
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local textures = {
     tl = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_ul.dds'),
@@ -15,10 +14,11 @@ local textures = {
     br = UIUtil.SkinnableFile('/game/mini-map-glow-brd/mini-map-glow_brd_lr.dds'),
 }
 
-
-GlowBorder = Class(Group)
+---@class GlowBorder : UMT.Group
+GlowBorder = UMT.Class(Group)
 {
-
+    ---@param self GlowBorder
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -34,52 +34,46 @@ GlowBorder = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
-    _Layout = function(self)
+    _Layout = function(self, layouter)
 
-        LayoutFor(self.tl)
+        layouter(self.tl)
             :Left(self.Left)
             :Top(self.Top)
 
-        LayoutFor(self.tr)
+        layouter(self.tr)
             :Top(self.Top)
             :Right(self.Right)
 
-        LayoutFor(self.bl)
+        layouter(self.bl)
             :Left(self.Left)
             :Bottom(self.Bottom)
 
-        LayoutFor(self.br)
+        layouter(self.br)
             :Bottom(self.Bottom)
             :Right(self.Right)
 
-        LayoutFor(self.tm)
+        layouter(self.tm)
             :Left(self.tl.Right)
             :Right(self.tr.Left)
             :AtTopIn(self, 1)
 
-
-        LayoutFor(self.bm)
+        layouter(self.bm)
             :Left(self.bl.Right)
             :Right(self.br.Left)
             :AtBottomIn(self, 1)
 
-
-
-        LayoutFor(self.mr)
+        layouter(self.mr)
             :Top(self.tr.Bottom)
             :Bottom(self.br.Top)
             :AtRightIn(self, 2)
 
-
-        LayoutFor(self.ml)
+        layouter(self.ml)
             :Top(self.tl.Bottom)
             :Bottom(self.bl.Top)
             :AtLeftIn(self, 2)
-
-
     end,
 
 }

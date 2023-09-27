@@ -32,19 +32,22 @@ end
 
 ---A layout function for scoreboard
 ---@param scoreboard ReplayScoreBoard
+---@param layouter LayouterFunctor
 ---@return fun(scoreboard : ReplayScoreBoard)
-Layout = function(scoreboard)
+Layout = function(scoreboard, layouter)
 
-    scoreboard:_Layout()
+    scoreboard:Layout()
     scoreboard.InitialAnimation = InitialAnimation
 
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
     scoreboard._border = UMT.Views.GlowBorder(scoreboard)
     scoreboard._arrow = UMT.Views.VerticalCollapseArrow(scoreboard)
 
-    LayoutFor(scoreboard._arrow)
+    layouter(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
-        :AtRightIn(GetFrame(0), -3)
+        :NoScale(function(_layouter)
+            _layouter:AtRightIn(GetFrame(0), -3)
+        end)
         :Over(scoreboard, 20)
 
     scoreboard._arrow.OnCheck = function(arrow, checked)
@@ -55,25 +58,25 @@ Layout = function(scoreboard)
         end
     end
 
-    LayoutFor(scoreboard._bracket)
+    layouter(scoreboard._bracket)
         :AtTopIn(scoreboard, -13)
         :AtBottomIn(scoreboard, -13)
         :AtRightIn(scoreboard, -26)
         :Over(scoreboard, 10)
 
 
-    LayoutFor(scoreboard._border)
+    layouter(scoreboard._border)
         :FillFixedBorder(scoreboard, -10)
         :Over(scoreboard)
         :DisableHitTest(true)
 
-    LayoutFor(scoreboard._dataPanel)
+    layouter(scoreboard._dataPanel)
         :Width(scoreboard.Width)
     if scoreboard._title then
-        LayoutFor(scoreboard._title)
+        layouter(scoreboard._title)
             :Width(scoreboard.Width)
     end
-    LayoutFor(scoreboard)
+    layouter(scoreboard)
         :AtRightIn(GetFrame(0), 25)
 
 

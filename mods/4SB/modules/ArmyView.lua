@@ -1,15 +1,14 @@
-local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-local Text = import("/lua/maui/text.lua").Text
+local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local LazyVar = import('/lua/lazyvar.lua').Create
 local Tooltip = import("/lua/ui/game/tooltip.lua")
+local Bitmap = UMT.Controls.Bitmap
+local Text = UMT.Controls.Text
 local ColorUtils = UMT.ColorUtils
 
 local Options = import("Options.lua")
 
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
+local Functions = UMT.Layouter.Functions
 local alphaAnimator = UMT.Animation.Animator(GetFrame(0))
 local animationFactory = UMT.Animation.Factory.Base
 local alphaAnimationFactory = UMT.Animation.Factory.Alpha
@@ -43,17 +42,15 @@ local armyViewTextPointSize = 12
 local armyViewNameFont = Options.player.font.name:Raw()
 local focusArmyNameFont = Options.player.font.focus:Raw()
 
-minNameWidth = LayoutHelpers.ScaleNumber(75)
-nameWidth = LazyVar(minNameWidth)
+nameWidth = LazyVar()
 armyViewWidth = LazyVar()
-armyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(80) end)
 allyViewWidth = LazyVar()
-allyViewWidth:Set(function() return nameWidth() + LayoutHelpers.ScaleNumber(160) end)
+
 
 local armyViewHeight = 20
 local outOfGameColor = "ffa0a0a0"
 
----@class ArmyView : Group
+---@class ArmyView : UMT.Group
 ---@field isOutOfGame boolean
 ---@field id integer
 ---@field _bg Bitmap
@@ -73,6 +70,7 @@ ArmyView = UMT.Class(Group)
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+
         self.parent = parent
 
         self.id = -1
@@ -94,20 +92,21 @@ ArmyView = UMT.Class(Group)
         self._name = Text(self)
     end,
 
+    ---@param self ArmyView
     __post_init = function(self)
-        self:_Layout()
+        self:Layout()
     end,
 
     ---Layouts ArmyView
     ---@param self ArmyView
-    _Layout = function(self)
-
-        LayoutFor(self._bg)
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
             :DisableHitTest()
 
-        LayoutFor(self._color)
+        layouter(self._color)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
@@ -116,13 +115,15 @@ ArmyView = UMT.Class(Group)
             :DisableHitTest()
             :Color(self.TeamColor)
 
-        LayoutFor(self._faction)
+        layouter(self._faction)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 4)
+            :Width(16)
+            :Height(16)
             :Over(self, 10)
             :DisableHitTest()
 
-        LayoutFor(self._div)
+        layouter(self._div)
             :Width(40)
             :Height(20)
             :AtVerticalCenterIn(self)
@@ -131,7 +132,7 @@ ArmyView = UMT.Class(Group)
             :DisableHitTest()
             :Alpha(0)
 
-        LayoutFor(self._rating)
+        layouter(self._rating)
             :AtVerticalCenterIn(self)
             :AnchorToLeft(self, -60)
             :DisableHitTest()
@@ -140,7 +141,7 @@ ArmyView = UMT.Class(Group)
             :Color(self.ArmyColor)
 
 
-        LayoutFor(self._name)
+        layouter(self._name)
             :AtVerticalCenterIn(self)
             :AtLeftIn(self, 70)
             :Over(self, 10)
@@ -149,7 +150,7 @@ ArmyView = UMT.Class(Group)
             :Color(self.PlainColor)
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(armyViewWidth)
             :Height(armyViewHeight)
     end,
@@ -171,10 +172,10 @@ ArmyView = UMT.Class(Group)
         if division and division ~= "" then
 
             if division ~= "unlisted" then
-                LayoutFor(self._div)
+                self.Layouter(self._div)
                     :Texture("/textures/divisions/" .. division .. "_medium.png", 0)
             else
-                LayoutFor(self._div)
+                self.Layouter(self._div)
                     :Width(20)
                     :Height(20)
                     :AtRightIn(self._rating, -1 + 10)
@@ -190,13 +191,17 @@ ArmyView = UMT.Class(Group)
 
         self:ResetFont()
 
-        self._faction:SetTexture(UIUtil.UIFile(Utils.GetSmallFactionIcon(faction)), 0)
+        self._faction:SetTexture(UIUtil.UIFile(Utils.GetFactionIcon(faction)), 0)
     end,
 
     ResetFont = function(self)
         local font = GetFocusArmy() == self.id and focusArmyNameFont or armyViewNameFont
-        nameWidth:Set(math.max(nameWidth(), TextWidth(self._name:GetText(), font(), armyViewTextPointSize)))
         self._name:SetFont(font, armyViewTextPointSize)
+        nameWidth:Set(
+            math.max(
+                nameWidth(),
+                TextWidth(self._name, self._name:GetText(), font(), armyViewTextPointSize)
+            ))
     end,
 
     ---@type Color
@@ -276,12 +281,11 @@ ArmyView = UMT.Class(Group)
         self.PlainColor = outOfGameColor
     end,
 
-    ---comment
     ---@param self ArmyView
     ---@param pingData PingData
     DisplayPing = function(self, pingData)
         local ping = PingAnimation(self, pingData.ArrowColor, pingData.Location)
-        LayoutFor(ping)
+        self.Layouter(ping)
             :Top(self.Top)
             :Bottom(self.Bottom)
             :Right(self.Left)
@@ -300,7 +304,6 @@ ArmyView = UMT.Class(Group)
 ---@field _unitsBtn Bitmap
 AllyView = UMT.Class(ArmyView)
 {
-    ---comment
     ---@param self AllyView
     ---@param parent Control
     __init = function(self, parent)
@@ -369,10 +372,12 @@ AllyView = UMT.Class(ArmyView)
         end
     end,
 
-    _Layout = function(self)
-        ArmyView._Layout(self)
+    ---@param self AllyView
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        ArmyView._Layout(self, layouter)
 
-        LayoutFor(self._unitsBtn)
+        layouter(self._unitsBtn)
             :AtHorizontalCenterIn(self._faction)
             :AtVerticalCenterIn(self)
             :Texture(UIUtil.UIFile '/textures/ui/icons_strategic/commander_generic.dds')
@@ -390,7 +395,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._energyBtn)
+        layouter(self._energyBtn)
             :Right(self._energy.Right)
             :AtVerticalCenterIn(self)
             :Width(35)
@@ -409,7 +414,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._massBtn)
+        layouter(self._massBtn)
             :Right(self._mass.Right)
             :AtVerticalCenterIn(self)
             :Width(35)
@@ -428,7 +433,7 @@ AllyView = UMT.Class(ArmyView)
             0.5
         )
 
-        LayoutFor(self._energy)
+        layouter(self._energy)
             :AtRightIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color('fff7c70f')
@@ -438,7 +443,7 @@ AllyView = UMT.Class(ArmyView)
 
 
 
-        LayoutFor(self._mass)
+        layouter(self._mass)
             :AtRightIn(self, 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
@@ -448,7 +453,7 @@ AllyView = UMT.Class(ArmyView)
 
 
 
-        LayoutFor(self)
+        layouter(self)
             :Width(allyViewWidth)
     end,
 
@@ -499,7 +504,7 @@ AllyView = UMT.Class(ArmyView)
 local lastDataTextOffset = 20
 local dataTextOffSet = 40
 
-local dataAnimationSpeed = LayoutHelpers.ScaleNumber(150)
+local dataAnimationSpeed = 150
 
 local contractDataAnimation = animationFactory
     :OnStart(function(control, state, nextControl, offset)
@@ -508,13 +513,14 @@ local contractDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() >= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
+        if control.Right() >= state.nextControl.Right() - control.Layouter:ScaleNumber(state.offset) then
             return true
         end
-        control.Right:Set(control.Right() + delta * dataAnimationSpeed)
+        control.Right:Set(control.Right() + delta * control.Layouter:ScaleNumber(dataAnimationSpeed))
     end)
     :OnFinish(function(control, state)
-        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
+        control.Layouter(control)
+            :AtRightIn(state.nextControl, state.offset)
     end)
     :Create()
 
@@ -525,13 +531,14 @@ local expandDataAnimation = animationFactory
         return { nextControl = nextControl, offset = offset }
     end)
     :OnFrame(function(control, delta, state)
-        if control.Right() <= state.nextControl.Right() - LayoutHelpers.ScaleNumber(state.offset) then
+        if control.Right() <= state.nextControl.Right() - control.Layouter:ScaleNumber(state.offset) then
             return true
         end
-        control.Right:Set(control.Right() - delta * dataAnimationSpeed)
+        control.Right:Set(control.Right() - delta * control.Layouter:ScaleNumber(dataAnimationSpeed))
     end)
     :OnFinish(function(control, state)
-        LayoutHelpers.AtRightIn(control, state.nextControl, state.offset)
+        control.Layouter(control)
+            :AtRightIn(state.nextControl, state.offset)
     end)
     :Create()
 
@@ -543,6 +550,8 @@ local colorAnimation = UMT.Animation.Factory.Color
     :For(0.3)
     :Create()
 
+---@class ReplayArmyView : ArmyView
+---@field _data Text[]
 ReplayArmyView = UMT.Class(ArmyView)
 {
     __init = function(self, parent)
@@ -554,24 +563,26 @@ ReplayArmyView = UMT.Class(ArmyView)
         end
     end,
 
-    _Layout = function(self)
-        ArmyView._Layout(self)
+    ---@param self ReplayArmyView
+    ---@param layouter UMT.Layouter
+    _Layout = function(self, layouter)
+        ArmyView._Layout(self, layouter)
 
         local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
             if i == 1 then
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
                 first = self._data[i]
             elseif i == dataSize then
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self, lastDataTextOffset)
             else
-                LayoutFor(self._data[i])
+                layouter(self._data[i])
                     :AtRightIn(self._data[i + 1], dataTextOffSet)
             end
-            LayoutFor(self._data[i])
+            layouter(self._data[i])
                 :AtVerticalCenterIn(self)
                 :Over(self, 15)
                 :DisableHitTest()
@@ -581,12 +592,11 @@ ReplayArmyView = UMT.Class(ArmyView)
             self._data[i]._contracted = false
         end
 
-        LayoutFor(self)
-            :Width(function()
-                return nameWidth() + LayoutHelpers.ScaleNumber(70 + dataTextOffSet)
-                    + self.Right() - first.Right()
-            end)
-
+        layouter(self)
+            :Width(layouter:Sum(
+                layouter:Sum(nameWidth, 70 + dataTextOffSet),
+                layouter:Diff(self.Right, first.Right)
+            ))
     end,
 
 
@@ -618,12 +628,12 @@ ReplayArmyView = UMT.Class(ArmyView)
             ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
             return true
         elseif event.Type == 'MouseExit' then
-            LayoutFor(self._bg)
+            self.Layouter(self._bg)
                 :Color(bgColor)
             --colorAnimation:Apply(self._bg, bgColor())
             return true
         elseif event.Type == 'MouseEnter' then
-            LayoutFor(self._bg)
+            self.Layouter(self._bg)
                 :Color(highlightColor)
             --colorAnimation:Apply(self._bg, UMT.ColorUtils.ColorMult(bgColor(), 1.4))
             return true
