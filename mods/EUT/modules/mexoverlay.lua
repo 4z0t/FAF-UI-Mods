@@ -1,7 +1,5 @@
-local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
-local LazyVar = import("/lua/lazyvar.lua").Create
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local Options = import("options.lua")
@@ -122,8 +120,6 @@ local NumberMexOverlay = Class(Overlay)
             self:Destroy()
         end
     end
-
-
 }
 
 local function VerifyWV()
