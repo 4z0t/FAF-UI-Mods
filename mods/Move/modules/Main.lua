@@ -43,7 +43,6 @@ local function IsOverChargeCommandCanceled(command)
     return IsOverChargeCommand(command) and command.isCancel
 end
 
----comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
@@ -53,7 +52,6 @@ function OnCommandStarted(commandMode, commandModeData)
     end
 end
 
----comment
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
 function OnCommandEnded(commandMode, commandModeData)
@@ -79,7 +77,6 @@ function Main(isReplay)
 
     CM.AddStartBehavior(OnCommandStarted)
     CM.AddEndBehavior(OnCommandEnded)
-
 end
 
 KeyMapper.SetUserKeyAction('Move only', {
