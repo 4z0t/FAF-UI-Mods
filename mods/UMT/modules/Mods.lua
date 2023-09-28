@@ -1,7 +1,7 @@
 local mods = {}
 
 function Load(isReplay)
-    for i, mod in mods do
+    for mod in mods do
         local files = DiskFindFiles("/mods/" .. mod .. "/", 'Main.lua')
         for _, file in files do
             LOG("UMT: Loading file " .. file)
@@ -13,5 +13,5 @@ end
 ---Adds mod to be loaded during start of the game
 ---@param name string # mod folder name
 function Add(name)
-    table.insert(mods, name)
+    mods[name] = true
 end

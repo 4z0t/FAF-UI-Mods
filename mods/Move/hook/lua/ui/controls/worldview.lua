@@ -8,7 +8,7 @@ do
             if event.Modifiers.Right and MoveOnly.IsLocked() then
                 MoveOnly.Toggle(true)
             end
-            _WorldViewHandleEvent(self, event)
+            return _WorldViewHandleEvent(self, event)
         end
     }
 end
