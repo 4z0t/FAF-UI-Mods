@@ -1,11 +1,14 @@
 name = "Move only"
-version = 1
+version = 2
 copyright = ""
-description = [[Adds move only order key action (like regular one), but cant be stopped until needed.
-Can be stopped with same key bind click or RMB.]]
+description = [[
+Adds move only order key action (like regular one), but cant be stopped until needed.
+Can be stopped with same key bind click or RMB.
+Supports OC mode.
+]]
 author = "4z0t"
 url = ""
-uid = "move-only-v01"
+uid = "move-only-v02"
 icon = "/mods/Move/icon.png"
 selectable = true
 enabled = true
