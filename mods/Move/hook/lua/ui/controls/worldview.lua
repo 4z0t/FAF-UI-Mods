@@ -1,17 +1,14 @@
 do
-    local oldWorldView = WorldView
+    local _WorldViewHandleEvent = WorldView.HandleEvent
     local MoveOnly = import "/mods/Move/modules/Main.lua"
-    WorldView = Class(oldWorldView) {
-
-        ---comment
+    WorldView = Class(WorldView) {
         ---@param self WorldView
         ---@param event KeyEvent
         HandleEvent = function(self, event)
             if event.Modifiers.Right and MoveOnly.IsLocked() then
-                MoveOnly.Toggle()
+                MoveOnly.Toggle(true)
             end
-            oldWorldView.HandleEvent(self, event)
+            _WorldViewHandleEvent(self, event)
         end
-
     }
 end
