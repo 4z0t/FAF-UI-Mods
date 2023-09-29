@@ -24,7 +24,18 @@ local function IsActive()
     return activeSelection ~= nil
 end
 
-local function Reset(deselect)
+local ignoreSelection = false
+function Ignore()
+    return ignoreSelection
+end
+
+local function IgnoredSelection(units)
+    ignoreSelection = true
+    SelectUnits(units)
+    ignoreSelection = false
+end
+
+function Reset(deselect)
     current = nil
     prevSelection = activeSelection
     activeSelection = nil
@@ -32,7 +43,7 @@ local function Reset(deselect)
     continuous = false
     templateData = nil
     if deselect then
-        SelectUnits(nil)
+        IgnoredSelection(nil)
     end
 end
 
@@ -49,9 +60,7 @@ function Next(isManual)
         end
     until not unit:IsDead()
     lastUnit = unit
-
-    SelectUnits { unit }
-
+    IgnoredSelection { unit }
     if not isManual then
         CM.StartCommandMode(activeCommandMode, activeCommandModeData)
         if templateData then
@@ -65,10 +74,12 @@ function Start(isContinuous)
     if not IsActive() then
         activeSelection = GetSelectedUnits()
         if not activeSelection and prevSelection then
-            SelectUnits(prevSelection)
+            templateData = nil
+            IgnoredSelection(prevSelection)
             prevSelection = nil
             return
         end
+        prevSelection = nil
         local cm = CM.GetCommandMode()
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
@@ -80,7 +91,6 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
     if not IsActive() then return end
-
 end
 
 ---@param commandMode CommandMode
