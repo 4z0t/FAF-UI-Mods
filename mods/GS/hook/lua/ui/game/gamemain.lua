@@ -8,18 +8,20 @@ do
     end
 end
 
+do
+    local _OnSelectionChanged = OnSelectionChanged
+    function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
--- local originalOnSelectionChanged = OnSelectionChanged
--- function OnSelectionChanged(oldSelection, newSelection, added, removed)
+        if ignoreSelection then
+            return
+        end
 
---     if ignoreSelection then
---         return
---     end
-
---     if import('/lua/ui/game/selection.lua').IsHidden() then
---         return
---     end
-
---     originalOnSelectionChanged(oldSelection, newSelection, added, removed)
---      -- override selection here
--- end
+        if import('/lua/ui/game/selection.lua').IsHidden() then
+            return
+        end
+        if not import('/mods/GS/modules/Main.lua').Ignore() then
+            import('/mods/GS/modules/Main.lua').Reset()
+        end
+        _OnSelectionChanged(oldSelection, newSelection, added, removed)
+    end
+end
