@@ -12,3 +12,17 @@ do
         import('/mods/GS/modules/Main.lua').OnCommandIssued(commandMode, modeData, command)
     end
 end
+
+
+do
+    local templateData
+    local _SetActiveBuildTemplate = SetActiveBuildTemplate
+    function _G.SetActiveBuildTemplate(template)
+        templateData = template
+        _SetActiveBuildTemplate(template)
+    end
+
+    function _G.GetActiveBuildTemplate()
+        return templateData
+    end
+end

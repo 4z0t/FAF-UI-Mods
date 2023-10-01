@@ -1,17 +1,10 @@
 local CM = import("/lua/ui/game/commandmode.lua")
+local GM = import("/lua/ui/game/gamemain.lua")
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
 
 
 local templateData = nil
-do
-    local _SetActiveBuildTemplate = SetActiveBuildTemplate
-    function _G.SetActiveBuildTemplate(template)
-        templateData = template
-        _SetActiveBuildTemplate(template)
-    end
-end
-
 local current = nil
 local prevSelection
 local activeSelection = nil
@@ -83,6 +76,7 @@ function Start(isContinuous)
         local cm = CM.GetCommandMode()
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
+        templateData = GetActiveBuildTemplate()
     end
     Next(true)
 end
@@ -118,12 +112,18 @@ function OnCommandIssued(commandMode, commandModeData, command)
     ForkThread(Next, false)
 end
 
+function OnSelectionChanged()
+    if not Ignore() then
+        Reset()
+    end
+end
+
 function Main(isReplay)
     if isReplay then return end
 
     CM.AddStartBehavior(OnCommandStarted)
     --CM.AddEndBehavior(OnCommandEnded)
-
+    GM.ObserveSelection:AddObserver(OnSelectionChanged)
 end
 
 KeyMapper.SetUserKeyAction('Quick Group Scatter', {
