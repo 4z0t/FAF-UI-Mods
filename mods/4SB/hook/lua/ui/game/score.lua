@@ -132,6 +132,7 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
         Options.teamColorAlpha:OnChange()
         Options.teamColorAsBG:OnChange()
         Options.useDivisions:OnChange()
+        Options.scoreboardScale:OnChange()
 
     end
 
