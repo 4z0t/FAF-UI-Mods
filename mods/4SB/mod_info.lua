@@ -1,5 +1,5 @@
 name = "4z0t's ScoreBoard"
-version = 9
+version = 10
 copyright = ""
 description = [[4z0t's ScoreBoard:
 * Minimalistic and simple design
@@ -14,7 +14,7 @@ See forum post for more info https://forum.faforever.com/topic/4391/new-scoreboa
 author = "4z0t"
 url = ""
 icon = "/mods/4SB/icon.png"
-uid = "4z0ts-scoreboard-v09"
+uid = "4z0ts-scoreboard-v10"
 exclusive = false
 ui_only = true
 conflicts = {}
