@@ -17,6 +17,7 @@ end
 do
     local templateData
     local _SetActiveBuildTemplate = SetActiveBuildTemplate
+    local _ClearBuildTemplates = ClearBuildTemplates
     function _G.SetActiveBuildTemplate(template)
         templateData = template
         _SetActiveBuildTemplate(template)
@@ -24,5 +25,10 @@ do
 
     function _G.GetActiveBuildTemplate()
         return templateData
+    end
+
+    function _G.ClearBuildTemplates()
+        templateData = nil
+        return _ClearBuildTemplates()
     end
 end
