@@ -29,6 +29,7 @@ local function IgnoredSelection(units)
 end
 
 function Reset(deselect)
+    --LOG("resetting")
     current = nil
     prevSelection = activeSelection
     activeSelection = nil
@@ -69,9 +70,11 @@ function Start(isContinuous)
         if not activeSelection and prevSelection then
             templateData = nil
             IgnoredSelection(prevSelection)
+            --LOG(" nil after reselect")
             prevSelection = nil
             return
         end
+        --LOG("nil after new command")
         prevSelection = nil
         local cm = CM.GetCommandMode()
         continuous = isContinuous
@@ -112,8 +115,8 @@ function OnCommandIssued(commandMode, commandModeData, command)
     ForkThread(Next, false)
 end
 
-function OnSelectionChanged()
-    if not Ignore() then
+function OnSelectionChanged(info)
+    if not Ignore() and not table.empty(info.added) and not table.empty(info.removed) then
         Reset()
     end
 end
