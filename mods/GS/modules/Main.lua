@@ -116,7 +116,9 @@ function OnCommandIssued(commandMode, commandModeData, command)
 end
 
 function OnSelectionChanged(info)
-    if not Ignore() and not table.empty(info.added) and not table.empty(info.removed) then
+    if not Ignore() and
+        not table.empty(info.added) and
+        not table.empty(info.removed) then
         Reset()
     end
 end
