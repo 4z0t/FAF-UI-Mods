@@ -49,8 +49,8 @@ function buildActionTemplateContext(modifier, context)
 
     -- Find all avaiable templates
     local allTemplates = Templates.GetTemplates()
-    if (not allTemplates) or table.empty(allTemplates) then
-        return
+    if not allTemplates or table.empty(allTemplates) then
+        return false
     end
 
     local effectiveTemplates = {}
@@ -115,7 +115,9 @@ function buildActionTemplateContext(modifier, context)
     end
 
     local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then return end
+    if maxPos == 0 then
+        return false
+    end
 
     cycleUnits(maxPos, '_templates' .. context, effectiveIcons, selection, modifier)
 
@@ -151,6 +153,7 @@ function buildActionTemplateContext(modifier, context)
             end
         end
     end
+    return true
 end
 
 local _buildActionTemplate = buildActionTemplate
@@ -159,8 +162,9 @@ function buildActionTemplate(modifier)
     local info = GetRolloverInfo()
     if info and info.blueprintId ~= "unknown" then
         if __blueprints[info.blueprintId].CategoriesHash["STRUCTURE"] then
-            buildActionTemplateContext(modifier, info.blueprintId)
-            return
+            if buildActionTemplateContext(modifier, info.blueprintId) then
+                return
+            end
         end
     end
 
