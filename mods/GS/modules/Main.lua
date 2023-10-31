@@ -1,17 +1,10 @@
 local CM = import("/lua/ui/game/commandmode.lua")
+local GM = import("/lua/ui/game/gamemain.lua")
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 local completeCycleSound = Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', }
 
 
 local templateData = nil
-do
-    local _SetActiveBuildTemplate = SetActiveBuildTemplate
-    function _G.SetActiveBuildTemplate(template)
-        templateData = template
-        _SetActiveBuildTemplate(template)
-    end
-end
-
 local current = nil
 local prevSelection
 local activeSelection = nil
@@ -24,7 +17,19 @@ local function IsActive()
     return activeSelection ~= nil
 end
 
-local function Reset(deselect)
+local ignoreSelection = false
+function Ignore()
+    return ignoreSelection
+end
+
+local function IgnoredSelection(units)
+    ignoreSelection = true
+    SelectUnits(units)
+    ignoreSelection = false
+end
+
+function Reset(deselect)
+    --LOG("resetting")
     current = nil
     prevSelection = activeSelection
     activeSelection = nil
@@ -32,7 +37,7 @@ local function Reset(deselect)
     continuous = false
     templateData = nil
     if deselect then
-        SelectUnits(nil)
+        IgnoredSelection(nil)
     end
 end
 
@@ -49,9 +54,7 @@ function Next(isManual)
         end
     until not unit:IsDead()
     lastUnit = unit
-
-    SelectUnits { unit }
-
+    IgnoredSelection { unit }
     if not isManual then
         CM.StartCommandMode(activeCommandMode, activeCommandModeData)
         if templateData then
@@ -65,13 +68,18 @@ function Start(isContinuous)
     if not IsActive() then
         activeSelection = GetSelectedUnits()
         if not activeSelection and prevSelection then
-            SelectUnits(prevSelection)
+            templateData = nil
+            IgnoredSelection(prevSelection)
+            --LOG(" nil after reselect")
             prevSelection = nil
             return
         end
+        --LOG("nil after new command")
+        prevSelection = nil
         local cm = CM.GetCommandMode()
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
+        templateData = GetActiveBuildTemplate()
     end
     Next(true)
 end
@@ -80,7 +88,6 @@ end
 ---@param commandModeData CommandModeData
 function OnCommandStarted(commandMode, commandModeData)
     if not IsActive() then return end
-
 end
 
 ---@param commandMode CommandMode
@@ -108,12 +115,20 @@ function OnCommandIssued(commandMode, commandModeData, command)
     ForkThread(Next, false)
 end
 
+function OnSelectionChanged(info)
+    if not Ignore() and
+        not table.empty(info.added) and
+        not table.empty(info.removed) then
+        Reset()
+    end
+end
+
 function Main(isReplay)
     if isReplay then return end
 
     CM.AddStartBehavior(OnCommandStarted)
     --CM.AddEndBehavior(OnCommandEnded)
-
+    GM.ObserveSelection:AddObserver(OnSelectionChanged)
 end
 
 KeyMapper.SetUserKeyAction('Quick Group Scatter', {
