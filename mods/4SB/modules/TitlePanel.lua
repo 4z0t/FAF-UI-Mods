@@ -76,8 +76,6 @@ local Timer = Class()
     ---@param seconds number
     ---@return boolean
     HasPassed = function(self, seconds)
-        LOG(self:ToSeconds())
-        LOG(seconds)
         return self:ToSeconds() < seconds
     end,
 
@@ -189,10 +187,8 @@ local TopInfoPanel = UMT.Class(Group)
         self._time:SetText(GetGameTime())
 
         if self._timer then
-            LOG "AAAA"
             local curSeconds = GameTick() / 10
             if self._timer:HasPassed(curSeconds) then
-                print "here"
                 self._timer = nil
                 SessionRequestPause()
             end
