@@ -21,26 +21,100 @@ local titlePanelHeight = 20
 
 local bgColor = Options.player.color.bg:Raw()
 
+local function Split(pString, pPattern)
+    local t = {}
+    local fpat = "(.-)" .. pPattern
+    local last_end = 1
+    local s, e, cap = pString:find(fpat, 1)
+    while s do
+        if s ~= 1 or cap ~= "" then
+            table.insert(t, cap)
+        end
+        last_end = e + 1
+        s, e, cap = pString:find(fpat, last_end)
+    end
+    if last_end <= string.len(pString) then
+        cap = pString:sub(last_end)
+        table.insert(t, cap)
+    end
+    return t
+end
+
+---@class Timer
+---@field seconds number
+---@field minutes number
+---@field hours number
+local Timer = Class()
+{
+
+    ---@param self Timer
+    __init = function(self)
+        self.seconds = 0
+        self.minutes = 0
+        self.hours = 0
+    end,
+
+    Set = function(self, hours, minutes, seconds)
+        self.seconds = seconds
+        self.minutes = minutes
+        self.hours = hours
+    end,
+
+    ---@param self Timer
+    ---@return string
+    Format = function(self)
+        return ("%02d:%02d:%02d"):format(self.hours, self.minutes, self.seconds)
+    end,
+
+    ---@param self Timer
+    ---@return number
+    ToSeconds = function(self)
+        return (self.hours * 60 + self.minutes) * 60 + self.seconds
+    end,
+
+    ---@param self Timer
+    ---@param seconds number
+    ---@return boolean
+    HasPassed = function(self, seconds)
+        LOG(self:ToSeconds())
+        LOG(seconds)
+        return self:ToSeconds() < seconds
+    end,
+
+    ---@param self Timer
+    ---@param s string
+    ---@return boolean
+    ParseString = function(self, s)
+        local splitS = Split(s, ':')
+        if table.getn(splitS) ~= 3 then
+            return false
+        end
+        self:Set(tonumber(splitS[1]), tonumber(splitS[2]), tonumber(splitS[3]))
+        return true
+    end
+}
 
 ---@class TopInfoPanel : UMT.Group
+---@field _timer Timer
 local TopInfoPanel = UMT.Class(Group)
 {
     __init = function(self, parent)
         Group.__init(self, parent)
         self._gameSpeed = 0
-
+        self._timer = nil
 
         self._time = Text(self)
         self._speed = Text(self)
         self._quality = Text(self)
         self._unitCap = Text(self)
-
     end,
 
     __post_init = function(self)
         self:Layout()
     end,
 
+    ---@param self TopInfoPanel
+    ---@param layouter UMT.Layouter
     _Layout = function(self, layouter)
         local parent = self:GetParent()
         layouter(self._time)
@@ -49,7 +123,27 @@ local TopInfoPanel = UMT.Class(Group)
             :Color(Options.title.color.time:Raw())
             :DisableHitTest()
         self._time:SetFont(Options.title.font.time:Raw(), timeTextSize)
-
+        if SessionIsReplay() then
+            self._time:EnableHitTest()
+            self._time.HandleEvent = function(_, event)
+                if event.Type == 'ButtonPress' or event.Type == 'ButtonDClick' then
+                    local dialog = UIUtil.CreateInputDialog(GetFrame(0), LOC("Enter time HH:MM:SS"),
+                        function(_, newtime)
+                            self._timer = Timer()
+                            if not self._timer:ParseString(newtime) then
+                                print("Invalid time passed!")
+                                return
+                            end
+                            print(("Timer set to %s"):format(self._timer:Format()))
+                        end
+                    )
+                    if self._timer then
+                        dialog.inputBox:SetText(self._timer:Format())
+                    end
+                    return true
+                end
+            end
+        end
 
         layouter(self._speed)
             :AtCenterIn(self, 0, -30)
@@ -83,6 +177,9 @@ local TopInfoPanel = UMT.Class(Group)
         end
     end,
 
+    ---@param self TopInfoPanel
+    ---@param data any
+    ---@param gameSpeed any
     Update = function(self, data, gameSpeed)
         if gameSpeed then
             self._gameSpeed = gameSpeed
@@ -90,6 +187,16 @@ local TopInfoPanel = UMT.Class(Group)
 
         self._speed:SetText(("%+d / %+d"):format(self._gameSpeed, GetSimRate()))
         self._time:SetText(GetGameTime())
+
+        if self._timer then
+            LOG "AAAA"
+            local curSeconds = GameTick() / 10
+            if self._timer:HasPassed(curSeconds) then
+                print "here"
+                self._timer = nil
+                SessionRequestPause()
+            end
+        end
 
         if not data then return end
 
