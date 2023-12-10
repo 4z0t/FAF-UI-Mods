@@ -133,7 +133,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number
             GetData = function(score)
-                return score.general.score
+                return (score.general.score or 0)
             end
         },
         {
@@ -151,7 +151,7 @@ checkboxes = {
             ---@return number, FormatFunc?
             GetData = function(score)
                 if score.general.built.mass == 0 then return 0, Utils.FormatRatioNumber end
-                return score.general.kills.mass / score.general.built.mass, Utils.FormatRatioNumber
+                return (score.general.kills.mass or 0) / (score.general.built.mass or 1), Utils.FormatRatioNumber
             end
         },
         {
@@ -169,7 +169,7 @@ checkboxes = {
             ---@return number, FormatFunc?
             GetData = function(score)
                 if score.general.lost.mass == 0 then return 0, Utils.FormatRatioNumber end
-                return score.general.kills.mass / score.general.lost.mass, Utils.FormatRatioNumber
+                return (score.general.kills.mass or 0) / (score.general.lost.mass or 1), Utils.FormatRatioNumber
             end
         },
 
@@ -189,7 +189,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number
             GetData = function(score)
-                return score.resources.massin.rate * 10
+                return (score.resources.massin.rate or 0) * 10
             end
         },
         {
@@ -206,7 +206,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.massin.total
+                return (score.resources.massin.total or 0)
             end
         },
         {
@@ -223,7 +223,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.massin.reclaimed
+                return (score.resources.massin.reclaimed or 0)
             end
         },
         {
@@ -240,7 +240,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.storage.storedMass
+                return (score.resources.storage.storedMass or 0)
             end
         },
 
@@ -260,7 +260,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.energyin.rate * 10
+                return (score.resources.energyin.rate or 0) * 10
             end
         },
         {
@@ -277,7 +277,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.energyin.total
+                return (score.resources.energyin.total or 0)
             end
         },
         {
@@ -294,7 +294,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.energyin.reclaimed
+                return (score.resources.energyin.reclaimed or 0)
             end
         },
         {
@@ -311,7 +311,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.storage.storedEnergy
+                return (score.resources.storage.storedEnergy or 0)
             end
         },
 
@@ -331,7 +331,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.general.kills.mass
+                return (score.general.kills.mass or 0)
             end
         },
         {
@@ -348,7 +348,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return (score.resources.massin.rate - score.resources.massout.rate) * 10
+                return ((score.resources.massin.rate or 0) - (score.resources.massout.rate or 0)) * 10
             end
         },
 
@@ -366,7 +366,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.resources.massin.total
+                return (score.resources.massin.total or 0)
             end
         }
     },
@@ -385,7 +385,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.general.currentunits
+                return (score.general.currentunits or 0)
             end
         },
         {
@@ -402,7 +402,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.units.naval.built - score.units.naval.lost
+                return (score.units.naval.built or 0) - (score.units.naval.lost or 0)
             end
         },
         {
@@ -419,7 +419,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.units.air.built - score.units.air.lost
+                return (score.units.air.built or 0) - (score.units.air.lost or 0)
             end
         },
         {
@@ -436,7 +436,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.units.land.built - score.units.land.lost
+                return (score.units.land.built or 0) - (score.units.land.lost or 0)
             end
         },
         -- {
@@ -451,7 +451,7 @@ checkboxes = {
         --     du = RGBA "",
         --     dc = RGBA "",
         --     GetData = function(score)
-        --         return score.units.sacu.built - score.units.sacu.lost
+        --         return (score.units.sacu.built or 0) - (score.units.sacu.lost or 0)
         --     end
         -- },
         {
@@ -468,7 +468,7 @@ checkboxes = {
             ---@param score ArmyScoreData
             ---@return number, FormatFunc?
             GetData = function(score)
-                return score.units.experimental.built - score.units.experimental.lost
+                return (score.units.experimental.built or 0) - (score.units.experimental.lost or 0)
             end
         },
     }
