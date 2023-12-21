@@ -14,6 +14,8 @@ local snowFlakePath = "/textures/ui/events/snow/snowflake.dds"
 local snowFlakeWidth = 10
 local snowFlakeHeight = 10
 
+local fadeHeight = 50
+
 SnowFlake = ClassUI(Bitmap)
 {
     __init = function(self, parent, speed, scale, xPos, yPos)
@@ -23,7 +25,7 @@ SnowFlake = ClassUI(Bitmap)
         self.XScale = Lazyvar(scale)
         self.YScale = Lazyvar(scale)
         self.PosX = Lazyvar(xPos)
-        self.PosY = Lazyvar(yPos)
+        self.PosY = Lazyvar(yPos + Math_Random(0, fadeHeight))
 
         self:SetAlpha(Math_Random())
 
@@ -65,12 +67,17 @@ SnowFlake = ClassUI(Bitmap)
 
         control:Show()
 
-        if (control.Left() < control.parent.Left() or control.Right() > control.parent.Right()) then
+        if control.Left() < control.parent.Left() or control.Right() > control.parent.Right() then
             control:Hide()
         end
-        if (control.PosY() > control.parent.Height()) then
-            control.PosY:Set(-10)
-            control.PosX:Set(Math_Random(control.parent.Width()))
+        if control.PosY() > control.parent.Height() then
+            if control.PosY() > control.parent.Height() + fadeHeight then
+                control.PosY:Set(-10)
+                control.PosX:Set(Math_Random(control.parent.Width()))
+                control:SetAlpha(1)
+                return
+            end
+            control:SetAlpha(1 - (control.PosY() - control.parent.Height()) / fadeHeight)
         end
     end
 
