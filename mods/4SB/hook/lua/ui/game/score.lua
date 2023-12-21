@@ -128,11 +128,69 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
             GameMain.RemoveBeatFunction(Update)
         end
 
+        Options.snowflakes.OnChange = function(var)
+            if var() then
+                if scoreboard.snowflakes then
+                    return
+                end
+                scoreboard.snowflakes = UMT.Controls.Group(scoreboard)
+                LayoutFor(scoreboard.snowflakes)
+                    :Fill(scoreboard)
+                    :DisableHitTest(true)
+
+                local SnowFlake = UMT.Views.Snowflake
+                local snowFlakeCount = Options.snowflakesCount()
+                local speed =  Options.snowflakesSpeed()
+                for i = 1, snowFlakeCount do
+                    SnowFlake(
+                        scoreboard.snowflakes,
+                        speed,
+                        math.random() * 2,
+                        math.random(scoreboard.snowflakes.Width()),
+                        math.random(scoreboard.snowflakes.Height())
+                    )
+                end
+            elseif scoreboard.snowflakes then
+                scoreboard.snowflakes:Destroy()
+                scoreboard.snowflakes = nil
+            end
+        end
+        Options.snowflakesCount.OnChange = function()
+            if not Options.snowflakes() then return end
+            
+            if scoreboard.snowflakes then
+                scoreboard.snowflakes:Destroy()
+            end
+            
+            scoreboard.snowflakes = UMT.Controls.Group(scoreboard)
+            LayoutFor(scoreboard.snowflakes)
+                :Fill(scoreboard)
+                :DisableHitTest(true)
+                
+                local SnowFlake = UMT.Views.Snowflake
+                local snowFlakeCount =  Options.snowflakesCount()
+                local speed =  Options.snowflakesSpeed()
+                for i = 1, snowFlakeCount do
+                SnowFlake(
+                    scoreboard.snowflakes,
+                    speed,
+                    math.random() * 2,
+                    math.random(scoreboard.snowflakes.Width()),
+                    math.random(scoreboard.snowflakes.Height())
+                )
+            end
+        end
+
+        Options.snowflakesSpeed.OnChange = Options.snowflakesCount.OnChange
+
         Options.useNickNameArmyColor:OnChange()
         Options.teamColorAlpha:OnChange()
         Options.teamColorAsBG:OnChange()
         Options.useDivisions:OnChange()
         Options.scoreboardScale:OnChange()
+        Options.snowflakes:OnChange()
+        Options.snowflakesCount:OnChange()
+        Options.snowflakesSpeed:OnChange()
 
     end
 

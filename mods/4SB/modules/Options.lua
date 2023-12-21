@@ -8,6 +8,10 @@ local function ArialFontOptionVar(option)
     return OptionVar(modName, option, "Arial")
 end
 
+local function OptVar4SB(name, default)
+    return OptionVar(modName, name, default)
+end
+
 title = {
     font = {
         gameSpeed = ArialFontOptionVar("title.font.gameSpeed"),
@@ -18,11 +22,11 @@ title = {
         quality = ArialFontOptionVar("title.font.quality"),
     },
     color = {
-        time = OptionVar(modName, "title.color.time", 'ff00dbff'),
-        gameSpeed = OptionVar(modName, "title.color.gameSpeed", 'ff00dbff'),
-        quality = OptionVar(modName, "title.color.quality", 'ff00dbff'),
-        totalUnits = OptionVar(modName, "title.color.totalUnits", 'ffff9900'),
-        bg = OptionVar(modName, "title.color.bg", "66000000"),
+        time = OptVar4SB("title.color.time", 'ff00dbff'),
+        gameSpeed = OptVar4SB("title.color.gameSpeed", 'ff00dbff'),
+        quality = OptVar4SB("title.color.quality", 'ff00dbff'),
+        totalUnits = OptVar4SB("title.color.totalUnits", 'ffff9900'),
+        bg = OptVar4SB("title.color.bg", "66000000"),
     }
 }
 
@@ -38,27 +42,33 @@ player = {
     },
 
     color = {
-        bg = OptionVar(modName, "player.color.bg", "66000000"),
+        bg = OptVar4SB("player.color.bg", "66000000"),
     }
 }
 
 observer = {
     font = ArialFontOptionVar("observer.font"),
     color = {
-        line = OptionVar(modName, "observer.color.line", "ffffffff"),
+        line = OptVar4SB("observer.color.line", "ffffffff"),
     }
 }
 
-style = OptionVar(modName, "scoreboardStyle", "glow border")
-replayStyle = OptionVar(modName, "scoreboardReplayStyle", "glow border")
 
-teamScoreSort = OptionVar(modName, "teamScoreSort", false)
-teamColorAsBG = OptionVar(modName, "teamColorAsBG", false)
-teamColorAlpha = OptionVar(modName, "teamColorAlpha", 20)
-useDivisions = OptionVar(modName, "useDivisions", false)
-useNickNameArmyColor = OptionVar(modName, "useNickNameArmyColor", false)
 
-scoreboardScale = OptionVar(modName, "scoreboardScale", 100)
+style = OptVar4SB("scoreboardStyle", "glow border")
+replayStyle = OptVar4SB("scoreboardReplayStyle", "glow border")
+
+teamScoreSort = OptVar4SB("teamScoreSort", false)
+teamColorAsBG = OptVar4SB("teamColorAsBG", false)
+teamColorAlpha = OptVar4SB("teamColorAlpha", 20)
+useDivisions = OptVar4SB("useDivisions", false)
+useNickNameArmyColor = OptVar4SB("useNickNameArmyColor", false)
+
+snowflakes = OptVar4SB("snowflakes", false)
+snowflakesCount = OptVar4SB("snowflakesCount", 50)
+snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
+
+scoreboardScale = OptVar4SB("scoreboardScale", 100)
 
 function Init(isReplay)
 
@@ -88,7 +98,10 @@ function Init(isReplay)
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
             Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
-            Options.Slider("ScoreBoard scale, %", 50, 300, 10, scoreboardScale, 4)
+            Options.Slider("ScoreBoard scale, %", 50, 300, 10, scoreboardScale, 4),
+            Options.Filter("Snowflakes in scoreboard", snowflakes, 4),
+            Options.Slider("Snowflakes count", 25, 200, 25, snowflakesCount, 4),
+            Options.Slider("Snowflakes speed", 10, 200, 10, snowflakesSpeed, 4),
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
