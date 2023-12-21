@@ -64,6 +64,7 @@ useNickNameArmyColor = OptionVar(modName, "useNickNameArmyColor", false)
 
 snowflakes = OptVar4SB("snowflakes", false)
 snowflakesCount = OptVar4SB("snowflakesCount", 50)
+snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
 
 scoreboardScale = OptionVar(modName, "scoreboardScale", 100)
 
@@ -98,6 +99,7 @@ function Init(isReplay)
             Options.Slider("ScoreBoard scale, %", 50, 300, 10, scoreboardScale, 4),
             Options.Filter("Snowflakes in scoreboard", snowflakes, 4),
             Options.Slider("Snowflakes count", 25, 200, 25, snowflakesCount, 4),
+            Options.Slider("Snowflakes speed", 10, 200, 10, snowflakesSpeed, 4),
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
