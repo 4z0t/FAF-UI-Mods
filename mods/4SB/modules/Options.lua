@@ -70,6 +70,12 @@ snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
 
 scoreboardScale = OptVar4SB("scoreboardScale", 100)
 
+UMT.Options.Mods["4SB"] = 
+{
+    hello = "a",
+    world = 1,
+}
+
 function Init(isReplay)
 
     local UIUtil = import('/lua/ui/uiutil.lua')

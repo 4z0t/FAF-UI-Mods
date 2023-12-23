@@ -329,3 +329,9 @@ end
 function Main()
     CreateUI(GetFrame(0))
 end
+
+
+---@alias ModOptions table<string, OptionVar|any>
+
+---@type table<string, ModOptions>
+Mods = {}
