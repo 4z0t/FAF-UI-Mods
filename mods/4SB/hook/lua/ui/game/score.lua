@@ -2,7 +2,6 @@ local function ExistGlobal(name)
     return rawget(_G, name) ~= nil
 end
 
-
 if ExistGlobal "UMT" and UMT.Version >= 11 then
 
     local ScoreBoards = import("/mods/4SB/modules/ScoreBoard.lua")

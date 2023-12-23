@@ -12,6 +12,7 @@ local Control = import('/lua/maui/control.lua').Control
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
+local OptionVar = import("OptionVar").Create
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
@@ -330,8 +331,24 @@ function Main()
     CreateUI(GetFrame(0))
 end
 
+local ModsOptionsMetaTable = {
+    __newindex = function(self, key, value)
+        local options = {}
+        local modName = key
+
+        for optName, defaultValue in value do
+            options[optName] = OptionVar(modName, optName, defaultValue)
+        end
+
+        rawset(self, modName, options)
+    end,
+
+    __index = function (self, key)
+        error(("No options for mod %s"):format(key))
+    end
+}
 
 ---@alias ModOptions table<string, OptionVar|any>
 
 ---@type table<string, ModOptions>
-Mods = {}
+Mods = setmetatable({}, ModsOptionsMetaTable)
