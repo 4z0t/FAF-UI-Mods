@@ -140,7 +140,7 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
                 local SnowFlake = UMT.Views.Snowflake
                 local snowFlakeCount = Options.snowflakesCount()
-                local speed =  Options.snowflakesSpeed()
+                local speed = Options.snowflakesSpeed()
                 for i = 1, snowFlakeCount do
                     SnowFlake(
                         scoreboard.snowflakes,
@@ -157,20 +157,20 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
         end
         Options.snowflakesCount.OnChange = function()
             if not Options.snowflakes() then return end
-            
+
             if scoreboard.snowflakes then
                 scoreboard.snowflakes:Destroy()
             end
-            
+
             scoreboard.snowflakes = UMT.Controls.Group(scoreboard)
             LayoutFor(scoreboard.snowflakes)
                 :Fill(scoreboard)
                 :DisableHitTest(true)
-                
-                local SnowFlake = UMT.Views.Snowflake
-                local snowFlakeCount =  Options.snowflakesCount()
-                local speed =  Options.snowflakesSpeed()
-                for i = 1, snowFlakeCount do
+
+            local SnowFlake = UMT.Views.Snowflake
+            local snowFlakeCount = Options.snowflakesCount()
+            local speed = Options.snowflakesSpeed()
+            for i = 1, snowFlakeCount do
                 SnowFlake(
                     scoreboard.snowflakes,
                     speed,

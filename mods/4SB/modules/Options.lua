@@ -74,6 +74,10 @@ UMT.Options.Mods["4SB"] =
 {
     hello = "a",
     world = 1,
+    kappa = {
+        pride = 1,
+        chat = "b"
+    },
 }
 
 function Init(isReplay)

@@ -331,24 +331,34 @@ function Main()
     CreateUI(GetFrame(0))
 end
 
+local function LoadOptions(values, modName, prefix)
+    local options = {}
+
+    for optName, defaultValue in values do
+        if type(defaultValue) == "table" then
+            options[optName] = LoadOptions(defaultValue, modName, prefix and (prefix .. "." .. optName) or optName)
+        else
+            options[optName] = OptionVar(modName, prefix and (prefix .. "." .. optName) or optName, defaultValue)
+        end
+    end
+
+    return options
+end
+
 local ModsOptionsMetaTable = {
     __newindex = function(self, key, value)
-        local options = {}
-        local modName = key
+        local options = LoadOptions(value, key)
 
-        for optName, defaultValue in value do
-            options[optName] = OptionVar(modName, optName, defaultValue)
-        end
-
-        rawset(self, modName, options)
+        rawset(self, key, options)
     end,
 
-    __index = function (self, key)
+    __index = function(self, key)
         error(("No options for mod %s"):format(key))
     end
 }
 
----@alias ModOptions table<string, OptionVar|any>
+---@alias ModOptions  table<string, ModOptions|OptionVar|any>
+
 
 ---@type table<string, ModOptions>
 Mods = setmetatable({}, ModsOptionsMetaTable)
