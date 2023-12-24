@@ -12,7 +12,7 @@ local Control = import('/lua/maui/control.lua').Control
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
-local OptionVar = import("OptionVar").Create
+local OptionVar = import("OptionVar.lua").Create
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
