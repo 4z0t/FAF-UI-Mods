@@ -357,6 +357,23 @@ local function LoadOptions(values, modName, prefix)
     return options
 end
 
+---@param modName string
+local function LoadOptionsFile(modsOptions, modName)
+    local files = DiskFindFiles("/mods/" .. modName .. "/", 'Options.lua')
+
+    for _, file in files do
+        LOG("UMT: Loading options file " .. file)
+        import(file).Main()
+    end
+
+    local options = rawget(modsOptions, modName)
+    if not options then
+        WARN(("error trying to load options of mod '%s', but couldn't"):format(modName))
+        return false
+    end
+    return true
+end
+
 local ModsOptionsMetaTable = {
     __newindex = function(self, key, value)
         local options = LoadOptions(value, key)
@@ -365,6 +382,9 @@ local ModsOptionsMetaTable = {
     end,
 
     __index = function(self, key)
+        if LoadOptionsFile(self, key) then
+            return rawget(self, key)
+        end
         error(("No options for mod %s"):format(key))
     end
 }
