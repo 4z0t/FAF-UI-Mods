@@ -359,8 +359,18 @@ local ModsOptionsMetaTable = {
     end
 }
 
----@alias ModOptions  table<string, ModOptions|OptionVar|any>
+---@alias ModOptionEntry ModOptions|OptionVar
+---@alias ModOptions table<string, ModOptions|OptionVar>
 
 
 ---@type table<string, ModOptions>
 Mods = setmetatable({}, ModsOptionsMetaTable)
+
+
+---@alias Opt OptionVar|any
+
+---@param value any
+---@return OptionVar
+function Opt(value)
+    return value
+end
