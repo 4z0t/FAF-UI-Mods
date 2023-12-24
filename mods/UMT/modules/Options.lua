@@ -359,6 +359,7 @@ end
 
 ---@param modName string
 local function LoadOptionsFile(modsOptions, modName)
+    LOG(("Loading options of mod '%s'"):format(modName))
     local files = DiskFindFiles("/mods/" .. modName .. "/", 'Options.lua')
 
     for _, file in files do
@@ -368,7 +369,7 @@ local function LoadOptionsFile(modsOptions, modName)
 
     local options = rawget(modsOptions, modName)
     if not options then
-        WARN(("error trying to load options of mod '%s', but couldn't"):format(modName))
+        WARN(("error trying to load options of mod '%s'"):format(modName))
         return false
     end
     return true
@@ -385,7 +386,7 @@ local ModsOptionsMetaTable = {
         if LoadOptionsFile(self, key) then
             return rawget(self, key)
         end
-        error(("No options for mod %s"):format(key))
+        error(("No options for mod '%s'"):format(key))
     end
 }
 
