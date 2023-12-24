@@ -331,13 +331,23 @@ function Main()
     CreateUI(GetFrame(0))
 end
 
+local OptValueMetaTable = {}
+function OptValueMetaTable.IsInstance(value)
+    return OptValueMetaTable == getmetatable(value)
+end
+
 local function LoadOptions(values, modName, prefix)
     local options = {}
 
     for optName, defaultValue in values do
         local opt = prefix and (prefix .. "." .. optName) or optName
         if type(defaultValue) == "table" then
-            options[optName] = LoadOptions(defaultValue, modName, opt)
+            if OptValueMetaTable.IsInstance(defaultValue) then
+                LOG(("UMT: loading option '%s'"):format(opt))
+                options[optName] = OptionVar(modName, opt, defaultValue.value)
+            else
+                options[optName] = LoadOptions(defaultValue, modName, opt)
+            end
         else
             LOG(("UMT: loading option '%s'"):format(opt))
             options[optName] = OptionVar(modName, opt, defaultValue)
@@ -364,11 +374,10 @@ local ModsOptionsMetaTable = {
 ---@type table<string, table>
 Mods = setmetatable({}, ModsOptionsMetaTable)
 
-
 ---@alias Opt OptionVar|any
 
 ---@param value any
 ---@return OptionVar
 function Opt(value)
-    return value
+    return setmetatable({ value = value }, OptValueMetaTable)
 end
