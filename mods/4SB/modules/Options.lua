@@ -70,12 +70,13 @@ snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
 
 scoreboardScale = OptVar4SB("scoreboardScale", 100)
 
+local Opt = UMT.Options.Opt
+
 UMT.Options.Mods["4SB"] = {
-    hello = "a",
+    hello = Opt "a",
     world = 1,
     kappa = {
-        ---@type Opt
-        pride = 1,
+        pride = Opt(1),
         ---@type Opt
         chat  = "b"
     },
