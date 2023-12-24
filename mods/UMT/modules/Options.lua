@@ -335,10 +335,12 @@ local function LoadOptions(values, modName, prefix)
     local options = {}
 
     for optName, defaultValue in values do
+        local opt = prefix and (prefix .. "." .. optName) or optName
         if type(defaultValue) == "table" then
-            options[optName] = LoadOptions(defaultValue, modName, prefix and (prefix .. "." .. optName) or optName)
+            options[optName] = LoadOptions(defaultValue, modName, opt)
         else
-            options[optName] = OptionVar(modName, prefix and (prefix .. "." .. optName) or optName, defaultValue)
+            LOG(("UMT: loading option '%s'"):format(opt))
+            options[optName] = OptionVar(modName, opt, defaultValue)
         end
     end
 
