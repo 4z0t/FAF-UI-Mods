@@ -72,29 +72,6 @@ scoreboardScale = OptVar4SB("scoreboardScale", 100)
 
 local Opt = UMT.Options.Opt
 
-UMT.Options.Mods["4SB"] = {
-    hello = Opt "a",
-    world = 1,
-    kappa = {
-        pride = Opt(1),
-        ---@type Opt
-        chat  = "b"
-    },
-    test = "c",
-    test2 = {
-        ---@type Opt
-        a = 1,
-        ---@type Opt
-        b = 2,
-        c = {
-            ---@type Opt
-            d = 3,
-            ---@type Opt
-            e = 4,
-        },
-    },
-}
-
 function Init(isReplay)
 
     local UIUtil = import('/lua/ui/uiutil.lua')

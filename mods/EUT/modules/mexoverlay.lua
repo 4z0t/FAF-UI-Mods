@@ -2,7 +2,7 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local Options = import("options.lua")
+local Options = UMT.Options.Mods["EUT"]
 
 ---@type WorldView
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft

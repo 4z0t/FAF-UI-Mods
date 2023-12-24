@@ -5,7 +5,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Options = import("Options.lua")
+local Options = UMT.Options.Mods["EUT"]
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")

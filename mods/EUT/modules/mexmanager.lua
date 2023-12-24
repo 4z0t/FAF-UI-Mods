@@ -11,8 +11,7 @@ local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local UpdateMexPanel = import("mexpanel.lua").Update
-local Options = import("options.lua")
-
+local Options = UMT.Options.Mods["EUT"]
 
 local mexCategories = import("mexcategories.lua").mexCategories
 
