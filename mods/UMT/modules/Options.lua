@@ -331,6 +331,9 @@ function Main()
     CreateUI(GetFrame(0))
 end
 
+local getmetatable = getmetatable
+local type = type
+
 local OptValueMetaTable = {}
 function OptValueMetaTable.IsInstance(value)
     return OptValueMetaTable == getmetatable(value)
@@ -343,13 +346,13 @@ local function LoadOptions(values, modName, prefix)
         local opt = prefix and (prefix .. "." .. optName) or optName
         if type(defaultValue) == "table" then
             if OptValueMetaTable.IsInstance(defaultValue) then
-                LOG(("UMT: loading option '%s'"):format(opt))
+                LogF("UMT: loading option '%s'", opt)
                 options[optName] = OptionVar(modName, opt, defaultValue.value)
             else
                 options[optName] = LoadOptions(defaultValue, modName, opt)
             end
         else
-            LOG(("UMT: loading option '%s'"):format(opt))
+            LogF("UMT: loading option '%s'", opt)
             options[optName] = OptionVar(modName, opt, defaultValue)
         end
     end
@@ -359,7 +362,7 @@ end
 
 ---@param modName string
 local function LoadOptionsFile(modsOptions, modName)
-    LOG(("Loading options of mod '%s'"):format(modName))
+    LogF("Loading options of mod '%s'", modName)
     local files = DiskFindFiles("/mods/" .. modName .. "/", 'Options.lua')
 
     for _, file in files do
@@ -369,7 +372,7 @@ local function LoadOptionsFile(modsOptions, modName)
 
     local options = rawget(modsOptions, modName)
     if not options then
-        WARN(("error trying to load options of mod '%s'"):format(modName))
+        WarnF("error trying to load options of mod '%s'", modName)
         return false
     end
     return true
@@ -386,7 +389,7 @@ local ModsOptionsMetaTable = {
         if LoadOptionsFile(self, key) then
             return rawget(self, key)
         end
-        error(("No options for mod '%s'"):format(key))
+        ErrorF("No options for mod '%s'", key)
     end
 }
 
