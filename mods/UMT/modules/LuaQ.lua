@@ -216,6 +216,28 @@ end)
 ---@type LuaQForEachPipeTable
 foreach = CreatePipe(LuaQForEach)
 
+---Sums values of table, values can be selected with selector
+---```lua
+--- ... | sum.keyvalue(function(id, player) if team[id] then return player.rating end return 0 end)
+---```
+---@class LuaQSumKVPipeTable : SelectorKV
+LuaQSumKV = MakePipe(function(tbl, self)
+    local selector = self:PopFn()
+
+    local _sum = 0
+    if selector then
+        for k, v in tbl do
+            _sum = _sum + selector(k, v)
+        end
+    else
+        for _, v in tbl do
+            _sum = _sum + v
+        end
+    end
+
+    return _sum
+end)
+
 ---@class LuaQSumPipeTable : Selector
 LuaQSum = MakePipe(function(tbl, self)
     local selector = self:PopFn()
@@ -234,23 +256,13 @@ LuaQSum = MakePipe(function(tbl, self)
     return _sum
 end)
 
----@class LuaQSumKVPipeTable : SelectorKV
-LuaQSumKV = MakePipe(function(tbl, self)
-    local selector = self:PopFn()
-
-    local _sum = 0
-    if selector then
-        for k, v in tbl do
-            _sum = _sum + selector(k, v)
-        end
-    else
-        for _, v in tbl do
-            _sum = _sum + v
-        end
-    end
-
-    return _sum
-end)
+---Sums values of table, values can be selected with selector
+---```lua
+--- ... | sum(function(v) v.rating or 0 end)
+---```
+---@class LuaQSum : LuaQSumPipeTable
+---@field keyvalue LuaQSumKVPipeTable
+sum = CreatePipe(LuaQSum, LuaQSumKV)
 
 ---@class LuaQAllPipeTable: ConditionalKV
 LuaQAll = MakePipe(function(tbl, self)
@@ -438,89 +450,6 @@ local LuaQContainsMetaTable = {
 }
 ---@type ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
-
-
----@class SumPipeTable
-local LuaQSumKeyValueMetaTable = {
-    ---sums values of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self SumPipeTable
-    ---@return V
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local _sum = 0
-        if selector then
-            for k, v in tbl do
-                _sum = _sum + selector(k, v)
-            end
-        else
-            for _, v in tbl do
-                _sum = _sum + v
-            end
-        end
-
-        return _sum
-    end,
-
-    ---sets selector for summing values of the table
-    ---@generic K
-    ---@generic V
-    ---@param self SumPipeTable
-    ---@param selector fun(key:K, value:V):V
-    ---@return SumPipeTable
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
----@class SumPipeTable
-local LuaQSumMetaTable = {
-    ---sums values of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self SumPipeTable
-    ---@return V
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local _sum = 0
-        if selector then
-            for _, v in ipairs(tbl) do
-                _sum = _sum + selector(v)
-            end
-        else
-            for _, v in tbl do
-                _sum = _sum + v
-            end
-        end
-
-        return _sum
-    end,
-
-    ---sets selector for summing values of the table
-    ---@generic T
-    ---@generic V
-    ---@param self SumPipeTable
-    ---@param selector fun(value:V):T
-    ---@return SumPipeTable
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
----@type SumPipeTable
-sum = setmetatable({
-    keyvalue = setmetatable({}, LuaQSumKeyValueMetaTable)
-}, LuaQSumMetaTable)
-
 
 local LuaQReduceMetaTable = {
     __bor = function(tbl, self)
