@@ -51,8 +51,9 @@ FunctionalTransformer = {
 ---@class ConditionalKV
 ---@field fn fun(k, v):boolean
 
-
----@param bor fun(tbl:table, self:FunctionalTransformer):table
+---@generic K
+---@generic V
+---@param bor fun(tbl:table<K, V>, self:FunctionalTransformer):table
 ---@generic T: fa-class
 ---@return T
 local function MakePipe(bor)
@@ -79,7 +80,118 @@ LuaQWhere = MakePipe(function(tbl, self)
     return result
 end)
 
+---@class LuaQWhereKVPipeTable : ConditionalKV
+LuaQWhereKV = MakePipe(function(tbl, self)
+    local func = self:PopFn()
 
+    local result = {}
+
+    for k, v in tbl do
+        if func(k, v) then
+            result[k] = v
+        end
+    end
+
+    return result
+end)
+
+---@class LuaQSortPipeTable : Comparator
+LuaQSortKV = MakePipe(function(tbl, self)
+    local func = self:PopFn()
+    table.sort(tbl, func)
+    return tbl
+end)
+
+
+---@class LuaQSelectKVPipeTable : SelectorKV
+LuaQSelectKV = MakePipe(function(tbl, self)
+    local selector = self:PopFn()
+
+    local result = {}
+
+    if type(selector) == "string" then
+        for k, v in tbl do
+            result[k] = v[selector]
+        end
+    elseif iscallable(selector) then
+        for k, v in tbl do
+            result[k] = selector(k, v)
+        end
+    else
+        error("Unsupported selector type " .. tostring(selector))
+    end
+
+    return result
+end)
+
+---@class LuaQSelectPipeTable : Selector
+LuaQSelect = MakePipe(function(tbl, self)
+    local selector = self:PopFn()
+
+    local result = {}
+
+    if type(selector) == "string" then
+        for _, v in ipairs(tbl) do
+            TableInsert(result, v[selector])
+        end
+    elseif iscallable(selector) then
+        for _, v in ipairs(tbl) do
+            TableInsert(result, selector(v))
+        end
+    else
+        error("Unsupported selector type " .. tostring(selector))
+    end
+
+    return result
+end)
+
+---@class LuaQForEachPipeTable : Selector
+LuaQForEach = MakePipe(function(tbl, self)
+    local func = self:PopFn()
+
+    for k, v in tbl do
+        func(k, v)
+    end
+
+    return tbl
+end)
+
+
+---@class LuaQSumPipeTable : Selector
+LuaQSum = MakePipe(function(tbl, self)
+    local selector = self:PopFn()
+
+    local _sum = 0
+    if selector then
+        for _, v in ipairs(tbl) do
+            _sum = _sum + selector(v)
+        end
+    else
+        for _, v in tbl do
+            _sum = _sum + v
+        end
+    end
+
+    return _sum
+end)
+
+---@class LuaQSumKVPipeTable : SelectorKV
+LuaQSumKV = MakePipe(function(tbl, self)
+    local selector = self:PopFn()
+
+    local _sum = 0
+    if selector then
+        for k, v in tbl do
+            _sum = _sum + selector(k, v)
+        end
+    else
+        for _, v in tbl do
+            _sum = _sum + v
+        end
+    end
+
+    return _sum
+end)
 
 ---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
