@@ -13,6 +13,47 @@ function From(tbl)
     return tbl
 end
 
+---@generic R
+---@generic K
+---@generic V?
+---@class FunctionalTransformer<R, K, V>
+---@field fn function
+FunctionalTransformer = Class()
+{
+    ---@param self FunctionalTransformer
+    ---@param func function
+    ---@return FunctionalTransformer
+    __call = function(self, func)
+        self.fn = func
+        return self
+    end,
+
+    ---@param self FunctionalTransformer
+    ---@return function
+    PopFn = function(self)
+        local fn = self.fn
+        self.fn  = nil
+        return fn
+    end
+}
+
+---@class Comparator : FunctionalTransformer
+---@field fn fun(a, b):boolean
+
+---@class Selector : FunctionalTransformer
+---@field fn fun(v:any):any
+
+---@class SelectorKV : FunctionalTransformer
+---@field fn fun(k, v):any
+
+---@class Conditional : FunctionalTransformer
+---@field fn fun(v):boolean
+
+---@class ConditionalKV : FunctionalTransformer
+---@field fn fun(k, v):boolean
+
+
+
 ---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
     ---return new table with elements satisfying the given condition
