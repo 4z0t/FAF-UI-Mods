@@ -1,16 +1,25 @@
 local TableInsert = table.insert
 local ipairs = ipairs
+local setmetatable = setmetatable
 
----@generic K
----@generic V
----@class BORTable<K,V> : table
----@operator bor(WherePipeTable):table
+---@class BORTable : table
+---@operator bor(table):table
 
----comment
 ---@param tbl table
 ---@return BORTable
 function From(tbl)
     return tbl
+end
+
+---@param pipeTable table
+---@param kvTable? table
+---@return table
+local function CreatePipe(pipeTable, kvTable)
+    local pipe = {}
+    if kvTable then
+        pipe.keyvalue = CreatePipe(kvTable)
+    end
+    return setmetatable(pipe, pipeTable)
 end
 
 ---@generic R
@@ -71,11 +80,6 @@ local function MakePipe(bor)
     return table.merged(BORPipe(bor), FunctionalTransformer)
 end
 
----Selects values that satisfy the condition
----```lua
---- ... | where(function(v) v > 3 end)
----```
---- `V`:`bool` -> `V`
 ---@class LuaQWherePipeTable : Conditional
 LuaQWhere = MakePipe(function(tbl, self)
     local func = self:PopFn()
@@ -91,6 +95,11 @@ LuaQWhere = MakePipe(function(tbl, self)
     return result
 end)
 
+---Selects key-values that satisfy the condition
+---```lua
+--- ... | where(function(k, v) v > 3 and type(k) == "string" end)
+---```
+--- `K`,`V`:`bool` -> `K`,`V`
 ---@class LuaQWhereKVPipeTable : ConditionalKV
 LuaQWhereKV = MakePipe(function(tbl, self)
     local func = self:PopFn()
@@ -105,6 +114,16 @@ LuaQWhereKV = MakePipe(function(tbl, self)
 
     return result
 end)
+
+---Selects values that satisfy the condition
+---```lua
+--- ... | where(function(v) v > 3 end)
+---```
+--- `V`:`bool` -> `V`
+---@class LuaQWhere : LuaQWherePipeTable
+---@field keyvalue LuaQWhereKVPipeTable
+where = CreatePipe(LuaQWhere, LuaQWhereKV)
+
 
 ---@class LuaQSortPipeTable : Comparator
 LuaQSortKV = MakePipe(function(tbl, self)
@@ -324,89 +343,6 @@ LuaQCountKV = MakePipe(function(tbl, self)
 
     return count
 end)
-
----@class LuaQWhereKeyValueMetaTable
-local LuaQWhereKeyValueMetaTable = {
-    ---return new table with elements satisfying the given condition
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
-
-        local result = {}
-
-        for k, v in tbl do
-            if func(k, v) then
-                result[k] = v
-            end
-        end
-
-        return result
-    end,
-
-    ---Sets condition for filtering table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(key:K, value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
-    end
-}
-
-
----@class LuaQWhereMetaTable`
-local LuaQWhereMetaTable = {
-    ---return new table with elements satisfying the given condition
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
-
-        local result = {}
-
-        for _, v in ipairs(tbl) do
-            if func(v) then
-                TableInsert(result, v)
-            end
-        end
-
-        return result
-    end,
-
-    ---Sets condition for filtering table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
-    end
-}
-
-
-
----@class WherePipeTable : LuaQWhereMetaTable
----@field keyvalue LuaQWhereKeyValueMetaTable
----@operator call:WherePipeTable
-
----@type WherePipeTable
-where = setmetatable({
-    keyvalue = setmetatable({}, LuaQWhereKeyValueMetaTable)
-}, LuaQWhereMetaTable)
-
 
 ---@class DeepCopyPipeTable
 local LuaQDeepCopyMetaTable = {
