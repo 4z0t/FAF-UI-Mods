@@ -82,7 +82,7 @@ end
 
 ---Selects key-values that satisfy the condition
 ---```lua
---- ... | where.keyvalue(function(k, v) v > 3 and type(k) == "string" end)
+--- ... | where.keyvalue(function(k, v) return v > 3 and type(k) == "string" end)
 ---```
 --- `K`,`V`:`bool` -> `K`,`V`
 ---@class LuaQWhereKVPipeTable : ConditionalKV
@@ -116,7 +116,7 @@ LuaQWhere = MakePipe(function(tbl, self)
 end)
 ---Selects values that satisfy the condition
 ---```lua
---- ... | where(function(v) v > 3 end)
+--- ... | where(function(v) return v > 3 end)
 ---```
 --- `V`:`bool` -> `V`
 ---@class LuaQWhere : LuaQWherePipeTable
@@ -125,7 +125,7 @@ where = CreatePipe(LuaQWhere, LuaQWhereKV)
 
 ---Sorts values in table by the condition
 ---```lua
---- ... | sort(function(a, b) a.value > b.value end)
+--- ... | sort(function(a, b) return a.value > b.value end)
 ---```
 ---@class LuaQSortPipeTable : Comparator
 LuaQSort = MakePipe(function(tbl, self)
@@ -138,7 +138,7 @@ sort = CreatePipe(LuaQSort)
 
 ---Creates new table based on return value of the selector
 ---```lua
---- ... | select.keyvalue(function(k, v) v.value end)
+--- ... | select.keyvalue(function(k, v) return v.value end)
 ---```
 ---With string selector
 ---```lua
@@ -188,7 +188,7 @@ end)
 
 ---Creates new table based on return value of the selector
 ---```lua
---- ... | select(function(v) v.value end)
+--- ... | select(function(v) return v.value end)
 ---```
 ---With string selector
 ---```lua
