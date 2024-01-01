@@ -288,6 +288,43 @@ LuaQDistinct = BORPipe(function(tbl, self)
     return tbl | toSet | keys
 end)
 
+
+---@class LuaQCountPipeTable : Conditional
+LuaQCount = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    if not condition then
+        return table.getn(tbl)
+    end
+
+    local count = 0
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            count = count + 1
+        end
+    end
+
+    return count
+end)
+
+---@class LuaQCountKVPipeTable : ConditionalKV
+LuaQCountKV = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    if not condition then
+        return table.getsize(tbl)
+    end
+
+    local count = 0
+    for k, v in tbl do
+        if condition(k, v) then
+            count = count + 1
+        end
+    end
+
+    return count
+end)
+
 ---@class LuaQWhereKeyValueMetaTable
 local LuaQWhereKeyValueMetaTable = {
     ---return new table with elements satisfying the given condition
@@ -324,7 +361,7 @@ local LuaQWhereKeyValueMetaTable = {
 }
 
 
----@class LuaQWherePipeTable
+---@class LuaQWhereMetaTable`
 local LuaQWhereMetaTable = {
     ---return new table with elements satisfying the given condition
     ---@generic K
@@ -361,7 +398,7 @@ local LuaQWhereMetaTable = {
 
 
 
----@class WherePipeTable : LuaQWherePipeTable
+---@class WherePipeTable : LuaQWhereMetaTable
 ---@field keyvalue LuaQWhereKeyValueMetaTable
 ---@operator call:WherePipeTable
 
