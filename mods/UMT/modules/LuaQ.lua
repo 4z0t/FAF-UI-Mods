@@ -17,7 +17,7 @@ end
 ---@generic K
 ---@generic V?
 ---@class FunctionalTransformer<R, K, V>
----@field fn function
+---@field private fn function
 FunctionalTransformer = {
     ---@param self FunctionalTransformer
     ---@param func function
@@ -36,19 +36,19 @@ FunctionalTransformer = {
     end
 }
 
----@class Comparator : FunctionalTransformer
+---@class Comparator
 ---@field fn fun(a, b):boolean
 
----@class Selector : FunctionalTransformer
+---@class Selector
 ---@field fn fun(v:any):any
 
----@class SelectorKV : FunctionalTransformer
+---@class SelectorKV
 ---@field fn fun(k, v):any
 
----@class Conditional : FunctionalTransformer
+---@class Conditional
 ---@field fn fun(v):boolean
 
----@class ConditionalKV : FunctionalTransformer
+---@class ConditionalKV
 ---@field fn fun(k, v):boolean
 
 
