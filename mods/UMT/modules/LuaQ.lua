@@ -137,7 +137,14 @@ end)
 ---@type LuaQSortPipeTable
 sort = CreatePipe(LuaQSort)
 
-
+---Creates new table based on return value of the selector
+---```lua
+--- ... | select.keyvalue(function(k, v) v.value end)
+---```
+---With string selector
+---```lua
+--- ... | select.keyvalue "value"
+---```
 ---@class LuaQSelectKVPipeTable : SelectorKV
 LuaQSelectKV = MakePipe(function(tbl, self)
     local selector = self:PopFn()
@@ -179,6 +186,18 @@ LuaQSelect = MakePipe(function(tbl, self)
 
     return result
 end)
+
+---Creates new table based on return value of the selector
+---```lua
+--- ... | select(function(v) v.value end)
+---```
+---With string selector
+---```lua
+--- ... | select "value"
+---```
+---@class LuaQSelect : LuaQSelectPipeTable
+---@field keyvalue LuaQSelectKVPipeTable
+select = CreatePipe(LuaQSelect, LuaQSelectKV)
 
 ---@class LuaQForEachPipeTable : Selector
 LuaQForEach = MakePipe(function(tbl, self)
@@ -414,67 +433,6 @@ local LuaQContainsMetaTable = {
 }
 ---@type ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
-
-
-local LuaQSelectKeyValueMetaTable = {
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local result = {}
-
-        if type(selector) == "string" then
-            for k, v in tbl do
-                result[k] = v[selector]
-            end
-        elseif iscallable(selector) then
-            for k, v in tbl do
-                result[k] = selector(k, v)
-            end
-        else
-            error("Unsupported selector type " .. tostring(selector))
-        end
-
-        return result
-    end,
-
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
-local LuaQSelectMetaTable = {
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local result = {}
-
-        if type(selector) == "string" then
-            for _, v in ipairs(tbl) do
-                TableInsert(result, v[selector])
-            end
-        elseif iscallable(selector) then
-            for _, v in ipairs(tbl) do
-                TableInsert(result, selector(v))
-            end
-        else
-            error("Unsupported selector type " .. tostring(selector))
-        end
-
-        return result
-    end,
-
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
-select = setmetatable({
-    keyvalue = setmetatable({}, LuaQSelectKeyValueMetaTable)
-}, LuaQSelectMetaTable)
 
 ---@class ForeachPipeTable
 local LuaQForeachMetaTable = {
