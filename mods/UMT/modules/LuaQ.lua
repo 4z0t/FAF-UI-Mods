@@ -264,6 +264,10 @@ end)
 ---@field keyvalue LuaQSumKVPipeTable
 sum = CreatePipe(LuaQSum, LuaQSumKV)
 
+---Returns true if all values satisfy the condition
+---```lua
+--- ... | all(function(k, v) v < 0 end)
+---```
 ---@class LuaQAllPipeTable: ConditionalKV
 LuaQAll = MakePipe(function(tbl, self)
     local condition = self:PopFn()
@@ -278,7 +282,13 @@ LuaQAll = MakePipe(function(tbl, self)
 
     return true
 end)
+---@type LuaQAllPipeTable
+all = CreatePipe(LuaQAll)
 
+---Returns true if any of values satisfy the condition
+---```lua
+--- ... | any(function(k, v) v < 0 end)
+---```
 ---@class LuaQAnyPipeTable: ConditionalKV
 LuaQAny = MakePipe(function(tbl, self)
     local condition = self:PopFn()
@@ -295,6 +305,9 @@ LuaQAny = MakePipe(function(tbl, self)
 
     return false
 end)
+
+---@type LuaQAnyPipeTable
+any = CreatePipe(LuaQAny)
 
 ---@class LuaQValuesPipeTable
 LuaQValues = BORPipe(function(tbl, self)
@@ -400,7 +413,6 @@ local LuaQDeepCopyMetaTable = {
 ---@type DeepCopyPipeTable
 deepcopy = setmetatable({}, LuaQDeepCopyMetaTable)
 
-
 ---@class CopyPipeTable
 local LuaQCopyMetaTable = {
     ---returns the deep copy of the table
@@ -472,58 +484,6 @@ local LuaQReduceMetaTable = {
     end
 }
 reduce = setmetatable({}, LuaQReduceMetaTable)
-
-
-local LuaQAllMetaTable = {
-    __bor = function(tbl, self)
-        local condition = self.__condition
-        self.__condition = nil
-
-        if condition then
-            for k, v in tbl do
-                if not condition(k, v) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-all = setmetatable({}, LuaQAllMetaTable)
-
-
-local LuaQAnyMetaTable = {
-    __bor = function(tbl, self)
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return not table.empty(tbl)
-        end
-
-        for k, v in tbl do
-            if condition(k, v) then
-                return true
-            end
-        end
-
-        return false
-    end,
-
-
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-any = setmetatable({}, LuaQAnyMetaTable)
 
 ---@class LuaQKeysTable
 local LuaQKeysMetaTable = {
