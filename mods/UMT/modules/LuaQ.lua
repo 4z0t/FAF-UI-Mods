@@ -408,24 +408,6 @@ end)
 ---@type LuaQDistinctPipeTable
 distinct = CreatePipe(LuaQDistinct)
 
----@class LuaQCountPipeTable : Conditional
-LuaQCount = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
-
-    if not condition then
-        return table.getn(tbl)
-    end
-
-    local count = 0
-    for _, v in ipairs(tbl) do
-        if condition(v) then
-            count = count + 1
-        end
-    end
-
-    return count
-end)
-
 ---@class LuaQCountKVPipeTable : ConditionalKV
 LuaQCountKV = MakePipe(function(tbl, self)
     local condition = self:PopFn()
@@ -437,6 +419,25 @@ LuaQCountKV = MakePipe(function(tbl, self)
     local count = 0
     for k, v in tbl do
         if condition(k, v) then
+            count = count + 1
+        end
+    end
+
+    return count
+end)
+
+
+---@class LuaQCountPipeTable : Conditional
+LuaQCount = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    if not condition then
+        return table.getn(tbl)
+    end
+
+    local count = 0
+    for _, v in ipairs(tbl) do
+        if condition(v) then
             count = count + 1
         end
     end
@@ -531,29 +532,6 @@ local LuaQReduceMetaTable = {
 }
 reduce = setmetatable({}, LuaQReduceMetaTable)
 
-local LuaQFirstMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        for _, v in ipairs(tbl) do
-            if condition(v) then
-                return v
-            end
-        end
-
-        return nil
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-first = setmetatable({}, LuaQFirstMetaTable)
-
-
 local LuaQCountKeyValueMetaTable = {
     __bor = function(tbl, self)
 
@@ -610,46 +588,6 @@ local LuaQCountMetaTable = {
 count = setmetatable({
     keyvalue = setmetatable({}, LuaQCountKeyValueMetaTable)
 }, LuaQCountMetaTable)
-
-
-local LuaQToSetMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        local result = {}
-
-        if condition then
-            for k, v in tbl do
-                if condition(k, v) then
-                    result[v] = true
-                end
-            end
-        else
-            for _, v in tbl do
-                result[v] = true
-            end
-        end
-
-        return result
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-toSet = setmetatable({}, LuaQToSetMetaTable)
-
-
-local LuaQDistinctMetaTable = {
-    __bor = function(tbl, self)
-        return tbl | toSet | keys
-    end,
-}
-distinct = setmetatable({}, LuaQDistinctMetaTable)
-
 
 ---retuns max of the given table
 ---@generic K
