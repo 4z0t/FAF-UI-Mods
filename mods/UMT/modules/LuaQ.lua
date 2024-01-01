@@ -345,6 +345,10 @@ end)
 ---@type LuaQKeysPipeTable
 keys = CreatePipe(LuaQKeys)
 
+---Returns table where keys are values of the given table
+---```lua
+--- ... | toSet
+---```
 ---@class LuaQToSetPipeTable
 LuaQToSet = BORPipe(function(tbl, self)
     local result = {}
@@ -355,7 +359,13 @@ LuaQToSet = BORPipe(function(tbl, self)
 
     return result
 end)
+---@type LuaQToSetPipeTable
+toSet = CreatePipe(LuaQToSet)
 
+---Returns the first value that satisfy the condition, if none - nil
+---```lua
+--- ... | first(function(v) return v > 0 end)
+---```
 ---@class LuaQFirstPipeTable : Conditional
 LuaQFirst = MakePipe(function(tbl, self)
     local condition = self:PopFn()
@@ -368,12 +378,35 @@ LuaQFirst = MakePipe(function(tbl, self)
 
     return nil
 end)
+---@type LuaQFirstPipeTable
+first = CreatePipe(LuaQFirst)
 
+---Returns index of the first value satisfying the condition, if none - nil
+---```lua
+--- ... | first(function(v) return v > 0 end)
+---```
+---@class LuaQFirstIPipeTable : Conditional
+LuaQFirstI = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    for i, v in ipairs(tbl) do
+        if condition(v) then
+            return i
+        end
+    end
+
+    return nil
+end)
+---@type LuaQFirstIPipeTable
+firstIndex = CreatePipe(LuaQFirstI)
+
+---Returns table of distinct values of given table
 ---@class LuaQDistinctPipeTable
 LuaQDistinct = BORPipe(function(tbl, self)
     return tbl | toSet | keys
 end)
-
+---@type LuaQDistinctPipeTable
+distinct = CreatePipe(LuaQDistinct)
 
 ---@class LuaQCountPipeTable : Conditional
 LuaQCount = MakePipe(function(tbl, self)
