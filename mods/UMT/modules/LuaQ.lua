@@ -18,8 +18,7 @@ end
 ---@generic V?
 ---@class FunctionalTransformer<R, K, V>
 ---@field fn function
-FunctionalTransformer = Class()
-{
+FunctionalTransformer = {
     ---@param self FunctionalTransformer
     ---@param func function
     ---@return FunctionalTransformer
@@ -51,6 +50,34 @@ FunctionalTransformer = Class()
 
 ---@class ConditionalKV : FunctionalTransformer
 ---@field fn fun(k, v):boolean
+
+
+---@param bor fun(tbl:table, self:FunctionalTransformer):table
+---@generic T: fa-class
+---@return T
+local function MakePipe(bor)
+    return table.merged({ __bor = bor }, FunctionalTransformer)
+end
+
+---Selects values that satisfy the condition
+---```lua
+--- ... | where(function(v) v > 3 end)
+---```
+--- `V`:`bool` -> `V`
+---@class LuaQWherePipeTable : Conditional
+LuaQWhere = MakePipe(function(tbl, self)
+    local func = self:PopFn()
+
+    local result = {}
+
+    for _, v in ipairs(tbl) do
+        if func(v) then
+            TableInsert(result, v)
+        end
+    end
+
+    return result
+end)
 
 
 
