@@ -258,7 +258,7 @@ end)
 
 ---Sums values of table, values can be selected with selector
 ---```lua
---- ... | sum(function(v) v.rating or 0 end)
+--- ... | sum(function(v) return v.rating or 0 end)
 ---```
 ---@class LuaQSum : LuaQSumPipeTable
 ---@field keyvalue LuaQSumKVPipeTable
@@ -266,7 +266,7 @@ sum = CreatePipe(LuaQSum, LuaQSumKV)
 
 ---Returns true if all values satisfy the condition
 ---```lua
---- ... | all(function(k, v) v < 0 end)
+--- ... | all(function(k, v) return v < 0 end)
 ---```
 ---@class LuaQAllPipeTable: ConditionalKV
 LuaQAll = MakePipe(function(tbl, self)
@@ -287,7 +287,7 @@ all = CreatePipe(LuaQAll)
 
 ---Returns true if any of values satisfy the condition
 ---```lua
---- ... | any(function(k, v) v < 0 end)
+--- ... | any(function(k, v) return v < 0 end)
 ---```
 ---@class LuaQAnyPipeTable: ConditionalKV
 LuaQAny = MakePipe(function(tbl, self)
