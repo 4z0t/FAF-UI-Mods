@@ -444,6 +444,9 @@ LuaQCount = MakePipe(function(tbl, self)
 
     return count
 end)
+---@class LuaQCount : LuaQCountPipeTable
+---@field keyvalue LuaQCountKVPipeTable
+count = CreatePipe(LuaQCount, LuaQCountKV)
 
 ---@class DeepCopyPipeTable
 local LuaQDeepCopyMetaTable = {
@@ -531,63 +534,6 @@ local LuaQReduceMetaTable = {
     end
 }
 reduce = setmetatable({}, LuaQReduceMetaTable)
-
-local LuaQCountKeyValueMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return table.getsize(tbl)
-        end
-
-        local count = 0
-        for k, v in tbl do
-            if condition(k, v) then
-                count = count + 1
-            end
-        end
-
-        return count
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-
-local LuaQCountMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return table.getn(tbl)
-        end
-
-        local count = 0
-        for _, v in ipairs(tbl) do
-            if condition(v) then
-                count = count + 1
-            end
-        end
-
-        return count
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-
-
-count = setmetatable({
-    keyvalue = setmetatable({}, LuaQCountKeyValueMetaTable)
-}, LuaQCountMetaTable)
 
 ---retuns max of the given table
 ---@generic K
