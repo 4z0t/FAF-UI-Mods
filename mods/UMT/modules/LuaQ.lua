@@ -207,10 +207,12 @@ local LuaQSelectKeyValueMetaTable = {
             for k, v in tbl do
                 result[k] = v[selector]
             end
-        elseif type(selector) == "function" then
+        elseif iscallable(selector) then
             for k, v in tbl do
                 result[k] = selector(k, v)
             end
+        else
+            error("Unsupported selector type " .. tostring(selector))
         end
 
         return result
@@ -233,10 +235,12 @@ local LuaQSelectMetaTable = {
             for _, v in ipairs(tbl) do
                 TableInsert(result, v[selector])
             end
-        elseif type(selector) == "function" then
+        elseif iscallable(selector) then
             for _, v in ipairs(tbl) do
                 TableInsert(result, selector(v))
             end
+        else
+            error("Unsupported selector type " .. tostring(selector))
         end
 
         return result
