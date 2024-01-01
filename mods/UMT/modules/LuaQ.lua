@@ -51,13 +51,24 @@ FunctionalTransformer = {
 ---@class ConditionalKV
 ---@field fn fun(k, v):boolean
 
+
+
+---@generic K
+---@generic V
+---@param bor fun(tbl:table<K, V>, self:table):table
+---@generic T: fa-class
+---@return T
+local function BORPipe(bor)
+    return { __bor = bor }
+end
+
 ---@generic K
 ---@generic V
 ---@param bor fun(tbl:table<K, V>, self:FunctionalTransformer):table
 ---@generic T: fa-class
 ---@return T
 local function MakePipe(bor)
-    return table.merged({ __bor = bor }, FunctionalTransformer)
+    return table.merged(BORPipe(bor), FunctionalTransformer)
 end
 
 ---Selects values that satisfy the condition
@@ -167,7 +178,7 @@ LuaQSum = MakePipe(function(tbl, self)
             _sum = _sum + selector(v)
         end
     else
-        for _, v in tbl do
+        for _, v in ipairs(tbl) do
             _sum = _sum + v
         end
     end
@@ -191,6 +202,90 @@ LuaQSumKV = MakePipe(function(tbl, self)
     end
 
     return _sum
+end)
+
+---@class LuaQAllPipeTable: ConditionalKV
+LuaQAll = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    if condition then
+        for k, v in tbl do
+            if not condition(k, v) then
+                return false
+            end
+        end
+    end
+
+    return true
+end)
+
+---@class LuaQAnyPipeTable: ConditionalKV
+LuaQAny = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    if not condition then
+        return not table.empty(tbl)
+    end
+
+    for k, v in tbl do
+        if condition(k, v) then
+            return true
+        end
+    end
+
+    return false
+end)
+
+---@class LuaQValuesPipeTable
+LuaQValues = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        TableInsert(result, v)
+    end
+
+    return result
+end)
+
+---@class LuaQKeysPipeTable
+LuaQKeys = BORPipe(function(tbl, self)
+    local result = {}
+
+    for k in tbl do
+        TableInsert(result, k)
+    end
+
+    return result
+end)
+
+
+---@class LuaQToSetPipeTable
+LuaQToSet = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        result[v] = true
+    end
+
+    return result
+end)
+
+---@class LuaQFirstPipeTable : Conditional
+LuaQFirst = MakePipe(function(tbl, self)
+    local condition = self:PopFn()
+
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            return v
+        end
+    end
+
+    return nil
+end)
+
+---@class LuaQDistinctPipeTable
+LuaQDistinct = BORPipe(function(tbl, self)
+    return tbl | toSet | keys
 end)
 
 ---@class LuaQWhereKeyValueMetaTable
