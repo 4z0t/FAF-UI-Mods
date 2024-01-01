@@ -80,21 +80,6 @@ local function MakePipe(bor)
     return table.merged(BORPipe(bor), FunctionalTransformer)
 end
 
----@class LuaQWherePipeTable : Conditional
-LuaQWhere = MakePipe(function(tbl, self)
-    local func = self:PopFn()
-
-    local result = {}
-
-    for _, v in ipairs(tbl) do
-        if func(v) then
-            TableInsert(result, v)
-        end
-    end
-
-    return result
-end)
-
 ---Selects key-values that satisfy the condition
 ---```lua
 --- ... | where.keyvalue(function(k, v) v > 3 and type(k) == "string" end)
@@ -115,6 +100,20 @@ LuaQWhereKV = MakePipe(function(tbl, self)
     return result
 end)
 
+---@class LuaQWherePipeTable : Conditional
+LuaQWhere = MakePipe(function(tbl, self)
+    local func = self:PopFn()
+
+    local result = {}
+
+    for _, v in ipairs(tbl) do
+        if func(v) then
+            TableInsert(result, v)
+        end
+    end
+
+    return result
+end)
 ---Selects values that satisfy the condition
 ---```lua
 --- ... | where(function(v) v > 3 end)
