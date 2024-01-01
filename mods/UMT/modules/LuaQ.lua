@@ -199,6 +199,11 @@ end)
 ---@field keyvalue LuaQSelectKVPipeTable
 select = CreatePipe(LuaQSelect, LuaQSelectKV)
 
+---Applies function to key-values of the table
+---```lua
+--- ... | foreach(function(k, v) print(tostring(k).. ":" .. tostring(v)) end)
+---```
+--- Returns table back
 ---@class LuaQForEachPipeTable : Selector
 LuaQForEach = MakePipe(function(tbl, self)
     local func = self:PopFn()
@@ -209,7 +214,8 @@ LuaQForEach = MakePipe(function(tbl, self)
 
     return tbl
 end)
-
+---@type LuaQForEachPipeTable
+foreach = CreatePipe(LuaQForEach)
 
 ---@class LuaQSumPipeTable : Selector
 LuaQSum = MakePipe(function(tbl, self)
@@ -433,39 +439,6 @@ local LuaQContainsMetaTable = {
 }
 ---@type ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
-
----@class ForeachPipeTable
-local LuaQForeachMetaTable = {
-    ---loops over table applying a function to each entry in the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
-
-        for k, v in tbl do
-            func(k, v)
-        end
-
-        return tbl
-    end,
-
-    ---Sets function to be called for each entry in the table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(key:K, value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
-    end
-}
----@type ForeachPipeTable
-foreach = setmetatable({}, LuaQForeachMetaTable)
 
 
 ---@class SumPipeTable
