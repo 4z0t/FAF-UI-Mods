@@ -5,12 +5,6 @@ local setmetatable = setmetatable
 ---@class BORTable : table
 ---@operator bor(table):table
 
----@param tbl table
----@return BORTable
-function From(tbl)
-    return tbl
-end
-
 ---@param pipeTable table
 ---@param kvTable? table
 ---@return table
@@ -425,7 +419,6 @@ LuaQCountKV = MakePipe(function(tbl, self)
 
     return count
 end)
-
 
 ---@class LuaQCountPipeTable : Conditional
 LuaQCount = MakePipe(function(tbl, self)

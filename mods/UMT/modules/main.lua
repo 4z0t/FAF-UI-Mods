@@ -90,9 +90,6 @@ function TestLuaQ()
         | LuaQ.where(function(v) return v & 1 == 1 end)
         | LuaQ.reduce(function(val, _, v) return v * val end, 1)
     LOG(m)
-    local c = LuaQ.From { 1, 2, 3, 4, 5 }
-        | LuaQ.where(function(v) return v & 1 == 1 end)
-
 end
 
 function TestOptions()
