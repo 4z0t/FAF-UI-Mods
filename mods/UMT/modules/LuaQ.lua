@@ -309,6 +309,10 @@ end)
 ---@type LuaQAnyPipeTable
 any = CreatePipe(LuaQAny)
 
+---Returns table with only values of the given table
+---```lua
+--- ... | values
+---```
 ---@class LuaQValuesPipeTable
 LuaQValues = BORPipe(function(tbl, self)
     local result = {}
@@ -320,6 +324,13 @@ LuaQValues = BORPipe(function(tbl, self)
     return result
 end)
 
+---@type LuaQValuesPipeTable
+values = CreatePipe(LuaQValues)
+
+---Returns table with only keys of the given table
+---```lua
+--- ... | keys
+---```
 ---@class LuaQKeysPipeTable
 LuaQKeys = BORPipe(function(tbl, self)
     local result = {}
@@ -331,6 +342,8 @@ LuaQKeys = BORPipe(function(tbl, self)
     return result
 end)
 
+---@type LuaQKeysPipeTable
+keys = CreatePipe(LuaQKeys)
 
 ---@class LuaQToSetPipeTable
 LuaQToSet = BORPipe(function(tbl, self)
@@ -484,83 +497,6 @@ local LuaQReduceMetaTable = {
     end
 }
 reduce = setmetatable({}, LuaQReduceMetaTable)
-
----@class LuaQKeysTable
-local LuaQKeysMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        local result = {}
-        if condition then
-            for k, v in tbl do
-                if condition(k, v) then
-                    TableInsert(result, k)
-                end
-            end
-        else
-            for k, _ in tbl do
-                TableInsert(result, k)
-            end
-        end
-
-        return result
-    end,
-
-    ---sets condition for keys to be selected
-    ---@generic K
-    ---@generic V
-    ---@param self LuaQKeysTable
-    ---@param condition fun(key:K, value:V):boolean
-    ---@return LuaQKeysTable
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
----@type LuaQKeysTable
-keys = setmetatable({}, LuaQKeysMetaTable)
-
-
----@class LuaQValuesTable
-local LuaQValuesMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-        local result = {}
-
-        if condition then
-            for _, v in tbl do
-                if condition(k, v) then
-                    TableInsert(result, v)
-                end
-            end
-        else
-            for _, v in tbl do
-                TableInsert(result, v)
-            end
-        end
-
-        return result
-    end,
-
-
-    ---sets condition for values to be selected
-    ---@generic K
-    ---@generic V
-    ---@param self LuaQValuesTable
-    ---@param condition fun(key:K, value:V):boolean
-    ---@return LuaQValuesTable
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
----@type LuaQValuesTable
-values = setmetatable({}, LuaQValuesMetaTable)
-
 
 local LuaQFirstMetaTable = {
     __bor = function(tbl, self)
