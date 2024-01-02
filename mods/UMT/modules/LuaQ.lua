@@ -28,16 +28,16 @@ FunctionalTransformer = {
     __call = function(self, func)
         self.fn = func
         return self
-    end,
-
-    ---@param self FunctionalTransformer
-    ---@return function
-    PopFn = function(self)
-        local fn = self.fn
-        self.fn  = nil
-        return fn
     end
 }
+
+---@param fnObj FunctionalTransformer
+---@return function
+local function PopFn(fnObj)
+    local fn = fnObj.fn
+    fnObj.fn  = nil
+    return fn
+end
 
 ---@class Comparator
 ---@field fn fun(a, b):boolean
@@ -71,7 +71,7 @@ end
 ---@generic T: fa-class
 ---@return T
 local function MakePipe(bor)
-    return table.merged(BORPipe(bor), FunctionalTransformer)
+    return table.combine(BORPipe(bor), FunctionalTransformer)
 end
 
 ---Selects key-values that satisfy the condition
@@ -81,7 +81,7 @@ end
 --- `K`,`V`:`bool` -> `K`,`V`
 ---@class LuaQWhereKVPipeTable : ConditionalKV
 LuaQWhereKV = MakePipe(function(tbl, self)
-    local func = self:PopFn()
+    local func = PopFn(self)
 
     local result = {}
 
@@ -96,7 +96,7 @@ end)
 
 ---@class LuaQWherePipeTable : Conditional
 LuaQWhere = MakePipe(function(tbl, self)
-    local func = self:PopFn()
+    local func = PopFn(self)
 
     local result = {}
 
@@ -123,7 +123,7 @@ where = CreatePipe(LuaQWhere, LuaQWhereKV)
 ---```
 ---@class LuaQSortPipeTable : Comparator
 LuaQSort = MakePipe(function(tbl, self)
-    local func = self:PopFn()
+    local func = PopFn(self)
     table.sort(tbl, func)
     return tbl
 end)
@@ -140,7 +140,7 @@ sort = CreatePipe(LuaQSort)
 ---```
 ---@class LuaQSelectKVPipeTable : SelectorKV
 LuaQSelectKV = MakePipe(function(tbl, self)
-    local selector = self:PopFn()
+    local selector = PopFn(self)
 
     local result = {}
 
@@ -161,7 +161,7 @@ end)
 
 ---@class LuaQSelectPipeTable : Selector
 LuaQSelect = MakePipe(function(tbl, self)
-    local selector = self:PopFn()
+    local selector = PopFn(self)
 
     local result = {}
 
@@ -199,7 +199,7 @@ select = CreatePipe(LuaQSelect, LuaQSelectKV)
 --- Returns table back
 ---@class LuaQForEachPipeTable : Selector
 LuaQForEach = MakePipe(function(tbl, self)
-    local func = self:PopFn()
+    local func = PopFn(self)
 
     for k, v in tbl do
         func(k, v)
@@ -216,7 +216,7 @@ foreach = CreatePipe(LuaQForEach)
 ---```
 ---@class LuaQSumKVPipeTable : SelectorKV
 LuaQSumKV = MakePipe(function(tbl, self)
-    local selector = self:PopFn()
+    local selector = PopFn(self)
 
     local _sum = 0
     if selector then
@@ -234,7 +234,7 @@ end)
 
 ---@class LuaQSumPipeTable : Selector
 LuaQSum = MakePipe(function(tbl, self)
-    local selector = self:PopFn()
+    local selector = PopFn(self)
 
     local _sum = 0
     if selector then
@@ -264,7 +264,7 @@ sum = CreatePipe(LuaQSum, LuaQSumKV)
 ---```
 ---@class LuaQAllPipeTable: ConditionalKV
 LuaQAll = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     if condition then
         for k, v in tbl do
@@ -285,7 +285,7 @@ all = CreatePipe(LuaQAll)
 ---```
 ---@class LuaQAnyPipeTable: ConditionalKV
 LuaQAny = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     if not condition then
         return not table.empty(tbl)
@@ -362,7 +362,7 @@ toSet = CreatePipe(LuaQToSet)
 ---```
 ---@class LuaQFirstPipeTable : Conditional
 LuaQFirst = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     for _, v in ipairs(tbl) do
         if condition(v) then
@@ -381,7 +381,7 @@ first = CreatePipe(LuaQFirst)
 ---```
 ---@class LuaQFirstIPipeTable : Conditional
 LuaQFirstI = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     for i, v in ipairs(tbl) do
         if condition(v) then
@@ -404,7 +404,7 @@ distinct = CreatePipe(LuaQDistinct)
 
 ---@class LuaQCountKVPipeTable : ConditionalKV
 LuaQCountKV = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     if not condition then
         return table.getsize(tbl)
@@ -422,7 +422,7 @@ end)
 
 ---@class LuaQCountPipeTable : Conditional
 LuaQCount = MakePipe(function(tbl, self)
-    local condition = self:PopFn()
+    local condition = PopFn(self)
 
     if not condition then
         return table.getn(tbl)
