@@ -31,6 +31,7 @@ FunctionalTransformer = {
     end
 }
 
+---Pops function from functional transformer
 ---@param fnObj FunctionalTransformer
 ---@return function
 local function PopFn(fnObj)
