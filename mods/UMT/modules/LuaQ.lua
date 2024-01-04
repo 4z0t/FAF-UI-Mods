@@ -36,7 +36,7 @@ FunctionalTransformer = {
 ---@return function
 local function PopFn(fnObj)
     local fn = fnObj.fn
-    fnObj.fn  = nil
+    fnObj.fn = nil
     return fn
 end
 
@@ -403,6 +403,28 @@ end)
 ---@type LuaQDistinctPipeTable
 distinct = CreatePipe(LuaQDistinct)
 
+---Makes shallow copy of the given table
+---```lua
+--- ... | copy
+---```
+---@class LuaQCopy
+LuaQCopy = BORPipe(function(tbl, self)
+    return table.copy(tbl)
+end)
+---@type LuaQCopy
+copy = CreatePipe(LuaQCopy)
+
+---Makes deep copy of the given table
+---```lua
+--- ... | deepcopy
+---```
+---@class LuaQDeepCopy
+LuaQDeepCopy = BORPipe(function(tbl, self)
+    return table.deepcopy(tbl)
+end)
+---@type LuaQDeepCopy
+deepcopy = CreatePipe(LuaQDeepCopy)
+
 ---@class LuaQCountKVPipeTable : ConditionalKV
 LuaQCountKV = MakePipe(function(tbl, self)
     local condition = PopFn(self)
@@ -442,35 +464,6 @@ end)
 ---@field keyvalue LuaQCountKVPipeTable
 count = CreatePipe(LuaQCount, LuaQCountKV)
 
----@class DeepCopyPipeTable
-local LuaQDeepCopyMetaTable = {
-    ---returns the deep copy of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self DeepCopyPipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        return table.deepcopy(tbl)
-    end,
-}
----@type DeepCopyPipeTable
-deepcopy = setmetatable({}, LuaQDeepCopyMetaTable)
-
----@class CopyPipeTable
-local LuaQCopyMetaTable = {
-    ---returns the deep copy of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self CopyPipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        return table.copy(tbl)
-    end,
-}
----@type CopyPipeTable
-copy = setmetatable({}, LuaQCopyMetaTable)
 
 ---@class ContainsPipeTable
 local LuaQContainsMetaTable = {

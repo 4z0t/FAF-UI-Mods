@@ -1,7 +1,7 @@
 local Options = UMT.Options
 local Opt = Options.Opt
 
-Options.Mods["EUT"] = {
+UMT.Options.Mods["EUT"] = {
     overlayOption = Opt(true),
     useNumberOverlay = Opt(false),
     overlaySize = Opt(10),
