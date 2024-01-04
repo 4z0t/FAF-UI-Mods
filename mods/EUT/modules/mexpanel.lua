@@ -6,7 +6,7 @@ local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 
-local Options = import("options.lua")
+local Options = UMT.Options.Mods["EUT"]
 local From = import("/mods/UMT/modules/linq.lua").From
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
