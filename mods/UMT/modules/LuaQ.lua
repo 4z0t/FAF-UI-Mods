@@ -408,9 +408,7 @@ distinct = CreatePipe(LuaQDistinct)
 --- ... | copy
 ---```
 ---@class LuaQCopy
-LuaQCopy = BORPipe(function(tbl, self)
-    return table.copy(tbl)
-end)
+LuaQCopy = BORPipe(table.copy)
 ---@type LuaQCopy
 copy = CreatePipe(LuaQCopy)
 
@@ -419,9 +417,7 @@ copy = CreatePipe(LuaQCopy)
 --- ... | deepcopy
 ---```
 ---@class LuaQDeepCopy
-LuaQDeepCopy = BORPipe(function(tbl, self)
-    return table.deepcopy(tbl)
-end)
+LuaQDeepCopy = BORPipe(table.deepcopy)
 ---@type LuaQDeepCopy
 deepcopy = CreatePipe(LuaQDeepCopy)
 
