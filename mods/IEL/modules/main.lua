@@ -4,7 +4,7 @@ local Group = import("/lua/maui/group.lua").Group
 local UIUtil = import("/lua/ui/uiutil.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
-local LazyVar = import("/lua/lazyvar.lua")
+local LazyVar = import("/lua/lazyvar.lua").Create
 
 
 local GetUnits = UMT.Units.GetFast
@@ -41,12 +41,18 @@ local EngineerOverlay = Class(Overlay)
         self.offsetY = 1
         self.isIdle = false
         if unit:IsInCategory("TECH1") then
-            self:SetTexture("/mods/IEL/textures/t1_idle_bold.dds", 0)
+            self:SetTexture("/mods/IEL/textures/t1_active_bold.dds", 0)
         elseif unit:IsInCategory("TECH2") then
-            self:SetTexture("/mods/IEL/textures/t2_idle_bold.dds", 0)
+            self:SetTexture("/mods/IEL/textures/t2_active_bold.dds", 0)
         elseif unit:IsInCategory("TECH3") then
-            self:SetTexture("/mods/IEL/textures/t3_idle_bold.dds", 0)
+            self:SetTexture("/mods/IEL/textures/t3_active_bold.dds", 0)
         end
+
+        self.color = LazyVar()
+        self.color.OnDirty = function(var)
+            self:SetColorMask(var())
+        end
+        self.color:Set(Options.overlayColor:Raw())
     end,
 
     OnFrame = function(self, delta)

@@ -10,6 +10,7 @@ UMT.Options.Mods["IEL"] = {
     tacticalNukesOption = Opt(true),
     massExtractorsOption = Opt(true),
     engineersOption = Opt(true),
+    overlayColor = Opt("ffff00ff"),
 }
 
 
@@ -23,6 +24,7 @@ function Main(isReplay)
             Options.Filter("Show factories ovelays", options.factoriesOption),
             Options.Filter("Show facrory ovelays with text", options.factoryOverlayWithTextOption),
             Options.Filter("Show Nukes and TMLs ovelays", options.tacticalNukesOption),
-            Options.Filter("Show Mex ovelays", options.massExtractorsOption)
+            Options.Filter("Show Mex ovelays", options.massExtractorsOption),
+            Options.ColorSlider("overlay color", options.overlayColor)
         })
 end
