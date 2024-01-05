@@ -1,7 +1,6 @@
 local Options = UMT.Options
 local Opt = UMT.Options.Opt
 
-local modName = "EUT"
 UMT.Options.Mods["EUT"] = {
     overlayOption = Opt(true),
     useNumberOverlay = Opt(false),
@@ -20,7 +19,7 @@ UMT.Options.Mods["EUT"] = {
 
 function Main()
     local options = UMT.Options.Mods["EUT"]
-    Options.AddOptions(modName, "ECO UI Tools", {
+    Options.AddOptions("EUT", "ECO UI Tools", {
         Options.Filter("Show mex overlay", options.overlayOption),
         Options.Filter("Auto T1 mex upgrade", options.upgradeT1Option),
         Options.Filter("Auto T2 capped mex upgrade", options.upgradeT2Option),
