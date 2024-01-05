@@ -4,14 +4,6 @@ do
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local unpack = unpack
 
-    local textureTypes = {
-        ["direct"] = "ffff2c2c",
-        ["nondirect"] = "fff2f029",
-        ["antiair"] = "ff29def2",
-        ["smd"] = "ffff8a2c",
-        ["tmd"] = "ffff8a2c"
-    }
-
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
 
     local function GetBPInfo(bp)
