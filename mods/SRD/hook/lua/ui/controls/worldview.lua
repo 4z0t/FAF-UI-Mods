@@ -15,7 +15,7 @@ do
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
 
     local function GetBPInfo(bp)
-        if bp.Weapon ~= nil then
+        if bp.Weapon ~= nil and not table.empty(bp.Weapon) then
             local weapons = {}
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
@@ -30,11 +30,21 @@ do
                 end
             end
             return weapons
+        elseif bp.Intel ~= nil then
+            local weapons = {}
+            if bp.Intel.OmniRadius then
+                TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
+            end
+            if bp.Intel.RadarRadius then
+                TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
+            end
+            return weapons
         end
     end
 
     local function GetColorAndThickness(type)
-        return string.format("ff%s", string.sub(overlayParams[type].NormalColor, 3)), overlayParams[type].Inner[1]
+        return ("ff%s"):format((overlayParams[type].NormalColor):sub(3)),
+            overlayParams[type].Outer[1] / overlayParams[type].Type
     end
 
     ---@class Ring
