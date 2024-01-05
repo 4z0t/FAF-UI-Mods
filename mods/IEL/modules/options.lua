@@ -13,8 +13,7 @@ UMT.Options.Mods["IEL"] = {
     overlayColor = Opt("ffff00ff"),
 }
 
-
-function Main(isReplay)
+function Main()
     local options = UMT.Options.Mods["IEL"]
     Options.AddOptions("IEL", "Idle Engineers Light",
         {

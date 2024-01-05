@@ -346,13 +346,13 @@ local function LoadOptions(values, modName, prefix)
         local opt = prefix and (prefix .. "." .. optName) or optName
         if type(defaultValue) == "table" then
             if OptValueMetaTable.IsInstance(defaultValue) then
-                LogF("UMT: loading option '%s'", opt)
+                LogF("UMT: loading option '%s':'%s'", modName, opt)
                 options[optName] = OptionVar(modName, opt, defaultValue.value)
             else
                 options[optName] = LoadOptions(defaultValue, modName, opt)
             end
         else
-            LogF("UMT: loading option '%s'", opt)
+            LogF("UMT: loading option '%s':'%s'", modName, opt)
             options[optName] = OptionVar(modName, opt, defaultValue)
         end
     end
