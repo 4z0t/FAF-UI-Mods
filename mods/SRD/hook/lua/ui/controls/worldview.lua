@@ -1,10 +1,9 @@
 do
     local TableInsert = table.insert
-
+    local TableGetn = table.getn
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
-    local Decal = import("/lua/user/userdecal.lua").UserDecal
+    local unpack = unpack
 
-    local texturePath = "/mods/SRD/textures/"
     local textureTypes = {
         ["direct"] = "ffff2c2c",
         ["nondirect"] = "fff2f029",
@@ -13,32 +12,82 @@ do
         ["tmd"] = "ffff8a2c"
     }
 
+    local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
+
     local function GetBPInfo(bp)
         if bp.Weapon ~= nil then
             local weapons = {}
             for _wIndex, w in bp.Weapon do
-                local radius = w.MaxRadius;
+                local radius = w.MaxRadius
                 if w.RangeCategory == "UWRC_DirectFire" then
-                    TableInsert(weapons, { "direct", radius })
+                    TableInsert(weapons, { "AllMilitary", radius })
                 elseif w.RangeCategory == "UWRC_IndirectFire" then
-                    TableInsert(weapons, { "nondirect", radius })
+                    TableInsert(weapons, { "IndirectFire", radius })
                 elseif w.RangeCategory == "UWRC_AntiAir" then
-                    TableInsert(weapons, { "antiair", radius })
+                    TableInsert(weapons, { "AntiAir", radius })
                 elseif w.RangeCategory == "UWRC_Countermeasure" then
-                    TableInsert(weapons, { "smd", radius })
+                    TableInsert(weapons, { "Defense", radius })
                 end
             end
             return weapons
         end
     end
 
-    local Ring = import("/lua/ui/game/gamemain.lua").Ring
+    local function GetColorAndThickness(type)
+        return string.format("ff%s", string.sub(overlayParams[type].NormalColor, 3)), overlayParams[type].Inner[1]
+    end
+
+    ---@class Ring
+    ---@field pos Vector
+    ---@field color string
+    ---@field radius number
+    ---@field thickness number
+    Ring = ClassSimple
+    {
+        __init = function(self, color, radius)
+            self.pos = Vector(0, 0, 0)
+            self.color = color or "ffffffff"
+            self.radius = radius or 0
+            self.thickness = 0.15
+        end,
+
+        ---@param self Ring
+        Render = function(self)
+            UI_DrawCircle(self.pos, self.radius, self.color, self.thickness)
+        end,
+
+        SetPosition = function(self, pos)
+            self.pos = pos
+        end,
+
+        SetRadius = function(self, radius)
+            self.radius = radius
+        end,
+
+        SetColor = function(self, color)
+            self.color = color
+        end
+
+    }
+
     local oldWorldView = WorldView
     WorldView = Class(oldWorldView) {
 
+        ---@param self WorldView
+        ---@param spec any
+        __post_init = function(self, spec)
+            oldWorldView.__post_init(self, spec)
+            self:SetCustomRender(self:GetName() ~= "MiniMap")
+        end,
+        OnRenderWorld = function(self, delta)
+            for _, ring in self.ActiveRings do
+                ring:Render()
+            end
+        end,
+
         PreviewKey = "SHIFT",
         IsClear = false,
-        ActiveDecals = {},
+        ActiveRings = {},
 
         OnUpdateCursor = function(self)
             if IsKeyDown(self.PreviewKey) and not GetCommandMode()[2] then
@@ -49,11 +98,13 @@ do
             return oldWorldView.OnUpdateCursor(self)
         end,
 
-        CreateRingDecal = function(type, range)
+        CreateRing = function(type, range)
             local ring = Ring()
-            ring:SetColor(textureTypes[type])
+            local color, thick = GetColorAndThickness(type)
+            ring:SetColor(color)
             ring:SetRadius(range)
             ring:SetPosition(GetMouseWorldPos())
+            ring.thickness = thick
             ring.type = type
             ring.range = range
             return ring
@@ -61,8 +112,10 @@ do
 
         UpdateDecal = function(decal, type, range)
             if decal.type ~= type then
-                decal:SetColor(textureTypes[type])
+                local color, thick = GetColorAndThickness(type)
+                decal:SetColor(color)
                 decal.type = type
+                decal.thickness = thick
             end
             if decal.range ~= range then
                 decal:SetRadius(range)
@@ -78,29 +131,28 @@ do
                 if table.empty(weapons) then
                     self:Clear()
                 else
-                    local ActiveDecals = self.ActiveDecals
+                    local ActiveRings = self.ActiveRings
 
                     self.IsClear = false
 
-                    if table.getn(weapons) > table.getn(ActiveDecals) then
+                    if TableGetn(weapons) > TableGetn(ActiveRings) then
                         local decal
                         for i, weapon in weapons do
-                            decal = ActiveDecals[i]
+                            decal = ActiveRings[i]
                             if decal then
                                 self.UpdateDecal(decal, unpack(weapon))
                             else
-                                ActiveDecals[i] = self.CreateRingDecal(unpack(weapon))
+                                ActiveRings[i] = self.CreateRing(unpack(weapon))
                             end
                         end
                     else
                         local weapon
-                        for i, decal in ActiveDecals do
+                        for i, decal in ActiveRings do
                             weapon = weapons[i]
                             if weapon then
                                 self.UpdateDecal(decal, unpack(weapon))
                             else
-                                decal:Destroy()
-                                ActiveDecals[i] = nil
+                                ActiveRings[i] = nil
                             end
                         end
                     end
@@ -112,9 +164,8 @@ do
 
         Clear = function(self)
             if not self.IsClear then
-                for i, decal in self.ActiveDecals do
-                    decal:Destroy()
-                    self.ActiveDecals[i] = nil
+                for i, decal in self.ActiveRings do
+                    self.ActiveRings[i] = nil
                 end
                 self.IsClear = true
             end
@@ -122,7 +173,7 @@ do
 
         OnDestroy = function(self)
             self:Clear()
-            self.ActiveDecals = nil
+            self.ActiveRings = nil
             oldWorldView.OnDestroy(self)
         end
 
