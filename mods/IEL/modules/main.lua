@@ -11,23 +11,14 @@ local GetUnits = UMT.Units.GetFast
 local Options = UMT.Options.Mods["IEL"]
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local engineersOption = Options.engineersOption
-local engineersWithNumbersOption = Options.engineersWithNumbersOption
-local factoryOverlayWithTextOption = Options.factoryOverlayWithTextOption
-local factoriesOption = Options.factoriesOption
-local supportCommanderOption = Options.supportCommanderOption
-local commanderOverlayOption = Options.commanderOverlayOption
-local tacticalNukesOption = Options.tacticalNukesOption
-local massExtractorsOption = Options.massExtractorsOption
-
-local engineersOverlay = engineersOption()
-local engineersOverlayWithNumbers = engineersWithNumbersOption()
-local factoryOverlayWithText = factoryOverlayWithTextOption()
-local factoriesOverlay = factoriesOption()
-local commanderOverlay = commanderOverlayOption()
-local supportCommanderOverlay = supportCommanderOption()
-local tacticalNukesOverlay = tacticalNukesOption()
-local massExtractorsOverlay = massExtractorsOption()
+local engineersOverlay = Options.engineersOption()
+local engineersOverlayWithNumbers = Options.engineersWithNumbersOption()
+local factoryOverlayWithText = Options.factoryOverlayWithTextOption()
+local factoriesOverlay = Options.factoriesOption()
+local commanderOverlay = Options.commanderOverlayOption()
+local supportCommanderOverlay = Options.supportCommanderOption()
+local tacticalNukesOverlay = Options.tacticalNukesOption()
+local massExtractorsOverlay = Options.massExtractorsOption()
 
 local overlays = UMT.Weak.Value {}
 
@@ -328,28 +319,28 @@ end
 
 function Main(isReplay)
     AddBeatFunction(CreateUnitOverlays, true)
-    engineersOption.OnChange = function(var)
+    Options.engineersOption.OnChange = function(var)
         engineersOverlay = var()
     end
-    commanderOverlayOption.OnChange = function(var)
+    Options.commanderOverlayOption.OnChange = function(var)
         commanderOverlay = var()
     end
-    engineersWithNumbersOption.OnChange = function(var)
+    Options.engineersWithNumbersOption.OnChange = function(var)
         engineersOverlayWithNumbers = var()
     end
-    factoryOverlayWithTextOption.OnChange = function(var)
+    Options.factoryOverlayWithTextOption.OnChange = function(var)
         factoryOverlayWithText = var()
     end
-    factoriesOption.OnChange = function(var)
+    Options.factoriesOption.OnChange = function(var)
         factoriesOverlay = var()
     end
-    supportCommanderOption.OnChange = function(var)
+    Options.supportCommanderOption.OnChange = function(var)
         supportCommanderOverlay = var()
     end
-    tacticalNukesOption.OnChange = function(var)
+    Options.tacticalNukesOption.OnChange = function(var)
         tacticalNukesOverlay = var()
     end
-    massExtractorsOption.OnChange = function(var)
+    Options.massExtractorsOption.OnChange = function(var)
         massExtractorsOverlay = var()
     end
 end
