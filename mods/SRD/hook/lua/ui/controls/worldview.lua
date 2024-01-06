@@ -165,12 +165,12 @@ do
         end,
 
         Clear = function(self)
-            if not self.IsClear then
-                for i, decal in self.ActiveRings do
-                    self.ActiveRings[i] = nil
-                end
-                self.IsClear = true
+            if self.IsClear then return end
+
+            for i, decal in self.ActiveRings do
+                self.ActiveRings[i] = nil
             end
+            self.IsClear = true
         end,
 
         OnDestroy = function(self)
