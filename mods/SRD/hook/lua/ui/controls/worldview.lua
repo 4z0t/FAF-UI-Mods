@@ -1,9 +1,9 @@
 do
     local TableInsert = table.insert
     local TableGetn = table.getn
-    local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local unpack = unpack
 
+    local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
 
     local function GetBPInfo(bp)
@@ -128,39 +128,39 @@ do
 
         Update = function(self)
             local info = GetRolloverInfo()
-            if info and info.blueprintId ~= "unknown" then
-                local weapons = GetBPInfo(__blueprints[info.blueprintId])
-                if table.empty(weapons) then
-                    self:Clear()
-                else
-                    local ActiveRings = self.ActiveRings
+            if not (info and info.blueprintId ~= "unknown") then
+                self:Clear()
+                return
+            end
 
-                    self.IsClear = false
+            local weapons = GetBPInfo(__blueprints[info.blueprintId])
+            if table.empty(weapons) then
+                self:Clear()
+                return
+            end
 
-                    if TableGetn(weapons) > TableGetn(ActiveRings) then
-                        local decal
-                        for i, weapon in weapons do
-                            decal = ActiveRings[i]
-                            if decal then
-                                self.UpdateDecal(decal, unpack(weapon))
-                            else
-                                ActiveRings[i] = self.CreateRing(unpack(weapon))
-                            end
-                        end
+            local ActiveRings = self.ActiveRings
+            self.IsClear = false
+            if TableGetn(weapons) > TableGetn(ActiveRings) then
+                local decal
+                for i, weapon in weapons do
+                    decal = ActiveRings[i]
+                    if decal then
+                        self.UpdateDecal(decal, unpack(weapon))
                     else
-                        local weapon
-                        for i, decal in ActiveRings do
-                            weapon = weapons[i]
-                            if weapon then
-                                self.UpdateDecal(decal, unpack(weapon))
-                            else
-                                ActiveRings[i] = nil
-                            end
-                        end
+                        ActiveRings[i] = self.CreateRing(unpack(weapon))
                     end
                 end
             else
-                self:Clear()
+                local weapon
+                for i, decal in ActiveRings do
+                    weapon = weapons[i]
+                    if weapon then
+                        self.UpdateDecal(decal, unpack(weapon))
+                    else
+                        ActiveRings[i] = nil
+                    end
+                end
             end
         end,
 
