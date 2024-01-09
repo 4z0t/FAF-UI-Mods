@@ -1,7 +1,6 @@
 local Options = UMT.Options
 local Opt = UMT.Options.Opt
 UMT.Options.Mods["IEL"] = {
-
     engineersWithNumbersOption = Opt(false),
     factoryOverlayWithTextOption = Opt(false),
     factoriesOption = Opt(true),
@@ -12,6 +11,7 @@ UMT.Options.Mods["IEL"] = {
     engineersOption = Opt(true),
     overlayColor = Opt("ffff00ff"),
     activeInReplays = Opt(true),
+    scanDelay = Opt(1),
 }
 
 function Main()
@@ -26,6 +26,7 @@ function Main()
             Options.Filter("Show Nukes and TMLs ovelays", options.tacticalNukesOption),
             Options.Filter("Show Mex ovelays", options.massExtractorsOption),
             Options.ColorSlider("overlay color", options.overlayColor),
-            Options.Filter("Active in replays", options.activeInReplays)
+            Options.Filter("Active in replays", options.activeInReplays),
+            Options.Slider([[Unit scanner delay in ticks (increase if you expirience performance issues in late game)]], 1, 100, 1, options.scanDelay),
         })
 end

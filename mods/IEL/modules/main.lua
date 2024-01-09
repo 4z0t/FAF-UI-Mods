@@ -340,7 +340,16 @@ local function CreateUnitOverlays()
             end
         end
     end
+end
 
+local scanCount = 0
+local scanDelay = 1
+local function OnTick()
+    scanCount = scanCount + 1
+    if scanCount >= scanDelay then
+        scanCount = 0
+        CreateUnitOverlays()
+    end
     UpdateOverlays()
 end
 
@@ -348,6 +357,9 @@ function Main(isReplay)
     if isReplay and not Options.activeInReplays() then
         return
     end
+    Options.scanDelay:Bind(function(var)
+        scanDelay = var()
+    end)
     InitOptions()
-    AddBeatFunction(CreateUnitOverlays, true)
+    AddBeatFunction(OnTick, true)
 end
