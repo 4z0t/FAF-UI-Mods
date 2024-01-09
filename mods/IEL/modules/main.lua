@@ -20,7 +20,7 @@ local supportCommanderOverlay
 local tacticalNukesOverlay
 local massExtractorsOverlay
 
-local function InitOptions()
+local function BindOptions()
     Options.engineersOption:Bind(function(var)
         engineersOverlay = var()
     end)
@@ -360,6 +360,6 @@ function Main(isReplay)
     Options.scanDelay:Bind(function(var)
         scanDelay = var()
     end)
-    InitOptions()
+    BindOptions()
     AddBeatFunction(OnTick, true)
 end
