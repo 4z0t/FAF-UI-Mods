@@ -27,6 +27,7 @@ function Main()
             Options.Filter("Show Mex ovelays", options.massExtractorsOption),
             Options.ColorSlider("overlay color", options.overlayColor),
             Options.Filter("Active in replays", options.activeInReplays),
-            Options.Slider([[Unit scanner delay in ticks (increase if you expirience performance issues in late game)]], 1, 100, 1, options.scanDelay),
+            Options.Slider([[Unit scanner delay in ticks (increase if you expirience performance issues in late game)]],
+                1, 100, 1, options.scanDelay),
         })
 end
