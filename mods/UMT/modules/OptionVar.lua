@@ -67,6 +67,13 @@ end
 function OptionVarMetaTable:OnSave()
 end
 
+---Sets OnChange function and calls it
+---@param fn fun(opt: OptionVar)
+function OptionVarMetaTable:Bind(fn)
+    self.OnChange = fn
+    self:OnChange()
+end
+
 ---creates optionvar with default value if there is no saved one with given name
 ---@param modOptionName string
 ---@param subOption string
