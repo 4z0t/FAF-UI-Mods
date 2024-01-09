@@ -1,4 +1,3 @@
-local Options = UMT.Options
 local Opt = UMT.Options.Opt
 UMT.Options.Mods["IEL"] = {
     engineersWithNumbersOption = Opt(false),
@@ -15,6 +14,7 @@ UMT.Options.Mods["IEL"] = {
 }
 
 function Main()
+    local Options = UMT.Options
     local options = UMT.Options.Mods["IEL"]
     Options.AddOptions("IEL", "Idle Engineers Light",
         {
