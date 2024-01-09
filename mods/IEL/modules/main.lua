@@ -11,14 +11,41 @@ local GetUnits = UMT.Units.GetFast
 local Options = UMT.Options.Mods["IEL"]
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local engineersOverlay = Options.engineersOption()
-local engineersOverlayWithNumbers = Options.engineersWithNumbersOption()
-local factoryOverlayWithText = Options.factoryOverlayWithTextOption()
-local factoriesOverlay = Options.factoriesOption()
-local commanderOverlay = Options.commanderOverlayOption()
-local supportCommanderOverlay = Options.supportCommanderOption()
-local tacticalNukesOverlay = Options.tacticalNukesOption()
-local massExtractorsOverlay = Options.massExtractorsOption()
+local engineersOverlay
+local engineersOverlayWithNumbers
+local factoryOverlayWithText
+local factoriesOverlay
+local commanderOverlay
+local supportCommanderOverlay
+local tacticalNukesOverlay
+local massExtractorsOverlay
+
+local function InitOptions()
+    Options.engineersOption:Bind(function(var)
+        engineersOverlay = var()
+    end)
+    Options.commanderOverlayOption:Bind(function(var)
+        commanderOverlay = var()
+    end)
+    Options.engineersWithNumbersOption:Bind(function(var)
+        engineersOverlayWithNumbers = var()
+    end)
+    Options.factoryOverlayWithTextOption:Bind(function(var)
+        factoryOverlayWithText = var()
+    end)
+    Options.factoriesOption:Bind(function(var)
+        factoriesOverlay = var()
+    end)
+    Options.supportCommanderOption:Bind(function(var)
+        supportCommanderOverlay = var()
+    end)
+    Options.tacticalNukesOption:Bind(function(var)
+        tacticalNukesOverlay = var()
+    end)
+    Options.massExtractorsOption:Bind(function(var)
+        massExtractorsOverlay = var()
+    end)
+end
 
 local overlays = UMT.Weak.Value {}
 
@@ -318,29 +345,6 @@ local function CreateUnitOverlays()
 end
 
 function Main(isReplay)
+    InitOptions()
     AddBeatFunction(CreateUnitOverlays, true)
-    Options.engineersOption.OnChange = function(var)
-        engineersOverlay = var()
-    end
-    Options.commanderOverlayOption.OnChange = function(var)
-        commanderOverlay = var()
-    end
-    Options.engineersWithNumbersOption.OnChange = function(var)
-        engineersOverlayWithNumbers = var()
-    end
-    Options.factoryOverlayWithTextOption.OnChange = function(var)
-        factoryOverlayWithText = var()
-    end
-    Options.factoriesOption.OnChange = function(var)
-        factoriesOverlay = var()
-    end
-    Options.supportCommanderOption.OnChange = function(var)
-        supportCommanderOverlay = var()
-    end
-    Options.tacticalNukesOption.OnChange = function(var)
-        tacticalNukesOverlay = var()
-    end
-    Options.massExtractorsOption.OnChange = function(var)
-        massExtractorsOverlay = var()
-    end
 end
