@@ -7,6 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 ---@field _o string
 ---@field _lv LazyVar
 ---@field _prev any
+---@operator call:any
 ---@field OnChange fun(self : OptionVar)
 ---@field OnSave fun(self : OptionVar)
 local OptionVarMetaTable = {}

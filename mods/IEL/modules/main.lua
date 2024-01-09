@@ -345,6 +345,9 @@ local function CreateUnitOverlays()
 end
 
 function Main(isReplay)
+    if isReplay and not Options.activeInReplays() then
+        return
+    end
     InitOptions()
     AddBeatFunction(CreateUnitOverlays, true)
 end
