@@ -3,6 +3,7 @@ do
     local TableGetn = table.getn
     local unpack = unpack
 
+    local options = UMT.Options.Mods["SRD"]
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
 
@@ -87,7 +88,7 @@ do
             end
         end,
 
-        PreviewKey = "SHIFT",
+        PreviewKey = options.previewKey(),
         IsClear = false,
         ActiveRings = {},
 

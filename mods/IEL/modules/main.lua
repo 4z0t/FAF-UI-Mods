@@ -1,7 +1,6 @@
 local IsDestroyed = IsDestroyed
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local UIUtil = import("/lua/ui/uiutil.lua")
-local AddBeatFunction = import("/lua/ui/game/gamemain.lua").AddBeatFunction
 local LazyVar = import("/lua/lazyvar.lua").Create
 
 
@@ -359,5 +358,5 @@ function Main(isReplay)
         scanDelay = var()
     end)
     BindOptions()
-    AddBeatFunction(OnTick, true)
+    import("/lua/ui/game/gamemain.lua").AddBeatFunction(OnTick, true)
 end
