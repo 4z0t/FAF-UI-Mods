@@ -11,7 +11,7 @@ UMT.Options.Mods["IEL"] = {
     engineersOption = Opt(true),
     overlayColor = Opt("ffff00ff"),
     activeInReplays = Opt(true),
-    scanDelay = Opt(1),
+    scanDelay = Opt(10),
 }
 
 function Main()
