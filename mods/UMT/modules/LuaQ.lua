@@ -464,6 +464,39 @@ end)
 ---@field keyvalue LuaQCountKVPipeTable
 count = CreatePipe(LuaQCount, LuaQCountKV)
 
+---@class LuaQPartition : Conditional
+LuaQPartition = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+    local _true = {}
+    local _false = {}
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            TableInsert(_true, v)
+        else
+            TableInsert(_false, v)
+        end
+    end
+    return { _true, _false }
+end)
+
+---@class LuaQPartitionKV : ConditionalKV
+LuaQPartitionKV = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+    local _true = {}
+    local _false = {}
+    for k, v in tbl do
+        if condition(k, v) then
+            _true[k] = v
+        else
+            _false[k] = v
+        end
+    end
+    return { _true, _false }
+end)
+
+---@class LuaQPartitionPipe : LuaQPartition
+---@field keyvalue LuaQPartitionKV
+partition = CreatePipe(LuaQPartition, LuaQPartitionKV)
 
 ---@class ContainsPipeTable
 local LuaQContainsMetaTable = {
