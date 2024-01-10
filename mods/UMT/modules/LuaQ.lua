@@ -498,6 +498,46 @@ end)
 ---@field keyvalue LuaQPartitionKV
 partition = CreatePipe(LuaQPartition, LuaQPartitionKV)
 
+---@class LuaQGroupBy : Selector
+LuaQGroupBy = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+    local result = {}
+
+    for _, v in ipairs(tbl) do
+        local group = selector(v)
+
+        if not result[group] then
+            result[group] = {}
+        end
+
+        TableInsert(result[group], v)
+    end
+
+    return result
+end)
+
+---@class LuaQGroupByKV : SelectorKV
+LuaQGroupByKV = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+    local result = {}
+
+    for k, v in tbl do
+        local group = selector(k, v)
+
+        if not result[group] then
+            result[group] = {}
+        end
+
+        result[group][k] = v
+    end
+
+    return result
+end)
+
+---@class LuaQGroupByPipe : LuaQGroupBy
+---@field keyvalue LuaQGroupByKV
+groupBy = CreatePipe(LuaQGroupBy, LuaQGroupByKV)
+
 ---@class ContainsPipeTable
 local LuaQContainsMetaTable = {
     ---returns if table contains a given value
