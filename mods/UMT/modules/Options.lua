@@ -1,16 +1,5 @@
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Prefs = import('/lua/user/prefs.lua')
-local Window = import('/lua/maui/window.lua').Window
-local Edit = import('/lua/maui/edit.lua').Edit
-local Text = import('/lua/maui/text.lua').Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Control = import('/lua/maui/control.lua').Control
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 local OptionVar = import("OptionVar.lua").Create
 
