@@ -1,3 +1,0 @@
-function Main(isReplay)
-    
-end
