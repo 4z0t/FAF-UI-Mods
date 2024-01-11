@@ -476,7 +476,7 @@ LuaQPartition = MakePipe(function(tbl, self)
             TableInsert(_false, v)
         end
     end
-    return { _true, _false }
+    return { [true] = _true, [false] = _false }
 end)
 
 ---@class LuaQPartitionKV : ConditionalKV
@@ -491,7 +491,7 @@ LuaQPartitionKV = MakePipe(function(tbl, self)
             _false[k] = v
         end
     end
-    return { _true, _false }
+    return { [true] = _true, [false] = _false }
 end)
 
 ---@class LuaQPartitionPipe : LuaQPartition
