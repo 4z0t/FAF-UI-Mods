@@ -89,9 +89,7 @@ MexPanel = UMT.Class(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
-        self.Layouter = UMT.Layouter.FloorLayouter(function()
-            return Options.panelScale() / 100
-        end)
+        self.Layouter = UMT.Layouter.FloorLayouter(UMT.Layouter.Functions.Div(Options.panelScale:Raw(), 100))
 
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
