@@ -1,6 +1,7 @@
 local math = math
 local iscallable = iscallable
 local MathFloor = math.floor
+local MathRound = MATH_IRound
 
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 
@@ -226,6 +227,18 @@ function Floor(n)
         return function() return MathFloor(n()) end
     end
     return MathFloor(n)
+end
+
+---returns function of floor of a given lazyvar
+---@overload fun(n:number):number
+---@overload fun(n:NumberVar):NumberFunction
+---@param n NumberVar
+---@return NumberFunction
+function Round(n)
+    if iscallable(n) then
+        return function() return MathRound(n()) end
+    end
+    return MathRound(n)
 end
 
 function AtCenterOffset(base, baseLen, len, offset, scale)

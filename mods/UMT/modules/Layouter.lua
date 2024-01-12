@@ -588,6 +588,8 @@ Layouter = UMT.Class()
 
 }
 
+local FuncFloor = Functions.Floor
+
 ---@class FloorLayouter:UMT.Layouter
 FloorLayouter = UMT.Class(Layouter)
 {
@@ -598,14 +600,14 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param offset number
     ---@return FunctionalNumber
     AtCenterOffset = function(self, base, baseLen, len, offset)
-        return Functions.Floor(Layouter.AtCenterOffset(self, base, baseLen, len, offset))
+        return FuncFloor(Layouter.AtCenterOffset(self, base, baseLen, len, offset))
     end,
     ---Scales given number / Numbervar
     ---@param self FloorLayouter
     ---@param value FunctionalNumber
     ---@return FunctionalNumber
     ScaleVar = function(self, value)
-        return Functions.Floor(Layouter.ScaleVar(self, value))
+        return FuncFloor(Layouter.ScaleVar(self, value))
     end,
 
     ---Scales given number
@@ -613,7 +615,7 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param value number
     ---@return number
     ScaleNumber = function(self, value)
-        return Functions.Floor(Layouter.ScaleNumber(self, value))
+        return FuncFloor(Layouter.ScaleNumber(self, value))
     end,
 
     ---@param self FloorLayouter
@@ -621,7 +623,7 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
     Sum = function(self, n1, n2)
-        return Functions.Floor(Layouter.Sum(self, n1, n2))
+        return FuncFloor(Layouter.Sum(self, n1, n2))
     end,
 
     ---@param self FloorLayouter
@@ -629,7 +631,7 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
     Diff = function(self, n1, n2)
-        return Functions.Floor(Layouter.Diff(self, n1, n2))
+        return FuncFloor(Layouter.Diff(self, n1, n2))
     end,
 
     ---@param self FloorLayouter
@@ -637,7 +639,7 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
     Max = function(self, n1, n2)
-        return Functions.Floor(Layouter.Max(self, n1, n2))
+        return FuncFloor(Layouter.Max(self, n1, n2))
     end,
 
     ---@param self FloorLayouter
@@ -645,10 +647,77 @@ FloorLayouter = UMT.Class(Layouter)
     ---@param n2 FunctionalNumber
     ---@return FunctionalNumber
     Min = function(self, n1, n2)
-        return Functions.Floor(Layouter.Min(self, n1, n2))
+        return FuncFloor(Layouter.Min(self, n1, n2))
+    end,
+}
+
+local FuncRound = Functions.Round
+
+---@class RoundLayouter:UMT.Layouter
+RoundLayouter = UMT.Class(Layouter)
+{
+    ---@param self RoundLayouter
+    ---@param base FunctionalNumber
+    ---@param baseLen FunctionalNumber
+    ---@param len FunctionalNumber
+    ---@param offset number
+    ---@return FunctionalNumber
+    AtCenterOffset = function(self, base, baseLen, len, offset)
+        return FuncRound(Layouter.AtCenterOffset(self, base, baseLen, len, offset))
+    end,
+    ---Scales given number / Numbervar
+    ---@param self RoundLayouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
+    ScaleVar = function(self, value)
+        return FuncRound(Layouter.ScaleVar(self, value))
+    end,
+
+    ---Scales given number
+    ---@param self RoundLayouter
+    ---@param value number
+    ---@return number
+    ScaleNumber = function(self, value)
+        return FuncRound(Layouter.ScaleNumber(self, value))
+    end,
+
+    ---@param self RoundLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Sum = function(self, n1, n2)
+        return FuncRound(Layouter.Sum(self, n1, n2))
+    end,
+
+    ---@param self RoundLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Diff = function(self, n1, n2)
+        return FuncRound(Layouter.Diff(self, n1, n2))
+    end,
+
+    ---@param self RoundLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Max = function(self, n1, n2)
+        return FuncRound(Layouter.Max(self, n1, n2))
+    end,
+
+    ---@param self RoundLayouter
+    ---@param n1 FunctionalNumber
+    ---@param n2 FunctionalNumber
+    ---@return FunctionalNumber
+    Min = function(self, n1, n2)
+        return FuncRound(Layouter.Min(self, n1, n2))
     end,
 }
 
 
 ---@type UMT.Layouter
 ReusedLayoutFor = FloorLayouter()
+
+---@type UMT.Layouter
+RoundLayoutFor = RoundLayouter()
+
