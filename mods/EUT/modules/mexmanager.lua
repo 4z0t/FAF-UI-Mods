@@ -15,11 +15,29 @@ local Options = UMT.Options.Mods["EUT"]
 
 local mexCategories = import("mexcategories.lua").mexCategories
 
-local upgradeT1 = Options.upgradeT1Option()
-local upgradeT2 = Options.upgradeT2Option()
-local unpauseAssisted = Options.unpauseAssisted()
-local unpauseAssistedBP = Options.unpauseAssistedBP()
-local unpauseOnce = Options.unpauseOnce()
+local upgradeT1
+local upgradeT2
+local unpauseAssisted
+local unpauseAssistedBP
+local unpauseOnce
+
+local function BindOptions()
+    Options.upgradeT1Option:Bind(function(var)
+        upgradeT1 = var()
+    end)
+    Options.upgradeT2Option:Bind(function(var)
+        upgradeT2 = var()
+    end)
+    Options.unpauseAssisted:Bind(function(var)
+        unpauseAssisted = var()
+    end)
+    Options.unpauseAssistedBP:Bind(function(var)
+        unpauseAssistedBP = var()
+    end)
+    Options.unpauseOnce:Bind(function(var)
+        unpauseOnce = var()
+    end)
+end
 
 local mexData = {}
 local toBePaused = {}
@@ -292,22 +310,6 @@ function SelectOnScreen(id)
 end
 
 function init()
-
-    Options.upgradeT1Option.OnChange = function(var)
-        upgradeT1 = var()
-    end
-    Options.upgradeT2Option.OnChange = function(var)
-        upgradeT2 = var()
-    end
-
-    Options.unpauseAssisted.OnChange = function(var)
-        unpauseAssisted = var()
-    end
-    Options.unpauseAssistedBP.OnChange = function(var)
-        unpauseAssistedBP = var()
-    end
-    Options.unpauseOnce.OnChange = function(var)
-        unpauseOnce = var()
-    end
+    BindOptions()
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
 end
