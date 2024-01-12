@@ -1,7 +1,6 @@
 local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
 
-
+local math = math
 
 ---@class StaticScrollable : Group
 ---@field _topLine  integer
@@ -28,7 +27,7 @@ StaticScrollable = Class(Group) {
     end,
 
     ScrollSetTop = function(self, axis, top)
-        top = math.floor(math.max(math.min(self._dataSize - self._numLines + 1, top), 1))
+        top = math.floor(math.clamp(top, 1, self._dataSize - self._numLines + 1))
         if top == self._topLine then return end
         self._topLine = top
         self:CalcVisible()
