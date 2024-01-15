@@ -1,7 +1,3 @@
-local function ExistGlobal(name)
-    return rawget(_G, name) ~= nil
-end
-
 function Main(isReplay)
     if UMT.Version < 11 then
         WARN("EUT requires UMT Version 11 or higher")
