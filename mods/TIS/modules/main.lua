@@ -2,8 +2,8 @@ function main(isReplay)
     if exists('/mods/UMT/mod_info.lua') and import('/mods/UMT/mod_info.lua').version >= 4 then
         local UIUtil = import('/lua/ui/uiutil.lua')
 
-        local GlobalOptions = import('/mods/UMT/modules/GlobalOptions.lua')
-        local OptionsUtils = import('/mods/UMT/modules/OptionsWindow.lua')
+
+        local OptionsUtils = UMT.Options
         local OptionVarCreate = import("/mods/UMT/modules/OptionVar.lua").Create
 
         local Update = import("update.lua")
@@ -48,22 +48,22 @@ function main(isReplay)
         Nuke.init(isReplay, siloOptions)
         Update.init(isReplay)
 
-        GlobalOptions.AddOptions('TIS', 'TeamInfo Share',
+        OptionsUtils.AddOptions('TIS', 'TeamInfo Share',
             { OptionsUtils.Filter('Show exp ovelays', expOptions.overlay),
                 OptionsUtils.Filter('Show nukes and smds ovelays', siloOptions.overlay),
                 OptionsUtils.Title('Nukes and smds', 18, nil, UIUtil.factionTextColor),
                 OptionsUtils.Title('Countdown', 12),
-                OptionsUtils.Slider('Vertical offset',  -20, 20, 1, siloOptions.eta.offsetY),
-                OptionsUtils.Slider('Horizonal offset',  -20, 20, 1, siloOptions.eta.offsetX),
+                OptionsUtils.Slider('Vertical offset', -20, 20, 1, siloOptions.eta.offsetY),
+                OptionsUtils.Slider('Horizonal offset', -20, 20, 1, siloOptions.eta.offsetX),
                 OptionsUtils.Title('Progress', 12),
-                OptionsUtils.Slider('Vertical offset',  -20, 20, 1, siloOptions.progress.offsetY),
-                OptionsUtils.Slider('Horizonal offset',  -20, 20, 1, siloOptions.progress.offsetX),
+                OptionsUtils.Slider('Vertical offset', -20, 20, 1, siloOptions.progress.offsetY),
+                OptionsUtils.Slider('Horizonal offset', -20, 20, 1, siloOptions.progress.offsetX),
                 OptionsUtils.Title('Silo count', 12),
                 OptionsUtils.Slider('Vertical offset', -20, 20, 1, siloOptions.count.offsetY),
-                OptionsUtils.Slider('Horizonal offset',  -20, 20, 1, siloOptions.count.offsetX),
+                OptionsUtils.Slider('Horizonal offset', -20, 20, 1, siloOptions.count.offsetX),
                 OptionsUtils.Title('EXPs', 18, nil, UIUtil.factionTextColor), OptionsUtils.Title('Countdown', 12),
                 OptionsUtils.Slider('Vertical offset', -20, 20, 1, expOptions.eta.offsetY),
-                OptionsUtils.Slider('Horizonal offset',  -20, 20, 1, expOptions.eta.offsetX),
+                OptionsUtils.Slider('Horizonal offset', -20, 20, 1, expOptions.eta.offsetX),
                 OptionsUtils.Title('Progress', 12),
                 OptionsUtils.Slider('Vertical offset', -20, 20, 1, expOptions.progress.offsetY),
                 OptionsUtils.Slider('Horizonal offset', -20, 20, 1, expOptions.progress.offsetX) })

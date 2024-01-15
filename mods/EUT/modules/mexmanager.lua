@@ -5,7 +5,7 @@ local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
-local Select = UMT.Select
+local HiddenSelect = UMT.Units.HiddenSelect
 local GetUnits = UMT.Units.Get
 local From = import("/mods/UMT/modules/linq.lua").From
 
@@ -240,7 +240,7 @@ function UpgradeAll(id, selector)
 end
 
 function UpgradeOnScreen(id, selector)
-    Select.Hidden(function()
+    HiddenSelect(function()
         local mexes = mexData[id].mexes
         mexes = From(mexes)
         UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)

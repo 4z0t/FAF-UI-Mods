@@ -51,7 +51,6 @@ _G.UMT = {
     Controls     = LazyImport("/mods/UMT/modules/Controls/__Init__.lua"),
     Layouter     = LazyImport("/mods/UMT/modules/Layouter.lua"),
     OptionVar    = import("/mods/UMT/modules/OptionVar.lua"),
-    Select       = LazyImport("/mods/UMT/modules/select.lua"),
     Interfaces   = LazyImport("/mods/UMT/modules/Interfaces/__Init__.lua"),
     Views        = LazyImport("/mods/UMT/modules/Views/__Init__.lua"),
     Weak         = import("/mods/UMT/modules/WeakMeta.lua"),
