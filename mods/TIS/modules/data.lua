@@ -5,7 +5,7 @@ local Exp = import('exp.lua')
 local Nuke = import('nuke.lua')
 local Smd = import('smd.lua')
 
-local is_replay 
+local is_replay
 
 function init(isReplay)
     is_replay = isReplay
