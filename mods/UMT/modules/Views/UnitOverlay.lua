@@ -5,7 +5,7 @@ local LazyVar = import('/lua/lazyvar.lua').Create
 ---@field PosX LazyVar<number>
 ---@field PosY LazyVar<number>
 ---@field unit UserUnit
----@field id integer
+---@field string integer
 ---@field offsetX number
 ---@field offsetY number
 UnitOverlay = Class(Bitmap)
