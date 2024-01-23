@@ -6,6 +6,18 @@ local Update = import('update.lua')
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
+---@param parent Control
+---@param label string
+---@param pointSize number
+---@param offsets { offsetX: OptionVar, offsetY: OptionVar }
+---@return Text
+local function OffsettableText(parent, label, pointSize, offsets)
+    local text   = UIUtil.CreateText(parent, label, pointSize, UIUtil.bodyFont)
+    text.offsetX = offsets.offsetX:Raw()
+    text.offsetY = offsets.offsetY:Raw()
+    return text
+end
+
 ---@class TIS.Data
 ---@field id string
 ---@field eta number
@@ -25,13 +37,8 @@ Overlay = Class(Group)
         Group.__init(self, worldview)
         self.worldview = worldview
 
-        self.eta = UIUtil.CreateText(self, '??:??', 10, UIUtil.bodyFont)
-        self.eta.offsetX = option.eta.offsetX:Raw()
-        self.eta.offsetY = option.eta.offsetY:Raw()
-
-        self.progress = UIUtil.CreateText(self, '0%', 9, UIUtil.bodyFont)
-        self.progress.offsetX = option.progress.offsetX:Raw()
-        self.progress.offsetY = option.progress.offsetY:Raw()
+        self.eta = OffsettableText(self, '??:??', 10, option.eta)
+        self.progress = OffsettableText(self, '0%', 9, option.progress)
     end,
 
     ---@param self TIS.Overlay
