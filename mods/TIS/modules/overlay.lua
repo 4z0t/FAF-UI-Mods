@@ -2,7 +2,10 @@ local math = math
 
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Update = import('update.lua')
+local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
+
+local ScaleNumber = LayoutHelpers.ScaleNumber
+local MathFloor = math.floor
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -57,8 +60,20 @@ Overlay = Class(Group)
             :DropShadow(true)
             :DisableHitTest()
 
-        Update.AtCenterInOffset(self.eta, self)
-        Update.AtCenterInOffset(self.progress, self)
+
+        local function AtCenterInOffset(control, parent)
+            control.Left:Set(function()
+                return MathFloor(parent.Left() + (parent.Width() - control.Width()) * 0.5 +
+                    ScaleNumber(control.offsetX()))
+            end)
+            control.Top:Set(function()
+                return MathFloor(parent.Top() + (parent.Height() - control.Height()) * 0.5 +
+                    ScaleNumber(control.offsetY()))
+            end)
+        end
+
+        AtCenterInOffset(self.eta, self)
+        AtCenterInOffset(self.progress, self)
     end,
 
     ---@param self TIS.Overlay
