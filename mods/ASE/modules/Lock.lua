@@ -20,6 +20,7 @@ local Overlay = Class(UOverlay)
     end,
 
     ---@param self UnitOverlay
+    ---@return Vector2?
     GetUnitPosition = function(self)
         local view = self:GetParent()
         local pos = view:Project(self.unit:GetInterpolatedPosition())

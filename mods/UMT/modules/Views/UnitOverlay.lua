@@ -34,6 +34,7 @@ UnitOverlay = Class(Bitmap)
     end,
 
     ---@param self UnitOverlay
+    ---@return Vector2?
     GetUnitPosition = function (self)
         return self:GetParent():GetScreenPos(self.unit)
     end,
