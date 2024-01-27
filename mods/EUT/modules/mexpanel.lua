@@ -97,7 +97,7 @@ MexPanel = UMT.Class(Group) {
         self.Layouter(self)
             :Width(170)
             :Height(60)
-            :EnableHitTest()
+            :DisableHitTest()
             :Over(parent, 100)
 
         self.contents = Group(self)
@@ -106,6 +106,7 @@ MexPanel = UMT.Class(Group) {
             :Width(168)
             :Height(50)
             :AtCenterIn(self)
+            :DisableHitTest()
 
         self:InitMexPanels(self.contents)
     end,
