@@ -79,7 +79,7 @@ local function UpgradeMexes(mexes, selector)
     end
 
     if not table.empty(upgrades) then
-        Select.Hidden(function()
+        HiddenSelect(function()
             for upgradesTo, upMexes in upgrades do
                 SelectUnits(upMexes)
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgradesTo, 1, false)
