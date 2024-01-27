@@ -51,23 +51,15 @@ end
 
 function Main(_isReplay)
     isReplay = _isReplay
-    if not isReplay then
-        if exists("/mods/UMT/mod_info.lua") and import("/mods/UMT/mod_info.lua").version >= 6 then
-            Selection = import("Selection.lua")
-            Lock = import("Lock.lua")
-            Groups = import("Groups.lua")
-            Lock.Main(_isReplay)
-            Selection.Main(_isReplay)
-            BindOptions()
-        else
-            isReplay = true
-            ForkThread(function()
-                WaitSeconds(4)
-                print("Advanced Selection Extension requires UI mod tools version 7 and higher!!!")
-            end)
-            return
-        end
-    end
+    if isReplay then return end
+
+    Selection = import("Selection.lua")
+    Lock = import("Lock.lua")
+    Groups = import("Groups.lua")
+    Lock.Main(_isReplay)
+    Selection.Main(_isReplay)
+    BindOptions()
+
 end
 
 function SelectionChanged(oldSelection, newSelection, added, removed)
