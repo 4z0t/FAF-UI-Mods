@@ -2,7 +2,6 @@ local Lock = import("Lock.lua")
 local IsLocked = Lock.IsLocked
 local IsLockEmpty = Lock.IsEmpty
 local ContainsLocked = Lock.ContainsLocked
-local Options = UMT.Options.Mods["ASE"]
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 local TableGetN = table.getn
 
@@ -108,6 +107,7 @@ function FilterLayer(selection)
 end
 
 function Main(_isReplay)
+    local Options = UMT.Options.Mods["ASE"]
     Options.autoLayer:Bind(function(var)
         isAuto = var()
     end)

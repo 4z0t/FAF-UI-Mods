@@ -2,8 +2,8 @@ local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local LazyVar = import("/lua/lazyvar.lua").Create
 
 
-local locked = setmetatable({}, { __mode = 'k' })
-local overlays = setmetatable({}, { __mode = 'v' })
+local locked = UMT.Weak.Key {}
+local overlays = UMT.Weak.Value {}
 local isReplay
 
 local Overlay = Class(Bitmap)
@@ -92,14 +92,25 @@ local function Toggle(unit)
     end
 end
 
+local LuaQ = UMT.LuaQ
 function ToggleUnits()
     if isReplay then return end
     local selection = GetSelectedUnits()
-    if selection then
+    if not selection then return end
+
+    local allIsLocked = selection | LuaQ.all(function(_, unit) return IsLocked(unit) end)
+    if allIsLocked then
         for _, unit in selection do
-            Toggle(unit)
+            UnLock(unit)
         end
+        print "Unlocked"
+    else
+        for _, unit in selection do
+            Lock(unit)
+        end
+        print "Locked"
     end
+
 end
 
 function ToggleUnit()
