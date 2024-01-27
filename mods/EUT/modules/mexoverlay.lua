@@ -1,3 +1,5 @@
+local IsDestroyed = IsDestroyed
+
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
@@ -9,19 +11,19 @@ local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
 local overlays = UMT.Weak.Value {}
 
-local showOverlay = Options.overlayOption()
-local useNumberOverlay = Options.useNumberOverlay()
+local showOverlay
+local useNumberOverlay
 
 local overlaySize = Options.overlaySize:Raw()
 
 function init()
-    Options.overlayOption.OnChange = function(var)
+    Options.overlayOption:Bind(function(var)
         showOverlay = var()
-    end
+    end)
 
-    Options.useNumberOverlay.OnChange = function(var)
+    Options.useNumberOverlay:Bind(function(var)
         useNumberOverlay = var()
-    end
+    end)
 end
 
 local upgradeColor = "ff00ff00"
