@@ -44,7 +44,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
     ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
-        self.Layouter = UMT.Layouter.FloorLayouter(LazyVar(1))
+        self.Layouter = UMT.Layouter.RoundLayouter(LazyVar(1))
 
         self._focusArmy = GetFocusArmy()
         self._title = false
