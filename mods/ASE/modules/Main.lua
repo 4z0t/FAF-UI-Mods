@@ -81,8 +81,8 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
     local changed = false
     local changedSel
 
-    newSelection, changedSel = Groups.SelectionChanged(oldSelection, newSelection, added, removed)
-    changed = changed or changedSel
+    -- newSelection, changedSel = Groups.SelectionChanged(oldSelection, newSelection, added, removed)
+    -- changed = changed or changedSel
 
     if assisters then
         newSelection, changedSel = Selection.FilterAssisters(newSelection)
