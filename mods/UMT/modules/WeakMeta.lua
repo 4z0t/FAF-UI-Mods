@@ -1,7 +1,8 @@
+local setmetatable = setmetatable
+
 local weakKey = { __mode = 'k' }
 local weakValue = { __mode = 'v' }
 local weakKeyValue = { __mode = 'kv' }
-
 
 
 ---Makes table weak by key
