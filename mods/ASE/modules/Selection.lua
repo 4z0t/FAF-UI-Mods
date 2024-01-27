@@ -2,7 +2,9 @@ local Lock = import("Lock.lua")
 local IsLocked = Lock.IsLocked
 local IsLockEmpty = Lock.IsEmpty
 local ContainsLocked = Lock.ContainsLocked
-local Options = import("Options.lua")
+local Options = UMT.Options.Mods["ASE"]
+local EntityCategoryFilterDown = EntityCategoryFilterDown
+local TableGetN = table.getn
 
 
 local layers = { "NAVAL", "LAND", "AIR" }
@@ -10,7 +12,7 @@ local activeLayer = "LAND"
 
 
 -- determines whether last selected units not containing active category replace active actegory
-local isAuto = Options.autoLayer()
+local isAuto
 
 local assistBPs = {
     -- t1 scouts
@@ -102,11 +104,11 @@ function FilterLayer(selection)
         return selection, false
     end
 
-    return filtered, (table.getn(filtered) ~= table.getn(selection))
+    return filtered, (TableGetN(filtered) ~= TableGetN(selection))
 end
 
 function Main(_isReplay)
-    Options.autoLayer.OnChange = function(var)
+    Options.autoLayer:Bind(function(var)
         isAuto = var()
-    end
+    end)
 end

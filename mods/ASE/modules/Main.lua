@@ -33,16 +33,32 @@ local function SelectIgnored(units)
     ignored = false
 end
 
+local layer
+local locked
+local assisters
+function BindOptions()
+    local Options = UMT.Options.Mods["ASE"]
+    Options.assisterFilter:Bind(function(opt)
+        assisters = opt()
+    end)
+    Options.layerFilter:Bind(function(opt)
+        layer = opt()
+    end)
+    Options.lockedFilter:Bind(function(opt)
+        locked = opt()
+    end)
+end
+
 function Main(_isReplay)
     isReplay = _isReplay
     if not isReplay then
         if exists("/mods/UMT/mod_info.lua") and import("/mods/UMT/mod_info.lua").version >= 6 then
-            import("Options.lua").Main(_isReplay)
             Selection = import("Selection.lua")
             Lock = import("Lock.lua")
             Groups = import("Groups.lua")
             Lock.Main(_isReplay)
             Selection.Main(_isReplay)
+            BindOptions()
         else
             isReplay = true
             ForkThread(function()
@@ -68,18 +84,20 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
     newSelection, changedSel = Groups.SelectionChanged(oldSelection, newSelection, added, removed)
     changed = changed or changedSel
 
-    newSelection, changedSel = Selection.FilterAssisters(newSelection)
-    changed = changed or changedSel
+    if assisters then
+        newSelection, changedSel = Selection.FilterAssisters(newSelection)
+        changed = changed or changedSel
+    end
 
+    if locked then
+        newSelection, changedSel = Selection.FilterLocked(newSelection)
+        changed = changed or changedSel
+    end
 
-    newSelection, changedSel = Selection.FilterLocked(newSelection)
-    changed = changed or changedSel
-
-
-    newSelection, changedSel = Selection.FilterLayer(newSelection)
-    changed = changed or changedSel
-
-
+    if layer then
+        newSelection, changedSel = Selection.FilterLayer(newSelection)
+        changed = changed or changedSel
+    end
 
     if changed then
         ForkThread(SelectIgnored, newSelection)
