@@ -1,4 +1,4 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 import("Views/__Init__.lua")
 local Utils = import("Utils.lua")
 local ArmyViews = import("ArmyView.lua")
@@ -9,9 +9,7 @@ local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
 local LazyVar = import('/lua/lazyvar.lua').Create
 
-
-local LazyImport = UMT.LazyImport
-local Scores = LazyImport("/lua/ui/game/score.lua")
+local Scores = UMT.LazyImport("/lua/ui/game/score.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -29,7 +27,7 @@ local slideForward = UMT.Animation.Factory.Base
     :Create()
 
 
----@class ScoreBoard : Group, ILayoutable
+---@class ScoreBoard : UMT.Group
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
 ---@field protected _armyViews table<integer, ArmyView>
 ---@field protected _title TitlePanel
@@ -37,7 +35,7 @@ local slideForward = UMT.Animation.Factory.Base
 ---@field protected _focusArmy integer
 ---@field protected _lines ArmyView[]
 ---@field protected isHovered boolean
-ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+ScoreBoard = UMT.Class(Group)
 {
     ---@param self ScoreBoard
     ---@param parent Control
