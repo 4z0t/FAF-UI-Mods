@@ -33,11 +33,15 @@ UnitOverlay = Class(Bitmap)
         self:SetNeedsFrameUpdate(true)
     end,
 
+    ---@param self UnitOverlay
+    GetUnitPosition = function (self)
+        return self:GetParent():GetScreenPos(self.unit)
+    end,
 
     ---updates the position of the unit overlay on screen
     ---@param self UnitOverlay
     Update = function(self)
-        local pos = self:GetParent():GetScreenPos(self.unit)
+        local pos = self:GetUnitPosition()
         if pos then
             self:Show()
             self.PosX:Set(pos.x)

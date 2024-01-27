@@ -1,45 +1,32 @@
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
-local LazyVar = import("/lua/lazyvar.lua").Create
-
-
 local locked = UMT.Weak.Key {}
 local overlays = UMT.Weak.Value {}
 local isReplay
 
-local Overlay = Class(Bitmap)
-{
-    __init = function(self, parent, unit)
-        Bitmap.__init(self, parent)
+local UOverlay = UMT.Views.UnitOverlay
 
-        self:Hide()
-        self:DisableHitTest()
-        self.id = unit:GetEntityId()
-        self.unit = unit
-        self.view = parent
+---@class LockOverlay : UnitOverlay
+local Overlay = Class(UOverlay)
+{
+    ---@param self LockOverlay
+    ---@param parent WorldView
+    ---@param unit UserUnit
+    __init = function(self, parent, unit)
+        UOverlay.__init(self, parent, unit)
+
         self.offsetX = 5
         self.offsetY = 5
-        self.PosX = LazyVar()
-        self.PosY = LazyVar()
-        self.Left:Set(function()
-            return parent.Left() + self.PosX() - self.Width() / 2 + self.offsetX + 1
-        end)
-        self.Top:Set(function()
-            return parent.Top() + self.PosY() - self.Height() / 2 + self.offsetY + 1
-        end)
-        self:SetTexture("/mods/ASE/textures/lock_icon.dds", 0)
-        self:SetNeedsFrameUpdate(true)
 
+        self:SetTexture("/mods/ASE/textures/lock_icon.dds", 0)
     end,
 
-    Update = function(self)
-        local pos = self.view:GetScreenPos(self.unit)
-        if pos then
-            self:Show()
-            self.PosX:Set(pos.x)
-            self.PosY:Set(pos.y)
-        else
-            self:Hide()
+    ---@param self UnitOverlay
+    GetUnitPosition = function(self)
+        local view = self:GetParent()
+        local pos = view:Project(self.unit:GetInterpolatedPosition())
+        if view.Left() > pos.x or view.Right() < pos.x or view.Top() > pos.y or view.Bottom() < pos.y then
+            return
         end
+        return pos
     end,
 
     OnFrame = function(self, delta)
