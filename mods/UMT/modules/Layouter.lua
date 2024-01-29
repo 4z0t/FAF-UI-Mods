@@ -492,6 +492,17 @@ Layouter = UMT.Class()
             :ResetHeight()
     end,
 
+    ---Reset position of the control, keeps width and height
+    ---@param self UMT.Layouter
+    ---@return UMT.Layouter
+    ResetPosition = function(self)
+        return self
+            :ResetTop()
+            :ResetLeft()
+            :ResetRight()
+            :ResetBottom()
+    end,
+
     ---applies default scale in callback function
     ---@param self UMT.Layouter
     ---@param callback fun(layouter: UMT.Layouter)
@@ -720,4 +731,3 @@ ReusedLayoutFor = FloorLayouter()
 
 ---@type UMT.Layouter
 RoundLayoutFor = RoundLayouter()
-
