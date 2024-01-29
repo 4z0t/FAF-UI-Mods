@@ -66,5 +66,3 @@ _G.UMT = {
     ColorUtils   = import("/mods/UMT/modules/ColorUtils.lua"),
     Mods         = import("/mods/UMT/modules/Mods.lua")
 }
-
-_G.UMT = UMT.Prevent.EditOf(_G.UMT)

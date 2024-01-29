@@ -1,6 +1,5 @@
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 Functions = import("LayoutFunctions.lua")
-local LazyVar = import("/lua/lazyvar.lua").Create
 
 local defaultScale = LayoutHelpers.GetPixelScaleFactor()
 
