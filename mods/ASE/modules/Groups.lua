@@ -1,5 +1,5 @@
 local groups = {}
-
+local TableGetN = table.getn
 
 local function Contains(tbl, entry)
     for i, v in ipairs(tbl) do
@@ -71,7 +71,7 @@ local function FilterUnitsInGroups(selection)
         return selection, false
     end
 
-    return newSelection, (table.getn(newSelection) ~= table.getn(selection))
+    return newSelection, TableGetN(newSelection) ~= TableGetN(selection)
 end
 
 function AssignGroup()
@@ -103,7 +103,7 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
 
     if not lastSelectedUnit then
         -- selected one unit, but we didn't have one before
-        if not table.empty(newSelection) and table.getn(newSelection) == 1 then
+        if not table.empty(newSelection) and TableGetN(newSelection) == 1 then
 
             lastSelectedUnit = newSelection[1]
             groupId = nil
@@ -122,7 +122,7 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
     else
 
         --selected one, but it isnt same one
-        if not table.empty(newSelection) and table.getn(newSelection) == 1 then
+        if not table.empty(newSelection) and TableGetN(newSelection) == 1 then
             if newSelection[1] ~= lastSelectedUnit then
                 lastSelectedUnit = nil
                 return newSelection, false
@@ -130,8 +130,8 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
         end
 
         --double clicked, we get all unit of same type
-        if table.getn(EntityCategoryFilterDown(categories[lastSelectedUnit:GetBlueprint().BlueprintId], newSelection)) ==
-            table.getn(newSelection)
+        if TableGetN(EntityCategoryFilterDown(categories[lastSelectedUnit:GetBlueprint().BlueprintId], newSelection)) ==
+            TableGetN(newSelection)
         then
             lastSelectedUnit = nil
             -- we found group that unit belongs to

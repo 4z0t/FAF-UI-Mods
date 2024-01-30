@@ -1,6 +1,3 @@
-local Prefs = import('/lua/user/prefs.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local Text = import('/lua/maui/text.lua').Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
