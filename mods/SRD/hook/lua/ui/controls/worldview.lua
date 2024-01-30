@@ -80,7 +80,9 @@ do
         ---@param spec any
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
-            self:SetCustomRender(self:GetName() ~= "MiniMap")
+            if self.SetCustomRender then
+                self:SetCustomRender(self:GetName() ~= "MiniMap")
+            end
         end,
         OnRenderWorld = function(self, delta)
             for _, ring in self.ActiveRings do
