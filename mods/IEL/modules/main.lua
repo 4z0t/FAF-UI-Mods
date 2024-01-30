@@ -219,20 +219,22 @@ local FactoryOverlay = Class(Overlay)
     end,
 
     UpdateState = function(self)
-        if self.unit:IsDead() or not factoriesOverlay then
+        local unit = self.unit
+        if unit:IsDead() or not factoriesOverlay then
             self:Destroy()
             return
         end
-        if self.unit:IsIdle() then
+        local focus = unit:GetFocus()
+        if unit:IsIdle() then
             self:SetFrame(1)
             self.showState = true
-        elseif self.unit:IsRepeatQueue() and self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("ENGINEER") then
+        elseif unit:IsRepeatQueue() and focus and focus:IsInCategory("ENGINEER") then
             self:SetFrame(3)
             self.showState = true
-        elseif self.unit:IsRepeatQueue() then
+        elseif unit:IsRepeatQueue() then
             self:SetFrame(0)
             self.showState = true
-        elseif self.unit:GetFocus() and self.unit:GetFocus():IsInCategory("FACTORY") then
+        elseif focus and focus:IsInCategory("FACTORY") then
             self:SetFrame(2)
             self.showState = true
         else
