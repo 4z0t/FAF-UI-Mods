@@ -49,6 +49,56 @@
         ],
         "description": "class with layout interface"
     },
+    "uigroup": {
+        "body": [
+            "local Group = UMT.Controls.Group"
+            "---@class ${1:class} : UMT.Group",
+            "${1:class} = UMT.Class(Group)",
+            "{",
+            "",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      Group.__init(self, parent)",
+            "",
+            "   end,",
+            "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "",
+            "   end,",
+            "}"
+        ],
+        "prefix": [
+            "uigroup"
+        ],
+        "description": "UI class inherited from UMT.Group"
+    },
+    "uibitmap": {
+        "body": [
+            "local Bitmap = UMT.Controls.Bitmap"
+            "---@class ${1:class} : UMT.Bitmap",
+            "${1:class} = UMT.Class(Bitmap)",
+            "{",
+            "",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      Bitmap.__init(self, parent)",
+            "",
+            "   end,",
+            "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "",
+            "   end,",
+            "}"
+        ],
+        "prefix": [
+            "uibitmap"
+        ],
+        "description": "UI class inherited from UMT.Bitmap"
+    },
     "classscrollable": {
         "body": [
             "${1:class} = Class(IScrollable)",
