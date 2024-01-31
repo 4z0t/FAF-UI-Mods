@@ -108,6 +108,9 @@ MexPanel = UMT.Class(Group) {
             :AtCenterIn(self)
             :DisableHitTest()
 
+    end,
+
+    InitLayout = function(self)
         self:InitMexPanels(self.contents)
     end,
 

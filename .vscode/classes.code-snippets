@@ -36,10 +36,10 @@
             "end,",
             "",
             "__post_init = function(self)",
-            "   self:_Layout()",
+            "   self:InitLayout()",
             "end,",
             "",
-            "_Layout = function(self)",
+            "InitLayout = function(self)",
             "end,",
             "",
             "}"

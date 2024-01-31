@@ -156,7 +156,7 @@ DataPanel = UMT.Class(Group)
 
     ---@param self DataPanel
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
 
 
         local dropdownsCount = table.getn(self._dropdowns)

@@ -161,10 +161,10 @@ local OptionLine = Class(Group)
         end
     end,
     __post_init = function(self, parent)
-        self:_Layout(parent)
+        self:InitLayout(parent)
     end,
 
-    _Layout = function(self, parent)
+    InitLayout = function(self, parent)
 
         LayoutFor(self._bg)
             :Fill(self)
@@ -221,7 +221,7 @@ local OptionSelector = Class(DynamicScrollable)
     end,
 
     __post_init = function(self, parent)
-        self:_Layout(parent)
+        self:InitLayout(parent)
         self:_InitLines()
         self:CalcVisible()
     end,
@@ -252,7 +252,7 @@ local OptionSelector = Class(DynamicScrollable)
         self:Setup(1, index)
     end,
 
-    _Layout = function(self, parent)
+    InitLayout = function(self, parent)
 
 
         LayoutFor(self._title)

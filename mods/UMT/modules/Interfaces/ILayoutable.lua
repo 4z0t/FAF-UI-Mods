@@ -27,19 +27,17 @@ ILayoutable = ClassSimple
                 self._clearLayout = nil
             end
 
-            self._layout = nil
-
             if layout then
-                self._clearLayout = layout(self, self.Layouter)
                 self._layout = layout
+                self._clearLayout = layout(self, self.Layouter)
             else
-                self:_Layout(self.Layouter)
+                self:InitLayout(self.Layouter)
             end
         end,
         ---@param self ILayoutable
         ---@return fun(control: ILayoutable, layouter?:ULayouter)
         get = function(self)
-            local layout = self._layout or self._Layout
+            local layout = self._layout or self.InitLayout
             ---@param control ILayoutable
             ---@param layouter? ULayouter
             return function(control, layouter)
@@ -65,8 +63,12 @@ ILayoutable = ClassSimple
     },
 
     ---@param self ILayoutable
+    __post_init = function (self)
+        self:Layout()
+    end,
+
+    ---@param self ILayoutable
     ---@param layouter ULayouter
-    _Layout = function(self, layouter)
-        error "Not implemented _Layout method!"
+    InitLayout = function(self, layouter)
     end
 }

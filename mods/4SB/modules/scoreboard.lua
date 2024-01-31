@@ -73,7 +73,7 @@ ScoreBoard = UMT.Class(Group)
 
     ---@param self ScoreBoard
     ---@param layouter LayouterFunctor
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         if self._title then
             layouter(self._title)
                 :AtRightTopIn(self)
@@ -294,10 +294,10 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
 
 
     __post_init = function(self)
-        self:_Layout()
+        self:InitLayout()
     end,
 
-    _Layout = function(self)
+    InitLayout = function(self)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)

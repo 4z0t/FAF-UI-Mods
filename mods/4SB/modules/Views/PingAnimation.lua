@@ -76,12 +76,8 @@ PingAnimation = UMT.Class(Group)
         self:_InitLayers(count)
     end,
 
-    __post_init = function(self, parent)
-        self:Layout()
 
-    end,
-
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         self:_LayoutLayers(layouter)
     end,
 

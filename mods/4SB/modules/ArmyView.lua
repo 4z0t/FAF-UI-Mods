@@ -92,15 +92,10 @@ ArmyView = UMT.Class(Group)
         self._name = Text(self)
     end,
 
-    ---@param self ArmyView
-    __post_init = function(self)
-        self:Layout()
-    end,
-
     ---Layouts ArmyView
     ---@param self ArmyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
@@ -374,8 +369,8 @@ AllyView = UMT.Class(ArmyView)
 
     ---@param self AllyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
-        ArmyView._Layout(self, layouter)
+    InitLayout = function(self, layouter)
+        ArmyView.InitLayout(self, layouter)
 
         layouter(self._unitsBtn)
             :AtHorizontalCenterIn(self._faction)
@@ -565,8 +560,8 @@ ReplayArmyView = UMT.Class(ArmyView)
 
     ---@param self ReplayArmyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
-        ArmyView._Layout(self, layouter)
+    InitLayout = function(self, layouter)
+        ArmyView.InitLayout(self, layouter)
 
         local first
         local dataSize = table.getn(self._data)
