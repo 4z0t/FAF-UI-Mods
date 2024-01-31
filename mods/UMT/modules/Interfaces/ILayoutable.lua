@@ -27,8 +27,9 @@ ILayoutable = ClassSimple
                 self._clearLayout = nil
             end
 
-            if layout then
-                self._layout = layout
+            self._layout = layout
+            
+            if self._layout then
                 self._clearLayout = layout(self, self.Layouter)
             else
                 self:InitLayout(self.Layouter)
@@ -63,7 +64,7 @@ ILayoutable = ClassSimple
     },
 
     ---@param self ILayoutable
-    __post_init = function (self)
+    __post_init = function(self)
         self:Layout()
     end,
 
