@@ -53,6 +53,8 @@ ScoreBoard = UMT.Class(Group)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
         self:ResetWidthComponents()
+        self:_InitArmyViews()
+        self._mode = "income"
     end,
 
     ---@param self ScoreBoard
@@ -60,15 +62,6 @@ ScoreBoard = UMT.Class(Group)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
         ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
-    end,
-
-    ---@param self ScoreBoard
-    __post_init = function(self)
-
-        self:_InitArmyViews()
-        self:Layout()
-
-        self._mode = "income"
     end,
 
     ---@param self ScoreBoard
@@ -286,15 +279,13 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
 
-        self._armiesContainer = ArmyViewsContainer(self)
-        self._teamsContainer = TeamViewsContainer(self)
         self._obs = ObserverPanel(self)
         self._dataPanel = DataPanel(self)
     end,
 
-
-    __post_init = function(self)
-        self:InitLayout()
+    _InitArmyViews = function (self)
+        self._armiesContainer = ArmyViewsContainer(self)
+        self._teamsContainer = TeamViewsContainer(self)
     end,
 
     InitLayout = function(self)
