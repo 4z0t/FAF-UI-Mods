@@ -28,16 +28,20 @@
     },
     "classlayoutable": {
         "body": [
-            "${1:class} = Class(${2:Base})",
+            "---@class ${1:class} : ${2:Base}",
+            "${1:class} = UMT.Class(${2:Base})",
             "{",
             "",
-            "__init = function(self, parent)",
-            "   ${2:Base}.__init(self, parent)",
-            "end,",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      ${2:Base}.__init(self, parent)",
             "",
-            "InitLayout = function(self)",
-            "end,",
+            "   end,",
             "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "   end,",
             "}"
         ],
         "prefix": [
