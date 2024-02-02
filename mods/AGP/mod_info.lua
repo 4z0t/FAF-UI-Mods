@@ -1,0 +1,13 @@
+name = "Actions Grid Panel"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+icon = "/mods/AGP/icon.png"
+uid = "actions-grid-panel-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
+__umt = true
+AGP = "ExampleHandler"

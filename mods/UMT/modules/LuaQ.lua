@@ -322,6 +322,26 @@ end)
 ---@type LuaQValuesPipeTable
 values = CreatePipe(LuaQValues)
 
+---Returns table with concatinated tables inside given one
+---```lua
+--- ... | concat
+---```
+---@class LuaQConcatPipeTable
+LuaQConcat = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        for _, el in v do
+            TableInsert(result, el)
+        end
+    end
+
+    return result
+end)
+
+---@type LuaQConcatPipeTable
+concat = CreatePipe(LuaQConcat)
+
 ---Returns table with only keys of the given table
 ---```lua
 --- ... | keys

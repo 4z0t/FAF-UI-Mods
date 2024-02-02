@@ -1,38 +1,8 @@
 local LuaQ = UMT.LuaQ
 
-
--- -- look for template that can be built
--- function availableTemplate(allTemplates, buildable)
---     local effectiveTemplates = {}
---     local effectiveIcons = {}
---     for templateIndex, template in allTemplates do
---         local valid = true
---         for _, entry in template.templateData do
---             if type(entry) == 'table' then
---                 if entry.id then
---                     if not table.find(buildable, entry.id) then -- factory templates
---                         valid = false
---                         break
---                     end
---                 else
---                     if not table.find(buildable, entry[1]) then -- build templates
---                         valid = false
---                         break
---                     end
---                 end
---             end
---         end
---         if valid then
---             template.templateID = templateIndex
---             table.insert(effectiveTemplates, template)
---             table.insert(effectiveIcons, template.icon)
---         end
---     end
---     return effectiveTemplates, effectiveIcons
--- end
+local TemplateUtils = import("/mods/ContextTemplates/modules/TemplateUtils.lua")
 
 function buildActionTemplateContext(modifier, context)
-    LOG(context)
     local options = Prefs.GetFromCurrentProfile('options')
 
     -- Reset everything that could be fading or running
@@ -41,8 +11,8 @@ function buildActionTemplateContext(modifier, context)
 
     -- Find all avaiable templates
     local allTemplates = Templates.GetTemplates()
-    if (not allTemplates) or table.empty(allTemplates) then
-        return
+    if not allTemplates or table.empty(allTemplates) then
+        return false
     end
 
     local effectiveTemplates = {}
@@ -53,18 +23,15 @@ function buildActionTemplateContext(modifier, context)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
     -- Allow all races to build other races templates
-    local currentFaction = selection[1]:GetBlueprint().General.FactionName
+    local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+    local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
     if options.gui_all_race_templates ~= 0 and currentFaction then
+        local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
         local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"] = { "uab", "xab", "dab" },
-                ["UEF"] = { "ueb", "xeb", "deb" },
-                ["CYBRAN"] = { "urb", "xrb", "drb" },
-                ["SERAPHIM"] = { "xsb", "usb", "dsb" },
-            }
-            for i, prefix in prefixes[string.upper(currentFaction)] do
-                if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                    return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+            for i, prefix in prefixes do
+                local convertedID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+                if table.find(buildableUnits, convertedID) then
+                    return convertedID
                 end
             end
             return false
@@ -76,9 +43,9 @@ function buildActionTemplateContext(modifier, context)
             for _, entry in template.templateData do
                 if type(entry) == 'table' then
                     if not table.find(buildableUnits, entry[1]) then
-                        entry[1] = ConvertID(entry[1])
+                        local convertedID = ConvertID(entry[1])
                         converted = true
-                        if not table.find(buildableUnits, entry[1]) then
+                        if not table.find(buildableUnits, convertedID) then
                             valid = false
                             break
                         end
@@ -90,15 +57,18 @@ function buildActionTemplateContext(modifier, context)
                     template.icon = ConvertID(template.icon)
                 end
                 local found = false
-                for _, entry in template.templateData do
+                local index = nil
+                for i, entry in template.templateData do
                     if type(entry) == 'table' then
                         if entry[1] == context or ConvertID(entry[1]) == ConvertID(context) then
                             found = true
+                            index = i
                             break
                         end
                     end
                 end
                 if found then
+                    template = TemplateUtils.CenterTemplateToIndex(template, index)
                     template.templateID = templateIndex
                     table.insert(effectiveTemplates, template)
                     table.insert(effectiveIcons, template.icon)
@@ -110,7 +80,9 @@ function buildActionTemplateContext(modifier, context)
     end
 
     local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then return end
+    if maxPos == 0 then
+        return false
+    end
 
     cycleUnits(maxPos, '_templates' .. context, effectiveIcons, selection, modifier)
 
@@ -146,6 +118,7 @@ function buildActionTemplateContext(modifier, context)
             end
         end
     end
+    return true
 end
 
 local _buildActionTemplate = buildActionTemplate
@@ -153,8 +126,11 @@ function buildActionTemplate(modifier)
 
     local info = GetRolloverInfo()
     if info and info.blueprintId ~= "unknown" then
-        buildActionTemplateContext(modifier, info.blueprintId)
-        return
+        if __blueprints[info.blueprintId].CategoriesHash["STRUCTURE"] then
+            if buildActionTemplateContext(modifier, info.blueprintId) then
+                return
+            end
+        end
     end
 
     _buildActionTemplate(modifier)
