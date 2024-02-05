@@ -1,3 +1,7 @@
+local next = next
+local table = table
+local IsDestroyed = IsDestroyed
+
 local ActionsGridPanel = import("ActionsGridPanel.lua").ActionsGridPanel
 
 local LuaQ = UMT.LuaQ
@@ -73,8 +77,6 @@ Panel = UMT.Class(ActionsGridPanel)
             end
             return oa < ob
         end)
-
-        local next = next
 
         if table.empty(actions) then
             self:Hide()
