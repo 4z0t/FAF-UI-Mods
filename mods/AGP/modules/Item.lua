@@ -2,6 +2,8 @@ local Bitmap = UMT.Controls.Bitmap
 local IComponentable = import("IComponentable.lua").IComponentable
 local options = UMT.Options.Mods["AGP"]
 
+local itemSize = options.itemSize:Raw()
+
 ---@class Item : UMT.Bitmap, IComponentable
 ---@field _activeComponent string
 ---@field _grid ActionsGridPanel
@@ -24,8 +26,8 @@ Item = UMT.Class(Bitmap, IComponentable)
     ---@param layouter UMT.Layouter
     InitLayout = function(self, layouter)
         layouter(self)
-            :Width(options.itemSize:Raw())
-            :Height(options.itemSize:Raw())
+            :Width(itemSize)
+            :Height(itemSize)
             :Color("99000000")
     end,
 
