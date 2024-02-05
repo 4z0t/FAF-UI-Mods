@@ -106,12 +106,12 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
     ---@param self ActionsGridPanel
     ---@param item Item
-    ---@param ix number
-    ---@param iy number
-    PositionItem = function(self, item, ix, iy)
+    ---@param row number
+    ---@param column number
+    PositionItem = function(self, item, row, column)
         self.Layouter(item)
-            :AtLeftIn(self, OffsetFn(ix - 1, itemSize))
-            :AtTopIn(self, OffsetFn(iy - 1, itemSize))
+            :AtTopIn(self, OffsetFn(row - 1, itemSize))
+            :AtLeftIn(self, OffsetFn(column - 1, itemSize))
     end,
 
     ---@param self ActionsGridPanel
@@ -129,13 +129,13 @@ ActionsGridPanel = UMT.Class(Bitmap)
     Resize = function(self)
         self:ClearGrid()
 
-        local nx = self._nx()
-        local ny = self._ny()
+        local ncolumns = self._nx()
+        local nrows = self._ny()
 
         self._items = {}
-        for x = 1, nx do
+        for x = 1, nrows do
             self._items[x] = {}
-            for y = 1, ny do
+            for y = 1, ncolumns do
                 self._items[x][y] = Item(self)
             end
         end
