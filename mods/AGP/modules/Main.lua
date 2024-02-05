@@ -52,7 +52,7 @@ Panel = UMT.Class(ActionsGridPanel)
 
     ---@param self Panel
     ---@param selection UserUnit[]
-    OnSelectionChanged = function(self, selection)
+    GetActions = function(self, selection)
         local order = self._order
         local actions = {}
 
@@ -77,6 +77,14 @@ Panel = UMT.Class(ActionsGridPanel)
             end
             return oa < ob
         end)
+
+        return actions
+    end,
+
+    ---@param self Panel
+    ---@param selection UserUnit[]
+    OnSelectionChanged = function(self, selection)
+        local actions = self:GetActions(selection)
 
         if table.empty(actions) then
             self:Hide()
