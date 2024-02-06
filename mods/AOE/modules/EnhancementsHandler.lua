@@ -42,6 +42,7 @@ local bpIDtoUpgradeChains = {
 }
 
 ---@param unit  UserUnit
+---@return string[]?
 local function GetAvailableUpgrades(unit)
     local bpID = unit:GetBlueprint().BlueprintId:lower()
     local chains = bpIDtoUpgradeChains[bpID]
