@@ -29,13 +29,7 @@ local SelectorLine = Class(Group)
         self._name = UIUtil.CreateText(self, '', 14, UIUtil.bodyFont, true)
         self.selector = selector
         self._bg.OnCheck = function(bg, checked)
-            LOG(self.data.name)
             self.selector:OnSelect(self.id, checked)
-            -- if IsDestroyed(optionsWindows[self.id]) then
-            --     optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
-            --         self.id, self.data[2])
-            --     optionsSelector:Destroy()
-            -- end
         end
     end,
 
