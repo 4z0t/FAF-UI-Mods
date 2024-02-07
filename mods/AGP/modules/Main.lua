@@ -6,6 +6,31 @@ local ActionsGridPanel = import("ActionsGridPanel.lua").ActionsGridPanel
 
 local LuaQ = UMT.LuaQ
 
+local extensions = {}
+local function LoadExtensions()
+    local l = __active_mods
+        | LuaQ.where(function(v) return v.AGP and v.ui_only end)
+        | LuaQ.select(function(modInfo)
+            local modFolder = string.sub(modInfo.location, 7)
+            local className = modInfo.AGP
+
+            local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
+            for _, file in files do
+                local class = import(file)[className]
+                LOG("AGP: added " .. modFolder .. " : " .. className)
+                return { ("%s.%s"):format(modFolder, className), class }
+            end
+            error(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
+        end)
+
+    for i, info in l do
+        local name         = info[1]
+        local handlerClass = info[2]
+
+        extensions[name] = handlerClass
+    end
+end
+
 ---@class Panel : ActionsGridPanel
 ---@field _selectionHandlers table<string, ISelectionHandler>
 ---@field _order table<string, number>
@@ -132,6 +157,7 @@ function Main(isReplay)
 
     local GM = import("/lua/ui/game/gamemain.lua")
     GM.ObserveSelection:AddObserver(OnSelectionChanged)
+    LoadExtensions()
 
     ForkThread(function()
         WaitSeconds(1)
@@ -147,4 +173,21 @@ function Main(isReplay)
         LayoutFor(constructionPanelControls.constructionGroup)
             :AnchorToLeft(panel, 20)
     end)
+end
+
+---@type Selector
+local selector
+local Selector = import("Selector.lua").Selector
+function CreateSelector()
+    if IsDestroyed(selector) then
+        selector = Selector(GetFrame(0))
+        local info = extensions | LuaQ.select.keyvalue(function(name, class)
+            return {
+                name = class.Name or name,
+                description = class.Description or "NO DESCRIPTION",
+            }
+        end)
+        selector:SetData(info)
+        selector:CalcVisible()
+    end
 end
