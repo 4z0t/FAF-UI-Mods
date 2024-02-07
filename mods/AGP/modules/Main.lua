@@ -185,22 +185,22 @@ end
 local selector
 local Selector = import("Selector.lua").Selector
 function CreateSelector()
-    if IsDestroyed(selector) then
-        selector = Selector(GetFrame(0))
-        ---@param self Selector
-        ---@param id string
-        ---@param enabled boolean
-        selector.OnSelect = function(self, id, enabled)
-            local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
-            extensions[id].enabled = enabled
-            activeExtensions[id] = enabled
-            Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
-        end
-        selector.OnClose = function(self)
-            if IsDestroyed(panel) then return end
-            panel:Resize()
-        end
-        selector:SetData(extensions)
-        selector:CalcVisible()
+    if not IsDestroyed(selector) then return end
+
+    selector = Selector(GetFrame(0))
+    ---@param self Selector
+    ---@param id string
+    ---@param enabled boolean
+    selector.OnSelect = function(self, id, enabled)
+        local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
+        extensions[id].enabled = enabled
+        activeExtensions[id] = enabled
+        Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
     end
+    selector.OnClose = function(self)
+        if IsDestroyed(panel) then return end
+        panel:Resize()
+    end
+    selector:SetData(extensions)
+    selector:CalcVisible()
 end
