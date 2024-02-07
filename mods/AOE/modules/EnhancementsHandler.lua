@@ -67,6 +67,7 @@ end
 EnhancementsHandler = Class(ISelectionHandler)
 {
     Name = "ACU Enhancements",
+    Description = "Extension providing ACU enhamcements",
     Enabled = true,
     ---@param self ExampleHandler
     ---@param selection UserUnit[]

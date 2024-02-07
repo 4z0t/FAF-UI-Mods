@@ -7,6 +7,7 @@ local IItemComponent = import("IItemComponent.lua").IItemComponent
 ExampleHandler = Class(ISelectionHandler)
 {
     Name = "Example extension",
+    Description = "Extension for testing purposes",
     Enabled = false,
     ---@param self ExampleHandler
     ---@param selection UserUnit[]

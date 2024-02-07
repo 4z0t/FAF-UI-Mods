@@ -26,7 +26,8 @@ local SelectorLine = Class(Group)
             UIUtil.SkinnableFile('/MODS/disabled.dds'),
             'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
 
-        self._name = UIUtil.CreateText(self, '', 14, UIUtil.bodyFont, true)
+        self._name = UIUtil.CreateText(self, '', 14, UIUtil.titleFont, true)
+        self._description = UIUtil.CreateText(self, '', 11, UIUtil.factionFont, true)
         self.selector = selector
         self._bg.OnCheck = function(bg, checked)
             self.selector:OnSelect(self.id, checked)
@@ -45,12 +46,16 @@ local SelectorLine = Class(Group)
             :Disable()
 
         LayoutFor(self._name)
-            :Color('FFE9ECE9')
+            :Color(UIUtil.factionTextColor)
             :DisableHitTest()
-            :AtLeftIn(self, 5)
-            :AtVerticalCenterIn(self)
+            :AtLeftTopIn(self, 5, 2)
+
+        LayoutFor(self._description)
+            :Below(self._name, 5)
+            :DisableHitTest()
+
         LayoutFor(self)
-            :Height(30)
+            :Height(50)
             :Over(parent)
     end,
 
@@ -62,6 +67,7 @@ local SelectorLine = Class(Group)
             self.id = id
             self.data = data
             self._name:SetText(data.name)
+            self._description:SetText(data.description)
             self._bg:Enable()
             self._bg:SetCheck(data.enabled, true)
         else
