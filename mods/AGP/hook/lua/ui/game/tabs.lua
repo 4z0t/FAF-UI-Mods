@@ -6,5 +6,5 @@ do
             tooltip = 'TODO'
         })
     end
-    actions['AGP'] = import('/mods/AGP/modules/Main.lua').CreateSelector
+    actions['AGP'] = function() return import('/mods/AGP/modules/Main.lua').CreateSelector() end
 end

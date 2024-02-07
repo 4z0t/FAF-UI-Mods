@@ -6,10 +6,6 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local DynamicScrollable = UMT.Views.DynamicScrollable
 local EscapeCover = UMT.Views.EscapeCover
 
----@class ExtensionInfo
----@field name string
----@field description string
-
 ---@class SelectorLine : Group
 ---@field data ExtensionInfo
 ---@field id string
@@ -34,7 +30,7 @@ local SelectorLine = Class(Group)
         self.selector = selector
         self._bg.OnCheck = function(bg, checked)
             LOG(self.data.name)
-            self.selector:OnSelect(self.id)
+            self.selector:OnSelect(self.id, checked)
             -- if IsDestroyed(optionsWindows[self.id]) then
             --     optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
             --         self.id, self.data[2])
@@ -73,7 +69,7 @@ local SelectorLine = Class(Group)
             self.data = data
             self._name:SetText(data.name)
             self._bg:Enable()
-            self._bg:SetCheck(false, true)
+            self._bg:SetCheck(data.enabled, true)
         else
             self._name:SetText('')
             self._bg:Disable()
@@ -99,10 +95,12 @@ Selector = Class(DynamicScrollable)
         self._bg = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
 
         self._quitButton.OnClick = function(button, modifiers)
+            self:OnClose()
             self:Destroy()
         end
 
         self._cover.OnClose = function(cover)
+            self:OnClose()
             self:Destroy()
         end
 
@@ -115,7 +113,7 @@ Selector = Class(DynamicScrollable)
 
     ---@param self Selector
     ---@param id string
-    OnSelect = function(self, id)
+    OnSelect = function(self, id, enabled)
         LOG(id)
     end,
 
@@ -191,6 +189,9 @@ Selector = Class(DynamicScrollable)
 
     DataIter = function(self, key, data)
         return next(data, key)
+    end,
+
+    OnClose = function(self)
     end,
 
     OnDestroy = function(self)

@@ -3,11 +3,20 @@ local table = table
 local IsDestroyed = IsDestroyed
 
 local ActionsGridPanel = import("ActionsGridPanel.lua").ActionsGridPanel
+local Prefs = import('/lua/user/prefs.lua')
 
 local LuaQ = UMT.LuaQ
 
+---@class ExtensionInfo
+---@field name string
+---@field description string
+---@field class ISelectionHandler
+---@field enabled boolean
+
+---@type table<string, ExtensionInfo>
 local extensions = {}
 local function LoadExtensions()
+    local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
     local l = __active_mods
         | LuaQ.where(function(v) return v.AGP and v.ui_only end)
         | LuaQ.select(function(modInfo)
@@ -26,9 +35,20 @@ local function LoadExtensions()
     for i, info in l do
         local name         = info[1]
         local handlerClass = info[2]
+        local enabled      = activeExtensions[name]
 
-        extensions[name] = handlerClass
+        if enabled == nil then
+            enabled = handlerClass.Enabled
+        end
+        activeExtensions[name] = enabled
+        extensions[name] = {
+            name = handlerClass.Name or name,
+            description = handlerClass.Description or "NO DESCRIPTION",
+            class = handlerClass,
+            enabled = enabled,
+        }
     end
+    Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
 end
 
 ---@class Panel : ActionsGridPanel
@@ -40,35 +60,21 @@ Panel = UMT.Class(ActionsGridPanel)
     LoadExtensions = function(self)
         self._selectionHandlers = {}
         self._order = {}
-        local l = __active_mods
-            | LuaQ.where(function(v) return v.AGP and v.ui_only end)
-            | LuaQ.select(function(modInfo)
-                local modFolder = string.sub(modInfo.location, 7)
-                local className = modInfo.AGP
 
-                local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
-                for _, file in files do
-                    local class = import(file)[className]
-                    LOG("AGP: added " .. modFolder .. " : " .. className)
-                    return { ("%s.%s"):format(modFolder, className), class }
-                end
-                error(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
-            end)
-
-        for i, info in l do
-            local name         = info[1]
-            local handlerClass = info[2]
-
-            self._selectionHandlers[name] = handlerClass(self)
-            self._order[name]             = i
+        local i = 0
+        for name, info in pairs(extensions) do
+            if info.enabled then
+                self._selectionHandlers[name] = info.class(self)
+                self._order[name]             = i
+            end
+            i = i + 1
         end
     end,
 
     ---@param self Panel
     OnResized = function(self)
-        if not self._selectionHandlers then
-            self:LoadExtensions()
-        end
+        self:LoadExtensions()
+
         for name, handler in self._selectionHandlers do
             self:AddItemComponent(name, handler.ComponentClass)
         end
@@ -181,13 +187,20 @@ local Selector = import("Selector.lua").Selector
 function CreateSelector()
     if IsDestroyed(selector) then
         selector = Selector(GetFrame(0))
-        local info = extensions | LuaQ.select.keyvalue(function(name, class)
-            return {
-                name = class.Name or name,
-                description = class.Description or "NO DESCRIPTION",
-            }
-        end)
-        selector:SetData(info)
+        ---@param self Selector
+        ---@param id string
+        ---@param enabled boolean
+        selector.OnSelect = function(self, id, enabled)
+            local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
+            extensions[id].enabled = enabled
+            activeExtensions[id] = enabled
+            Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
+        end
+        selector.OnClose = function(self)
+            if IsDestroyed(panel) then return end
+            panel:Resize()
+        end
+        selector:SetData(extensions)
         selector:CalcVisible()
     end
 end
