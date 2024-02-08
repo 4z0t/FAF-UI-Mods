@@ -153,11 +153,20 @@ local OptionLine = Class(Group)
         self._name = UIUtil.CreateText(self, '', 14, UIUtil.bodyFont, true)
 
         self._bg.OnCheck = function(bg, checked)
-            if IsDestroyed(optionsWindows[self.id]) then
-                optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
-                    self.id, self.data[2])
-                optionsSelector:Destroy()
+            if not IsDestroyed(optionsWindows[self.id]) then return end
+
+            if iscallable(self.data[2]) then
+                optionsWindows[self.id] = self.data[2](parent:GetRootFrame())
+            else
+                optionsWindows[self.id] = OptionsWindow(
+                    parent:GetRootFrame(),
+                    self.data[1],
+                    self.id,
+                    self.data[2]
+                )
             end
+
+            optionsSelector:Destroy()
         end
     end,
     __post_init = function(self, parent)
@@ -304,8 +313,7 @@ local OptionSelector = Class(DynamicScrollable)
 --- adds options window builder for a mod
 ---@param option string
 ---@param title string
----@param buildTable table
----@return nil
+---@param buildTable table|fun(frame:Frame):Control
 function AddOptions(option, title, buildTable)
     globalOptions[option] = { title, buildTable }
 end
