@@ -19,4 +19,8 @@ function Main()
         Options.Slider("Space", 0, 10, 1, options.space, 4),
         --Options.Slider("Height", 10, 64, 1, options.itemHeight, 4),
     })
+
+    Options.AddOptions("AGP_Ext", "Actions Grid Extensions", function(parent)
+        return import("/mods/AGP/modules/Main.lua").CreateSelector(parent)
+    end)
 end

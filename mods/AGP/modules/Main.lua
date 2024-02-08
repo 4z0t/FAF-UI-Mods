@@ -181,13 +181,10 @@ function Main(isReplay)
     end)
 end
 
----@type Selector
-local selector
 local Selector = import("Selector.lua").Selector
-function CreateSelector()
-    if not IsDestroyed(selector) then return end
-
-    selector = Selector(GetFrame(0))
+function CreateSelector(parent)
+    ---@type Selector
+    local selector = Selector(parent)
     ---@param self Selector
     ---@param id string
     ---@param enabled boolean
@@ -203,4 +200,5 @@ function CreateSelector()
     end
     selector:SetData(extensions)
     selector:CalcVisible()
+    return selector
 end
