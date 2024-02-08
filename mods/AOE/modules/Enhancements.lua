@@ -53,7 +53,8 @@ end
 
 ---@param unit UserUnit
 ---@param enhancement any
-function OrderUnitEnhancement(unit, enhancement)
+---@param noClear? boolean
+function OrderUnitEnhancement(unit, enhancement, noClear)
 
     local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
     if not bpEnhancements then return end
@@ -101,9 +102,7 @@ function OrderUnitEnhancement(unit, enhancement)
 
     table.insert(orders, enhancement)
 
-
-    local cleanOrder = not HasOrderedUpgrades(unit)
-
+    local cleanOrder = not HasOrderedUpgrades(unit) and not noClear
 
     for _, order in orders do
         IssueCommand("UNITCOMMAND_Script",
@@ -140,8 +139,10 @@ function HasPrerequisite(unit, prerequisite)
     end)
 end
 
-function OrderEnhancement(enhancement)
+---@param enhancement string
+---@param noClearOrders? boolean
+function OrderEnhancement(enhancement, noClearOrders)
     ApplyToSelectedUnits(function(unit)
-        OrderUnitEnhancement(unit, enhancement)
+        OrderUnitEnhancement(unit, enhancement, noClearOrders)
     end)
 end

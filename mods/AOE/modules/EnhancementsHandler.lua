@@ -14,8 +14,8 @@ local bpIDtoUpgradeChains = {
         { "CoolingUpgrade", },
         { "AdvancedEngineering", "T3Engineering", },
         { "StealthGenerator", "FAF_SelfRepairSystem", "CloakingGenerator", },
-        { "MicrowaveLaserGenerator", },
         { "ResourceAllocation" },
+        { "MicrowaveLaserGenerator", },
         { "Teleporter" },
     },
     ["uel0001"] = {
@@ -116,8 +116,10 @@ EnhancementsHandler = Class(ISelectionHandler)
                 :Disable()
             self.btn.mClickCue = "UI_MFD_Click"
             self.btn.mRolloverCue = "UI_MFD_Rollover"
-            self.btn.OnClick = function()
-                Enhancements.OrderEnhancement(self.name)
+            ---@param button Button
+            ---@param modifiers EventModifiers
+            self.btn.OnClick = function(button, modifiers)
+                Enhancements.OrderEnhancement(self.name, modifiers.Shift)
                 item:UpdatePanel()
             end
         end,
