@@ -36,12 +36,11 @@ function GetAllInstalledEnhancements(unit)
     local enhancements = {}
 
     for _, enh in existingEnhancements do
-        table.insert(enhancements, enh)
-        local prerequisite = bpEnhancements[enh].Prerequisite
-        while prerequisite do
+        local prerequisite = enh
+        repeat
             table.insert(enhancements, prerequisite)
             prerequisite = bpEnhancements[prerequisite].Prerequisite
-        end
+        until prerequisite
     end
 
     return enhancements
