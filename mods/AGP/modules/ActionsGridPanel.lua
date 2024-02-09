@@ -32,7 +32,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
     __init = function(self, parent)
         Bitmap.__init(self, parent)
 
-        self._border = GlowBorder(self)
+        self._border = UMT.Views.WindowFrame(self)
 
         local nx = LazyVar()
         local ny = LazyVar()
@@ -88,7 +88,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
     InitLayout = function(self, layouter)
 
         layouter(self._border)
-            :FillFixedBorder(self, -10)
+            :FillFixedBorder(self, -5)
             :Under(self)
             :DisableHitTest(true)
 
