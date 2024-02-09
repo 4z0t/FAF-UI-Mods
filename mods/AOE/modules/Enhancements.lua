@@ -46,8 +46,28 @@ function GetAllInstalledEnhancements(unit)
     return enhancements
 end
 
+---@param unit UserUnit
+---@param upgrade string
+---@return boolean
 function IsInstalled(unit, upgrade)
-    return GetAllInstalledEnhancements(unit) | LuaQ.contains(upgrade)
+
+    local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return false end
+
+    local existingEnhancements = EnhanceCommon.GetEnhancements(unit:GetEntityId())
+    if not existingEnhancements then return false end
+
+    for _, enh in existingEnhancements do
+        local prerequisite = enh
+        repeat
+            if upgrade == prerequisite then
+                return true
+            end
+            prerequisite = bpEnhancements[prerequisite].Prerequisite
+        until prerequisite
+    end
+
+    return false
 end
 
 ---@param unit UserUnit
