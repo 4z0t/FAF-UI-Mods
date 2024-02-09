@@ -1,7 +1,6 @@
 local Bitmap     = UMT.Controls.Bitmap
 local Item       = import("Item.lua").Item
 local LazyVar    = import('/lua/lazyvar.lua').Create
-local GlowBorder = UMT.Views.GlowBorder
 
 local options = UMT.Options.Mods["AGP"]
 
