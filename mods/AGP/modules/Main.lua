@@ -152,8 +152,6 @@ local panel = nil
 function OnSelectionChanged(info)
     if IsDestroyed(panel) then return end
 
-    if table.empty(info.added) and table.empty(info.removed) then return end
-
     panel:OnSelectionChanged(info.newSelection)
 end
 
