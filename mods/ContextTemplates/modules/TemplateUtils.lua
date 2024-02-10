@@ -13,3 +13,13 @@ function CenterTemplateToIndex(template, index)
     local x, y = entry[3], entry[4]
     return OffsetOn(template, x, y)
 end
+
+function ConvertTemplate(template, converter)
+    local newTemplate = template | UMT.LuaQ.deepcopy
+    for i, entry in newTemplate.templateData do
+        if type(entry) == 'table' then
+            entry[1] = converter(entry[1])
+        end
+    end
+    return newTemplate
+end
