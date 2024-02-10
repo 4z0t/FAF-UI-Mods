@@ -9,7 +9,6 @@ function buildActionTemplateContext(modifier, context)
     -- Reset everything that could be fading or running
     hideCycleMap()
 
-
     -- Find all avaiable templates
     local allTemplates = Templates.GetTemplates()
     if not allTemplates or table.empty(allTemplates) then
@@ -106,7 +105,7 @@ function buildActionTemplateContext(modifier, context)
             if event.Type == 'ButtonPress' then
                 if event.Modifiers.Middle then
                     ClearBuildTemplates()
-                    local tempTemplate = table.deepcopy(template.templateData)
+                    local tempTemplate = template.templateData
                     template.templateData[1] = tempTemplate[2]
                     template.templateData[2] = tempTemplate[1]
                     for i = 3, table.getn(template.templateData) do
