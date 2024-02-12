@@ -1,6 +1,6 @@
-local Bitmap     = UMT.Controls.Bitmap
-local Item       = import("Item.lua").Item
-local LazyVar    = import('/lua/lazyvar.lua').Create
+local Bitmap  = UMT.Controls.Bitmap
+local Item    = import("Item.lua").Item
+local LazyVar = import('/lua/lazyvar.lua').Create
 
 local options = UMT.Options.Mods["AGP"]
 
@@ -26,6 +26,7 @@ end
 ---@field _border GlowBorder
 ActionsGridPanel = UMT.Class(Bitmap)
 {
+    ItemClass = Item,
 
     ---@param self ActionsGridPanel
     __init = function(self, parent)
@@ -135,7 +136,7 @@ ActionsGridPanel = UMT.Class(Bitmap)
         for x = 1, nrows do
             self._items[x] = {}
             for y = 1, ncolumns do
-                self._items[x][y] = Item(self)
+                self._items[x][y] = self.ItemClass(self)
             end
         end
         self:LayoutItems()
@@ -155,5 +156,11 @@ ActionsGridPanel = UMT.Class(Bitmap)
 
     ---@param self ActionsGridPanel
     Update = function(self)
+    end,
+
+    ---@generic T
+    ---@param self ActionsGridPanel
+    ---@return table<string,T>
+    GetExtensionComponentClasses = function(self)
     end,
 }

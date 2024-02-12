@@ -1,5 +1,5 @@
 local Bitmap = UMT.Controls.Bitmap
-local IComponentable = import("IComponentable.lua").IComponentable
+local ILazyComponentable = import("ILazyComponentable.lua").ILazyComponentable
 local options = UMT.Options.Mods["AGP"]
 
 local itemSize = options.itemSize:Raw()
@@ -7,7 +7,7 @@ local itemSize = options.itemSize:Raw()
 ---@class Item : UMT.Bitmap, IComponentable
 ---@field _activeComponent string
 ---@field _grid ActionsGridPanel
-Item = UMT.Class(Bitmap, IComponentable)
+Item = UMT.Class(Bitmap, ILazyComponentable)
 {
 
     ---@param self Item
@@ -84,5 +84,41 @@ Item = UMT.Class(Bitmap, IComponentable)
         Bitmap.OnDestroy(self)
         self:DestroyComponents()
         self._grid = nil
-    end
+    end,
+
+    ---@generic T
+    ---@param self Item
+    ---@return table<string, T>
+    GetClassProvider = function(self)
+        return self._grid:GetExtensionComponentClasses()
+    end,
+}
+
+---@class DebugItem : Item
+---@field text UMT.Text
+DebugItem = UMT.Class(Item)
+{
+    ---@param self DebugItem
+    __init = function(self, parent)
+        Item.__init(self, parent)
+        self.text = UMT.Controls.Text(self)
+        self.text:SetFont('Arial', 16)
+    end,
+
+    ---@param self DebugItem
+    ---@param layouter UMT.Layouter
+    InitLayout = function(self, layouter)
+        Item.InitLayout(self, layouter)
+
+        layouter(self.text)
+            :AtRightTopIn(self, 1, 1)
+            :Over(self, 10)
+            :DisableHitTest()
+    end,
+
+    ---@param self DebugItem
+    DisableComponents = function(self)
+        Item.DisableComponents(self)
+        self.text:SetText(table.getsize(self:GetComponents()))
+    end,
 }

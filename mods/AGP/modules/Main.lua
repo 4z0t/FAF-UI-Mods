@@ -54,18 +54,22 @@ end
 ---@class Panel : ActionsGridPanel
 ---@field _selectionHandlers table<string, ISelectionHandler>
 ---@field _order table<string, number>
+---@field _componentClasses table<string, fun(item:Item):IItemComponent>
 Panel = UMT.Class(ActionsGridPanel)
 {
     ---@param self Panel
     LoadExtensions = function(self)
         self._selectionHandlers = {}
         self._order = {}
+        self._componentClasses = {}
 
         local i = 0
         for name, info in pairs(extensions) do
             if info.enabled then
-                self._selectionHandlers[name] = info.class(self)
+                local handler                 = info.class(self)
+                self._selectionHandlers[name] = handler
                 self._order[name]             = i
+                self._componentClasses[name]  = handler.ComponentClass
             end
             i = i + 1
         end
@@ -74,10 +78,6 @@ Panel = UMT.Class(ActionsGridPanel)
     ---@param self Panel
     OnResized = function(self)
         self:LoadExtensions()
-
-        for name, handler in self._selectionHandlers do
-            self:AddItemComponent(name, handler.ComponentClass)
-        end
         self:Update()
     end,
 
@@ -144,6 +144,15 @@ Panel = UMT.Class(ActionsGridPanel)
         self._selectionHandlers = nil
         self._order = nil
     end,
+
+    ---@generic T
+    ---@param self Panel
+    ---@return table<string,T>
+    GetExtensionComponentClasses = function(self)
+        return self._componentClasses
+    end,
+
+    ItemClass = import("Item.lua").Item
 }
 
 ---@type Panel
