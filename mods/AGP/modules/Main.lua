@@ -179,8 +179,8 @@ function Main(isReplay)
     end)
 end
 
-local Selector = import("Selector.lua").Selector
 function CreateSelector(parent)
+    local Selector = import("Selector.lua").Selector
     ---@type Selector
     local selector = Selector(parent)
     ---@param self Selector
