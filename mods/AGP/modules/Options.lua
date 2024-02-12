@@ -2,10 +2,10 @@ local Options = UMT.Options
 local Opt = UMT.Options.Opt
 
 UMT.Options.Mods["AGP"] = {
-    rows = Opt(4),
-    columns = Opt(4),
-    itemSize = Opt(32),
-    space = Opt(3),
+    rows = Opt(2),
+    columns = Opt(8),
+    itemSize = Opt(48),
+    space = Opt(2),
 }
 
 function Main()
