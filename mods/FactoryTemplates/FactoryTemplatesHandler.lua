@@ -142,6 +142,8 @@ FactoryTemplatesHandler = Class(ISelectionHandler)
         Destroy = function(self)
             self.bg:Destroy()
             self.bg = nil
+            self.name:Destroy()
+            self.name = nil
         end,
     },
 }
