@@ -1,7 +1,7 @@
 name = "Factory Templates"
 version = 1
 copyright = ""
-description = [[]]
+description = [[An Extension for Actions Grid Panel that provides with factory templates actions.]]
 author = "4z0t"
 url = ""
 uid = "factory-templates-v01"
