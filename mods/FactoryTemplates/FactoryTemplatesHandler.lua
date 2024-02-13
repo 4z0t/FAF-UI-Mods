@@ -51,6 +51,7 @@ end
 FactoryTemplatesHandler = Class(ISelectionHandler)
 {
     Name = "Factory Templates",
+    Description = "Extension provides factory templates",
     Enabled = true,
     ---@param self FactoryTemplatesHandler
     ---@param selection UserUnit[]
