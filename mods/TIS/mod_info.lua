@@ -1,6 +1,6 @@
 name = "TeamInfo Share"
-uid = "teaminfo-share-v10"
-version = 10
+uid = "teaminfo-share-v11"
+version = 11
 copyright = ""
 description = [[Shares data in team about nukes, smds and exps completions
 requires UI mod tools]]
