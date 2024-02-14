@@ -109,14 +109,20 @@ function CreateUI(parent)
         ViewModel.SendActiveBuildTable()
     end
 
+    ---@type Edit
     group.edit = Edit(group)
     LayoutFor(group.edit)
-        :AtLeftTopIn(group, 100, 40)
-        :Width(200)
-        :Height(20)
+        :AtTopCenterIn(group, 40)
+        :Width(700)
+        :Height(30)
 
-    UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil,
-        nil, 20)
+    UIUtil.SetupEditStd(group.edit,
+        UIUtil.factionTextColor,
+        nil,
+        UIUtil.highlightColor,
+        UIUtil.consoleBGColor,
+        "Arial", 24, 50
+    )
 
     group.edit.OnEnterPressed = function(self, text)
         return true
@@ -131,7 +137,7 @@ function CreateUI(parent)
         UpdateUI()
     end
     LayoutFor(group.combo)
-        :AtLeftTopIn(group, 50, 20)
+        :LeftOf(group.edit, 20)
         :Width(200)
 
     group.construction = ConstructionScrollArea(group, ViewModel.FetchConstructionBlueprints(), 5)
