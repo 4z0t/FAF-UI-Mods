@@ -319,15 +319,19 @@ BlueprintSelector = Class(Scrollable) {
 }
 DEFAULT_CONSTRUCTION_ITEM_COUNT = 4
 
+---@class ConstructionScrollArea : Scrollable
+---@field _title Text
 ConstructionScrollArea = Class(Scrollable) {
+    ---@param self ConstructionScrollArea
+    ---@param parent Control
+    ---@param blueprints any
+    ---@param itemCount number
     __init = function(self, parent, blueprints, itemCount)
         Scrollable.__init(self, parent)
         LayoutHelpers.DepthOverParent(self, parent, 10)
 
+        self:Setup(1, itemCount or DEFAULT_CONSTRUCTION_ITEM_COUNT, DEFAULT_CONSTRUCTION_ITEM_COUNT)
         self._blueprints = blueprints
-        self._topLine = 1
-        self._numLines = DEFAULT_CONSTRUCTION_ITEM_COUNT
-        self._dataSize = itemCount or DEFAULT_CONSTRUCTION_ITEM_COUNT
         self._swapIndex = false
 
         self._title = UIUtil.CreateText(self, 'Construction', 20, UIUtil.titleFont, true)
@@ -476,8 +480,10 @@ ConstructionScrollArea = Class(Scrollable) {
     end,
 
     DecreaseSize = function(self)
-        if ViewModel.IsEmpty(self._dataSize) and ViewModel.IsEmpty(self._dataSize - 1) and
-            (self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT) then
+        if ViewModel.IsEmpty(self._dataSize) and
+            ViewModel.IsEmpty(self._dataSize - 1) and
+            self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT
+        then
             self._dataSize = self._dataSize - 1
             self._topLine = math.max(math.min(self._dataSize - self._numLines + 1, self._topLine), 1)
         end
