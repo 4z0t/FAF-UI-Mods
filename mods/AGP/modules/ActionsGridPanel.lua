@@ -23,7 +23,6 @@ end
 ---@field _nx LazyNumber
 ---@field _ny LazyNumber
 ---@field _items Item[][]
----@field _border GlowBorder
 ActionsGridPanel = UMT.Class(Bitmap)
 {
     ItemClass = Item,
@@ -31,8 +30,6 @@ ActionsGridPanel = UMT.Class(Bitmap)
     ---@param self ActionsGridPanel
     __init = function(self, parent)
         Bitmap.__init(self, parent)
-
-        self._border = UMT.Views.WindowFrame(self)
 
         local nx = LazyVar()
         local ny = LazyVar()

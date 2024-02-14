@@ -52,11 +52,29 @@ local function LoadExtensions()
 end
 
 ---@class Panel : ActionsGridPanel
+---@field _border GlowBorder
 ---@field _selectionHandlers table<string, ISelectionHandler>
 ---@field _order table<string, number>
 ---@field _componentClasses table<string, fun(item:Item):IItemComponent>
 Panel = UMT.Class(ActionsGridPanel)
 {
+
+    ---@param self Panel
+    __init = function(self, parent)
+        ActionsGridPanel.__init(self, parent)
+        self._border = UMT.Views.WindowFrame(self)
+    end,
+
+    ---@param self Panel
+    ---@param layouter UMT.Layouter
+    InitLayout = function(self, layouter)
+        ActionsGridPanel.InitLayout(self, layouter)
+        layouter(self._border)
+            :FillFixedBorder(self, -5)
+            :Under(self)
+            :DisableHitTest(true)
+    end,
+
     ---@param self Panel
     LoadExtensions = function(self)
         self._selectionHandlers = {}
