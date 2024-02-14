@@ -83,12 +83,6 @@ ActionsGridPanel = UMT.Class(Bitmap)
     ---@param self ActionsGridPanel
     ---@param layouter UMT.Layouter
     InitLayout = function(self, layouter)
-
-        layouter(self._border)
-            :FillFixedBorder(self, -5)
-            :Under(self)
-            :DisableHitTest(true)
-
         layouter(self)
             :Width(OffsetFn(self._nx, itemSize))
             :Height(OffsetFn(self._ny, itemSize))
