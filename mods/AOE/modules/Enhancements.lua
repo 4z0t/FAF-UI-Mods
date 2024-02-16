@@ -40,7 +40,7 @@ function GetAllInstalledEnhancements(unit)
         repeat
             table.insert(enhancements, prerequisite)
             prerequisite = bpEnhancements[prerequisite].Prerequisite
-        until prerequisite
+        until not prerequisite
     end
 
     return enhancements
@@ -64,7 +64,7 @@ function IsInstalled(unit, upgrade)
                 return true
             end
             prerequisite = bpEnhancements[prerequisite].Prerequisite
-        until prerequisite
+        until not prerequisite
     end
 
     return false
