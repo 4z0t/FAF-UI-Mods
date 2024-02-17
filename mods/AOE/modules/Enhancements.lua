@@ -3,7 +3,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
 local LuaQ = UMT.LuaQ
 
-
+---@param unit UserUnit
 function HasOrderedUpgrades(unit)
     if not unit:IsIdle() then
         local cmdqueue = unit:GetCommandQueue()
@@ -26,6 +26,10 @@ function GetBluePrintEnhancements(bp)
     end)
 end
 
+---@alias Upgrade string
+
+---@param unit UserUnit
+---@return Upgrade[]
 function GetAllInstalledEnhancements(unit)
 
     local id = unit:GetEntityId()
@@ -47,7 +51,7 @@ function GetAllInstalledEnhancements(unit)
 end
 
 ---@param unit UserUnit
----@param upgrade string
+---@param upgrade Upgrade
 ---@return boolean
 function IsInstalled(unit, upgrade)
 
@@ -134,6 +138,7 @@ function OrderUnitEnhancement(unit, enhancement, noClear)
     end
 end
 
+---@param fn fun(unit:UserUnit)
 function ApplyToSelectedUnits(fn)
     local selection = GetSelectedUnits()
     if not selection then return end
@@ -146,6 +151,8 @@ function ApplyToSelectedUnits(fn)
     end)
 end
 
+---@param unit UserUnit
+---@param prerequisite Upgrade
 function HasPrerequisite(unit, prerequisite)
 
     local id = unit:GetEntityId()
