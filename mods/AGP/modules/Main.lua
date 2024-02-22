@@ -182,28 +182,33 @@ function OnSelectionChanged(info)
     panel:OnSelectionChanged(info.newSelection)
 end
 
-function Main(isReplay)
-
+function CreatePanel()
     local LayoutFor = UMT.Layouter.ReusedLayoutFor
+    local parent = import("/lua/ui/game/construction.lua").controlClusterGroup
+    panel = Panel(parent)
+    LayoutFor(panel)
+        :AtRightBottomIn(GetFrame(0), 10, 10)
+        :Hide()
+end
 
-    local GM = import("/lua/ui/game/gamemain.lua")
-    GM.ObserveSelection:AddObserver(OnSelectionChanged)
-    LoadExtensions()
-
+function SetLayout()
     ForkThread(function()
-        WaitSeconds(1)
+        WaitSeconds(0.5)
+        if IsDestroyed(panel) then return end
+
+        local LayoutFor = UMT.Layouter.ReusedLayoutFor
         local constructionPanelControls = import("/lua/ui/game/construction.lua").controls
-        local parent = import("/lua/ui/game/construction.lua").controlClusterGroup
-
-        panel = Panel(parent)
-
-        LayoutFor(panel)
-            :AtRightBottomIn(GetFrame(0), 10, 10)
-            :Hide()
 
         LayoutFor(constructionPanelControls.constructionGroup)
             :AnchorToLeft(panel, 20)
     end)
+end
+
+function Main(isReplay)
+    local GM = import("/lua/ui/game/gamemain.lua")
+    GM.ObserveSelection:AddObserver(OnSelectionChanged)
+    LoadExtensions()
+    CreatePanel()
 end
 
 function CreateSelector(parent)
