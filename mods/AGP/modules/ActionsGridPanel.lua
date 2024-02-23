@@ -134,6 +134,13 @@ ActionsGridPanel = UMT.Class(Bitmap)
         self:OnResized()
     end,
 
+    ---@param self ActionsGridPanel
+    ---@param row number
+    ---@param column number
+    ---@return Item
+    GetItem = function(self, row, column)
+        return self._items[row][column]
+    end,
 
     ---@param self ActionsGridPanel
     OnDestroy = function(self)
