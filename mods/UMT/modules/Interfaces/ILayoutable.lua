@@ -28,11 +28,11 @@ ILayoutable = ClassSimple
             end
 
             self._layout = layout
-            
+
             if self._layout then
                 self._clearLayout = layout(self, self.Layouter)
             else
-                self:InitLayout(self.Layouter)
+                self._clearLayout = self:InitLayout(self.Layouter)
             end
         end,
         ---@param self ILayoutable
