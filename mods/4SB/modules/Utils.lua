@@ -28,7 +28,7 @@ end
 ---@field division string
 
 function ShortAIName(name)
-    return string.gsub(name, '(%S+) %((AI[Xx]?): %S+%)', '%1 (%2)')
+    return string.gsub(name, '^(%S+) %((AI[Xx]?): .+%)$', '%1 (%2)')
 end
 
 ---returns army data
@@ -48,7 +48,6 @@ function GetArmiesFormattedTable()
                 if Options.shortenAINickName() then
                     name = ShortAIName(name)
                 end
-                LOG(name)
                 if clanTag ~= "" then
                     name = ("[%s] %s"):format(clanTag, nickname)
                 end
