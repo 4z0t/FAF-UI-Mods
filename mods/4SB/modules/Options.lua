@@ -43,7 +43,7 @@ player = {
 
     color = {
         bg = OptVar4SB("player.color.bg", "66000000"),
-    }
+    },
 }
 
 observer = {
@@ -69,6 +69,8 @@ snowflakesCount = OptVar4SB("snowflakesCount", 50)
 snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
 
 scoreboardScale = OptVar4SB("scoreboardScale", 100)
+
+shortenAINickName = OptVar4SB("shortenAINickName", false)
 
 local Opt = UMT.Options.Opt
 
@@ -104,6 +106,7 @@ function Init(isReplay)
             Options.Filter("Snowflakes in scoreboard", snowflakes, 4),
             Options.Slider("Snowflakes count", 25, 200, 25, snowflakesCount, 4),
             Options.Slider("Snowflakes speed", 10, 200, 10, snowflakesSpeed, 4),
+            Options.Filter("Shorten AI nicknames", shortenAINickName, 4),
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {
