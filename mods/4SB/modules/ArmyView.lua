@@ -566,25 +566,27 @@ ReplayArmyView = UMT.Class(ArmyView)
         local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
+            local dataText = self._data[i]
+            local nextText = self._data[i + 1]
             if i == 1 then
-                layouter(self._data[i])
-                    :AtRightIn(self._data[i + 1], dataTextOffSet)
-                first = self._data[i]
+                layouter(dataText)
+                    :AtRightIn(nextText, dataTextOffSet)
+                first = dataText
             elseif i == dataSize then
-                layouter(self._data[i])
+                layouter(dataText)
                     :AtRightIn(self, lastDataTextOffset)
             else
-                layouter(self._data[i])
-                    :AtRightIn(self._data[i + 1], dataTextOffSet)
+                layouter(dataText)
+                    :AtRightIn(nextText, dataTextOffSet)
             end
-            layouter(self._data[i])
+            layouter(dataText)
                 :AtVerticalCenterIn(self)
                 :Over(self, 15)
                 :DisableHitTest()
                 :DropShadow(true)
-            self._data[i]:SetFont(armyViewDataFont, armyViewTextPointSize)
-            self._data[i]:SetText("0")
-            self._data[i]._contracted = false
+            dataText:SetFont(armyViewDataFont, armyViewTextPointSize)
+            dataText:SetText("0")
+            dataText._contracted = false
         end
 
         layouter(self)
