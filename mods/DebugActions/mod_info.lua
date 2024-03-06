@@ -1,0 +1,11 @@
+name = "Debug Actions"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+uid = "debug-actions-v01"
+exclusive = false
+ui_only = true
+conflicts = {}
+AGP = "DebugActions"
