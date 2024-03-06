@@ -18,7 +18,7 @@ DebugActions = Class(ISelectionHandler)
     ---@param selection UserUnit[]
     ---@return any
     OnSelectionChanged = function(self, selection)
-        if isCheatsEnabled then
+        if isCheatsEnabled and not SessionIsReplay() then
             return self.Actions
         end
     end,
