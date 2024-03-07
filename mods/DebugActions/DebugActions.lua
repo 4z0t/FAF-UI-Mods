@@ -6,7 +6,7 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 
 local LuaQ = UMT.LuaQ
 local sessionInfo = SessionGetScenarioInfo()
-local isCheatsEnabled = sessionInfo.Options.CheatsEnabled
+local isCheatsEnabled = sessionInfo.Options.CheatsEnabled == "true"
 
 ---@class DebugActions : ISelectionHandler
 DebugActions = Class(ISelectionHandler)
