@@ -17,30 +17,37 @@ local LuaQ = UMT.LuaQ
 local extensions = {}
 local function LoadExtensions()
     local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
-    local l = __active_mods
-        | LuaQ.where(function(v) return v.AGP and v.ui_only end)
-        | LuaQ.select(function(modInfo)
-            local modFolder = string.sub(modInfo.location, 7)
+    local l = {}
+    for _, modInfo in __active_mods do
+        if not (modInfo.AGP and modInfo.ui_only) then
+            continue
+        end
 
-            local classes = modInfo.AGP
-            if type(classes) == "table" then
-            elseif type(classes) == "string" then
-                classes = { classes }
-            else
-                WARN("Unsupported type of AGP extension of mod " .. modFolder)
-                return
-            end
+        local modFolder = string.sub(modInfo.location, 7)
 
-            for _, className in classes do
-                local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
-                for _, file in files do
-                    local class = import(file)[className]
-                    LOG("AGP: added " .. modFolder .. " : " .. className)
-                    return { ("%s.%s"):format(modFolder, className), class }
-                end
-                error(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
+        local classes = modInfo.AGP
+        if type(classes) == "table" then
+        elseif type(classes) == "string" then
+            classes = { classes }
+        else
+            WARN("Unsupported type of AGP extension of mod " .. modFolder)
+            return
+        end
+
+        for _, className in classes do
+            local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
+            if table.empty(files) then
+                WARN(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
+                continue
             end
-        end)
+            for _, file in files do
+                local class = import(file)[className]
+                LOG("AGP: added " .. modFolder .. " : " .. className)
+                table.insert(l, { ("%s.%s"):format(modFolder, className), class })
+            end
+        end
+    end
+
 
     for i, info in l do
         local name         = info[1]
