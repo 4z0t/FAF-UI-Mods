@@ -21,15 +21,25 @@ local function LoadExtensions()
         | LuaQ.where(function(v) return v.AGP and v.ui_only end)
         | LuaQ.select(function(modInfo)
             local modFolder = string.sub(modInfo.location, 7)
-            local className = modInfo.AGP
 
-            local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
-            for _, file in files do
-                local class = import(file)[className]
-                LOG("AGP: added " .. modFolder .. " : " .. className)
-                return { ("%s.%s"):format(modFolder, className), class }
+            local classes = modInfo.AGP
+            if type(classes) == "table" then
+            elseif type(classes) == "string" then
+                classes = { classes }
+            else
+                WARN("Unsupported type of AGP extension of mod " .. modFolder)
+                return
             end
-            error(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
+
+            for _, className in classes do
+                local files = DiskFindFiles("/mods/" .. modFolder .. "/", className .. '.lua')
+                for _, file in files do
+                    local class = import(file)[className]
+                    LOG("AGP: added " .. modFolder .. " : " .. className)
+                    return { ("%s.%s"):format(modFolder, className), class }
+                end
+                error(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
+            end
         end)
 
     for i, info in l do
