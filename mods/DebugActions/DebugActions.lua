@@ -16,7 +16,7 @@ DebugActions = Class(ISelectionHandler)
     Enabled = true,
     ---@param self DebugActions
     ---@param selection UserUnit[]
-    ---@return any
+    ---@return string[]?
     OnSelectionChanged = function(self, selection)
         if isCheatsEnabled and not SessionIsReplay() then
             return self.Actions
@@ -33,7 +33,7 @@ DebugActions = Class(ISelectionHandler)
     },
 
     ---@class DAComponent : IItemComponent
-    ---@field data FactoryTemplateData
+    ---@field data string
     ---@field bg UMT.Bitmap
     ---@field name UMT.Text
     ComponentClass = Class(IItemComponent)
