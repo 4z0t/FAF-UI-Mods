@@ -60,6 +60,7 @@ CategoryMatcher = Class()
 ---@field _actions Action[]
 ---@field _category? EntityCategory
 ---@field _matcher false|fun(selection:UserUnit[]?, category:EntityCategory?):boolean
+---@operator call(EntityCategory?): CategoryAction
 CategoryAction = Class()
 {
     ---@param self CategoryAction
