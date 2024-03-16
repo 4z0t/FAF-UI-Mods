@@ -16,6 +16,7 @@ end
 ---@class CategoryMatcher
 ---@field description string
 ---@field _actions CategoryAction[]
+---@operator call(Action[]):CategoryMatcher
 CategoryMatcher = Class()
 {
     __init = function(self, description)
@@ -51,6 +52,14 @@ CategoryMatcher = Class()
                 break
             end
         end
+    end,
+
+    ---@param self CategoryMatcher
+    ---@param other CategoryMatcher
+    Copy = function(self, other)
+        self._actions = table.copy(other._actions)
+        self:Register()
+        return self
     end,
 }
 
@@ -171,7 +180,7 @@ function Main()
         Cursor = 'ATTACK_MOVE',
     }
 
-    CategoryMatcher "Launch missle / attack-reclaim / attack order"
+    local action = CategoryMatcher "Launch missle / attack-reclaim / attack order"
     {
         CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
             :Action 'StartCommandMode order RULEUCC_Nuke',
@@ -188,4 +197,6 @@ function Main()
             end)
             :Action 'StartCommandMode order RULEUCC_Attack',
     }
+    CategoryMatcher "Launch missle / attack-reclaim / attack order - SHIFT version"
+        :Copy(action)
 end
