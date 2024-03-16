@@ -13,6 +13,8 @@ function ProcessAction(name)
     categotyActions[name]:Process(GetSelectedUnits())
 end
 
+---@param name string
+---@param matcher CategoryMatcher
 local function AddAction(name, matcher)
     local formattedName = name:gsub("[^A-Za-z0-9]+", "_")
     categotyActions[formattedName] = matcher
@@ -66,6 +68,7 @@ CategoryMatcher = Class()
         return self
     end,
 
+    ---@param self CategoryMatcher
     AddShiftVersion = function(self)
         AddAction(self.description .. " - SHIFT version", self)
     end,
