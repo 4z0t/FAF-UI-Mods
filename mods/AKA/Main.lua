@@ -141,7 +141,8 @@ CategoryMatcher("Fancy Description")
         :Match(function(selection)
             return selection
                 | LuaQ.all(function(_, unit)
-                    return unit:IsInCategory 'FACTORY' or unit:IsInCategory 'EXTERNALFACTORY'
+                    return unit:IsInCategory 'FACTORY'
+                        or unit:IsInCategory 'EXTERNALFACTORY'
                 end)
         end)
         :Action(function(selection)
@@ -159,5 +160,32 @@ CategoryMatcher("Fancy Description")
 }
 
 
+
 function Main()
+    local CM = import("/lua/ui/game/commandmode.lua")
+
+    local attackMoveModeData = {
+        name = "RULEUCC_Script",
+        AbilityName = 'AttackMove',
+        TaskName = 'AttackMove',
+        Cursor = 'ATTACK_MOVE',
+    }
+
+    CategoryMatcher "Launch missle / attack-reclaim / attack order"
+    {
+        CategoryAction(categories.SILO * categories.STRUCTURE * categories.STRATEGIC)
+            :Action 'StartCommandMode order RULEUCC_Nuke',
+        CategoryAction(categories.SILO * categories.STRUCTURE * categories.TACTICAL)
+            :Action 'StartCommandMode order RULEUCC_Tactical',
+        CategoryAction(categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3)
+            + categories.FACTORY * categories.STRUCTURE - categories.SUBCOMMANDER)
+            :Action(function(selection)
+                CM.StartCommandMode("order", attackMoveModeData)
+            end),
+        CategoryAction()
+            :Match(function(selection, category)
+                return true
+            end)
+            :Action 'StartCommandMode order RULEUCC_Attack',
+    }
 end
