@@ -13,6 +13,20 @@ function ProcessAction(name)
     categotyActions[name]:Process(GetSelectedUnits())
 end
 
+local function AddAction(name, matcher)
+    local formattedName = name:gsub("[^A-Za-z0-9]+", "_")
+    categotyActions[formattedName] = matcher
+    import("/lua/keymap/keymapper.lua").SetUserKeyAction(formattedName,
+        {
+            action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction('" .. formattedName .. "')",
+            category = "AKA"
+        })
+    if import("/lua/keymap/keydescriptions.lua").keyDescriptions[formattedName] then
+        WARN(("Overwriting key action description of '%s'"):format(formattedName))
+    end
+    import("/lua/keymap/keydescriptions.lua").keyDescriptions[formattedName] = name
+end
+
 ---@class CategoryMatcher
 ---@field description string
 ---@field _actions CategoryAction[]
@@ -31,17 +45,7 @@ CategoryMatcher = Class()
 
     ---@param self CategoryMatcher
     Register = function(self)
-        local name = self.description:gsub("[^A-Za-z0-9]+", "_")
-        categotyActions[name] = self
-        import("/lua/keymap/keymapper.lua").SetUserKeyAction(name,
-            {
-                action = "UI_Lua import('/mods/AKA/Main.lua').ProcessAction('" .. name .. "')",
-                category = "AKA"
-            })
-        if import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] then
-            WARN(("Overwriting key action description of '%s'"):format(name))
-        end
-        import("/lua/keymap/keydescriptions.lua").keyDescriptions[name] = self.description
+        AddAction(self.description, self)
     end,
 
     ---@param self CategoryMatcher
@@ -60,6 +64,10 @@ CategoryMatcher = Class()
         self._actions = table.copy(other._actions)
         self:Register()
         return self
+    end,
+
+    AddShiftVersion = function(self)
+        AddAction(self.description .. " - SHIFT version", self)
     end,
 }
 
@@ -180,7 +188,7 @@ function Main()
         Cursor = 'ATTACK_MOVE',
     }
 
-    local action = CategoryMatcher "Launch missle / attack-reclaim / attack order"
+    CategoryMatcher "Launch missle / attack-reclaim / attack order"
     {
         CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
             :Action 'StartCommandMode order RULEUCC_Nuke',
@@ -196,7 +204,6 @@ function Main()
                 return true
             end)
             :Action 'StartCommandMode order RULEUCC_Attack',
-    }
-    CategoryMatcher "Launch missle / attack-reclaim / attack order - SHIFT version"
-        :Copy(action)
+    }:AddShiftVersion()
+
 end
