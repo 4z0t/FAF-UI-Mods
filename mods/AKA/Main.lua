@@ -139,8 +139,10 @@ CategoryMatcher("Fancy Description")
         :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
     CategoryAction()
         :Match(function(selection)
-            return selection |
-                LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' or unit:IsInCategory 'EXTERNALFACTORY' end)
+            return selection
+                | LuaQ.all(function(_, unit)
+                    return unit:IsInCategory 'FACTORY' or unit:IsInCategory 'EXTERNALFACTORY'
+                end)
         end)
         :Action(function(selection)
             local isRepeatBuild = selection
