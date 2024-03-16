@@ -173,9 +173,9 @@ function Main()
 
     CategoryMatcher "Launch missle / attack-reclaim / attack order"
     {
-        CategoryAction(categories.SILO * categories.STRUCTURE * categories.STRATEGIC)
+        CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
             :Action 'StartCommandMode order RULEUCC_Nuke',
-        CategoryAction(categories.SILO * categories.STRUCTURE * categories.TACTICAL)
+        CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH2)
             :Action 'StartCommandMode order RULEUCC_Tactical',
         CategoryAction(categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3)
             + categories.FACTORY * categories.STRUCTURE - categories.SUBCOMMANDER)
