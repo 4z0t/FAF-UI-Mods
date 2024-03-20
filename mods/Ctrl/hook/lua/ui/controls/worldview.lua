@@ -9,34 +9,39 @@ do
 
     local function CopyBuilding()
         local info = GetRolloverInfo()
-        if info and info.blueprintId ~= 'unknown' then
-            local selection = GetSelectedUnits()
-            if not selection then
-                return false
-            end
-            local bp = info.blueprintId
-            local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
+        if not info or info.blueprintId == 'unknown' then
+            return false
+        end
 
-            local buildable = EntityCategoryGetUnitList(buildableCategories)
+        local selection = GetSelectedUnits()
+        if not selection then
+            return false
+        end
 
-            if table.empty(buildable) then
-                return false
-            end
+        local bp = info.blueprintId
+        local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
 
-            local currentFaction = string.upper(selection[1]:GetBlueprint().General.FactionName)
-            for i, prefix in prefixes[currentFaction] do
-                local nbp = string.gsub(bp, "(%a+)(%d+)", prefix .. "%2")
-                if table.find(buildable, nbp) then
-                    ClearBuildTemplates()
-                    CommandMode.StartCommandMode("build", {
-                        name = nbp
-                    })
-                    return true
-                end
+        local buildable = EntityCategoryGetUnitList(buildableCategories)
+
+        if table.empty(buildable) then
+            return false
+        end
+
+        local currentFaction = string.upper(selection[1]:GetBlueprint().General.FactionName)
+        for i, prefix in prefixes[currentFaction] do
+            local nbp = string.gsub(bp, "(%a+)(%d+)", prefix .. "%2")
+            if table.find(buildable, nbp) then
+                ClearBuildTemplates()
+                CommandMode.StartCommandMode("build", {
+                    name = nbp
+                })
+                return true
             end
         end
+
         return false
     end
+
     local _WorldViewHandleEvent = WorldView.HandleEvent
     WorldView = Class(WorldView) {
         ReturnHitTest = false,
