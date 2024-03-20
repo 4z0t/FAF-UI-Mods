@@ -37,7 +37,6 @@ do
         end
         return false
     end
-
     local _WorldViewHandleEvent = WorldView.HandleEvent
     WorldView = Class(WorldView) {
         ReturnHitTest = false,
