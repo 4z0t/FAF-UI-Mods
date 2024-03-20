@@ -54,7 +54,7 @@ do
             -- this one is called very inconsistenly.
             -- when we hold and drag it is called in the end.
             -- but when we just press it, it is not called at all, so we have no idea wheter we clicked
-            -- or dragged, because if we press during command mode again it is called xdddddd
+            -- or dragged, but if we press during command mode again it is called xdddddd
             if event.Type == "ButtonRelease" and self.WasCopying then
                 self.WasCopying = false
                 return event.Modifiers.Ctrl
