@@ -4,19 +4,11 @@ local ForkThread = ForkThread
 local CM = import("/lua/ui/game/commandmode.lua")
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 
-local isMoveLocked = false
-
-
-function IsLocked()
-    return isMoveLocked
-end
-
 function ResetMove()
     ConExecute 'StartCommandMode order RULEUCC_Move'
 end
 
 function Toggle(skip)
-    isMoveLocked = not isMoveLocked
     if not skip then ResetMove() end
 end
 
@@ -43,7 +35,7 @@ function Main(isReplay)
     CM.AddEndBehavior(OnCommandEnded)
 end
 
-KeyMapper.SetUserKeyAction('Ctrl Move', {
+KeyMapper.SetUserKeyAction('Ctrl-Move', {
     action = 'UI_Lua import("/mods/Ctrl/modules/Main.lua").Toggle()',
     category = 'orders'
 })
