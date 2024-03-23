@@ -27,7 +27,6 @@ function OnCommandEnded(commandMode, commandModeData)
     end
 end
 
-local CommandMode = import('/lua/ui/game/commandmode.lua')
 local prefixes = {
     ["AEON"] = { "uab", "xab", "dab", "zab" },
     ["UEF"] = { "ueb", "xeb", "deb", "zeb" },
@@ -60,7 +59,7 @@ local function CopyBuilding()
         local nbp = string.gsub(bp, "(%a+)(%d+)", prefix .. "%2")
         if table.find(buildable, nbp) then
             ClearBuildTemplates()
-            CommandMode.StartCommandMode("build", {
+            CM.StartCommandMode("build", {
                 name = nbp
             })
             return true
