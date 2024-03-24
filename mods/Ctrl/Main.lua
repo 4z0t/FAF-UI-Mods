@@ -18,7 +18,7 @@ local useCtrlCopy
 
 ---@param commandMode CommandMode
 ---@param commandModeData CommandModeData
-function OnCommandEnded(commandMode, commandModeData)
+local function OnCommandEnded(commandMode, commandModeData)
     if not useCtrlMove or not IsKeyDown("Control") then return end
 
     if IsMoveCommand(commandModeData) then
@@ -69,15 +69,16 @@ local function CopyBuilding()
     return false
 end
 
-
 function Main(isReplay)
     if isReplay then return end
 
-    UMT.Options.Mods["Ctrl"].enableCtrlMove:Bind(function(opt)
+    local options = UMT.Options.Mods["Ctrl"]
+
+    options.enableCtrlMove:Bind(function(opt)
         useCtrlMove = opt()
     end)
 
-    UMT.Options.Mods["Ctrl"].enableCtrlCopy:Bind(function(opt)
+    options.enableCtrlCopy:Bind(function(opt)
         useCtrlCopy = opt()
     end)
 
