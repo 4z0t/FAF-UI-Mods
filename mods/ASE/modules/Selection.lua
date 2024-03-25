@@ -216,6 +216,10 @@ local domainsOrders =
 }
 
 local function UpdateDomainsCursor()
+    if isAuto then
+        return
+    end
+
     local cursor = GetCursor()
     if not cursor.domains then
         cursor.domains = CursorDomains(GetFrame(0))
@@ -239,14 +243,21 @@ function FilterLayer(selection)
     local domainOrder = domainsOrders[currentDomainOrder].value
     local filtered
 
-    for _, domain in domainOrder do
-        filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
-        if not table.empty(filtered) then
-            break
+    if isAuto then
+        filtered = EntityCategoryFilterDown(layerCategory[activeLayer], selection)
+    else
+        for _, domain in domainOrder do
+            filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
+            if not table.empty(filtered) then
+                break
+            end
         end
     end
 
     if table.empty(filtered) then
+        if isAuto then
+            AutoLayer(selection)
+        end
         return selection, false
     end
     return filtered, (TableGetN(filtered) ~= TableGetN(selection))
