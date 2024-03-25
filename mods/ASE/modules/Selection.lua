@@ -10,6 +10,98 @@ local layers = { "NAVAL", "LAND", "AIR" }
 local activeLayer = "LAND"
 
 
+
+local domainColors = {
+    NAVAL = "ff00ABC9",
+    AIR = "ffffffff",
+    LAND = "ff005E0C",
+}
+
+local Bitmap = UMT.Controls.Bitmap
+
+---@class CursorDomains : UMT.Bitmap
+---@field top UMT.Bitmap
+---@field middle UMT.Bitmap
+---@field bottom UMT.Bitmap
+local CursorDomains = UMT.Class(Bitmap)
+{
+
+    ---@param self CursorDomains
+    ---@param cursor UICursor
+    __init = function(self, parent)
+        Bitmap.__init(self, parent)
+
+        self.top = Bitmap(self)
+        self.middle = Bitmap(self)
+        self.bottom = Bitmap(self)
+    end,
+
+    ---@param self CursorDomains
+    ---@param layouter UMT.Layouter
+    InitLayout = function(self, layouter)
+        local size = 8
+        local padding = 1
+        local blockSize = size - padding * 2
+        layouter(self)
+            :AtLeftTopIn(self:GetParent())
+            :DisableHitTest(true)
+            :Width(size)
+            :Height(size * 3 - padding * 4)
+            :Color("black")
+            :NeedsFrameUpdate(true)
+
+        layouter(self.top)
+            :Color("white")
+            :AtTopCenterIn(self, padding)
+            :Width(blockSize)
+            :Height(blockSize)
+
+        layouter(self.middle)
+            :Color("white")
+            :AtCenterIn(self)
+            :Width(blockSize)
+            :Height(blockSize)
+
+        layouter(self.bottom)
+            :Color("white")
+            :AtBottomCenterIn(self, padding)
+            :Width(blockSize)
+            :Height(blockSize)
+    end,
+
+    ---@param self CursorDomains
+    OnFrame = function(self, delta)
+        if IsKeyDown("Control") then
+            self:Show()
+            local v = GetMouseScreenPos()
+            self:Layouter()
+                :Top(v[2])
+                :Left(v[1] + 30)
+        else
+            self:Hide()
+        end
+    end,
+
+    ---@param self CursorDomains
+    SetDomainsOrder = function(self, domainOrder)
+        local top = domainOrder[1]
+        local middle = domainOrder[2]
+        local bottom = domainOrder[3]
+
+        self.top:SetSolidColor(domainColors[top])
+        self.middle:SetSolidColor(domainColors[middle])
+        self.bottom:SetSolidColor(domainColors[bottom])
+    end,
+
+    OnDestroy = function(self)
+        Bitmap.OnDestroy(self)
+        self.top = nil
+        self.middle = nil
+        self.bottom = nil
+    end
+}
+
+
 -- determines whether last selected units not containing active category replace active actegory
 local isAuto
 
@@ -123,6 +215,13 @@ local domainsOrders =
     { key = "AIR   > NAVAL > LAND", value = { "AIR", "NAVAL", "LAND" } },
 }
 
+local function UpdateDomainsCursor()
+    local cursor = GetCursor()
+    if not cursor.domains then
+        cursor.domains = CursorDomains(GetFrame(0))
+    end
+    cursor.domains:SetDomainsOrder(domainsOrders[currentDomainOrder].value)
+end
 
 function RotateDomains()
     local k, v = next(domainsOrders, currentDomainOrder)
@@ -132,6 +231,8 @@ function RotateDomains()
     end
     print(v.key)
     currentDomainOrder = k
+
+    UpdateDomainsCursor()
 end
 
 function FilterLayer(selection)
@@ -156,4 +257,6 @@ function Main(_isReplay)
     Options.autoLayer:Bind(function(var)
         isAuto = var()
     end)
+
+    UpdateDomainsCursor()
 end
