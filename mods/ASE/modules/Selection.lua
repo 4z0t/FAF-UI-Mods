@@ -190,7 +190,7 @@ end
 local exoticUnitsLandCategory = categories.xsl0305 + categories.xal0305 -- sniper bots
     + categories.LAND * categories.MOBILE * categories.SILO -- mmls
     + categories.MOBILE * categories.ARTILLERY * categories.TECH3 -- mobile arty
-    + categories.dal0310
+    + categories.dal0310 - categories.COMMAND - categories.SUBCOMMANDER
 
 -- ---@type EntityCategory
 -- local exoticUnitsAirCategory = categories.
