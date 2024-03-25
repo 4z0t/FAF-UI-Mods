@@ -69,9 +69,12 @@ do
         {
             action = "UI_Lua import('/mods/ASE/modules/Groups.lua').RemoveFromGroups()",
             category = 'Advanced Selection Extension',
-
         })
-
+    KeyMapper.SetUserKeyAction('Rotate Domain order',
+        {
+            action = "UI_Lua import('/mods/ASE/modules/Selection.lua').RotateDomains()",
+            category = 'Advanced Selection Extension',
+        })
 
 
 end

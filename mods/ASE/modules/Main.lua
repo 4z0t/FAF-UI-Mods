@@ -1,3 +1,5 @@
+local ForkThread = ForkThread
+
 local Selection
 local Lock
 local Groups
@@ -36,6 +38,7 @@ end
 local layer
 local locked
 local assisters
+local exotic
 function BindOptions()
     local Options = UMT.Options.Mods["ASE"]
     Options.assisterFilter:Bind(function(opt)
@@ -46,6 +49,9 @@ function BindOptions()
     end)
     Options.lockedFilter:Bind(function(opt)
         locked = opt()
+    end)
+    Options.exoticFilter:Bind(function(opt)
+        exotic = opt()
     end)
 end
 
@@ -88,6 +94,11 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
 
     if layer then
         newSelection, changedSel = Selection.FilterLayer(newSelection)
+        changed = changed or changedSel
+    end
+
+    if exotic then
+        newSelection, changedSel = Selection.FilterExotic(newSelection)
         changed = changed or changedSel
     end
 

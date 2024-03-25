@@ -28,7 +28,7 @@ local assistBPs = {
 }
 
 local layerCategory = {
-    NAVAL = categories.NAVAL,
+    NAVAL = categories.NAVAL, -- + categories.LAND * categories.HOVER,
     AIR = categories.AIR,
     LAND = categories.LAND,
 }
@@ -94,15 +94,60 @@ function AutoLayer(selection)
     end
 end
 
-function FilterLayer(selection)
-    local filtered = EntityCategoryFilterDown(layerCategory[activeLayer], selection)
-    if table.empty(filtered) then
-        if isAuto then
-            AutoLayer(selection)
-        end
+---@type EntityCategory
+local exoticUnitsLandCategory = categories.xsl0305 + categories.xal0305 -- sniper bots
+    + categories.LAND * categories.MOBILE * categories.SILO -- mmls
+    + categories.MOBILE * categories.ARTILLERY * categories.TECH3 -- mobile arty
+    + categories.dal0310
+
+-- ---@type EntityCategory
+-- local exoticUnitsAirCategory = categories.
+
+
+function FilterExotic(selection)
+    local filtered = EntityCategoryFilterOut(exoticUnitsLandCategory, selection)
+    if TableGetN(filtered) == TableGetN(selection) or table.empty(filtered) then
         return selection, false
     end
+    return filtered, true
+end
 
+local currentDomainOrder = 3
+local domainsOrders =
+{
+    { key = "NAVAL > LAND  > AIR", value = { "NAVAL", "LAND", "AIR" } },
+    { key = "NAVAL > AIR   > LAND", value = { "NAVAL", "AIR", "LAND" } },
+    { key = "LAND  > AIR   > NAVAL", value = { "LAND", "AIR", "NAVAL" } },
+    { key = "LAND  > NAVAL > AIR", value = { "LAND", "NAVAL", "AIR" } },
+    { key = "AIR   > LAND  > NAVAL", value = { "AIR", "LAND", "NAVAL" } },
+    { key = "AIR   > NAVAL > LAND", value = { "AIR", "NAVAL", "LAND" } },
+}
+
+
+function RotateDomains()
+    local k, v = next(domainsOrders, currentDomainOrder)
+    if k == nil then
+        k = 1
+        v = domainsOrders[1]
+    end
+    print(v.key)
+    currentDomainOrder = k
+end
+
+function FilterLayer(selection)
+    local domainOrder = domainsOrders[currentDomainOrder].value
+    local filtered
+
+    for _, domain in domainOrder do
+        filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
+        if not table.empty(filtered) then
+            break
+        end
+    end
+
+    if table.empty(filtered) then
+        return selection, false
+    end
     return filtered, (TableGetN(filtered) ~= TableGetN(selection))
 end
 
