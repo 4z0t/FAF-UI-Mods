@@ -7,6 +7,10 @@ UMT.Options.Mods["ASE"] = {
     lockedFilter = Opt(true),
     assisterFilter = Opt(true),
     exoticFilter = Opt(true),
+
+    filterSnipers = Opt(true),
+    filterMMLs = Opt(true),
+    filterT3MobileArty = Opt(true),
 }
 
 function Main(isReplay)
@@ -17,5 +21,9 @@ function Main(isReplay)
         Options.Filter("Filter locked units", options.lockedFilter),
         Options.Filter("Filter assisters", options.assisterFilter),
         Options.Filter("Filter exotics", options.exoticFilter),
+
+        Options.Filter("Filter snipers+absolver", options.filterSnipers, 8),
+        Options.Filter("Filter MMLs", options.filterMMLs, 8),
+        Options.Filter("Filter T3 mobile arty", options.filterT3MobileArty, 8),
     })
 end

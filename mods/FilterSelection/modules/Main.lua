@@ -39,9 +39,11 @@ function AddFilterSelection(group)
 end
 
 function FilterSelect(group)
-    if filters[group] == nil then return AddFilterSelection(group) end
+    if filters[group] == nil then
+        AddFilterSelection(group)
+        return
+    end
 
-    LOG(filters[group])
     UISelectionByCategory(filters[group], false, true, false, false)
 end
 

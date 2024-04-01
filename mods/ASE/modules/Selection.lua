@@ -4,6 +4,7 @@ local IsLockEmpty = Lock.IsEmpty
 local ContainsLocked = Lock.ContainsLocked
 local EntityCategoryFilterDown = EntityCategoryFilterDown
 local TableGetN = table.getn
+local TableEmpty = table.empty
 
 
 local layers = { "NAVAL", "LAND", "AIR" }
@@ -142,7 +143,7 @@ function FilterAssisters(selection)
         end
     end
 
-    if table.empty(newSelection) then
+    if TableEmpty(newSelection) then
         return selection, false
     end
     return newSelection, changed
@@ -161,7 +162,7 @@ function FilterLocked(selection)
             changed = true
         end
     end
-    if table.empty(newSelection) then
+    if TableEmpty(newSelection) then
         return selection, false
     end
     return newSelection, changed
@@ -172,7 +173,7 @@ function AutoLayer(selection)
     for layer, cat in layerCategory do
         if layer ~= activeLayer then
             local units = EntityCategoryFilterDown(cat, selection)
-            if not table.empty(units) then
+            if not TableEmpty(units) then
                 if newLayer == nil then
                     newLayer = layer
                 else
@@ -187,10 +188,7 @@ function AutoLayer(selection)
 end
 
 ---@type EntityCategory
-local exoticUnitsLandCategory = categories.xsl0305 + categories.xal0305 -- sniper bots
-    + categories.LAND * categories.MOBILE * categories.SILO -- mmls
-    + categories.MOBILE * categories.ARTILLERY * categories.TECH3 -- mobile arty
-    + categories.dal0310 - categories.COMMAND - categories.SUBCOMMANDER
+local exoticUnitsLandCategory = categories.ALLUNITS - categories.ALLUNITS
 
 -- ---@type EntityCategory
 -- local exoticUnitsAirCategory = categories.
@@ -198,7 +196,7 @@ local exoticUnitsLandCategory = categories.xsl0305 + categories.xal0305 -- snipe
 
 function FilterExotic(selection)
     local filtered = EntityCategoryFilterOut(exoticUnitsLandCategory, selection)
-    if TableGetN(filtered) == TableGetN(selection) or table.empty(filtered) then
+    if TableGetN(filtered) == TableGetN(selection) or TableEmpty(filtered) then
         return selection, false
     end
     return filtered, true
@@ -248,13 +246,13 @@ function FilterLayer(selection)
     else
         for _, domain in domainOrder do
             filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
-            if not table.empty(filtered) then
+            if not TableEmpty(filtered) then
                 break
             end
         end
     end
 
-    if table.empty(filtered) then
+    if TableEmpty(filtered) then
         if isAuto then
             AutoLayer(selection)
         end
@@ -263,11 +261,44 @@ function FilterLayer(selection)
     return filtered, (TableGetN(filtered) ~= TableGetN(selection))
 end
 
+local function InitOptionsExoticCategories()
+    local Options = UMT.Options.Mods["ASE"]
+    local categories = categories
+
+    local UpdateExotics = function()
+        exoticUnitsLandCategory = categories.ALLUNITS - categories.ALLUNITS
+
+        if Options.filterSnipers() then
+            exoticUnitsLandCategory = exoticUnitsLandCategory
+                + categories.xsl0305 + categories.xal0305 -- sniper bots
+                + categories.dal0310 -- absolver
+        end
+
+        if Options.filterMMLs() then
+            exoticUnitsLandCategory = exoticUnitsLandCategory
+                + categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2 -- mmls
+        end
+
+        if Options.filterT3MobileArty() then
+            exoticUnitsLandCategory = exoticUnitsLandCategory
+                + categories.MOBILE * categories.ARTILLERY * categories.TECH3 -- mobile arty
+        end
+    end
+
+    Options.filterMMLs.OnChange = UpdateExotics
+    Options.filterT3MobileArty.OnChange = UpdateExotics
+    Options.filterSnipers.OnChange = UpdateExotics
+
+    UpdateExotics()
+end
+
 function Main(_isReplay)
     local Options = UMT.Options.Mods["ASE"]
     Options.autoLayer:Bind(function(var)
         isAuto = var()
     end)
+
+    InitOptionsExoticCategories()
 
     UpdateDomainsCursor()
 end
