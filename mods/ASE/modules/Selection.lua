@@ -117,7 +117,8 @@ local assistBPs = {
     ["uel0307"] = true, --Parashield
     ["ual0307"] = true, --Asylum
 
-    ["url0306"] = true --Deceiver
+    ["url0306"] = true, --Deceiver
+    ["xrs0205"] = true -- mermaid
 }
 
 local layerCategory = {
@@ -262,32 +263,50 @@ function FilterLayer(selection)
 end
 
 local function InitOptionsExoticCategories()
-    local Options = UMT.Options.Mods["ASE"]
+    local filters = UMT.Options.Mods["ASE"].filters
     local categories = categories
+
+    local filttersTable = {
+        [filters.MMLs] = categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2
+            + categories.xel0306, -- mmls
+        [filters.Snipers] = categories.xsl0305 + categories.xal0305 -- sniper bots
+            + categories.dal0310, -- absolver
+        [filters.T3MobileArty] = categories.MOBILE * categories.ARTILLERY * categories.TECH3, -- mobile arty
+        [filters.Torps] = categories.uaa0204 + -- Skimmer
+            categories.ura0204 + -- Cormorant
+            categories.xsa0204 + -- Uosioz
+            categories.uea0204 + -- Stork
+            categories.xaa0306, -- Solace
+        [filters.Carriers] = categories.uas0303 + -- Keefer Class
+            categories.urs0303 + -- Command Class
+            categories.xss0303, -- Iavish
+        [filters.Strats] = categories.uaa0304 + -- Shocker
+            categories.ura0304 + -- Revenant
+            categories.xsa0304 + -- Sinntha
+            categories.uea0304, -- Ambassador
+        [filters.StrategicSubs] = categories.uas0304 + -- Silencer
+            categories.urs0304 + -- Plan B
+            categories.ues0304, -- Ace
+        [filters.T3Sonar] = categories.uas0305 + -- aeon
+            categories.urs0305 + -- Flood XR
+            categories.ues0305, -- SP3 - 3000
+        [filters.FireBeetle] = categories.xrl0302, -- fire beetle
+    }
 
     local UpdateExotics = function()
         exoticUnitsLandCategory = categories.ALLUNITS - categories.ALLUNITS
 
-        if Options.filterSnipers() then
-            exoticUnitsLandCategory = exoticUnitsLandCategory
-                + categories.xsl0305 + categories.xal0305 -- sniper bots
-                + categories.dal0310 -- absolver
+        for filter, category in filttersTable do
+            if filter() then
+                exoticUnitsLandCategory = exoticUnitsLandCategory + category
+            end
         end
 
-        if Options.filterMMLs() then
-            exoticUnitsLandCategory = exoticUnitsLandCategory
-                + categories.LAND * categories.MOBILE * categories.SILO * categories.TECH2 -- mmls
-        end
-
-        if Options.filterT3MobileArty() then
-            exoticUnitsLandCategory = exoticUnitsLandCategory
-                + categories.MOBILE * categories.ARTILLERY * categories.TECH3 -- mobile arty
-        end
     end
 
-    Options.filterMMLs.OnChange = UpdateExotics
-    Options.filterT3MobileArty.OnChange = UpdateExotics
-    Options.filterSnipers.OnChange = UpdateExotics
+    for filter in filttersTable do
+        filter.OnChange = UpdateExotics
+    end
 
     UpdateExotics()
 end
