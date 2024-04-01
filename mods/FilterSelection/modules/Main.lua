@@ -14,16 +14,12 @@ function AddFilterSelection(group)
     end
 
     local names = {}
-
     local cats = {}
-
 
     for _, unit in selection do
         local bp = unit:GetBlueprint()
-
         cats[bp.BlueprintId] = true
-
-        names[bp.BlueprintId] = TechCategoryList[bp.TechCategory] .. LOC(bp.Description)
+        names[bp.BlueprintId] = (TechCategoryList[bp.TechCategory] or "") .. LOC(bp.Description)
     end
 
     local message = 'Filter contains: '
