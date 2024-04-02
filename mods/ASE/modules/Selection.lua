@@ -8,11 +8,8 @@ local TableGetN = table.getn
 local TableEmpty = table.empty
 local TableInsert = table.insert
 
-
 local layers = { "NAVAL", "LAND", "AIR" }
 local activeLayer = "LAND"
-
-
 
 local domainColors = {
     NAVAL = "ff00ABC9",

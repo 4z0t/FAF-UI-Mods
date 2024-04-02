@@ -1,10 +1,4 @@
 do
-    local OldCreateUI = CreateUI
-    function CreateUI(isReplay)
-        OldCreateUI(isReplay)
-        import('/mods/ASE/modules/Main.lua').Main(isReplay)
-    end
-
     local ASE = import('/mods/ASE/modules/Main.lua')
     local originalOnSelectionChanged = OnSelectionChanged
     function OnSelectionChanged(oldSelection, newSelection, added, removed)
@@ -20,13 +14,6 @@ do
     end
 
     local KeyMapper = import('/lua/keymap/keymapper.lua')
-    KeyMapper.SetUserKeyAction('Toggle Advanced Selection Extension',
-        {
-            action = "UI_Lua import('/mods/ASE/modules/Main.lua').Toggle()",
-            category = 'Advanced Selection Extension',
-
-        })
-
     KeyMapper.SetUserKeyAction('Toggle units lock',
         {
             action = "UI_Lua import('/mods/ASE/modules/Lock.lua').ToggleUnits()",
@@ -58,18 +45,18 @@ do
             category = 'Advanced Selection Extension',
 
         })
-    KeyMapper.SetUserKeyAction('Add Units Group',
-        {
-            action = "UI_Lua import('/mods/ASE/modules/Groups.lua').AssignGroup()",
-            category = 'Advanced Selection Extension',
+    -- KeyMapper.SetUserKeyAction('Add Units Group',
+    --     {
+    --         action = "UI_Lua import('/mods/ASE/modules/Groups.lua').AssignGroup()",
+    --         category = 'Advanced Selection Extension',
 
-        })
+    --     })
 
-    KeyMapper.SetUserKeyAction('Remove from groups',
-        {
-            action = "UI_Lua import('/mods/ASE/modules/Groups.lua').RemoveFromGroups()",
-            category = 'Advanced Selection Extension',
-        })
+    -- KeyMapper.SetUserKeyAction('Remove from groups',
+    --     {
+    --         action = "UI_Lua import('/mods/ASE/modules/Groups.lua').RemoveFromGroups()",
+    --         category = 'Advanced Selection Extension',
+    --     })
     KeyMapper.SetUserKeyAction('Rotate Domain order',
         {
             action = "UI_Lua import('/mods/ASE/modules/Selection.lua').RotateDomains()",

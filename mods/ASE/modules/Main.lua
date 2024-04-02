@@ -1,4 +1,6 @@
 local ForkThread = ForkThread
+local IsKeyDown = IsKeyDown
+local TableEmpty = table.empty
 
 local Selection
 local Lock
@@ -6,7 +8,7 @@ local Groups
 
 local clearSelection = false
 local ignored = false
-local enabled = true
+local enabled = false
 local isReplay
 
 function SetIgnored(state)
@@ -15,15 +17,6 @@ end
 
 function GetIgnored()
     return ignored
-end
-
-function Toggle()
-    enabled = not enabled
-    if enabled then
-        print "ASE enabled"
-    else
-        print "ASE disabled"
-    end
 end
 
 local function SelectIgnored(units)
@@ -53,6 +46,9 @@ function BindOptions()
     Options.exoticFilter:Bind(function(opt)
         exotic = opt()
     end)
+    Options.enabled:Bind(function(opt)
+        enabled = opt()
+    end)
 end
 
 function Main(_isReplay)
@@ -69,12 +65,9 @@ function Main(_isReplay)
 end
 
 function SelectionChanged(oldSelection, newSelection, added, removed)
-    if isReplay or not enabled or ignored or IsKeyDown("Shift") or table.empty(added) then
+    if isReplay or not enabled or ignored or IsKeyDown("Shift") or TableEmpty(added) then
         return clearSelection
     end
-
-
-
 
     local changed = false
     local changedSel

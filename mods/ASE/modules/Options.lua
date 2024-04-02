@@ -2,6 +2,8 @@ local Options = UMT.Options
 
 local Opt = UMT.Options.Opt
 UMT.Options.Mods["ASE"] = {
+    enabled = Opt(true),
+
     autoLayer = Opt(false),
     layerFilter = Opt(true),
     lockedFilter = Opt(true),
@@ -28,6 +30,7 @@ function Main(isReplay)
     local options = UMT.Options.Mods["ASE"]
     local filters = options.filters
     Options.AddOptions("ASE", "Advanced Selection Extension", {
+        Options.Filter("Mod enabled", options.enabled),
         Options.Filter("Filter units by domain", options.layerFilter),
         Options.Filter("Use auto domain selection", options.autoLayer),
         Options.Filter("Filter locked units", options.lockedFilter),

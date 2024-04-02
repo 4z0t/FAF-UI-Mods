@@ -2,9 +2,13 @@ name = "Advanced Selection Extension"
 version = 1
 copyright = ""
 description = [[QoL Selection functions:
-- deselection of assisting land scouts, mobile shields and deceiver
-- unit lock allowing you to keep some units form selection
-- ]]
+    - deselection of assisting land scouts, mobile shields and deceiver
+    - unit lock allowing you to keep some units from selection
+    - domain filtering with lots of options including auto and manual set
+    - filtering of exotic units' type with options
+
+Required UI Mod Tools.
+]]
 author = "4z0t"
 url = ""
 uid = "advanced-selection-extension-v01"
@@ -18,3 +22,4 @@ requiresNames = {}
 conflicts = {}
 before = {}
 after = {}
+__umt = true
