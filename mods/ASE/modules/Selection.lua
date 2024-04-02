@@ -3,6 +3,7 @@ local IsLocked = Lock.IsLocked
 local IsLockEmpty = Lock.IsEmpty
 local ContainsLocked = Lock.ContainsLocked
 local EntityCategoryFilterDown = EntityCategoryFilterDown
+local EntityCategoryFilterOut = EntityCategoryFilterOut
 local TableGetN = table.getn
 local TableEmpty = table.empty
 
@@ -189,14 +190,14 @@ function AutoLayer(selection)
 end
 
 ---@type EntityCategory
-local exoticUnitsLandCategory = categories.ALLUNITS - categories.ALLUNITS
+local exoticUnitsCategory = categories.ALLUNITS - categories.ALLUNITS
 
 -- ---@type EntityCategory
 -- local exoticUnitsAirCategory = categories.
 
 
 function FilterExotic(selection)
-    local filtered = EntityCategoryFilterOut(exoticUnitsLandCategory, selection)
+    local filtered = EntityCategoryFilterOut(exoticUnitsCategory, selection)
     if TableGetN(filtered) == TableGetN(selection) or TableEmpty(filtered) then
         return selection, false
     end
@@ -294,11 +295,11 @@ local function InitOptionsExoticCategories()
     }
 
     local UpdateExotics = function()
-        exoticUnitsLandCategory = categories.ALLUNITS - categories.ALLUNITS
+        exoticUnitsCategory = categories.ALLUNITS - categories.ALLUNITS
 
         for filter, category in filttersTable do
             if filter() then
-                exoticUnitsLandCategory = exoticUnitsLandCategory + category
+                exoticUnitsCategory = exoticUnitsCategory + category
             end
         end
 
