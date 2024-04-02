@@ -7,6 +7,7 @@ description = [[QoL Selection functions:
     - domain filtering with lots of options including auto and manual set
     - filtering of exotic units' type with options
 
+You can find options in UI mods options menu.
 Required UI Mod Tools.
 ]]
 author = "4z0t"
