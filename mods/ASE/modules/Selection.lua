@@ -315,6 +315,14 @@ function Main(_isReplay)
         isAuto = var()
     end)
 
+    Options.includeHovers:Bind(function(opt)
+        if opt() then
+            layerCategory.NAVAL = categories.NAVAL + categories.LAND * categories.HOVER
+        else
+            layerCategory.NAVAL = categories.NAVAL
+        end
+    end)
+
     InitOptionsExoticCategories()
 
     UpdateDomainsCursor()
