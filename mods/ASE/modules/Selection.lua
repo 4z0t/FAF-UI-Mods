@@ -6,6 +6,7 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local EntityCategoryFilterOut = EntityCategoryFilterOut
 local TableGetN = table.getn
 local TableEmpty = table.empty
+local TableInsert = table.insert
 
 
 local layers = { "NAVAL", "LAND", "AIR" }
@@ -139,7 +140,7 @@ function FilterAssisters(selection)
     for _, unit in selection do
         local guard = unit:GetGuardedEntity()
         if not (assistBPs[unit:GetBlueprint().BlueprintId:lower()] and guard ~= nil) then
-            table.insert(newSelection, unit)
+            TableInsert(newSelection, unit)
         else
             changed = true
         end
@@ -159,7 +160,7 @@ function FilterLocked(selection)
     local changed = false
     for _, unit in selection do
         if not IsLocked(unit) then
-            table.insert(newSelection, unit)
+            TableInsert(newSelection, unit)
         else
             changed = true
         end
@@ -191,10 +192,6 @@ end
 
 ---@type EntityCategory
 local exoticUnitsCategory = categories.ALLUNITS - categories.ALLUNITS
-
--- ---@type EntityCategory
--- local exoticUnitsAirCategory = categories.
-
 
 function FilterExotic(selection)
     local filtered = EntityCategoryFilterOut(exoticUnitsCategory, selection)
