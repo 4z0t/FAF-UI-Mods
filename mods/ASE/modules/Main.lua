@@ -1,12 +1,12 @@
 local ForkThread = ForkThread
 local IsKeyDown = IsKeyDown
 local TableEmpty = table.empty
+local SelectUnits = SelectUnits
 
 local Selection
 local Lock
 local Groups
 
-local clearSelection = false
 local ignored = false
 local enabled = false
 local isReplay
@@ -21,9 +21,7 @@ end
 
 local function SelectIgnored(units)
     ignored = true
-    clearSelection = true
     SelectUnits(nil)
-    clearSelection = false
     SelectUnits(units)
     ignored = false
 end
@@ -66,7 +64,7 @@ end
 
 function SelectionChanged(oldSelection, newSelection, added, removed)
     if isReplay or not enabled or ignored or IsKeyDown("Shift") or TableEmpty(added) then
-        return clearSelection
+        return false
     end
 
     local changed = false
@@ -99,8 +97,6 @@ function SelectionChanged(oldSelection, newSelection, added, removed)
         ForkThread(SelectIgnored, newSelection)
         return true
     end
-
-
 
     return false
 end

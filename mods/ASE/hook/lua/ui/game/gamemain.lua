@@ -1,5 +1,5 @@
 do
-    local ASE = import('/mods/ASE/modules/Main.lua')
+    local ASESelectionChanged = import('/mods/ASE/modules/Main.lua').SelectionChanged
     local originalOnSelectionChanged = OnSelectionChanged
     function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
@@ -7,7 +7,7 @@ do
             return
         end
 
-        if not ASE.SelectionChanged(oldSelection, newSelection, added, removed) then
+        if not ASESelectionChanged(oldSelection, newSelection, added, removed) then
             originalOnSelectionChanged(oldSelection, newSelection, added, removed)
         end
 
