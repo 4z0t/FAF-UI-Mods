@@ -105,7 +105,7 @@ function Main(isReplay)
                 return event.Modifiers.Ctrl
             end
             -- Check our primary stuff here.
-            if event.Type == "ButtonPress" and event.Modifiers.Ctrl and event.Modifiers.Right then
+            if event.Type == "ButtonPress" and event.Modifiers.Ctrl and event.Modifiers.Right and not event.Modifiers.Shift then
                 if CopyBuilding() then
                     self.WasCopying = true
                     self.ReturnHitTest = true
