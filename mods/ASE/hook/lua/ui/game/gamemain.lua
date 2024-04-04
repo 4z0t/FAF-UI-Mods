@@ -1,6 +1,6 @@
 do
     local ASESelectionChanged = import('/mods/ASE/modules/Main.lua').SelectionChanged
-    local originalOnSelectionChanged = OnSelectionChanged
+    local _OnSelectionChanged = OnSelectionChanged
     function OnSelectionChanged(oldSelection, newSelection, added, removed)
 
         if ignoreSelection or import('/lua/ui/game/selection.lua').IsHidden() then
@@ -8,7 +8,7 @@ do
         end
 
         if not ASESelectionChanged(oldSelection, newSelection, added, removed) then
-            originalOnSelectionChanged(oldSelection, newSelection, added, removed)
+            _OnSelectionChanged(oldSelection, newSelection, added, removed)
         end
 
     end
