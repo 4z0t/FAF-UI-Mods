@@ -3,7 +3,8 @@ local EntityCategoryFilterDown = EntityCategoryFilterDown
 local EntityCategoryFilterOut = EntityCategoryFilterOut
 local GetFocusArmy = GetFocusArmy
 local GameTick = GameTick
-
+local GetSelectedUnits = GetSelectedUnits
+local SelectUnits = SelectUnits
 
 local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
 local CommandMode = import('/lua/ui/game/commandmode.lua')
