@@ -8,13 +8,16 @@ local LuaQ = UMT.LuaQ
 local sessionInfo = SessionGetScenarioInfo()
 local isCheatsEnabled = sessionInfo.Options.CheatsEnabled == "true"
 
----@class AdjustGameSpeed : ISelectionHandler
-AdjustGameSpeed = Class(ISelectionHandler)
+---@class ConsoleActions : ISelectionHandler
+ConsoleActions = Class(ISelectionHandler)
 {
-    Name = "Game speed adjust",
-    Description = "",
+    Name = "Console commands",
+    Description = [[Commands for
+        * adjusting game speed
+        * displaying variuos stuff
+    ]],
     Enabled = true,
-    ---@param self AdjustGameSpeed
+    ---@param self ConsoleActions
     ---@param selection UserUnit[]
     ---@return string[]?
     OnSelectionChanged = function(self, selection)
@@ -27,6 +30,7 @@ AdjustGameSpeed = Class(ISelectionHandler)
     {
         { "WLD_DecreaseSimRate", "-" },
         { "WLD_IncreaseSimRate", "+" },
+        { "SallyShears", "☼" },
     },
 
     ---@class GSComponent : IItemComponent
