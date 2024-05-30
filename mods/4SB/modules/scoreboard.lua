@@ -62,7 +62,7 @@ ScoreBoard = UMT.Class(Group)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
 
-        if ArmyViews.showFullResourceData then
+        if self._mode == "full" then
             ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 260))
         else
             ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
@@ -70,12 +70,12 @@ ScoreBoard = UMT.Class(Group)
     end,
 
     SetFullDataView = function(self, val)
-        ArmyViews.showFullResourceData = val
-
-        if ArmyViews.showFullResourceData then
-            ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 260))
+        if val then
+            self._mode = "full"
+            local data = Scores.GetScoreCache()
+            self:UpdateArmiesData(data)
         else
-        ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
+            self._mode = "income"
         end
     end,
 
@@ -200,6 +200,7 @@ ScoreBoard = UMT.Class(Group)
         end
         self:UpdateArmiesData(data)
     end,
+
     UpdateArmiesData = function(self, data)
         if data then
             local mode = self._mode
@@ -234,10 +235,11 @@ ScoreBoard = UMT.Class(Group)
         end
     end,
 
-    ---comment
     ---@param self ScoreBoard
     ---@param delta number
     OnFrame = function(self, delta)
+        if self._mode == "full" then return end
+
         local isCtrl = IsKeyDown("control")
         local update = false
         if not isCtrl and self.isHovered and self._mode ~= "storage" then
@@ -298,7 +300,7 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
         self._dataPanel = DataPanel(self)
     end,
 
-    _InitArmyViews = function (self)
+    _InitArmyViews = function(self)
         self._armiesContainer = ArmyViewsContainer(self)
         self._teamsContainer = TeamViewsContainer(self)
     end,

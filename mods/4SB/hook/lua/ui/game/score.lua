@@ -107,17 +107,16 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
         end
 
-        Options.showFullResourceData.OnChange = function(var)
+        Options.showFullResourceData:Bind(function(var)
             local showFullResourceData = var()
 
             scoreboard:SetFullDataView(showFullResourceData)
+            scoreboard:ResetWidthComponents()
 
             scoreboard:ApplyToViews(function(armyId, armyView)
                 armyView:ResetFont()
 
                 if armyView.isAlly then
-                    armyView:Update()
-
                     if showFullResourceData then
                         --ArmyViews.viewWidth:Set(500)
                         LayoutFor(armyView._massBtn)
@@ -134,10 +133,9 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
                         LayoutFor(armyView._mass)
                             :AtRightIn(armyView, 50)
                     end
-
                 end
             end)
-        end
+        end)
 
         Options.useNickNameArmyColor.OnChange = function(var)
             local useNickNameColor = var()
