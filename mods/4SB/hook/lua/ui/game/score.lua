@@ -118,7 +118,6 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
                 if armyView.isAlly then
                     if showFullResourceData then
-                        --ArmyViews.viewWidth:Set(500)
                         LayoutFor(armyView._massBtn)
                             :Width(85)
                         LayoutFor(armyView._energyBtn)

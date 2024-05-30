@@ -72,11 +72,11 @@ ScoreBoard = UMT.Class(Group)
     SetFullDataView = function(self, val)
         if val then
             self._mode = "full"
-            local data = Scores.GetScoreCache()
-            self:UpdateArmiesData(data)
         else
             self._mode = "income"
         end
+        local data = Scores.GetScoreCache()
+        self:UpdateArmiesData(data)
     end,
 
     ---@param self ScoreBoard
