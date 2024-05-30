@@ -42,6 +42,8 @@ local armyViewTextPointSize = 12
 local armyViewNameFont = Options.player.font.name:Raw()
 local focusArmyNameFont = Options.player.font.focus:Raw()
 
+showFullResourceData = Options.showFullResourceData()
+
 nameWidth = LazyVar()
 armyViewWidth = LazyVar()
 allyViewWidth = LazyVar()
@@ -393,7 +395,7 @@ AllyView = UMT.Class(ArmyView)
         layouter(self._energyBtn)
             :Right(self._energy.Right)
             :AtVerticalCenterIn(self)
-            :Width(35)
+            :Width(showFullResourceData and 85 or 35)
             :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
@@ -412,7 +414,7 @@ AllyView = UMT.Class(ArmyView)
         layouter(self._massBtn)
             :Right(self._mass.Right)
             :AtVerticalCenterIn(self)
-            :Width(35)
+            :Width(showFullResourceData and 85 or 35)
             :Height(self.Height)
             :Over(self, 15)
             :EnableHitTest()
@@ -439,7 +441,7 @@ AllyView = UMT.Class(ArmyView)
 
 
         layouter(self._mass)
-            :AtRightIn(self, 50)
+            :AtRightIn(self, showFullResourceData and 110 or 50)
             :AtVerticalCenterIn(self)
             :Color('ffb7e75f')
             :Over(self, 10)
@@ -471,7 +473,12 @@ AllyView = UMT.Class(ArmyView)
         local resources = data.resources
         if not resources then return end
 
-        if mode == "income" then
+        if showFullResourceData then
+            self._energy:SetText(FormatNumber(resources.storage.storedEnergy) ..
+                " / " .. FormatNumber(resources.storage.maxEnergy) .. " +" .. FormatNumber(resources.energyin.rate * 10))
+            self._mass:SetText(FormatNumber(resources.storage.storedMass) ..
+                " / " .. FormatNumber(resources.storage.maxMass) .. " +" .. FormatNumber(resources.massin.rate * 10))
+        elseif mode == "income" then
             self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
             self._mass:SetText(FormatNumber(resources.massin.rate * 10))
         elseif mode == "storage" then

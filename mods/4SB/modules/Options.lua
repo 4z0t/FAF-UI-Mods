@@ -59,6 +59,7 @@ style = OptVar4SB("scoreboardStyle", "glow border")
 replayStyle = OptVar4SB("scoreboardReplayStyle", "glow border")
 
 teamScoreSort = OptVar4SB("teamScoreSort", false)
+showFullResourceData = OptVar4SB("showFullResourceData", false)
 teamColorAsBG = OptVar4SB("teamColorAsBG", false)
 teamColorAlpha = OptVar4SB("teamColorAlpha", 20)
 useDivisions = OptVar4SB("useDivisions", false)
@@ -99,6 +100,7 @@ function Init(isReplay)
             Options.Filter("Use divisions instead of rating", useDivisions, 4),
             Options.Filter("Use nickname color as army color", useNickNameArmyColor, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
+            Options.Filter("Show all resource data simultaneously", showFullResourceData, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
             Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
