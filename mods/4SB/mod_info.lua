@@ -10,6 +10,9 @@ description = [[4z0t's ScoreBoard:
 Requires UI Mod Tools >= 12.
 
 See forum post for more info https://forum.faforever.com/topic/4391/new-scoreboard?_=1669035632876
+
+Contributors:
+    - FreadyFish
 ]]
 author = "4z0t"
 url = ""
