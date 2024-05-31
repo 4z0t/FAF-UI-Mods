@@ -107,6 +107,35 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
         end
 
+        Options.showFullResourceData:Bind(function(var)
+            local showFullResourceData = var()
+
+            scoreboard:SetFullDataView(showFullResourceData)
+            scoreboard:ResetWidthComponents()
+
+            scoreboard:ApplyToViews(function(armyId, armyView)
+                armyView:ResetFont()
+
+                if armyView.isAlly then
+                    if showFullResourceData then
+                        LayoutFor(armyView._massBtn)
+                            :Width(85)
+                        LayoutFor(armyView._energyBtn)
+                            :Width(85)
+                        LayoutFor(armyView._mass)
+                            :AtRightIn(armyView, 110)
+                    else
+                        LayoutFor(armyView._massBtn)
+                            :Width(35)
+                        LayoutFor(armyView._energyBtn)
+                            :Width(35)
+                        LayoutFor(armyView._mass)
+                            :AtRightIn(armyView, 50)
+                    end
+                end
+            end)
+        end)
+
         Options.useNickNameArmyColor.OnChange = function(var)
             local useNickNameColor = var()
             scoreboard:ApplyToViews(function(armyId, armyView)

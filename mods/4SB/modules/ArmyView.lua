@@ -471,7 +471,18 @@ AllyView = UMT.Class(ArmyView)
         local resources = data.resources
         if not resources then return end
 
-        if mode == "income" then
+        if mode == "full" then
+            self._energy:SetText(("%s / %s +%s"):format(
+                FormatNumber(resources.storage.storedEnergy),
+                FormatNumber(resources.storage.maxEnergy),
+                FormatNumber(resources.energyin.rate * 10)
+            ))
+            self._mass:SetText(("%s / %s +%s"):format(
+                FormatNumber(resources.storage.storedMass),
+                FormatNumber(resources.storage.maxMass),
+                FormatNumber(resources.massin.rate * 10)
+            ))
+        elseif mode == "income" then
             self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
             self._mass:SetText(FormatNumber(resources.massin.rate * 10))
         elseif mode == "storage" then
