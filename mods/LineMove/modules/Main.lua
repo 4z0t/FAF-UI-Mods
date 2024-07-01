@@ -96,12 +96,13 @@ UnitMesh = Class(WorldMesh)
         WorldMesh.__init(self)
         local bp = unit:GetBlueprint()
         local bpId = bp.BlueprintId
+        local scale = bp.Display.UniformScale or 0.1
         self:SetMesh(
             {
                 MeshName = "/units/" .. bpId .. "/" .. bpId .. "_lod0.scm",
                 TextureName = "/units/" .. bpId .. "/" .. bpId .. "_albedo.dds",
                 ShaderName = 'RallyPoint',
-                UniformScale = 0.10
+                UniformScale = scale
             })
         self:SetHidden(false)
         self.unit = unit
