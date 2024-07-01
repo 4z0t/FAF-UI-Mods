@@ -1,0 +1,17 @@
+name = "Line Move"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+uid = "line-move-v01"
+icon = "/mods/LineMove/icon.png"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
