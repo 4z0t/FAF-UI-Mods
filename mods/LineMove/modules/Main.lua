@@ -26,7 +26,7 @@ local function GetKeyBind()
     for key, value in Prefs.GetFromCurrentProfile('UserKeyMap') do
         if value == "Line move" then
             LOG(key)
-            return KEY_CODES[key]
+            return 39 --KEY_CODES[key]
         end
     end
 end
@@ -44,17 +44,17 @@ local toCommandType = {
 
 
 local function GiveOrders(orders, orderType)
-
-    for id, position in orders do
-        SimCallback({
-            Func = "GiveOrders",
-            Args = {
-                unit_orders = { { CommandType = orderType, Position = position } },
-                unit_id     = id,
-                From        = GetFocusArmy()
-            }
-        }, false)
-    end
+    return
+    -- for id, position in orders do
+    --     SimCallback({
+    --         Func = "GiveOrders",
+    --         Args = {
+    --             unit_orders = { { CommandType = orderType, Position = position } },
+    --             unit_id     = id,
+    --             From        = GetFocusArmy()
+    --         }
+    --     }, false)
+    -- end
 
 end
 
@@ -82,6 +82,40 @@ Point = Class(Bitmap)
     end
 }
 
+local WorldMesh = import("/lua/ui/controls/worldmesh.lua").WorldMesh
+
+---@class UnitMesh : WorldMesh
+---@field position Vector
+---@field unit UserUnit
+UnitMesh = Class(WorldMesh)
+{
+    ---@param self UnitMesh
+    ---@param unit UserUnit
+    ---@param position Vector
+    __init = function(self, unit, position)
+        WorldMesh.__init(self)
+        local bp = unit:GetBlueprint()
+        local bpId = bp.BlueprintId
+        self:SetMesh(
+            {
+                MeshName = "/units/" .. bpId .. "/" .. bpId .. "_lod0.scm",
+                TextureName = "/units/" .. bpId .. "/" .. bpId .. "_albedo.dds",
+                ShaderName = 'RallyPoint',
+                UniformScale = 0.10
+            })
+        self:SetHidden(false)
+        self.unit = unit
+        self:SetPosition(Vector(position[1], position[2], position[3]))
+    end,
+
+    SetPosition = function(self, position)
+        self.position = position
+        local unitPos = self.unit:GetPosition()
+        local dir = VDiff(position, unitPos)
+        local orient = OrientFromDir(dir)
+        self:SetStance(position, orient)
+    end
+}
 
 ---@class MouseMonitor : Group
 MouseMonitor = Class(Group)
@@ -160,10 +194,8 @@ MouseMonitor = Class(Group)
     end,
 
     InitPositions = function(self, position)
-        for i = 1, table.getn(self.selection) do
-            local point = Point(self, self:GetParent(), position)
-            LayoutFor(point)
-                :Color("white")
+        for _, unit in self.selection do
+            local point = UnitMesh(unit, position)
             self.unitPositions:Add(point)
         end
     end,
@@ -221,6 +253,8 @@ MouseMonitor = Class(Group)
                 prevPoint[1] = MATH_Lerp(s, p1[1], p2[1])
                 prevPoint[2] = MATH_Lerp(s, p1[2], p2[2])
                 prevPoint[3] = MATH_Lerp(s, p1[3], p2[3])
+
+                self.unitPositions[curUnitPosition]:SetPosition(prevPoint)
 
                 curUnitPosition = curUnitPosition + 1
                 currentSegmentLength = distBetween
