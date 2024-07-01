@@ -143,6 +143,7 @@ MouseMonitor = Class(Group)
     end,
 
     StartLineMove = function(self)
+        self:EnableHitTest()
         self.selection = GetSelectedUnits()
         if not self.selection then
             return
@@ -155,6 +156,7 @@ MouseMonitor = Class(Group)
 
 
     EndLineMove = function(self)
+        self:DisableHitTest()
         self.pressed = false
         self.prevPosition = false
         self:GiveOrders()

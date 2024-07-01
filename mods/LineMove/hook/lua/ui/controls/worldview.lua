@@ -12,6 +12,7 @@ do
             self._mouseMonitor = LineMoveModule.MouseMonitor(self)
             LayoutFor(self._mouseMonitor)
                 :Fill(self)
+                :DisableHitTest()
         end,
 
         -- ---@param self WorldView
