@@ -43,7 +43,16 @@ local toCommandType = {
 }
 
 
-local function GiveOrders(orders, orderType)
+local function GiveOrders(curve, orderType, clear)
+    SimCallback({
+        Func = "LineMove",
+        Args = {
+            Curve = curve,
+            Order = orderType,
+            Clear = clear,
+        }
+    }, true)
+
     return
     -- for id, position in orders do
     --     SimCallback({
@@ -160,12 +169,13 @@ MouseMonitor = Class(Group)
         self:AcquireKeyboardFocus(true)
     end,
 
-
-    EndLineMove = function(self)
+    ---@param self any
+    ---@param mods EventModifiers
+    EndLineMove = function(self, mods)
         self:DisableHitTest()
         self.pressed = false
         self.prevPosition = false
-        self:GiveOrders()
+        self:GiveOrders(not mods.Shift)
         self.selection = false
         self:DestroyPoints()
         self:AbandonKeyboardFocus()
@@ -196,9 +206,9 @@ MouseMonitor = Class(Group)
         elseif self:IsEndEvent(event) then
 
         elseif self:IsCancelEvent(event) then
-            self:EndLineMove()
+            self:EndLineMove(event.Modifiers)
         end
-
+        return false
     end,
 
     InitPositions = function(self, position)
@@ -282,22 +292,27 @@ MouseMonitor = Class(Group)
     end,
 
 
-    GiveOrders = function(self)
+    GiveOrders = function(self, clear)
         if table.getn(self.points) <= 1 then return end
 
         local orderType = CommandMode.GetCommandMode()[2].name and toCommandType[CommandMode.GetCommandMode()[2].name] or
             'Move'
 
-        local curPos = 1
-        local orders = {}
-        for _, unit in self.selection do
-            if unit:IsDead() then continue end
-
-            orders[unit:GetEntityId()] = self.unitPositions[curPos].position
-            curPos                     = curPos + 1
+        local curve = {}
+        for i, point in self.points do
+            curve[i] = point.position
         end
+        GiveOrders(curve, orderType, clear)
+        -- local curPos = 1
+        -- local orders = {}
+        -- for _, unit in self.selection do
+        --     if unit:IsDead() then continue end
 
-        GiveOrders(orders, orderType)
+        --     orders[unit:GetEntityId()] = self.unitPositions[curPos].position
+        --     curPos                     = curPos + 1
+        -- end
+
+        -- GiveOrders(orders, orderType)
     end
 
 
