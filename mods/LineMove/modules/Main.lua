@@ -101,7 +101,7 @@ UnitMesh = Class(WorldMesh)
             {
                 MeshName = "/units/" .. bpId .. "/" .. bpId .. "_lod0.scm",
                 TextureName = "/units/" .. bpId .. "/" .. bpId .. "_albedo.dds",
-                ShaderName = 'RallyPoint',
+                ShaderName = 'UnitFormationPreview',
                 UniformScale = scale
             })
         self:SetHidden(false)
