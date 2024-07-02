@@ -58,6 +58,8 @@ local function GiveOrders(orders, orderType)
 
 end
 
+local DEBUG = false
+
 Point = Class(Bitmap)
 {
     __init = function(self, parent, view, position)
@@ -69,9 +71,12 @@ Point = Class(Bitmap)
             :Width(2)
             :Height(2)
             :DisableHitTest()
-            :NeedsFrameUpdate(true)
+            :NeedsFrameUpdate(DEBUG)
         self.position = { position[1], position[2], position[3] }
         self.view = view
+        if not DEBUG then
+            self:Hide()
+        end
     end,
 
     OnFrame = function(self, delta)
@@ -237,27 +242,31 @@ MouseMonitor = Class(Group)
 
         if len == 0 then return end
 
-        local unitCount = table.getn(self.unitPositions)
+        local unitPositions = self.unitPositions
+        local points = self.points
+
+        local unitCount = table.getn(unitPositions)
+        local pointsCount = table.getn(points)
+
         local distBetween = len / (unitCount + 1)
         local currentSegmentLength = distBetween
         local curUnitPosition = 1
 
-        local pointsCount = table.getn(self.points)
-        local prevPoint   = nil
-        local i           = 1
+        local prevPoint = nil
+        local i         = 1
         while i < pointsCount do
-            local p1 = prevPoint or self.points[i].position
-            local p2 = self.points[i + 1].position
+            local p1 = prevPoint or points[i].position
+            local p2 = points[i + 1].position
             local dist = VDist3(p1, p2)
             if dist > currentSegmentLength then
                 local s = currentSegmentLength / dist
-                prevPoint = self.unitPositions[curUnitPosition].position
+                prevPoint = unitPositions[curUnitPosition].position
 
                 prevPoint[1] = MATH_Lerp(s, p1[1], p2[1])
                 prevPoint[2] = MATH_Lerp(s, p1[2], p2[2])
                 prevPoint[3] = MATH_Lerp(s, p1[3], p2[3])
 
-                self.unitPositions[curUnitPosition]:SetPosition(prevPoint)
+                unitPositions[curUnitPosition]:SetPosition(prevPoint)
 
                 curUnitPosition = curUnitPosition + 1
                 currentSegmentLength = distBetween
