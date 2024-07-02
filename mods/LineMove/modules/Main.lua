@@ -133,9 +133,13 @@ UnitMesh = Class(WorldMesh)
 }
 
 ---@class MouseMonitor : Group
+---@field
 MouseMonitor = Class(Group)
 {
+    MinFrameTime = 0.15,
 
+    ---@param self MouseMonitor
+    ---@param parent any
     __init = function(self, parent)
         Group.__init(self, parent)
         self.pressed       = false
@@ -143,6 +147,9 @@ MouseMonitor = Class(Group)
         self.unitPositions = TrashBag()
         self.selection     = false
         self.prevPosition  = false
+        self._frameCount   = 0
+        self._preview      = false
+        self:SetNeedsFrameUpdate(true)
     end,
 
     IsStartEvent = function(self, event)
@@ -159,27 +166,37 @@ MouseMonitor = Class(Group)
 
     StartLineMove = function(self)
         LOG "Start"
+        self._frameCount = 0
         self:EnableHitTest()
         self.selection = GetSelectedUnits()
         if not self.selection then
             return
         end
         self.pressed = true
-        self:InitPositions(GetMouseWorldPos())
+
         self:AddPoint(GetMouseWorldPos())
-        self:AcquireKeyboardFocus(true)
+    end,
+
+    CreatePreview = function(self)
+        self._preview = true
+        self:InitPositions(GetMouseWorldPos())
+        -- self:AcquireKeyboardFocus(true)
     end,
 
     ---@param self any
     ---@param mods EventModifiers
     EndLineMove = function(self, mods)
+        self._frameCount = 0
         LOG "End"
         self:DisableHitTest()
         self.pressed = false
         self.prevPosition = false
-        self:GiveOrders(not mods.Shift)
+        if self._preview then
+            self:GiveOrders(not mods.Shift)
+        end
         self.selection = false
         self:DestroyPoints()
+        self._preview = false
         self:AbandonKeyboardFocus()
     end,
 
@@ -197,7 +214,9 @@ MouseMonitor = Class(Group)
         end
         return false
     end,
-
+    OnFrame = function(self, delta)
+        self._frameCount = self._frameCount + delta
+    end,
     ---@param self MouseMonitor
     ---@param event KeyEvent
     HandleEvent = function(self, event)
@@ -206,6 +225,9 @@ MouseMonitor = Class(Group)
         if self:IsStartEvent(event) then
             self:StartLineMove()
         elseif self:IsMoveEvent(event) then
+            if not self._preview and self._frameCount > self.MinFrameTime then
+                self:CreatePreview()
+            end
             -- LOG "Move"
             self:AddPoint(GetMouseWorldPos())
         elseif self:IsEndEvent(event) then
@@ -253,6 +275,8 @@ MouseMonitor = Class(Group)
     end,
 
     UpdatePositions = function(self)
+        if not self._preview then return end
+
         local len = self:GetLineLength()
 
         if len == 0 then return end
