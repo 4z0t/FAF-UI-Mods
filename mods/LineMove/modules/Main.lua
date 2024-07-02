@@ -196,7 +196,7 @@ MouseMonitor = Class(Group)
         return false
     end,
 
-    ---@param MouseMonitor WorldView
+    ---@param self WorldView
     ---@param event KeyEvent
     HandleEvent = function(self, event)
         --if not event.Modifiers.Right then return end
