@@ -44,7 +44,7 @@ local toCommandType = {
 
 
 local function GiveOrders(curve, orderType, clear)
-    SimCallback({
+    ForkThread(SimCallback, {
         Func = "LineMove",
         Args = {
             Curve = curve,
@@ -158,6 +158,7 @@ MouseMonitor = Class(Group)
     end,
 
     StartLineMove = function(self)
+        LOG "Start"
         self:EnableHitTest()
         self.selection = GetSelectedUnits()
         if not self.selection then
@@ -172,6 +173,7 @@ MouseMonitor = Class(Group)
     ---@param self any
     ---@param mods EventModifiers
     EndLineMove = function(self, mods)
+        LOG "End"
         self:DisableHitTest()
         self.pressed = false
         self.prevPosition = false
@@ -196,15 +198,18 @@ MouseMonitor = Class(Group)
         return false
     end,
 
-    ---@param self WorldView
+    ---@param self MouseMonitor
     ---@param event KeyEvent
     HandleEvent = function(self, event)
         --if not event.Modifiers.Right then return end
         --LOG(event.Type)
-        if self:IsMoveEvent(event) then
+        if self:IsStartEvent(event) then
+            self:StartLineMove()
+        elseif self:IsMoveEvent(event) then
+            -- LOG "Move"
             self:AddPoint(GetMouseWorldPos())
         elseif self:IsEndEvent(event) then
-
+            self:EndLineMove(event.Modifiers)
         elseif self:IsCancelEvent(event) then
             self:EndLineMove(event.Modifiers)
         end

@@ -15,6 +15,15 @@ do
                 :DisableHitTest()
         end,
 
+        ---@param self WorldView
+        ---@param event KeyEvent
+        HandleEvent = function(self, event)
+            if event.Type == "ButtonPress" and event.Modifiers.Right then
+                self._mouseMonitor:StartLineMove()
+            end
+            return oldWorldView.HandleEvent(self, event)
+        end
+
         -- ---@param self WorldView
         -- ---@param event KeyEvent
         -- HandleEvent = function(self, event)
