@@ -207,12 +207,13 @@ local specialToCategory =
 }
 
 
+local layerExclusion = " - COMMAND - EXPERIMENTAL - ENGINEER"
 
 local layerToCategory = {
-    ["l"] = Make("Land Units", ToCategory "LAND"),
-    ["a"] = Make("Air Units", ToCategory "AIR"),
-    ["s"] = Make("Naval Units", ToCategory "NAVAL"),
-    ["b"] = Make("Structure Units", ToCategory "STRUCTURE"),
+    ["l"] = Make("Land Units", "LAND" .. layerExclusion),
+    ["a"] = Make("Air Units", "AIR" .. layerExclusion),
+    ["s"] = Make("Naval Units", "NAVAL" .. layerExclusion),
+    ["b"] = Make("Structure Units", "STRUCTURE" .. layerExclusion),
 }
 
 
