@@ -209,11 +209,15 @@ local specialToCategory =
 
 local layerExclusion = " - COMMAND - EXPERIMENTAL - ENGINEER"
 
+local function Wrap(s)
+    return ("{%s}"):format(s)
+end
+
 local layerToCategory = {
-    ["l"] = Make("Land Units", "LAND" .. layerExclusion),
-    ["a"] = Make("Air Units", "AIR" .. layerExclusion),
-    ["s"] = Make("Naval Units", "NAVAL" .. layerExclusion),
-    ["b"] = Make("Structure Units", "STRUCTURE" .. layerExclusion),
+    ["l"] = Make("Land Units", Wrap("LAND" .. layerExclusion)),
+    ["a"] = Make("Air Units", Wrap("AIR" .. layerExclusion)),
+    ["s"] = Make("Naval Units", Wrap("NAVAL" .. layerExclusion)),
+    ["b"] = Make("Structure Units", Wrap("STRUCTURE" .. layerExclusion)),
 }
 
 
