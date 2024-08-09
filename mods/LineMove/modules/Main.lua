@@ -3,37 +3,8 @@ local VDist3, MATH_Lerp = VDist3, MATH_Lerp
 local Prefs = import('/lua/user/prefs.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local LayoutFor = import('/lua/maui/layouthelpers.lua').ReusedLayoutFor
-local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Group = import('/lua/maui/group.lua').Group
 local CommandMode = import("/lua/ui/game/commandmode.lua")
-local KeyMapper = import("/lua/keymap/keymapper.lua")
-
-KeyMapper.SetUserKeyAction("Line move", {
-    action = "UI_Lua import(\"/mods/LineMove/modules/Main.lua\").Start()",
-    category = "order"
-})
-
-local KEY_CODES = (function()
-    local keyNames = import("ASCIInames.lua").names
-    local result = {}
-    for k, v in keyNames do
-        result[v] = STR_xtoi(k)
-    end
-    return result
-end)()
-
-local function GetKeyBind()
-    for key, value in Prefs.GetFromCurrentProfile('UserKeyMap') do
-        if value == "Line move" then
-            LOG(key)
-            return 39 --KEY_CODES[key]
-        end
-    end
-end
-
-function Start()
-    import("/lua/ui/game/worldview.lua").viewLeft._mouseMonitor:StartLineMove()
-end
 
 local toCommandType = {
     ["RULEUCC_Move"] = "Move",
