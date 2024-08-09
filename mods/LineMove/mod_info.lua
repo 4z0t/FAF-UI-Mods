@@ -1,5 +1,5 @@
 name = "Line Move"
-version = 1
+version = 2
 copyright = ""
 description = [[
 This SIM mod provides initial implementation for Line Move feature.
@@ -17,7 +17,7 @@ This is a SIM MOD!
 ]]
 author = "4z0t"
 url = ""
-uid = "line-move-v01"
+uid = "line-move-v02"
 icon = "/mods/LineMove/icon.png"
 selectable = true
 enabled = true
