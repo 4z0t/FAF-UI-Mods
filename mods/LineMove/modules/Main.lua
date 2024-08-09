@@ -41,6 +41,7 @@ local toCommandType = {
     ["RULEUCC_Guard"] = "Guard",
     ["RULEUCC_Tactical"] = "Tactical",
     ["RULEUCC_Nuke"] = "Nuke",
+    ["AttackMove"] = "AttackMove",
 }
 
 
@@ -188,7 +189,7 @@ MouseMonitor = Class(Group)
         self.pressed = false
         self.prevPosition = false
         if self._preview then
-            self:GiveOrders(not mods.Shift)
+            self:GiveOrders(mods)
         end
         self.selection = false
         self:DestroyPoints()
@@ -316,31 +317,23 @@ MouseMonitor = Class(Group)
         end
     end,
 
-
-    GiveOrders = function(self, clear)
+    ---comment
+    ---@param self MouseMonitor
+    ---@param mods EventModifiers
+    GiveOrders = function(self, mods)
         if table.getn(self.points) <= 1 then return end
 
-        local orderType = CommandMode.GetCommandMode()[2].name and toCommandType[CommandMode.GetCommandMode()[2].name] or
-            'Move'
+        local cmodeData = CommandMode.GetCommandMode()[2]
+        local orderType = cmodeData.name and toCommandType[cmodeData.name] or 'Move'
+
+        if mods.Alt then
+            orderType = "AttackMove"
+        end
 
         local curve = {}
         for i, point in self.points do
             curve[i] = point.position
         end
-        GiveOrders(curve, orderType, clear)
-        -- local curPos = 1
-        -- local orders = {}
-        -- for _, unit in self.selection do
-        --     if unit:IsDead() then continue end
-
-        --     orders[unit:GetEntityId()] = self.unitPositions[curPos].position
-        --     curPos                     = curPos + 1
-        -- end
-
-        -- GiveOrders(orders, orderType)
+        GiveOrders(curve, orderType, true)
     end
-
-
-
-
 }
