@@ -111,6 +111,15 @@ UnitMesh = Class(WorldMesh)
         local bp = unit:GetBlueprint()
         local bpId = bp.BlueprintId
         local scale = bp.Display.UniformScale or 0.1
+        if bpId:find("_") then
+            bpId = bpId:sub(1, bpId:find("_") - 1)
+        end
+        if not exists("/units/" .. bpId .. "/" .. bpId .. "_lod0.scm") or
+            not exists("/units/" .. bpId .. "/" .. bpId .. "_albedo.dds") then
+            WARN("Cant find blueprint mesh " .. bpId)
+            self:SetHidden(true)
+            return
+        end
         self:SetMesh(
             {
                 MeshName = "/units/" .. bpId .. "/" .. bpId .. "_lod0.scm",
