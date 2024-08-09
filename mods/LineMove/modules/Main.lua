@@ -66,8 +66,6 @@ local function ReducePoints(points, epsilon)
         end
     end
 
-
-
     if dmax > epsilon then
         local result1 = ReducePoints(TableSub(points, 1, index), epsilon)
         local result2 = ReducePoints(TableSub(points, index, totalPoints), epsilon)
