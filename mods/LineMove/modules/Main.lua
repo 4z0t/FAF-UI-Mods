@@ -1,4 +1,5 @@
 local VDist3, MATH_Lerp = VDist3, MATH_Lerp
+local TableGetN = table.getn
 
 local Prefs = import('/lua/user/prefs.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
@@ -16,7 +17,82 @@ local toCommandType = {
 }
 
 
+
+local MathSqrt = math.sqrt
+local function perpendicularDistance(point, lineStart, lineEnd)
+    local dx = lineEnd.x - lineStart.x
+    local dy = lineEnd.z - lineStart.z
+
+    local mag = MathSqrt(dx * dx + dy * dy)
+    if mag > 0.0 then
+        dx = dx / mag
+        dy = dy / mag
+    end
+
+    local pvx = point.x - lineStart.x
+    local pvy = point.z - lineStart.z
+
+    local pvDot = dx * pvx + dy * pvy
+
+    local ax = pvDot * dx
+    local ay = pvDot * dy
+
+    local pdx = pvx - ax
+    local pdy = pvy - ay
+
+    return MathSqrt(pdx * pdx + pdy * pdy)
+end
+
+local function TableSub(tbl, starti, endi)
+    local result = {}
+    for i = starti, endi do
+        table.insert(result, tbl[i])
+    end
+    return result
+end
+
+---@param points Vector[]
+---@param epsilon number
+local function ReducePoints(points, epsilon)
+    local dmax = 0
+    local index = 0
+    local totalPoints = TableGetN(points)
+
+    for i = 2, totalPoints - 1 do
+        local d = perpendicularDistance(points[i], points[1], points[totalPoints])
+        if d > dmax then
+            index = i
+            dmax = d
+        end
+    end
+
+
+
+    if dmax > epsilon then
+        local result1 = ReducePoints(TableSub(points, 1, index), epsilon)
+        local result2 = ReducePoints(TableSub(points, index, totalPoints), epsilon)
+
+        local result = {}
+        for i = 1, TableGetN(result1) - 1 do
+            table.insert(result, result1[i])
+        end
+        for i = 1, TableGetN(result2) do
+            table.insert(result, result2[i])
+        end
+
+        return result
+    else
+        return { points[1], points[totalPoints] }
+    end
+end
+
 local function GiveOrders(curve, orderType, clear)
+
+    local eps = 1
+    while TableGetN(curve) > 100 do
+        curve = ReducePoints(curve, eps)
+        eps = eps + 0.5
+    end
     ForkThread(SimCallback, {
         Func = "LineMove",
         Args = {
@@ -42,7 +118,7 @@ Point = Class(Bitmap)
             :Height(2)
             :DisableHitTest()
             :NeedsFrameUpdate(DEBUG)
-        self.position = { position[1], position[2], position[3] }
+        self.position = Vector(position[1], position[2], position[3])
         self.view = view
         if not DEBUG then
             self:Hide()
@@ -175,10 +251,10 @@ MouseMonitor = Class(Group)
         if event.Type == "ButtonPress" then
             return true
         elseif event.Type == 'KeyUp' then
-            local bind = GetKeyBind()
-            LOG(bind)
-            LOG(event.KeyCode)
-            return event.KeyCode == bind
+            -- local bind = GetKeyBind()
+            -- LOG(bind)
+            -- LOG(event.KeyCode)
+            -- return event.KeyCode == bind
         end
         return false
     end,
@@ -252,8 +328,8 @@ MouseMonitor = Class(Group)
         local unitPositions = self.unitPositions
         local points = self.points
 
-        local unitCount = table.getn(unitPositions)
-        local pointsCount = table.getn(points)
+        local unitCount = TableGetN(unitPositions)
+        local pointsCount = TableGetN(points)
 
         local distBetween = len / (unitCount + 1)
         local currentSegmentLength = distBetween
@@ -292,7 +368,7 @@ MouseMonitor = Class(Group)
     ---@param self MouseMonitor
     ---@param mods EventModifiers
     GiveOrders = function(self, mods)
-        if table.getn(self.points) <= 1 then return end
+        if TableGetN(self.points) <= 1 then return end
 
         local cmodeData = CommandMode.GetCommandMode()[2]
         local orderType = cmodeData.name and toCommandType[cmodeData.name] or 'Move'
