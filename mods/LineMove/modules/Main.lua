@@ -39,7 +39,8 @@ local toCommandType = {
     ["RULEUCC_Move"] = "Move",
     ["RULEUCC_Attack"] = "Attack",
     ["RULEUCC_Guard"] = "Guard",
-    ["RULEUCC_Tactical"] = "Tactical"
+    ["RULEUCC_Tactical"] = "Tactical",
+    ["RULEUCC_Nuke"] = "Nuke",
 }
 
 
@@ -50,21 +51,9 @@ local function GiveOrders(curve, orderType, clear)
             Curve = curve,
             Order = orderType,
             Clear = clear,
+            Army = GetFocusArmy()
         }
     }, true)
-
-    return
-    -- for id, position in orders do
-    --     SimCallback({
-    --         Func = "GiveOrders",
-    --         Args = {
-    --             unit_orders = { { CommandType = orderType, Position = position } },
-    --             unit_id     = id,
-    --             From        = GetFocusArmy()
-    --         }
-    --     }, false)
-    -- end
-
 end
 
 local DEBUG = false
@@ -162,7 +151,7 @@ MouseMonitor = Class(Group)
     end,
 
     IsStartEvent = function(self, event)
-        return event.Type == "ButtonPress" and event.Modifiers.Right
+        return event.Type == "ButtonPress" and event.Modifiers.Right and not event.Modifiers.Shift
     end,
 
     IsMoveEvent = function(self, event)
@@ -174,7 +163,6 @@ MouseMonitor = Class(Group)
     end,
 
     StartLineMove = function(self)
-        LOG "Start"
         self._frameCount = 0
         self:EnableHitTest()
         self.selection = GetSelectedUnits()
@@ -196,7 +184,6 @@ MouseMonitor = Class(Group)
     ---@param mods EventModifiers
     EndLineMove = function(self, mods)
         self._frameCount = 0
-        LOG "End"
         self:DisableHitTest()
         self.pressed = false
         self.prevPosition = false

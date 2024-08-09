@@ -5,6 +5,8 @@ do
     local LineMoveModule = import("/mods/LineMove/modules/Main.lua")
 
     local oldWorldView = WorldView
+    ---@class WorldView : WorldView
+    ---@field _mouseMonitor MouseMonitor
     WorldView = Class(oldWorldView) {
 
         __init = function(self, ...)
@@ -18,7 +20,7 @@ do
         ---@param self WorldView
         ---@param event KeyEvent
         HandleEvent = function(self, event)
-            if event.Type == "ButtonPress" and event.Modifiers.Right then
+            if self._mouseMonitor:IsStartEvent(event) then
                 self._mouseMonitor:StartLineMove()
             end
             return oldWorldView.HandleEvent(self, event)
