@@ -1,5 +1,6 @@
 local ISelectionHandler = import("/mods/AGP/modules/ISelectionHandler.lua").ISelectionHandler
 local IItemComponent = import("/mods/AGP/modules/IItemComponent.lua").IItemComponent
+local UIUtil = import("/lua/ui/uiutil.lua")
 
 local GetEnhancementTextures = import("/lua/ui/game/construction.lua").GetEnhancementTextures
 local Enhancements = import("Enhancements.lua")
@@ -15,28 +16,37 @@ local bpIDtoUpgradeChains = {
         { "AdvancedEngineering", "T3Engineering", },
         { "StealthGenerator", "FAF_SelfRepairSystem", "CloakingGenerator", },
         { "ResourceAllocation" },
+        { "NaniteTorpedoTube" },
         { "MicrowaveLaserGenerator", },
         { "Teleporter" },
     },
     ["uel0001"] = {
         { "HeavyAntiMatterCannon", },
+        { "DamageStabilization" },
         { "AdvancedEngineering", "T3Engineering", },
         { "Shield", "ShieldGeneratorField", },
         { "ResourceAllocation" },
+        { "TacticalMissile", "TacticalNukeMissile" },
         { "Teleporter" },
     },
     ["xsl0001"] = {
         { "RateOfFire", },
         { "AdvancedEngineering", "T3Engineering", },
+        { "RegenAura", "AdvancedRegenAura" },
         { "DamageStabilization", "DamageStabilizationAdvanced", },
+        { "Missile" },
         { "ResourceAllocation", "ResourceAllocationAdvanced" },
+        { "BlastAttack" },
         { "Teleporter" },
     },
     ["ual0001"] = {
         { "HeatSink", },
+        { "CrysalisBeam", "FAF_CrysalisBeamAdvanced" },
         { "AdvancedEngineering", "T3Engineering", },
         { "Shield", "ShieldHeavy", },
+        { "EnhancedSensors" },
         { "ResourceAllocation", "ResourceAllocationAdvanced" },
+        { "ChronoDampener" },
         { "Teleporter" },
     },
 }
@@ -119,6 +129,22 @@ EnhancementsHandler = Class(ISelectionHandler)
             ---@param button Button
             ---@param modifiers EventModifiers
             self.btn.OnClick = function(button, modifiers)
+                local occupiedEnhName = Enhancements.IsOccupiedSlotFor(GetSelectedUnits()[1], self.name)
+                if occupiedEnhName then
+                    UIUtil.QuickDialog(GetFrame(0),
+                        ("Choosing this enhancement will destroy '%s' in this slot. Are you sure?"):format(LOC(occupiedEnhName))
+                        ,
+                        "<LOC _Yes>", function()
+                            safecall("Enhancements.OrderEnhancement",
+                                Enhancements.OrderEnhancement, self.name, modifiers.Shift)
+                            item:UpdatePanel()
+                        end,
+                        "<LOC _No>", function() end,
+                        nil, nil,
+                        true, { worldCover = true, enterButton = 1, escapeButton = 2 }
+                    )
+                    return
+                end
                 Enhancements.OrderEnhancement(self.name, modifiers.Shift)
                 item:UpdatePanel()
             end

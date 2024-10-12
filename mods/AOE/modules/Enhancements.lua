@@ -74,6 +74,27 @@ function IsInstalled(unit, upgrade)
     return false
 end
 
+function IsOccupiedSlotFor(unit, enhancement)
+    local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return false end
+
+    if not bpEnhancements[enhancement] then return false end
+
+    local id = unit:GetEntityId()
+    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
+    if table.empty(existingEnhancements) then return false end
+
+    local slot = bpEnhancements[enhancement].Slot
+    local prerequisite = bpEnhancements[enhancement].Prerequisite
+
+    for _, enh in existingEnhancements do
+        if prerequisite ~= enh and bpEnhancements[enh].Slot == slot then
+            return bpEnhancements[enh].Name
+        end
+    end
+    return false
+end
+
 ---@param unit UserUnit
 ---@param enhancement any
 ---@param noClear? boolean
@@ -106,7 +127,6 @@ function OrderUnitEnhancement(unit, enhancement, noClear)
                 table.insert(orders, enh .. "Remove")
             end
         end
-
     end
 
     RemoveUpgradeInRequiredSlot()
