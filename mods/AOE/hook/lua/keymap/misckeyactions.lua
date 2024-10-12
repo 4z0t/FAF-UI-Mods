@@ -140,10 +140,14 @@ function UpgradeMexGotoNextNearestIdle()
             underUpgrade[focus] = true
         end
     end
-    ConExecute "UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH1, MASSEXTRACTION STRUCTURE TECH2"
+    ConExecute "UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH1"
     local mexes = GetSelectedUnits()
     if not mexes then
-        return
+        ConExecute "UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH2"
+        mexes = GetSelectedUnits()
+        if not mexes then
+            return
+        end
     end
 
     local minDist = nil
