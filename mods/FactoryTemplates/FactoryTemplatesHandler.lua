@@ -1,9 +1,12 @@
 local ipairs = ipairs
+local EntityCategoryContains = EntityCategoryContains
+local GetSelectedUnits = GetSelectedUnits
 
 local ISelectionHandler = import("/mods/AGP/modules/ISelectionHandler.lua").ISelectionHandler
 local IItemComponent = import("/mods/AGP/modules/IItemComponent.lua").IItemComponent
 local UIUtil = import("/lua/ui/uiutil.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
+local factoryCategory = categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT
 
 local LuaQ = UMT.LuaQ
 
@@ -18,6 +21,17 @@ local LuaQ = UMT.LuaQ
 ---@field icon string
 ---@field templateData TemplateData[]
 
+local function SetRepeatQueue()
+    local selection = GetSelectedUnits()
+    if not selection then return end
+
+    for _, unit in selection do
+        unit:ProcessInfo('SetRepeatQueue', "true")
+        if EntityCategoryContains(factoryCategory, unit) then
+            unit:GetCreator():ProcessInfo('SetRepeatQueue', "true")
+        end
+    end
+end
 
 ---@param data FactoryTemplateData
 local function IssueFactoryTemplate(data)
@@ -109,6 +123,9 @@ FactoryTemplatesHandler = Class(ISelectionHandler)
         ---@param event KeyEvent
         HandleEvent = function(self, item, event)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
+                if event.Modifiers.Right then
+                    SetRepeatQueue()
+                end
                 IssueFactoryTemplate(self.data)
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
             end
