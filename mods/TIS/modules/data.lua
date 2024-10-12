@@ -1,17 +1,19 @@
-local RegisterChatFunc = import('/lua/ui/game/gamemain.lua').RegisterChatFunc
-local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
 local FindClients = import('/lua/ui/game/chat.lua').FindClients
+local SessionSendChatMessage = SessionSendChatMessage
 local Exp = import('exp.lua')
 local Nuke = import('nuke.lua')
 local Smd = import('smd.lua')
 
-local is_replay 
+local is_replay
 
 function init(isReplay)
     is_replay = isReplay
-    if not is_replay then
-        RegisterChatFunc(ProcessData, 'TIS')
+
+    if is_replay then
+        return
     end
+
+    import('/lua/ui/game/gamemain.lua').RegisterChatFunc(ProcessData, 'TIS')
 end
 
 local function isAllytoMe(nickname, me)

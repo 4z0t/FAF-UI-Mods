@@ -1,7 +1,7 @@
 local Group = UMT.Controls.Group
 local Bitmap = UMT.Controls.Bitmap
 
-local count = 30
+local count = 50
 
 local offset = 0
 
@@ -56,8 +56,8 @@ local fade = UMT.Animation.Factory.Alpha
     :Create()
 
 local layerAnimation = UMT.Animation.Sequential(appearAndFade, 0.05, 0.1)
-local layersAppear = UMT.Animation.Sequential(appear, 1 / 60, 0.1)
-local layersFade = UMT.Animation.Sequential(fade, 1 / 60)
+local layersAppear = UMT.Animation.Sequential(appear, 1 / 15, 0.1)
+local layersFade = UMT.Animation.Sequential(fade, 1 / 15)
 
 
 local pingColors = {
@@ -76,12 +76,8 @@ PingAnimation = UMT.Class(Group)
         self:_InitLayers(count)
     end,
 
-    __post_init = function(self, parent)
-        self:Layout()
 
-    end,
-
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         self:_LayoutLayers(layouter)
     end,
 

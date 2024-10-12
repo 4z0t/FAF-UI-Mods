@@ -63,7 +63,7 @@ function VerifyOverlay(id)
 end
 
 function VerifyWV()
-    if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft 
+    if IsDestroyed(worldView) -- ~= import('/lua/ui/game/worldview.lua').viewLeft
     then
         worldView = import('/lua/ui/game/worldview.lua').viewLeft
         overlays = {}
@@ -86,7 +86,7 @@ function UpdateData(id)
     }
     if (current_progress > u_data.prev_progress) then
         data.eta = math.ceil(((current_tick - prev_tick) / 10) *
-                                 ((1 - current_progress) / (current_progress - u_data.prev_progress)))
+            ((1 - current_progress) / (current_progress - u_data.prev_progress)))
     end
     data.is_done = (u_data.posX ~= listeners[id]:GetPosition()[1]) or (current_progress == 1) -- unit moved or hp full -> done
     UpdateOverlay(data)
@@ -98,24 +98,25 @@ function UpdateData(id)
 end
 
 function UpdateOverlay(data)
-    if VerifyOverlay(data.id) then
-        local overlay = overlays[data.id]
-        unit_data[data.id].prev_tick = current_tick
-        if data.is_done then
-            overlay:Hide()
-            overlay:SetNeedsFrameUpdate(false)
-            return
-        end
-        overlay.progress:SetText(math.floor(data.progress * 100) .. "%")
-
-        overlay.eta:SetText((function(eta)
-            if eta > 0 then
-                return string.format("%.2d:%.2d", eta / 60, math.mod(eta, 60))
-            else
-                return '??:??'
-            end
-        end)(data.eta))
+    if not VerifyOverlay(data.id) then return end
+    
+    local overlay = overlays[data.id]
+    unit_data[data.id].prev_tick = current_tick
+    if data.is_done then
+        overlay:Hide()
+        overlay:SetNeedsFrameUpdate(false)
+        return
     end
+    overlay.progress:SetText(math.floor(data.progress * 100) .. "%")
+
+    overlay.eta:SetText((function(eta)
+        if eta > 0 then
+            return string.format("%.2d:%.2d", eta / 60, math.mod(eta, 60))
+        else
+            return '??:??'
+        end
+    end)(data.eta))
+
 end
 
 function init(isReplay, option)
@@ -151,7 +152,7 @@ function Add(unit)
         id = id,
         init = true,
         exp = true,
-        pos = {pos[1], pos[2], pos[3]}
+        pos = { pos[1], pos[2], pos[3] }
     }
     unit_data[id] = {
         prev_progress = 0,
@@ -181,10 +182,10 @@ function CreateUnitOverlay(unit, id)
                 return
             end
             local pos = worldView:Project(unit_data[self.id].pos)
-            self.Left:Set(function ()
+            self.Left:Set(function()
                 return worldView.Left() + pos.x - self.Width() / 2
             end)
-            self.Top:Set(function ()
+            self.Top:Set(function()
                 return worldView.Top() + pos.y - self.Height() / 2
             end)
         end
@@ -196,10 +197,10 @@ function CreateUnitOverlay(unit, id)
             end
             if (not self.unit:IsDead()) then
                 local pos = worldView:Project(self.unit:GetPosition())
-                self.Left:Set(function ()
+                self.Left:Set(function()
                     return worldView.Left() + pos.x - self.Width() / 2
                 end)
-                self.Top:Set(function ()
+                self.Top:Set(function()
                     return worldView.Top() + pos.y - self.Height() / 2
                 end)
             end
@@ -225,4 +226,3 @@ function CreateUnitOverlay(unit, id)
 
     return overlay
 end
-

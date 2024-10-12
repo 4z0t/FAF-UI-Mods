@@ -1,164 +1,562 @@
 local TableInsert = table.insert
 local ipairs = ipairs
+local setmetatable = setmetatable
+
+---@class BORTable : table
+---@operator bor(table):table
+
+---@param pipeTable table
+---@param kvTable? table
+---@return table
+local function CreatePipe(pipeTable, kvTable)
+    local pipe = {}
+    if kvTable then
+        pipe.keyvalue = CreatePipe(kvTable)
+    end
+    return setmetatable(pipe, pipeTable)
+end
+
+---@generic R
+---@generic K
+---@generic V?
+---@class FunctionalTransformer<R, K, V>
+---@field private fn function
+FunctionalTransformer = {
+    ---@param self FunctionalTransformer
+    ---@param func function
+    ---@return FunctionalTransformer
+    __call = function(self, func)
+        self.fn = func
+        return self
+    end
+}
+
+---Pops function from functional transformer
+---@param fnObj FunctionalTransformer
+---@return function
+local function PopFn(fnObj)
+    local fn = fnObj.fn
+    fnObj.fn = nil
+    return fn
+end
+
+---@class Comparator
+---@field fn fun(a, b):boolean
+
+---@class Selector
+---@field fn fun(v:any):any
+
+---@class SelectorKV
+---@field fn fun(k, v):any
+
+---@class Conditional
+---@field fn fun(v):boolean
+
+---@class ConditionalKV
+---@field fn fun(k, v):boolean
+
+
 
 ---@generic K
 ---@generic V
----@class BORTable<K,V> : table
----@operator bor(WherePipeTable):table
-
----comment
----@param tbl table
----@return BORTable
-function From(tbl)
-    return tbl
+---@param bor fun(tbl:table<K, V>, self:table):table
+---@generic T: fa-class
+---@return T
+local function BORPipe(bor)
+    return { __bor = bor }
 end
 
----@class LuaQWhereKeyValueMetaTable
-local LuaQWhereKeyValueMetaTable = {
-    ---return new table with elements satisfying the given condition
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
+---@generic K
+---@generic V
+---@param bor fun(tbl:table<K, V>, self:FunctionalTransformer):table
+---@generic T: fa-class
+---@return T
+local function MakePipe(bor)
+    return table.combine(BORPipe(bor), FunctionalTransformer)
+end
 
-        local result = {}
+---Selects key-values that satisfy the condition
+---```lua
+--- ... | where.keyvalue(function(k, v) return v > 3 and type(k) == "string" end)
+---```
+--- `K`,`V`:`bool` -> `K`,`V`
+---@class LuaQWhereKVPipeTable : ConditionalKV
+LuaQWhereKV = MakePipe(function(tbl, self)
+    local func = PopFn(self)
 
+    local result = {}
+
+    for k, v in tbl do
+        if func(k, v) then
+            result[k] = v
+        end
+    end
+
+    return result
+end)
+
+---@class LuaQWherePipeTable : Conditional
+LuaQWhere = MakePipe(function(tbl, self)
+    local func = PopFn(self)
+
+    local result = {}
+
+    for _, v in ipairs(tbl) do
+        if func(v) then
+            TableInsert(result, v)
+        end
+    end
+
+    return result
+end)
+---Selects values that satisfy the condition
+---```lua
+--- ... | where(function(v) return v > 3 end)
+---```
+--- `V`:`bool` -> `V`
+---@class LuaQWhere : LuaQWherePipeTable
+---@field keyvalue LuaQWhereKVPipeTable
+where = CreatePipe(LuaQWhere, LuaQWhereKV)
+
+---Sorts values in table by the condition
+---```lua
+--- ... | sort(function(a, b) return a.value > b.value end)
+---```
+---@class LuaQSortPipeTable : Comparator
+LuaQSort = MakePipe(function(tbl, self)
+    local func = PopFn(self)
+    table.sort(tbl, func)
+    return tbl
+end)
+---@type LuaQSortPipeTable
+sort = CreatePipe(LuaQSort)
+
+---Creates new table based on return value of the selector
+---```lua
+--- ... | select.keyvalue(function(k, v) return v.value end)
+---```
+---With string selector
+---```lua
+--- ... | select.keyvalue "value"
+---```
+---@class LuaQSelectKVPipeTable : SelectorKV
+LuaQSelectKV = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+
+    local result = {}
+
+    if type(selector) == "string" then
         for k, v in tbl do
-            if func(k, v) then
-                result[k] = v
-            end
+            result[k] = v[selector]
         end
-
-        return result
-    end,
-
-    ---Sets condition for filtering table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(key:K, value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
+    elseif iscallable(selector) then
+        for k, v in tbl do
+            result[k] = selector(k, v)
+        end
+    else
+        error("Unsupported selector type " .. tostring(selector))
     end
-}
 
+    return result
+end)
 
----@class LuaQWherePipeTable
-local LuaQWhereMetaTable = {
-    ---return new table with elements satisfying the given condition
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
+---@class LuaQSelectPipeTable : Selector
+LuaQSelect = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
 
-        local result = {}
+    local result = {}
 
+    if type(selector) == "string" then
         for _, v in ipairs(tbl) do
-            if func(v) then
-                TableInsert(result, v)
+            TableInsert(result, v[selector])
+        end
+    elseif iscallable(selector) then
+        for _, v in ipairs(tbl) do
+            TableInsert(result, selector(v))
+        end
+    else
+        error("Unsupported selector type " .. tostring(selector))
+    end
+
+    return result
+end)
+
+---Creates new table based on return value of the selector
+---```lua
+--- ... | select(function(v) return v.value end)
+---```
+---With string selector
+---```lua
+--- ... | select "value"
+---```
+---@class LuaQSelect : LuaQSelectPipeTable
+---@field keyvalue LuaQSelectKVPipeTable
+select = CreatePipe(LuaQSelect, LuaQSelectKV)
+
+---Applies function to key-values of the table
+---```lua
+--- ... | foreach(function(k, v) print(tostring(k).. ":" .. tostring(v)) end)
+---```
+--- Returns table back
+---@class LuaQForEachPipeTable : Selector
+LuaQForEach = MakePipe(function(tbl, self)
+    local func = PopFn(self)
+
+    for k, v in tbl do
+        func(k, v)
+    end
+
+    return tbl
+end)
+---@type LuaQForEachPipeTable
+foreach = CreatePipe(LuaQForEach)
+
+---Sums values of table, values can be selected with selector
+---```lua
+--- ... | sum.keyvalue(function(id, player) if team[id] then return player.rating end return 0 end)
+---```
+---@class LuaQSumKVPipeTable : SelectorKV
+LuaQSumKV = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+
+    local _sum = 0
+    if selector then
+        for k, v in tbl do
+            _sum = _sum + selector(k, v)
+        end
+    else
+        for _, v in tbl do
+            _sum = _sum + v
+        end
+    end
+
+    return _sum
+end)
+
+---@class LuaQSumPipeTable : Selector
+LuaQSum = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+
+    local _sum = 0
+    if selector then
+        for _, v in ipairs(tbl) do
+            _sum = _sum + selector(v)
+        end
+    else
+        for _, v in ipairs(tbl) do
+            _sum = _sum + v
+        end
+    end
+
+    return _sum
+end)
+
+---Sums values of table, values can be selected with selector
+---```lua
+--- ... | sum(function(v) return v.rating or 0 end)
+---```
+---@class LuaQSum : LuaQSumPipeTable
+---@field keyvalue LuaQSumKVPipeTable
+sum = CreatePipe(LuaQSum, LuaQSumKV)
+
+---Returns true if all values satisfy the condition
+---```lua
+--- ... | all(function(k, v) return v < 0 end)
+---```
+---@class LuaQAllPipeTable: ConditionalKV
+LuaQAll = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    if condition then
+        for k, v in tbl do
+            if not condition(k, v) then
+                return false
             end
         end
-
-        return result
-    end,
-
-    ---Sets condition for filtering table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
     end
-}
 
+    return true
+end)
+---@type LuaQAllPipeTable
+all = CreatePipe(LuaQAll)
 
+---Returns true if any of values satisfy the condition
+---```lua
+--- ... | any(function(k, v) return v < 0 end)
+---```
+---@class LuaQAnyPipeTable: ConditionalKV
+LuaQAny = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
 
----@class WherePipeTable : LuaQWherePipeTable
----@field keyvalue LuaQWhereKeyValueMetaTable
----@operator call:WherePipeTable
-
----@type WherePipeTable
-where = setmetatable({
-    keyvalue = setmetatable({}, LuaQWhereKeyValueMetaTable)
-}, LuaQWhereMetaTable)
-
-
----@class DeepCopyPipeTable
-local LuaQDeepCopyMetaTable = {
-    ---returns the deep copy of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self DeepCopyPipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        return table.deepcopy(tbl)
-    end,
-}
----@type DeepCopyPipeTable
-deepcopy = setmetatable({}, LuaQDeepCopyMetaTable)
-
-
----@class CopyPipeTable
-local LuaQCopyMetaTable = {
-    ---returns the deep copy of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self CopyPipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        return table.copy(tbl)
-    end,
-}
----@type CopyPipeTable
-copy = setmetatable({}, LuaQCopyMetaTable)
-
-
----@class SortPipeTable
-local LuaQSortMetaTable = {
-    ---sorts table based on the given function
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self SortPipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
-
-        table.sort(tbl, func)
-
-        return tbl
-    end,
-
-    ---sets sort function
-    ---@generic K
-    ---@generic V
-    ---@param self SortPipeTable
-    ---@param func fun(a:V, b:V):boolean
-    ---@return SortPipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
+    if not condition then
+        return not table.empty(tbl)
     end
-}
----@type SortPipeTable
-sort = setmetatable({}, LuaQSortMetaTable)
 
+    for k, v in tbl do
+        if condition(k, v) then
+            return true
+        end
+    end
+
+    return false
+end)
+
+---@type LuaQAnyPipeTable
+any = CreatePipe(LuaQAny)
+
+---Returns table with only values of the given table
+---```lua
+--- ... | values
+---```
+---@class LuaQValuesPipeTable
+LuaQValues = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        TableInsert(result, v)
+    end
+
+    return result
+end)
+
+---@type LuaQValuesPipeTable
+values = CreatePipe(LuaQValues)
+
+---Returns table with concatinated tables inside given one
+---```lua
+--- ... | concat
+---```
+---@class LuaQConcatPipeTable
+LuaQConcat = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        for _, el in v do
+            TableInsert(result, el)
+        end
+    end
+
+    return result
+end)
+
+---@type LuaQConcatPipeTable
+concat = CreatePipe(LuaQConcat)
+
+---Returns table with only keys of the given table
+---```lua
+--- ... | keys
+---```
+---@class LuaQKeysPipeTable
+LuaQKeys = BORPipe(function(tbl, self)
+    local result = {}
+
+    for k in tbl do
+        TableInsert(result, k)
+    end
+
+    return result
+end)
+
+---@type LuaQKeysPipeTable
+keys = CreatePipe(LuaQKeys)
+
+---Returns table where keys are values of the given table
+---```lua
+--- ... | toSet
+---```
+---@class LuaQToSetPipeTable
+LuaQToSet = BORPipe(function(tbl, self)
+    local result = {}
+
+    for _, v in tbl do
+        result[v] = true
+    end
+
+    return result
+end)
+---@type LuaQToSetPipeTable
+toSet = CreatePipe(LuaQToSet)
+
+---Returns the first value that satisfy the condition, if none - nil
+---```lua
+--- ... | first(function(v) return v > 0 end)
+---```
+---@class LuaQFirstPipeTable : Conditional
+LuaQFirst = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            return v
+        end
+    end
+
+    return nil
+end)
+---@type LuaQFirstPipeTable
+first = CreatePipe(LuaQFirst)
+
+---Returns index of the first value satisfying the condition, if none - nil
+---```lua
+--- ... | first(function(v) return v > 0 end)
+---```
+---@class LuaQFirstIPipeTable : Conditional
+LuaQFirstI = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for i, v in ipairs(tbl) do
+        if condition(v) then
+            return i
+        end
+    end
+
+    return nil
+end)
+---@type LuaQFirstIPipeTable
+firstIndex = CreatePipe(LuaQFirstI)
+
+---Returns table of distinct values of given table
+---@class LuaQDistinctPipeTable
+LuaQDistinct = BORPipe(function(tbl, self)
+    return tbl | toSet | keys
+end)
+---@type LuaQDistinctPipeTable
+distinct = CreatePipe(LuaQDistinct)
+
+---Makes shallow copy of the given table
+---```lua
+--- ... | copy
+---```
+---@class LuaQCopy
+LuaQCopy = BORPipe(function(tbl, self)
+    return table.copy(tbl)
+end)
+---@type LuaQCopy
+copy = CreatePipe(LuaQCopy)
+
+---Makes deep copy of the given table
+---```lua
+--- ... | deepcopy
+---```
+---@class LuaQDeepCopy
+LuaQDeepCopy = BORPipe(function(tbl, self)
+    return table.deepcopy(tbl)
+end)
+---@type LuaQDeepCopy
+deepcopy = CreatePipe(LuaQDeepCopy)
+
+---@class LuaQCountKVPipeTable : ConditionalKV
+LuaQCountKV = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    if not condition then
+        return table.getsize(tbl)
+    end
+
+    local count = 0
+    for k, v in tbl do
+        if condition(k, v) then
+            count = count + 1
+        end
+    end
+
+    return count
+end)
+
+---@class LuaQCountPipeTable : Conditional
+LuaQCount = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    if not condition then
+        return table.getn(tbl)
+    end
+
+    local count = 0
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            count = count + 1
+        end
+    end
+
+    return count
+end)
+---@class LuaQCount : LuaQCountPipeTable
+---@field keyvalue LuaQCountKVPipeTable
+count = CreatePipe(LuaQCount, LuaQCountKV)
+
+---@class LuaQPartition : Conditional
+LuaQPartition = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+    local _true = {}
+    local _false = {}
+    for _, v in ipairs(tbl) do
+        if condition(v) then
+            TableInsert(_true, v)
+        else
+            TableInsert(_false, v)
+        end
+    end
+    return { [true] = _true, [false] = _false }
+end)
+
+---@class LuaQPartitionKV : ConditionalKV
+LuaQPartitionKV = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+    local _true = {}
+    local _false = {}
+    for k, v in tbl do
+        if condition(k, v) then
+            _true[k] = v
+        else
+            _false[k] = v
+        end
+    end
+    return { [true] = _true, [false] = _false }
+end)
+
+---@class LuaQPartitionPipe : LuaQPartition
+---@field keyvalue LuaQPartitionKV
+partition = CreatePipe(LuaQPartition, LuaQPartitionKV)
+
+---@class LuaQGroupBy : Selector
+LuaQGroupBy = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+    local result = {}
+
+    for _, v in ipairs(tbl) do
+        local group = selector(v)
+
+        if not result[group] then
+            result[group] = {}
+        end
+
+        TableInsert(result[group], v)
+    end
+
+    return result
+end)
+
+---@class LuaQGroupByKV : SelectorKV
+LuaQGroupByKV = MakePipe(function(tbl, self)
+    local selector = PopFn(self)
+    local result = {}
+
+    for k, v in tbl do
+        local group = selector(k, v)
+
+        if not result[group] then
+            result[group] = {}
+        end
+
+        result[group][k] = v
+    end
+
+    return result
+end)
+
+---@class LuaQGroupByPipe : LuaQGroupBy
+---@field keyvalue LuaQGroupByKV
+groupBy = CreatePipe(LuaQGroupBy, LuaQGroupByKV)
 
 ---@class ContainsPipeTable
 local LuaQContainsMetaTable = {
@@ -195,179 +593,6 @@ local LuaQContainsMetaTable = {
 ---@type ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
 
-
-local LuaQSelectKeyValueMetaTable = {
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local result = {}
-
-        if type(selector) == "string" then
-            for k, v in tbl do
-                result[k] = v[selector]
-            end
-        elseif type(selector) == "function" then
-            for k, v in tbl do
-                result[k] = selector(k, v)
-            end
-        end
-
-        return result
-    end,
-
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
-local LuaQSelectMetaTable = {
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local result = {}
-
-        if type(selector) == "string" then
-            for _, v in ipairs(tbl) do
-                TableInsert(result, v[selector])
-            end
-        elseif type(selector) == "function" then
-            for _, v in ipairs(tbl) do
-                TableInsert(result, selector(v))
-            end
-        end
-
-        return result
-    end,
-
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
-select = setmetatable({
-    keyvalue = setmetatable({}, LuaQSelectKeyValueMetaTable)
-}, LuaQSelectMetaTable)
-
----@class ForeachPipeTable
-local LuaQForeachMetaTable = {
-    ---loops over table applying a function to each entry in the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self WherePipeTable
-    ---@return table<K,V>
-    __bor = function(tbl, self)
-        local func = self.__func
-        self.__func = nil
-
-        for k, v in tbl do
-            func(k, v)
-        end
-
-        return tbl
-    end,
-
-    ---Sets function to be called for each entry in the table
-    ---@generic K
-    ---@generic V
-    ---@param self WherePipeTable
-    ---@param func fun(key:K, value:V):boolean
-    ---@return WherePipeTable
-    __call = function(self, func)
-        self.__func = func
-        return self
-    end
-}
----@type ForeachPipeTable
-foreach = setmetatable({}, LuaQForeachMetaTable)
-
-
----@class SumPipeTable
-local LuaQSumKeyValueMetaTable = {
-    ---sums values of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self SumPipeTable
-    ---@return V
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local _sum = 0
-        if selector then
-            for k, v in tbl do
-                _sum = _sum + selector(k, v)
-            end
-        else
-            for _, v in tbl do
-                _sum = _sum + v
-            end
-        end
-
-        return _sum
-    end,
-
-    ---sets selector for summing values of the table
-    ---@generic K
-    ---@generic V
-    ---@param self SumPipeTable
-    ---@param selector fun(key:K, value:V):V
-    ---@return SumPipeTable
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
----@class SumPipeTable
-local LuaQSumMetaTable = {
-    ---sums values of the table
-    ---@generic K
-    ---@generic V
-    ---@param tbl table<K,V>
-    ---@param self SumPipeTable
-    ---@return V
-    __bor = function(tbl, self)
-        local selector = self.__selector
-        self.__selector = nil
-
-        local _sum = 0
-        if selector then
-            for _, v in ipairs(tbl) do
-                _sum = _sum + selector(v)
-            end
-        else
-            for _, v in tbl do
-                _sum = _sum + v
-            end
-        end
-
-        return _sum
-    end,
-
-    ---sets selector for summing values of the table
-    ---@generic T
-    ---@generic V
-    ---@param self SumPipeTable
-    ---@param selector fun(value:V):T
-    ---@return SumPipeTable
-    __call = function(self, selector)
-        self.__selector = selector
-        return self
-    end
-}
-
----@type SumPipeTable
-sum = setmetatable({
-    keyvalue = setmetatable({}, LuaQSumKeyValueMetaTable)
-}, LuaQSumMetaTable)
-
-
 local LuaQReduceMetaTable = {
     __bor = function(tbl, self)
         local reducer = self.__reducer
@@ -389,255 +614,6 @@ local LuaQReduceMetaTable = {
     end
 }
 reduce = setmetatable({}, LuaQReduceMetaTable)
-
-
-local LuaQAllMetaTable = {
-    __bor = function(tbl, self)
-        local condition = self.__condition
-        self.__condition = nil
-
-        if condition then
-            for k, v in tbl do
-                if not condition(k, v) then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-all = setmetatable({}, LuaQAllMetaTable)
-
-
-local LuaQAnyMetaTable = {
-    __bor = function(tbl, self)
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return not table.empty(tbl)
-        end
-
-        for k, v in tbl do
-            if condition(k, v) then
-                return true
-            end
-        end
-
-        return false
-    end,
-
-
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-any = setmetatable({}, LuaQAnyMetaTable)
-
----@class LuaQKeysTable
-local LuaQKeysMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        local result = {}
-        if condition then
-            for k, v in tbl do
-                if condition(k, v) then
-                    TableInsert(result, k)
-                end
-            end
-        else
-            for k, _ in tbl do
-                TableInsert(result, k)
-            end
-        end
-
-        return result
-    end,
-
-    ---sets condition for keys to be selected
-    ---@generic K
-    ---@generic V
-    ---@param self LuaQKeysTable
-    ---@param condition fun(key:K, value:V):boolean
-    ---@return LuaQKeysTable
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
----@type LuaQKeysTable
-keys = setmetatable({}, LuaQKeysMetaTable)
-
-
----@class LuaQValuesTable
-local LuaQValuesMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-        local result = {}
-
-        if condition then
-            for _, v in tbl do
-                if condition(k, v) then
-                    TableInsert(result, v)
-                end
-            end
-        else
-            for _, v in tbl do
-                TableInsert(result, v)
-            end
-        end
-
-        return result
-    end,
-
-
-    ---sets condition for values to be selected
-    ---@generic K
-    ---@generic V
-    ---@param self LuaQValuesTable
-    ---@param condition fun(key:K, value:V):boolean
-    ---@return LuaQValuesTable
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
----@type LuaQValuesTable
-values = setmetatable({}, LuaQValuesMetaTable)
-
-
-local LuaQFirstMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        for _, v in ipairs(tbl) do
-            if condition(v) then
-                return v
-            end
-        end
-
-        return nil
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-first = setmetatable({}, LuaQFirstMetaTable)
-
-
-local LuaQCountKeyValueMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return table.getsize(tbl)
-        end
-
-        local count = 0
-        for k, v in tbl do
-            if condition(k, v) then
-                count = count + 1
-            end
-        end
-
-        return count
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-
-local LuaQCountMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        if not condition then
-            return table.getn(tbl)
-        end
-
-        local count = 0
-        for _, v in ipairs(tbl) do
-            if condition(v) then
-                count = count + 1
-            end
-        end
-
-        return count
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-
-
-count = setmetatable({
-    keyvalue = setmetatable({}, LuaQCountKeyValueMetaTable)
-}, LuaQCountMetaTable)
-
-
-local LuaQToSetMetaTable = {
-    __bor = function(tbl, self)
-
-        local condition = self.__condition
-        self.__condition = nil
-
-        local result = {}
-
-        if condition then
-            for k, v in tbl do
-                if condition(k, v) then
-                    result[v] = true
-                end
-            end
-        else
-            for _, v in tbl do
-                result[v] = true
-            end
-        end
-
-        return result
-    end,
-
-    __call = function(self, condition)
-        self.__condition = condition
-        return self
-    end
-}
-toSet = setmetatable({}, LuaQToSetMetaTable)
-
-
-local LuaQDistinctMetaTable = {
-    __bor = function(tbl, self)
-        return tbl | toSet | keys
-    end,
-}
-distinct = setmetatable({}, LuaQDistinctMetaTable)
-
 
 ---retuns max of the given table
 ---@generic K

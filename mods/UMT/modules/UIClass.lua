@@ -1,3 +1,5 @@
+local rawset = rawset
+
 --- Determines whether we have a simple class: one that has no base classes
 local emptyMetaTable = getmetatable {}
 local function IsSimpleClass(arg)

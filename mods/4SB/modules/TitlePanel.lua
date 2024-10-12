@@ -106,14 +106,10 @@ local TopInfoPanel = UMT.Class(Group)
         self._quality = Text(self)
         self._unitCap = Text(self)
     end,
-
-    __post_init = function(self)
-        self:Layout()
-    end,
-
+    
     ---@param self TopInfoPanel
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         local parent = self:GetParent()
         layouter(self._time)
             :AtLeftIn(self, 10)
@@ -277,11 +273,7 @@ TitlePanel = UMT.Class(Group)
         self._expanded = true
     end,
 
-    __post_init = function(self)
-        self:Layout()
-    end,
-
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
 
         layouter(self._bg)
             :Fill(self)

@@ -1,8 +1,7 @@
 local UIUtil = import("/lua/ui/uiutil.lua")
-local Group = import("/lua/maui/group.lua").Group
-local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
+local Group = UMT.Controls.Group
+local Bitmap = UMT.Controls.Bitmap
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 local ColorUtils = UMT.ColorUtils
 
 local function IntColorSlider(parent)
@@ -27,15 +26,15 @@ local ColorSlider = Class(Group)
     end,
 
     __post_init = function(self)
-        self:_Layout()
+        self:InitLayout()
     end,
 
-    _Layout = function(self)
+    InitLayout = function(self)
     end,
 
 }
-
-ColorSliders = Class(Group)
+---@class ColorSliders : UMT.Group
+ColorSliders = UMT.Class(Group)
 {
 
     __init = function(self, parent, optionVar, name)
@@ -101,67 +100,65 @@ ColorSliders = Class(Group)
 
     end,
 
-    __post_init = function(self)
-        self:_Layout()
-    end,
-
-    _Layout = function(self)
-        LayoutFor(self.name)
+    ---@param self ColorSliders
+    ---@param layouter UMT.Layouter
+    InitLayout = function(self, layouter)
+        layouter(self.name)
             :AtLeftTopIn(self)
 
-        LayoutFor(self.colorBitmap)
+        layouter(self.colorBitmap)
             :Below(self.name, 1)
             :Height(5)
             :Right(self.Right)
             :Color(self._option:Raw())
 
 
-        LayoutFor(self.alphaText)
+        layouter(self.alphaText)
             :Color("white")
             :Below(self.colorBitmap, 1)
 
-        LayoutFor(self.redText)
+        layouter(self.redText)
             :Color("red")
             :Below(self.alphaText, 1)
 
-        LayoutFor(self.greenText)
+        layouter(self.greenText)
             :Color("green")
             :Below(self.redText, 1)
 
-        LayoutFor(self.blueText)
+        layouter(self.blueText)
             :Color("blue")
             :Below(self.greenText, 1)
 
-        LayoutFor(self.alphaSlider)
+        layouter(self.alphaSlider)
             :RightOf(self.alphaText, 1)
             :AtLeftIn(self, 15)
 
-        LayoutFor(self.redSlider)
+        layouter(self.redSlider)
             :RightOf(self.redText, 1)
             :AtLeftIn(self, 15)
 
-        LayoutFor(self.greenSlider)
+        layouter(self.greenSlider)
             :RightOf(self.greenText, 1)
             :AtLeftIn(self, 15)
 
-        LayoutFor(self.blueSlider)
+        layouter(self.blueSlider)
             :RightOf(self.blueText, 1)
             :AtLeftIn(self, 15)
 
-        LayoutFor(self.alphaValue)
+        layouter(self.alphaValue)
             :RightOf(self.alphaSlider)
 
-        LayoutFor(self.redValue)
+        layouter(self.redValue)
             :RightOf(self.redSlider)
 
-        LayoutFor(self.greenValue)
+        layouter(self.greenValue)
             :RightOf(self.greenSlider)
 
-        LayoutFor(self.blueValue)
+        layouter(self.blueValue)
             :RightOf(self.blueSlider)
 
 
-        LayoutFor(self)
+        layouter(self)
             :Height(function()
                 return self.blueSlider.Bottom() - self.name.Top()
             end)

@@ -1,12 +1,7 @@
-local Group = import('/lua/maui/group.lua').Group
-local UIUtil = import('/lua/ui/uiutil.lua')
 local StaticScrollable = import("StaticScrollable.lua").StaticScrollable
 
 
 ---@class DynamicScrollable : StaticScrollable
----@field _topLine  integer
----@field _dataSize integer
----@field _numLines integer
 DynamicScrollable = Class(StaticScrollable) {
 
     Setup = function(self, topIndex, numLines)

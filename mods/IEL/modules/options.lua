@@ -1,33 +1,33 @@
-do
-    local GlobalOptions = import("/mods/UMT/modules/GlobalOptions.lua")
-    local OptionsUtils = import("/mods/UMT/modules/OptionsWindow.lua")
-    local OptionVarCreate = import("/mods/UMT/modules/OptionVar.lua").Create
+local Opt = UMT.Options.Opt
+UMT.Options.Mods["IEL"] = {
+    engineersWithNumbersOption = Opt(false),
+    factoryOverlayWithTextOption = Opt(false),
+    factoriesOption = Opt(true),
+    supportCommanderOption = Opt(true),
+    commanderOverlayOption = Opt(false),
+    tacticalNukesOption = Opt(true),
+    massExtractorsOption = Opt(true),
+    engineersOption = Opt(true),
+    overlayColor = Opt("ffff00ff"),
+    activeInReplays = Opt(true),
+    scanDelay = Opt(10),
+}
 
-    local modName = "IEL"
-    local function IELOptionVar(name, value)
-        return OptionVarCreate(modName, name, value)
-    end
-
-    engineersOption = IELOptionVar("engineersOverlay", true)
-    engineersWithNumbersOption = IELOptionVar("engineersWithNumbersOption", false)
-    factoryOverlayWithTextOption = IELOptionVar("factoryOverlayWithTextOption", false)
-    factoriesOption = IELOptionVar("factoriesOverlay", true)
-    supportCommanderOption = IELOptionVar("supportCommanderOverlay", true)
-    commanderOverlayOption = IELOptionVar("commanderOverlayOption", false)
-    tacticalNukesOption = IELOptionVar("tacticalNukesOverlay", true)
-    massExtractorsOption = IELOptionVar("massExtractorsOverlay", true)
-
-
-    function Main(isReplay)
-        GlobalOptions.AddOptions(modName, "Idle Engineers Light",
-            {
-                OptionsUtils.Filter("Show engineers ovelays", engineersOption),
-                OptionsUtils.Filter("Show commander ovelays", commanderOverlayOption),
-                OptionsUtils.Filter("Show engineers ovelays with numbers", engineersWithNumbersOption),
-                OptionsUtils.Filter("Show factories ovelays", factoriesOption),
-                OptionsUtils.Filter("Show facrory ovelays with text", factoryOverlayWithTextOption),
-                OptionsUtils.Filter("Show Nukes and TMLs ovelays", tacticalNukesOption),
-                OptionsUtils.Filter("Show Mex ovelays", massExtractorsOption)
-            })
-    end
+function Main()
+    local Options = UMT.Options
+    local options = UMT.Options.Mods["IEL"]
+    Options.AddOptions("IEL", "Idle Engineers Light",
+        {
+            Options.Filter("Show engineers ovelays", options.engineersOption),
+            Options.Filter("Show commander ovelays", options.commanderOverlayOption),
+            Options.Filter("Show engineers ovelays with numbers", options.engineersWithNumbersOption),
+            Options.Filter("Show factories ovelays", options.factoriesOption),
+            Options.Filter("Show facrory ovelays with text", options.factoryOverlayWithTextOption),
+            Options.Filter("Show Nukes and TMLs ovelays", options.tacticalNukesOption),
+            Options.Filter("Show Mex ovelays", options.massExtractorsOption),
+            Options.ColorSlider("overlay color", options.overlayColor),
+            Options.Filter("Active in replays", options.activeInReplays),
+            Options.Slider([[Unit scanner delay in ticks (increase if you expirience performance issues in late game)]],
+                1, 100, 1, options.scanDelay),
+        })
 end

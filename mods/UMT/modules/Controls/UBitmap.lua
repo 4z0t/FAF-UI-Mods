@@ -12,7 +12,7 @@ Bitmap = UMT.Class(_Bitmap, UMT.Interfaces.ILayoutable)
     ---@param self UMT.Bitmap
     ResetLayout = function(self)
         self.Layouter(self)
-            :ResetLayout()
+            :ResetPosition()
             :Width(self.Layouter:ScaleVar(self.BitmapWidth))
             :Height(self.Layouter:ScaleVar(self.BitmapHeight))
     end,
