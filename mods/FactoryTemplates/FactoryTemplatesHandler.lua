@@ -1,6 +1,7 @@
 local ipairs = ipairs
 local EntityCategoryContains = EntityCategoryContains
 local GetSelectedUnits = GetSelectedUnits
+local TableEmpty = table.empty
 
 local ISelectionHandler = import("/mods/AGP/modules/ISelectionHandler.lua").ISelectionHandler
 local IItemComponent = import("/mods/AGP/modules/IItemComponent.lua").IItemComponent
@@ -71,16 +72,16 @@ FactoryTemplatesHandler = Class(ISelectionHandler)
     ---@param selection UserUnit[]
     ---@return EnhancementIconInfo[]?
     OnSelectionChanged = function(self, selection)
-        if table.empty(selection) then
+        if TableEmpty(selection) then
             return
         end
-        if table.empty(EntityCategoryFilterDown(categories.FACTORY, selection)) then
+        if TableEmpty(EntityCategoryFilterDown(categories.FACTORY, selection)) then
             return
         end
         ---@type FactoryTemplateData[]?
         local allFactoryTemplates = FactoryTemplates.GetTemplates()
 
-        if not allFactoryTemplates or table.empty(allFactoryTemplates) then
+        if not allFactoryTemplates or TableEmpty(allFactoryTemplates) then
             return
         end
 
