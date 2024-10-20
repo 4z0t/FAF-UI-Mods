@@ -24,3 +24,4 @@ uid = "additional-orders-extension-v05"
 exclusive = false
 ui_only = true
 conflicts = {}
+AGP = "EnhancementsHandler"

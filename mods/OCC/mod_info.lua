@@ -1,0 +1,17 @@
+name = "OC Control"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+url = ""
+uid = "oc-control-v01"
+icon = "/mods/OCC/icon.png"
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}

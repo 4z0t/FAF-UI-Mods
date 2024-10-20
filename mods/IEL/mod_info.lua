@@ -1,6 +1,6 @@
 name = "Idle Engineers Light"
-uid = "idle-engineers-light-v11"
-version = 11
+uid = "idle-engineers-light-v12"
+version = 12
 copyright = ""
 description = [[Highlights
 
@@ -11,7 +11,7 @@ description = [[Highlights
 - ACU with text
 
 Options window can be found on main tab in "UI mods options"
-requires UI mod tools]]
+requires UI mod tools >= 12]]
 author = "4z0t"
 url = ""
 icon = "/mods/IEL/icon.png"

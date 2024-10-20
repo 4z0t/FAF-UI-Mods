@@ -80,6 +80,9 @@ function Start(isContinuous)
         continuous = isContinuous
         activeCommandMode, activeCommandModeData = cm[1], cm[2]
         templateData = GetActiveBuildTemplate()
+        if templateData and table.empty(templateData) then
+            templateData = nil
+        end
     end
     Next(true)
 end

@@ -17,3 +17,4 @@ uid = "selected-units-info-v03"
 exclusive = false
 ui_only = true
 conflicts = {}
+__umt = true

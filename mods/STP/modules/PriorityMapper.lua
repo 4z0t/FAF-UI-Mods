@@ -5,6 +5,10 @@ function Make(name, category)
     }
 end
 
+function TechDecreased(cat)
+    return ("{(%s) * TECH3, (%s) * TECH2, (%s) * TECH1}"):format(cat, cat, cat)
+end
+
 local fabsCats = "MASSFABRICATION * STRUCTURE * TECH3, MASSFABRICATION * STRUCTURE * TECH2"
 local mexesCats = "MASSEXTRACTION * STRUCTURE * TECH3, MASSEXTRACTION * STRUCTURE * TECH2, MASSEXTRACTION * STRUCTURE * TECH1"
 local maaCat = "categories.LAND * categories.MOBILE * categories.ANTIAIR"
@@ -25,16 +29,14 @@ local mobileAntiAir = Make("MAA", "{" .. maaCat .. "," .. aaCat .. "}")
 local massFabs = Make("Mass (fabs)", "{" .. fabsCats .. "," .. mexesCats .. "}")
 local massExtractors = Make("Mass (mexes)", "{" .. mexesCats .. "," .. fabsCats .. "}")
 
-local power = Make("Power",
-    "{ENERGYPRODUCTION * STRUCTURE * TECH3, ENERGYPRODUCTION * STRUCTURE * TECH2, ENERGYPRODUCTION * STRUCTURE * TECH1}")
+local power = Make("Power", TechDecreased "ENERGYPRODUCTION * STRUCTURE")
 
 local engineers = Make("Engineers",
     "{categories.ENGINEER * categories.TECH3, categories.ENGINEER * categories.TECH2, categories.ENGINEER * categories.TECH1}")
 
 local transports = Make("Transports", ToCategory "TRANSPORTATION")
 
-local pds = Make("Point Defenses",
-    "{categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH3,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH2,categories.STRUCTURE * categories.DEFENSE * categories.DIRECTFIRE * categories.TECH1}")
+local pds = Make("Point Defenses", TechDecreased "STRUCTURE * DEFENSE * DIRECTFIRE")
 
 local sonars = Make("Sonars",
     "{categories.MOBILESONAR , categories.STRUCTURE * categories.INTELLIGENCE * categories.SONAR}")
@@ -47,7 +49,7 @@ local staticArty = Make("Artillery Installation",
 
 local mobileArty = Make("Mobile Artillery", "{categories.Mobile * categories.ARTILLERY}")
 
-local factory = Make("Factories", "FACTORY * STRUCTURE * TECH3, FACTORY * STRUCTURE * TECH2, FACTORY * STRUCTURE * TECH1")
+local factory = Make("Factories", TechDecreased "FACTORY * STRUCTURE")
 
 local scouts = Make("Scouts", ToCategory "SCOUT")
 
@@ -207,12 +209,17 @@ local specialToCategory =
 }
 
 
+local layerExclusion = " - COMMAND - EXPERIMENTAL - ENGINEER"
+
+local function Wrap(s)
+    return ("{%s}"):format(s)
+end
 
 local layerToCategory = {
-    ["l"] = Make("Land Units", ToCategory "LAND"),
-    ["a"] = Make("Air Units", ToCategory "AIR"),
-    ["s"] = Make("Naval Units", ToCategory "NAVAL"),
-    ["b"] = Make("Structure Units", ToCategory "STRUCTURE"),
+    ["l"] = Make("Land Units", TechDecreased("LAND" .. layerExclusion)),
+    ["a"] = Make("Air Units", TechDecreased("AIR" .. layerExclusion)),
+    ["s"] = Make("Naval Units", TechDecreased("NAVAL" .. layerExclusion)),
+    ["b"] = Make("Structure Units", TechDecreased("STRUCTURE" .. layerExclusion)),
 }
 
 

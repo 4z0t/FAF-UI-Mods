@@ -1,5 +1,5 @@
 name = "ECO UI Tools"
-version = 10
+version = 11
 copyright = ""
 description = [[Provides ECO management UI components.
 
@@ -15,11 +15,11 @@ Options:
 - unpause once
 
 You can find these options in menu > UI Mods Options > ECO UI Tools.
-Requires UI mod tools >= 11.
+Requires UI mod tools >= 12.
 ]]
 author = "4z0t"
 url = ""
-uid = "eco-ui-tools-4z0t-v10"
+uid = "eco-ui-tools-4z0t-v11"
 exclusive = false
 ui_only = true
 conflicts = {}
