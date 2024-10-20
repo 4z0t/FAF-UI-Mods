@@ -67,7 +67,7 @@ do
                     else
                         LayoutHelpers.ReusedLayoutFor(text)
                         :Over(parent, parent:GetTopmostDepth() + 1)
-                        :Left(10)
+                        :Left(20)
                         :Top(400)
                         :Color(client.color)
                         :DisableHitTest()
