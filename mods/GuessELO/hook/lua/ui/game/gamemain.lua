@@ -46,10 +46,64 @@ do
         return _info
     end
 
+    ---@param armiesTable ArmyInfo[]
+    local function CreatePlayersList(armiesTable)
+        local UIUtil = import("/lua/ui/uiutil.lua")
+        local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+        local sessionInfo = SessionGetScenarioInfo()
+        local parent = GetFrame(0)
+        local prev = nil
+        for i, client in ipairs(armiesTable) do
+            if (not client.civilian) then
+                local text = UIUtil.CreateText(parent,
+                    ("%d %s"):format(sessionInfo.Options.Ratings[client.nickname] or 0, client.nickname), 13, nil,
+                    true)
+                if prev then
+                    LayoutHelpers.ReusedLayoutFor(text)
+                        :Over(parent, parent:GetTopmostDepth() + 1)
+                        :Below(prev, 4)
+                        :Color(client.color)
+                        :DisableHitTest()
+                    else
+                        LayoutHelpers.ReusedLayoutFor(text)
+                        :Over(parent, parent:GetTopmostDepth() + 1)
+                        :Left(10)
+                        :Top(400)
+                        :Color(client.color)
+                        :DisableHitTest()
+                end
+                prev = text
+            end
+        end
+
+    end
+
+    local function CreateRevealButton()
+        local UIUtil = import("/lua/ui/uiutil.lua")
+        local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
+
+        local parent = GetFrame(0)
+        local btn = UIUtil.CreateButtonWithDropshadow(parent, '/BUTTON/medium/', "Reveal")
+        LayoutHelpers.ReusedLayoutFor(btn)
+            :Over(parent, parent:GetTopmostDepth() + 1)
+            :Left(10)
+            :Top(500)
+            :EnableHitTest()
+            :End()
+
+        btn.OnClick = function(self, mods)
+            local armiesTable = _GetArmiesTable()
+            CreatePlayersList(armiesTable.armiesTable)
+            self:Destroy()
+        end
+
+    end
+
     local _CreateUI = CreateUI
     function CreateUI(isReplay)
         _CreateUI(isReplay)
         ConExecute("ui_RenderCustomNames false")
+        CreateRevealButton()
     end
 
 end
