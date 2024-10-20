@@ -23,6 +23,7 @@ do
 
     local once = true
 
+    local _originalNames = {}
     _G.GetArmiesTable = function()
         -- if once then
         --     once = false
@@ -31,6 +32,7 @@ do
         local armiesTable = _GetArmiesTable()
         for i, client in ipairs(armiesTable.armiesTable) do
             if (not client.civilian) then
+                _originalNames[i] = client.nickname
                 client.nickname = string.format('Player %d', i)
             end
         end
@@ -64,11 +66,11 @@ do
                         :Below(prev, 4)
                         :Color(client.color)
                         :DisableHitTest()
-                    else
-                        LayoutHelpers.ReusedLayoutFor(text)
+                else
+                    LayoutHelpers.ReusedLayoutFor(text)
                         :Over(parent, parent:GetTopmostDepth() + 1)
-                        :Left(20)
-                        :Top(400)
+                        :AtRightIn(parent, 50)
+                        :Top(500)
                         :Color(client.color)
                         :DisableHitTest()
                 end
@@ -86,7 +88,7 @@ do
         local btn = UIUtil.CreateButtonWithDropshadow(parent, '/BUTTON/medium/', "Reveal")
         LayoutHelpers.ReusedLayoutFor(btn)
             :Over(parent, parent:GetTopmostDepth() + 1)
-            :Left(10)
+            :AtRightIn(parent, 10)
             :Top(500)
             :EnableHitTest()
             :End()
@@ -104,6 +106,10 @@ do
         _CreateUI(isReplay)
         ConExecute("ui_RenderCustomNames false")
         CreateRevealButton()
+    end
+
+    _G.GetOriginalNames = function()
+        return _originalNames
     end
 
 end
