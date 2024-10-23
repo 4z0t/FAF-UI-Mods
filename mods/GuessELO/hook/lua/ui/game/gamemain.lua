@@ -1,9 +1,8 @@
 do
     local _GetArmiesTable = _G.GetArmiesTable
-
+    local colors = {}
     local function ShuffleColors()
         local armiesTable = _GetArmiesTable()
-        local colors = {}
         for i, client in ipairs(armiesTable.armiesTable) do
             if (not client.civilian) then
                 client.nickname = string.format('Player %d', i)
@@ -33,6 +32,7 @@ do
         for i, client in ipairs(armiesTable.armiesTable) do
             if (not client.civilian) then
                 _originalNames[i] = client.nickname
+                client.color = colors[i]
                 client.nickname = string.format('Player %d', i)
             end
         end
