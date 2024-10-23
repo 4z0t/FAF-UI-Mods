@@ -6,19 +6,16 @@ do
         local i = table.find(originalNames, sender)
         local changedName = armiesTable.armiesTable[i].nickname
         local i = table.find(originalNames, msg.from)
-        msg.from = armiesTable.armiesTable[i].nickname
+        msg.from = armiesTable.armiesTable[i].nickname or "unknown"
 
 
-        local found = false
-        for _, name in originalNames do
-
-            if string.find(msg.text:lower(), name:lower()) then
-                found = true
+        for i, name in originalNames do
+            local _start, _end = string.find(msg.text:lower(), name:lower())
+            if _start then
+                local replaceName = armiesTable.armiesTable[i].nickname or "unknown"
+                msg.text = string.sub(msg.text, 1, _start - 1) .. replaceName .. string.sub(msg.text, _end + 1)
                 break
             end
-        end
-        if found then
-            return
         end
         return _ReceiveChatFromSim(changedName, msg)
     end
