@@ -1,9 +1,11 @@
 local Group = UMT.Controls.Group
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = UMT.Controls.Bitmap
-local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 ---@class FactionRightBracket: UMT.Group
+---@field top UMT.Bitmap
+---@field middle UMT.Bitmap
+---@field bottom UMT.Bitmap
 FactionRightBracket = UMT.Class(Group)
 {
     ---@param self FactionRightBracket
@@ -16,11 +18,9 @@ FactionRightBracket = UMT.Class(Group)
         self.bottom = Bitmap(self, UIUtil.SkinnableFile("/game/bracket-right/bracket_bmp_b.dds"))
     end,
 
-    __post_init = function(self)
-        self:Layout()
-    end,
-
-    _Layout = function(self, layouter)
+    ---@param self FactionRightBracket
+    ---@param layouter UMT.Layouter
+    InitLayout = function(self, layouter)
 
         layouter(self.top)
             :Right(self.Right)

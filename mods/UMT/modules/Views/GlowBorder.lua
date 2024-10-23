@@ -33,11 +33,7 @@ GlowBorder = UMT.Class(Group)
         self.br = Bitmap(self, textures.br)
     end,
 
-    __post_init = function(self)
-        self:Layout()
-    end,
-
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
 
         layouter(self.tl)
             :Left(self.Left)

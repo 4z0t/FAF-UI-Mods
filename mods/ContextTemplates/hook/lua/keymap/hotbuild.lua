@@ -1,48 +1,18 @@
+local Factions = import("/lua/factions.lua").Factions
+local FactionInUnitBpToKey = import("/lua/factions.lua").FactionInUnitBpToKey
+local TemplateUtils = import("/mods/ContextTemplates/modules/TemplateUtils.lua")
 local LuaQ = UMT.LuaQ
 
-
--- -- look for template that can be built
--- function availableTemplate(allTemplates, buildable)
---     local effectiveTemplates = {}
---     local effectiveIcons = {}
---     for templateIndex, template in allTemplates do
---         local valid = true
---         for _, entry in template.templateData do
---             if type(entry) == 'table' then
---                 if entry.id then
---                     if not table.find(buildable, entry.id) then -- factory templates
---                         valid = false
---                         break
---                     end
---                 else
---                     if not table.find(buildable, entry[1]) then -- build templates
---                         valid = false
---                         break
---                     end
---                 end
---             end
---         end
---         if valid then
---             template.templateID = templateIndex
---             table.insert(effectiveTemplates, template)
---             table.insert(effectiveIcons, template.icon)
---         end
---     end
---     return effectiveTemplates, effectiveIcons
--- end
-
 function buildActionTemplateContext(modifier, context)
-    LOG(context)
     local options = Prefs.GetFromCurrentProfile('options')
 
     -- Reset everything that could be fading or running
     hideCycleMap()
 
-
     -- Find all avaiable templates
     local allTemplates = Templates.GetTemplates()
-    if (not allTemplates) or table.empty(allTemplates) then
-        return
+    if not allTemplates or table.empty(allTemplates) then
+        return false
     end
 
     local effectiveTemplates = {}
@@ -52,71 +22,75 @@ function buildActionTemplateContext(modifier, context)
     local _, _, buildableCategories = GetUnitCommandData(selection)
     local buildableUnits = EntityCategoryGetUnitList(buildableCategories)
 
-    -- Allow all races to build other races templates
-    local currentFaction = selection[1]:GetBlueprint().General.FactionName
-    if options.gui_all_race_templates ~= 0 and currentFaction then
-        local function ConvertID(BPID)
-            local prefixes = {
-                ["AEON"] = { "uab", "xab", "dab" },
-                ["UEF"] = { "ueb", "xeb", "deb" },
-                ["CYBRAN"] = { "urb", "xrb", "drb" },
-                ["SERAPHIM"] = { "xsb", "usb", "dsb" },
-            }
-            for i, prefix in prefixes[string.upper(currentFaction)] do
-                if table.find(buildableUnits, string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")) then
-                    return string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
-                end
+    local buildableUnitsSet = buildableUnits | LuaQ.toSet
+    local unitFactionName = selection[1]:GetBlueprint().General.FactionName
+    local currentFaction = Factions[ FactionInUnitBpToKey[unitFactionName] ]
+    local prefixes = currentFaction.GAZ_UI_Info.BuildingIdPrefixes or {}
+    local function ConvertID(BPID)
+        for i, prefix in prefixes do
+            local convertedID = string.gsub(BPID, "(%a+)(%d+)", prefix .. "%2")
+            if buildableUnitsSet[convertedID] then
+                return convertedID
             end
-            return false
         end
+        return false
+    end
 
+    if options.gui_all_race_templates ~= 0 and currentFaction then
         for templateIndex, template in allTemplates do
             local valid = true
             local converted = false
             for _, entry in template.templateData do
                 if type(entry) == 'table' then
-                    if not table.find(buildableUnits, entry[1]) then
-                        entry[1] = ConvertID(entry[1])
+                    if not buildableUnitsSet[ entry[1] ] then
+                        local convertedID = ConvertID(entry[1])
                         converted = true
-                        if not table.find(buildableUnits, entry[1]) then
+                        if not buildableUnitsSet[convertedID] then
                             valid = false
                             break
                         end
                     end
                 end
             end
-            if valid then
-                if converted then
-                    template.icon = ConvertID(template.icon)
-                end
-                local found = false
-                for _, entry in template.templateData do
-                    if type(entry) == 'table' then
-                        if entry[1] == context or ConvertID(entry[1]) == ConvertID(context) then
-                            found = true
-                            break
-                        end
+
+            if not valid then continue end
+
+            if converted then
+                template.icon = ConvertID(template.icon)
+            end
+            local found = false
+            local index = nil
+            for i, entry in template.templateData do
+                if type(entry) == 'table' then
+                    if entry[1] == context or ConvertID(entry[1]) == ConvertID(context) then
+                        found = true
+                        index = i
+                        break
                     end
                 end
-                if found then
-                    template.templateID = templateIndex
-                    table.insert(effectiveTemplates, template)
-                    table.insert(effectiveIcons, template.icon)
-                end
             end
+            if found then
+                template = TemplateUtils.CenterTemplateToIndex(template, index)
+                template.templateID = templateIndex
+                table.insert(effectiveTemplates, template)
+                table.insert(effectiveIcons, template.icon)
+            end
+
         end
     else
         effectiveTemplates, effectiveIcons = availableTemplate(allTemplates, buildableUnits)
     end
 
     local maxPos = table.getsize(effectiveTemplates)
-    if maxPos == 0 then return end
+    if maxPos == 0 then
+        return false
+    end
 
     cycleUnits(maxPos, '_templates' .. context, effectiveIcons, selection, modifier)
 
     hotbuildCyclePreview()
 
-    local template = effectiveTemplates[cyclePos]
+    local template = TemplateUtils.ConvertTemplate(effectiveTemplates[cyclePos], ConvertID)
     local cmd = template.templateData[3][1]
 
     ClearBuildTemplates()
@@ -131,7 +105,7 @@ function buildActionTemplateContext(modifier, context)
             if event.Type == 'ButtonPress' then
                 if event.Modifiers.Middle then
                     ClearBuildTemplates()
-                    local tempTemplate = table.deepcopy(template.templateData)
+                    local tempTemplate = template.templateData
                     template.templateData[1] = tempTemplate[2]
                     template.templateData[2] = tempTemplate[1]
                     for i = 3, table.getn(template.templateData) do
@@ -146,6 +120,7 @@ function buildActionTemplateContext(modifier, context)
             end
         end
     end
+    return true
 end
 
 local _buildActionTemplate = buildActionTemplate
@@ -153,8 +128,11 @@ function buildActionTemplate(modifier)
 
     local info = GetRolloverInfo()
     if info and info.blueprintId ~= "unknown" then
-        buildActionTemplateContext(modifier, info.blueprintId)
-        return
+        if __blueprints[info.blueprintId].CategoriesHash["STRUCTURE"] then
+            if buildActionTemplateContext(modifier, info.blueprintId) then
+                return
+            end
+        end
     end
 
     _buildActionTemplate(modifier)

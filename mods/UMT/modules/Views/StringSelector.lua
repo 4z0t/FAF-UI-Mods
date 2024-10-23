@@ -39,10 +39,10 @@ StringSelector = Class(Group)
     end,
 
     __post_init = function(self, parent)
-        self:_Layout(parent)
+        self:InitLayout(parent)
     end,
 
-    _Layout = function(self, parent)
+    InitLayout = function(self, parent)
         LayoutFor(self._name)
             :AtLeftTopIn(self, 2)
             :DisableHitTest()

@@ -55,13 +55,9 @@ ObserverPanel = UMT.Class(Group)
         self._observerText:SetFont(obsTextFont, obsTextSize)
     end,
 
-    __post_init = function(self)
-        self:Layout()
-    end,
-
     ---@param self ObserverPanel
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
 
         layouter(self._bg)
             :Fill(self)

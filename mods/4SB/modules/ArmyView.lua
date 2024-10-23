@@ -92,15 +92,10 @@ ArmyView = UMT.Class(Group)
         self._name = Text(self)
     end,
 
-    ---@param self ArmyView
-    __post_init = function(self)
-        self:Layout()
-    end,
-
     ---Layouts ArmyView
     ---@param self ArmyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         layouter(self._bg)
             :Fill(self)
             :Color(bgColor)
@@ -374,8 +369,8 @@ AllyView = UMT.Class(ArmyView)
 
     ---@param self AllyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
-        ArmyView._Layout(self, layouter)
+    InitLayout = function(self, layouter)
+        ArmyView.InitLayout(self, layouter)
 
         layouter(self._unitsBtn)
             :AtHorizontalCenterIn(self._faction)
@@ -476,7 +471,18 @@ AllyView = UMT.Class(ArmyView)
         local resources = data.resources
         if not resources then return end
 
-        if mode == "income" then
+        if mode == "full" then
+            self._energy:SetText(("%s / %s +%s"):format(
+                FormatNumber(resources.storage.storedEnergy),
+                FormatNumber(resources.storage.maxEnergy),
+                FormatNumber(resources.energyin.rate * 10)
+            ))
+            self._mass:SetText(("%s / %s +%s"):format(
+                FormatNumber(resources.storage.storedMass),
+                FormatNumber(resources.storage.maxMass),
+                FormatNumber(resources.massin.rate * 10)
+            ))
+        elseif mode == "income" then
             self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
             self._mass:SetText(FormatNumber(resources.massin.rate * 10))
         elseif mode == "storage" then
@@ -565,31 +571,33 @@ ReplayArmyView = UMT.Class(ArmyView)
 
     ---@param self ReplayArmyView
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
-        ArmyView._Layout(self, layouter)
+    InitLayout = function(self, layouter)
+        ArmyView.InitLayout(self, layouter)
 
         local first
         local dataSize = table.getn(self._data)
         for i = 1, dataSize do
+            local dataText = self._data[i]
+            local nextText = self._data[i + 1]
             if i == 1 then
-                layouter(self._data[i])
-                    :AtRightIn(self._data[i + 1], dataTextOffSet)
-                first = self._data[i]
+                layouter(dataText)
+                    :AtRightIn(nextText, dataTextOffSet)
+                first = dataText
             elseif i == dataSize then
-                layouter(self._data[i])
+                layouter(dataText)
                     :AtRightIn(self, lastDataTextOffset)
             else
-                layouter(self._data[i])
-                    :AtRightIn(self._data[i + 1], dataTextOffSet)
+                layouter(dataText)
+                    :AtRightIn(nextText, dataTextOffSet)
             end
-            layouter(self._data[i])
+            layouter(dataText)
                 :AtVerticalCenterIn(self)
                 :Over(self, 15)
                 :DisableHitTest()
                 :DropShadow(true)
-            self._data[i]:SetFont(armyViewDataFont, armyViewTextPointSize)
-            self._data[i]:SetText("0")
-            self._data[i]._contracted = false
+            dataText:SetFont(armyViewDataFont, armyViewTextPointSize)
+            dataText:SetText("0")
+            dataText._contracted = false
         end
 
         layouter(self)
