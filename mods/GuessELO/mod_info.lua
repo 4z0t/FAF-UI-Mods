@@ -1,10 +1,10 @@
 name = "Guess ELO"
-version = 2
+version = 4
 copyright = ""
 description = [[Ask Deli and Nuggets about it bruh]]
 author = "4z0t"
 url = ""
-uid = "guess-elo-v02"
+uid = "guess-elo-v04"
 exclusive = false
 ui_only = true
 conflicts = {}

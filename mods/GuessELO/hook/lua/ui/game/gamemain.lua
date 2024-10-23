@@ -25,10 +25,10 @@ do
 
     local _originalNames = {}
     _G.GetArmiesTable = function()
-        -- if once then
-        --     once = false
-        --     return ShuffleColors()
-        -- end
+        if once then
+            once = false
+            return ShuffleColors()
+        end
         local armiesTable = _GetArmiesTable()
         for i, client in ipairs(armiesTable.armiesTable) do
             if (not client.civilian) then
@@ -106,6 +106,11 @@ do
         _CreateUI(isReplay)
         ConExecute("ui_RenderCustomNames false")
         CreateRevealButton()
+        ForkThread(function()
+            print "DO NOT GO TO OBSERVER FOR SHUFFLED COLORS"
+            print "SWITCH BETWEEN PLAYERS ONLY"
+            ConExecute 'SetFocusArmy 0'
+        end)
     end
 
     _G.GetOriginalNames = function()
