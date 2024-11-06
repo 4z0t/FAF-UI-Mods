@@ -38,6 +38,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
             self.PosY = LazyVar()
             self.Left:Set(UMT.Layouter.Functions.Floor(function() return parent.Left() + self.PosX() - self.Width() * 0.5 end))
             self.Top:Set(UMT.Layouter.Functions.Floor(function() return parent.Top() + self.PosY() - self.Height() * 0.5 end))
+            self:DisableHitTest()
             self:SetNeedsFrameUpdate(true)
         end,
 
@@ -58,10 +59,17 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
 
     local oldWorldView = WorldView
     WorldView = Class(oldWorldView) {
+
+        __init = function(self, ...)
+            oldWorldView.__init(self, unpack(arg))
+            self._isMiniMap = arg[4] or false
+        end,
+
         ---@param self WorldView
         ---@param pingData PingData
         DisplayTempMarker = function(self, pingData)
-            if pingData.Marker or pingData.Renew then return end
+            if pingData.Marker or pingData.Renew or self._isMiniMap then return end
+
             ---@type TempMarker
             local marker = TempMarker(self, pingData.Location)
             marker.LifeTime = pingData.Lifetime
