@@ -74,11 +74,11 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
             scoreboard:ApplyToViews(function(armyId, armyView)
                 if _teamColorAsBG then
-                    LayoutFor(armyView._color)
+                    armyView.Layouter(armyView._color)
                         :Fill(armyView)
                         :Color(UMT.ColorUtils.SetAlpha(armyView.TeamColor(), _teamColorAlpha))
                 else
-                    LayoutFor(armyView._color)
+                    armyView.Layouter(armyView._color)
                         :Top(armyView.Top)
                         :Bottom(armyView.Bottom)
                         :Right(armyView.Left)
@@ -116,20 +116,21 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
             scoreboard:ApplyToViews(function(armyId, armyView)
                 armyView:ResetFont()
 
+                local layouter = armyView.Layouter
                 if armyView.isAlly then
                     if showFullResourceData then
-                        LayoutFor(armyView._massBtn)
+                        layouter(armyView._massBtn)
                             :Width(85)
-                        LayoutFor(armyView._energyBtn)
+                        layouter(armyView._energyBtn)
                             :Width(85)
-                        LayoutFor(armyView._mass)
+                        layouter(armyView._mass)
                             :AtRightIn(armyView, 110)
                     else
-                        LayoutFor(armyView._massBtn)
+                        layouter(armyView._massBtn)
                             :Width(35)
-                        LayoutFor(armyView._energyBtn)
+                        layouter(armyView._energyBtn)
                             :Width(35)
-                        LayoutFor(armyView._mass)
+                        layouter(armyView._mass)
                             :AtRightIn(armyView, 50)
                     end
                 end
