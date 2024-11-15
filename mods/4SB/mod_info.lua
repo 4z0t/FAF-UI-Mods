@@ -1,5 +1,5 @@
 name = "4z0t's ScoreBoard"
-version = 14
+version = 15
 copyright = ""
 description = [[4z0t's ScoreBoard:
 * Minimalistic and simple design
@@ -17,7 +17,7 @@ Contributors:
 author = "4z0t"
 url = ""
 icon = "/mods/4SB/icon.png"
-uid = "4z0ts-scoreboard-v14"
+uid = "4z0ts-scoreboard-v15"
 exclusive = false
 ui_only = true
 conflicts = {}
