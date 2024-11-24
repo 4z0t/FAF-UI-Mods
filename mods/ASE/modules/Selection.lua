@@ -192,13 +192,14 @@ local exoticUnitsCategory = categories.ALLUNITS - categories.ALLUNITS
 
 function FilterExotic(selection)
     local filtered = EntityCategoryFilterOut(exoticUnitsCategory, selection)
-    if TableGetN(filtered) == TableGetN(selection) or TableEmpty(filtered) then
+    if TableEmpty(filtered) or TableGetN(filtered) == TableGetN(selection) then
         return selection, false
     end
     return filtered, true
 end
 
-local currentDomainOrder = 3
+local currentDomainOrderOption = UMT.OptionVar.Create("ASE", "currentDomainOrderOption", 3)
+local currentDomainOrder = currentDomainOrderOption()
 local domainsOrders =
 {
     { key = "NAVAL > LAND  > AIR", value = { "NAVAL", "LAND", "AIR" } },
@@ -221,16 +222,18 @@ local function UpdateDomainsCursor()
     cursor.domains:SetDomainsOrder(domainsOrders[currentDomainOrder].value)
 end
 
+function SetDomain(i)
+    currentDomainOrder = i
+    print(domainsOrders[i].key)
+    currentDomainOrderOption:Set(i)
+    currentDomainOrderOption:Save()
+
+    -- UpdateDomainsCursor()
+end
+
 function RotateDomains()
     local k, v = next(domainsOrders, currentDomainOrder)
-    if k == nil then
-        k = 1
-        v = domainsOrders[1]
-    end
-    print(v.key)
-    currentDomainOrder = k
-
-    UpdateDomainsCursor()
+    SetDomain(k or 1)
 end
 
 function FilterLayer(selection)
@@ -322,5 +325,5 @@ function Main(_isReplay)
 
     InitOptionsExoticCategories()
 
-    UpdateDomainsCursor()
+    -- UpdateDomainsCursor()
 end

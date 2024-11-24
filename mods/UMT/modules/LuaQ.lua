@@ -398,7 +398,7 @@ first = CreatePipe(LuaQFirst)
 
 ---Returns index of the first value satisfying the condition, if none - nil
 ---```lua
---- ... | first(function(v) return v > 0 end)
+--- ... | firstIndex(function(v) return v > 0 end)
 ---```
 ---@class LuaQFirstIPipeTable : Conditional
 LuaQFirstI = MakePipe(function(tbl, self)
@@ -414,6 +414,46 @@ LuaQFirstI = MakePipe(function(tbl, self)
 end)
 ---@type LuaQFirstIPipeTable
 firstIndex = CreatePipe(LuaQFirstI)
+
+---Returns the last value that satisfy the condition, if none - nil
+---```lua
+--- ... | last(function(v) return v > 0 end)
+---```
+---@class LuaQLastPipeTable : Conditional
+LuaQLast = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for i = table.getn(tbl), 1, -1 do
+        local v = tbl[i]
+        if condition(v) then
+            return v
+        end
+    end
+
+    return nil
+end)
+---@type LuaQLastPipeTable
+last = CreatePipe(LuaQLast)
+
+---Returns index of the last value satisfying the condition, if none - nil
+---```lua
+--- ... | lastIndex(function(v) return v > 0 end)
+---```
+---@class LuaQLastIPipeTable : Conditional
+LuaQLastI = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for i = table.getn(tbl), 1, -1 do
+        local v = tbl[i]
+        if condition(v) then
+            return i
+        end
+    end
+
+    return nil
+end)
+---@type LuaQLastIPipeTable
+lastIndex = CreatePipe(LuaQLastI)
 
 ---Returns table of distinct values of given table
 ---@class LuaQDistinctPipeTable
@@ -865,3 +905,64 @@ function range(startValue, endValue)
     until i >= endValue + 1
     return result
 end
+
+
+
+-- local BORTable = {
+--     __div = function(iterable, self)
+--       if type(iterable) == "table" then
+--         local t = iterable
+--         iterable = function(_, k)
+--           return next(t, k)
+--         end
+--       end
+--       return function(t, k)
+--           local nk, v = iterable(t, k)
+--           if nk == nil then return end
+--           print(v)
+--           return nk, v
+--       end
+--     end
+--   }
+  
+--   local Selector = {
+--     __div = function(iterable, self)
+--       if type(iterable) == "table" then
+--         local t = iterable
+--         iterable = function(_, k)
+--           return next(t, k)
+--         end
+--       end
+--       local selector = self.fn
+--       self.fn = nil
+--       return function(t, k)
+--           local nk, v = iterable(t, k)
+--           if nk == nil then return end
+          
+--           while not selector(v) do
+--             nk, v = iterable(t, nk)
+--           end
+--           return nk, v
+--       end
+--     end,
+    
+--     __call = function(self, selector)
+--       self.fn = selector
+--       return self
+--     end
+--   }
+  
+--   local t = {}
+--   setmetatable(t, BORTable)
+  
+--   local select = {}
+--   setmetatable(select, Selector)
+  
+--   local is = {1,2,3,4,5}
+  
+--   local s = next / select(function(v) return v > 3  end) / t
+  
+  
+--   for i in s, is  do
+--   end
+  
