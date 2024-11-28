@@ -63,5 +63,22 @@ do
             category = 'Advanced Selection Extension',
         })
 
+    KeyMapper.SetUserKeyAction("Toggle Domain Filter",
+        {
+            action = "UI_Lua import('/mods/ASE/modules/Main.lua').ToggleLayerFilter()",
+            category = "Advanced Selection Extension"
+        })
+
+    KeyMapper.SetUserKeyAction("Toggle Exotic Filter",
+        {
+            action = "UI_Lua import('/mods/ASE/modules/Main.lua').ToggleExoticFilter()",
+            category = "Advanced Selection Extension"
+        })
+
+    KeyMapper.SetUserKeyAction("Toggle Assisters Filter",
+        {
+            action = "UI_Lua import('/mods/ASE/modules/Main.lua').ToggleAssisterFilter()",
+            category = "Advanced Selection Extension"
+        })
 
 end
