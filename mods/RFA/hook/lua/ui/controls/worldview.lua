@@ -1,4 +1,5 @@
 do
+    local MathMax = math.max
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
@@ -89,6 +90,21 @@ do
         end)
 
         return weapons
+    end
+
+    ---@param unit UserUnit
+    local getBuildRangeForUnit = function(unit)
+        local commandMode = GetCommandMode()
+        local buildPreviewSkirtSize = 1
+        if commandMode[1] == 'build' then
+            local bpPhysics = __blueprints[commandMode[2].name].Physics
+            if bpPhysics then
+                buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ) or 1
+            end
+        end
+
+        local bp = unit:GetBlueprint()
+        return (bp.Economy.MaxBuildDistance or 5) + bp.Footprint.SizeZ + buildPreviewSkirtSize
     end
 
     local function GetColorAndThickness(type)
@@ -273,7 +289,7 @@ do
             end
 
             local radius = selection
-                | LuaQ.select(function(u) return u:GetBlueprint().Economy.MaxBuildDistance end)
+                | LuaQ.select(getBuildRangeForUnit)
                 | LuaQ.max.value
 
             ---@type Ring
