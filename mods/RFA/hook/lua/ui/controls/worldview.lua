@@ -203,10 +203,12 @@ do
                     if IsKeyDown(18) then --alt
                         self:UpdateReclaimRings()
                     elseif IsKeyDown(self.BuildPreviewKey) then
-                        self:UpdateBuildRings()
+                        self:UpdateBuildRings(true)
                     else
                         self:ClearBuildRings()
                     end
+                elseif self._buildRing or commandMode[1] == "build" then
+                    self:UpdateBuildRings(false)
                 end
             end
             return oldWorldView.OnUpdateCursor(self)
@@ -255,12 +257,15 @@ do
             TableClear(self._selectionRings)
         end,
 
-        UpdateBuildRings = function(self)
+        ---@param self WorldView
+        ---@param useMousePos boolean
+        UpdateBuildRings = function(self, useMousePos)
             local selection = GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
             end
+            ---@type UserUnit[]
             local builders = EntityCategoryFilterDown(buildersCategory, selection)
             if TableEmpty(builders) then
                 self:ClearBuildRings()
@@ -273,8 +278,23 @@ do
 
             ---@type Ring
             local ring = Ring()
-            ring.pos = GetMouseWorldPos()
-            ring.radius = (radius or 0) + 2
+            if useMousePos then
+                ring.pos = GetMouseWorldPos()
+            else
+                local unit = builders[1]
+                local pos = unit:GetPosition()
+                local queue = unit:GetCommandQueue()
+                for i = table.getn(queue), 0, -1 do
+                    local commandType = queue[i].type
+                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or commandType == "Patrol" then
+                        pos = queue[i].position
+                        break
+                    end
+                end
+                pos[2] = GetMouseWorldPos()[2]
+                ring.pos = pos
+            end
+            ring.radius = radius
             local color, thick = GetColorAndThickness "Miscellaneous"
             ring.thickness = thick
             ring:SetColor(color)
