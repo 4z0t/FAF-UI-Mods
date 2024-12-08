@@ -2,34 +2,34 @@ local Prefs = import('/lua/user/prefs.lua')
 local From = import('/mods/UMT/modules/linq.lua').From
 local KeyMapper = import('/lua/keymap/keymapper.lua')
 
-local skins = {'cybran', 'seraphim', 'aeon', 'uef'}
+local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
-local divisions = {{
+local divisions = { {
     name = 'Construction',
     all = {},
-    any = {'BUILTBYTIER3ENGINEER'}
+    any = { 'BUILTBYTIER3ENGINEER' }
 }, {
     name = 'Land',
-    all = {'LAND'},
-    any = {'BUILTBYTIER3FACTORY', 'BUILTBYLANDTIER3FACTORY'}
+    all = { 'LAND' },
+    any = { 'BUILTBYTIER3FACTORY', 'BUILTBYLANDTIER3FACTORY' }
 }, {
     name = 'Air',
-    all = {'AIR'},
-    any = {'BUILTBYTIER3FACTORY', 'TRANSPORTBUILTBYTIER3FACTORY'}
+    all = { 'AIR' },
+    any = { 'BUILTBYTIER3FACTORY', 'TRANSPORTBUILTBYTIER3FACTORY' }
 }, {
     name = 'Naval',
-    all = {'NAVAL'},
-    any = {'BUILTBYTIER3FACTORY'}
+    all = { 'NAVAL' },
+    any = { 'BUILTBYTIER3FACTORY' }
 }, {
     name = 'Gate',
     all = {},
-    any = {'BUILTBYQUANTUMGATE'}
-}}
+    any = { 'BUILTBYQUANTUMGATE' }
+} }
 
-local legalCategories = From({'BUILTBYTIER1FACTORY', 'BUILTBYTIER2FACTORY', 'BUILTBYTIER3FACTORY',
-                              'BUILTBYTIER1ENGINEER', 'BUILTBYTIER2ENGINEER', 'BUILTBYTIER3ENGINEER',
-                              'BUILTBYCOMMANDER', 'BUILTBYQUANTUMGATE', 'BUILTBYLANDTIER3FACTORY', -- special for sparky
-'TRANSPORTBUILTBYTIER3FACTORY' -- all transports and mercy
+local legalCategories = From({ 'BUILTBYTIER1FACTORY', 'BUILTBYTIER2FACTORY', 'BUILTBYTIER3FACTORY',
+    'BUILTBYTIER1ENGINEER', 'BUILTBYTIER2ENGINEER', 'BUILTBYTIER3ENGINEER',
+    'BUILTBYCOMMANDER', 'BUILTBYQUANTUMGATE', 'BUILTBYLANDTIER3FACTORY', -- special for sparky
+    'TRANSPORTBUILTBYTIER3FACTORY' -- all transports and mercy
 })
 
 local sacu = {
@@ -39,14 +39,38 @@ local sacu = {
     ["uel0301"] = true
 }
 
+
+function Compile(data)
+    local res = From()
+    for category, dat in data do
+        if category == 'Construction' then
+            for index, bps in dat do
+                for faction, bp in bps do
+                    res:AddValue(bp)
+                end
+            end
+        else
+            for faction, bp in dat do
+                res:AddValue(bp)
+            end
+        end
+    end
+    return res:Distinct():ToDictionary()
+end
+
 local strLen = string.len
 
 local hotBuilds
 globalBPs = {}
 
-function init()
-    FilterBlueprints()
-    LoadHotBuilds()
+function ClearHotBuildActions()
+    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
+    for name, action in actions do
+        if action.category == 'HotBuild Overhaul' then
+            actions[name] = nil
+        end
+    end
+    Prefs.SetToCurrentProfile("UserKeyActions", actions)
 end
 
 function FilterBlueprints()
@@ -80,6 +104,15 @@ function FilterBlueprints()
             end):ToDictionary()
         end)
     end)
+end
+
+function AddToUnitkeygroups(name, compiled)
+    import('/lua/keymap/unitkeygroups.lua').unitkeygroups[name] = compiled
+    KeyMapper.SetUserKeyAction(string.lower(name), {
+        action = string.format('UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("%s")', name),
+        category = 'HotBuild Overhaul',
+        order = 2048
+    })
 end
 
 function LoadHotBuilds()
@@ -120,33 +153,6 @@ function DelHotBuild(name)
     end
 end
 
-function Compile(data)
-    local res = From()
-    for category, dat in data do
-        if category == 'Construction' then
-            for index, bps in dat do
-                for faction, bp in bps do
-                    res:AddValue(bp)
-                end
-            end
-        else
-            for faction, bp in dat do
-                res:AddValue(bp)
-            end
-        end
-    end
-    return res:Distinct():ToDictionary()
-end
-
-function AddToUnitkeygroups(name, compiled)
-    import('/lua/keymap/unitkeygroups.lua').unitkeygroups[name] = compiled
-    KeyMapper.SetUserKeyAction(string.lower(name), {
-        action = string.format('UI_Lua import("/lua/keymap/hotbuild.lua").buildAction("%s")', name),
-        category = 'HotBuild Overhaul',
-        order = 2048
-    })
-end
-
 function FetchHotBuild(id)
     local data = hotBuilds[id]
     if data then
@@ -155,12 +161,7 @@ function FetchHotBuild(id)
     return {}
 end
 
-function ClearHotBuildActions()
-    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
-    for name, action in actions do
-        if action.category == 'HotBuild Overhaul' then
-            actions[name] = nil
-        end
-    end
-    Prefs.SetToCurrentProfile("UserKeyActions", actions)
+function init()
+    FilterBlueprints()
+    LoadHotBuilds()
 end

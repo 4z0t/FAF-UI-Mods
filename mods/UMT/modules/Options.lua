@@ -1,17 +1,7 @@
-local Dragger = import('/lua/maui/dragger.lua').Dragger
-local Prefs = import('/lua/user/prefs.lua')
-local Window = import('/lua/maui/window.lua').Window
-local Edit = import('/lua/maui/edit.lua').Edit
-local Text = import('/lua/maui/text.lua').Text
-local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
-local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
-local Button = import('/lua/maui/button.lua').Button
-local Control = import('/lua/maui/control.lua').Control
-local Tooltip = import('/lua/ui/game/tooltip.lua')
-local Popup = import('/lua/ui/controls/popups/popup.lua').Popup
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
+local OptionVar = import("OptionVar.lua").Create
 
 local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
@@ -163,18 +153,27 @@ local OptionLine = Class(Group)
         self._name = UIUtil.CreateText(self, '', 14, UIUtil.bodyFont, true)
 
         self._bg.OnCheck = function(bg, checked)
-            if IsDestroyed(optionsWindows[self.id]) then
-                optionsWindows[self.id] = OptionsWindow(parent:GetRootFrame(), self.data[1],
-                    self.id, self.data[2])
-                optionsSelector:Destroy()
+            if not IsDestroyed(optionsWindows[self.id]) then return end
+
+            if iscallable(self.data[2]) then
+                optionsWindows[self.id] = self.data[2](parent:GetRootFrame())
+            else
+                optionsWindows[self.id] = OptionsWindow(
+                    parent:GetRootFrame(),
+                    self.data[1],
+                    self.id,
+                    self.data[2]
+                )
             end
+
+            optionsSelector:Destroy()
         end
     end,
     __post_init = function(self, parent)
-        self:_Layout(parent)
+        self:InitLayout(parent)
     end,
 
-    _Layout = function(self, parent)
+    InitLayout = function(self, parent)
 
         LayoutFor(self._bg)
             :Fill(self)
@@ -231,7 +230,7 @@ local OptionSelector = Class(DynamicScrollable)
     end,
 
     __post_init = function(self, parent)
-        self:_Layout(parent)
+        self:InitLayout(parent)
         self:_InitLines()
         self:CalcVisible()
     end,
@@ -262,7 +261,7 @@ local OptionSelector = Class(DynamicScrollable)
         self:Setup(1, index)
     end,
 
-    _Layout = function(self, parent)
+    InitLayout = function(self, parent)
 
 
         LayoutFor(self._title)
@@ -314,8 +313,7 @@ local OptionSelector = Class(DynamicScrollable)
 --- adds options window builder for a mod
 ---@param option string
 ---@param title string
----@param buildTable table
----@return nil
+---@param buildTable table|fun(frame:Frame):Control
 function AddOptions(option, title, buildTable)
     globalOptions[option] = { title, buildTable }
 end
@@ -328,4 +326,79 @@ end
 
 function Main()
     CreateUI(GetFrame(0))
+end
+
+local getmetatable = getmetatable
+local type = type
+
+local OptValueMetaTable = {}
+function OptValueMetaTable.IsInstance(value)
+    return OptValueMetaTable == getmetatable(value)
+end
+
+local function LoadOptions(values, modName, prefix)
+    local options = {}
+
+    for optName, defaultValue in values do
+        local opt = prefix and (prefix .. "." .. optName) or optName
+        if type(defaultValue) == "table" then
+            if OptValueMetaTable.IsInstance(defaultValue) then
+                LogF("UMT: loading option '%s':'%s'", modName, opt)
+                options[optName] = OptionVar(modName, opt, defaultValue.value)
+            else
+                options[optName] = LoadOptions(defaultValue, modName, opt)
+            end
+        else
+            LogF("UMT: loading option '%s':'%s'", modName, opt)
+            options[optName] = OptionVar(modName, opt, defaultValue)
+        end
+    end
+
+    return options
+end
+
+---@param modName string
+local function LoadOptionsFile(modsOptions, modName)
+    LogF("Loading options of mod '%s'", modName)
+    local files = DiskFindFiles("/mods/" .. modName .. "/", 'Options.lua')
+
+    for _, file in files do
+        LOG("UMT: Loading options file " .. file)
+        import(file).Main()
+    end
+
+    local options = rawget(modsOptions, modName)
+    if not options then
+        WarnF("error trying to load options of mod '%s'", modName)
+        return false
+    end
+    return true
+end
+
+local ModsOptionsMetaTable = {
+    __newindex = function(self, key, value)
+        local options = LoadOptions(value, key)
+
+        rawset(self, key, options)
+    end,
+
+    __index = function(self, key)
+        if LoadOptionsFile(self, key) then
+            return rawget(self, key)
+        end
+        ErrorF("No options for mod '%s'", key)
+    end
+}
+
+
+
+---@type table<string, table>
+Mods = setmetatable({}, ModsOptionsMetaTable)
+
+---@alias Opt OptionVar|any
+
+---@param value any
+---@return OptionVar
+function Opt(value)
+    return setmetatable({ value = value }, OptValueMetaTable)
 end

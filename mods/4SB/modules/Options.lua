@@ -43,7 +43,7 @@ player = {
 
     color = {
         bg = OptVar4SB("player.color.bg", "66000000"),
-    }
+    },
 }
 
 observer = {
@@ -59,6 +59,7 @@ style = OptVar4SB("scoreboardStyle", "glow border")
 replayStyle = OptVar4SB("scoreboardReplayStyle", "glow border")
 
 teamScoreSort = OptVar4SB("teamScoreSort", false)
+showFullResourceData = OptVar4SB("showFullResourceData", false)
 teamColorAsBG = OptVar4SB("teamColorAsBG", false)
 teamColorAlpha = OptVar4SB("teamColorAlpha", 20)
 useDivisions = OptVar4SB("useDivisions", false)
@@ -69,6 +70,10 @@ snowflakesCount = OptVar4SB("snowflakesCount", 50)
 snowflakesSpeed = OptVar4SB("snowflakesSpeed", 100)
 
 scoreboardScale = OptVar4SB("scoreboardScale", 100)
+
+shortenAINickName = OptVar4SB("shortenAINickName", false)
+
+local Opt = UMT.Options.Opt
 
 function Init(isReplay)
 
@@ -95,6 +100,7 @@ function Init(isReplay)
             Options.Filter("Use divisions instead of rating", useDivisions, 4),
             Options.Filter("Use nickname color as army color", useNickNameArmyColor, 4),
             Options.Filter("In team score sorting", teamScoreSort, 4),
+            Options.Filter("Show all resource data simultaneously", showFullResourceData, 4),
             Options.ColorSlider("Background", player.color.bg, 4),
             Options.Filter("Display Team color as background", teamColorAsBG, 4),
             Options.Slider("Team color alpha", 0, 64, 1, teamColorAlpha, 4),
@@ -102,6 +108,7 @@ function Init(isReplay)
             Options.Filter("Snowflakes in scoreboard", snowflakes, 4),
             Options.Slider("Snowflakes count", 25, 200, 25, snowflakesCount, 4),
             Options.Slider("Snowflakes speed", 10, 200, 10, snowflakesSpeed, 4),
+            Options.Filter("Shorten AI nicknames", shortenAINickName, 4),
         })
 
     Options.AddOptions(modName .. "FontsColors", "4z0t's ScoreBoard (Fonts/Colors)", {

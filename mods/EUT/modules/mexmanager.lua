@@ -5,22 +5,39 @@ local categoryMex = categories.MASSEXTRACTION * categories.STRUCTURE
 local categoryEngineer = categories.ENGINEER
 local GetIsPaused = GetIsPaused
 
-local Select = UMT.Select
+local HiddenSelect = UMT.Units.HiddenSelect
 local GetUnits = UMT.Units.Get
 local From = import("/mods/UMT/modules/linq.lua").From
 
 local UpdateMexOverlays = import("mexoverlay.lua").UpdateOverlays
 local UpdateMexPanel = import("mexpanel.lua").Update
-local Options = import("options.lua")
-
+local Options = UMT.Options.Mods["EUT"]
 
 local mexCategories = import("mexcategories.lua").mexCategories
 
-local upgradeT1 = Options.upgradeT1Option()
-local upgradeT2 = Options.upgradeT2Option()
-local unpauseAssisted = Options.unpauseAssisted()
-local unpauseAssistedBP = Options.unpauseAssistedBP()
-local unpauseOnce = Options.unpauseOnce()
+local upgradeT1
+local upgradeT2
+local unpauseAssisted
+local unpauseAssistedBP
+local unpauseOnce
+
+local function BindOptions()
+    Options.upgradeT1Option:Bind(function(var)
+        upgradeT1 = var()
+    end)
+    Options.upgradeT2Option:Bind(function(var)
+        upgradeT2 = var()
+    end)
+    Options.unpauseAssisted:Bind(function(var)
+        unpauseAssisted = var()
+    end)
+    Options.unpauseAssistedBP:Bind(function(var)
+        unpauseAssistedBP = var()
+    end)
+    Options.unpauseOnce:Bind(function(var)
+        unpauseOnce = var()
+    end)
+end
 
 local mexData = {}
 local toBePaused = {}
@@ -62,7 +79,7 @@ local function UpgradeMexes(mexes, selector)
     end
 
     if not table.empty(upgrades) then
-        Select.Hidden(function()
+        HiddenSelect(function()
             for upgradesTo, upMexes in upgrades do
                 SelectUnits(upMexes)
                 IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgradesTo, 1, false)
@@ -218,12 +235,12 @@ local function UpdateUI()
     UpdateMexOverlays(mexes)
 end
 
-function UpgradeAll(id)
-    UpgradeMexes(mexData[id].mexes)
+function UpgradeAll(id, selector)
+    UpgradeMexes(mexData[id].mexes, selector)
 end
 
-function UpgradeOnScreen(id)
-    Select.Hidden(function()
+function UpgradeOnScreen(id, selector)
+    HiddenSelect(function()
         local mexes = mexData[id].mexes
         mexes = From(mexes)
         UISelectionByCategory("MASSEXTRACTION STRUCTURE", false, true, false, false)
@@ -231,8 +248,16 @@ function UpgradeOnScreen(id)
         local result = mexes:Where(function(k, mex)
             return mexesOnScreen:Contains(mex)
         end):ToArray()
-        UpgradeMexes(result)
+        UpgradeMexes(result, selector)
     end)
+end
+
+function UpgradeAllCapped(id)
+    return UpgradeAll(id, IsCapped)
+end
+
+function UpgradeOnScreenCapped(id)
+    return UpgradeOnScreen(id, IsCapped)
 end
 
 function PauseWorst(id)
@@ -285,22 +310,6 @@ function SelectOnScreen(id)
 end
 
 function init()
-
-    Options.upgradeT1Option.OnChange = function(var)
-        upgradeT1 = var()
-    end
-    Options.upgradeT2Option.OnChange = function(var)
-        upgradeT2 = var()
-    end
-
-    Options.unpauseAssisted.OnChange = function(var)
-        unpauseAssisted = var()
-    end
-    Options.unpauseAssistedBP.OnChange = function(var)
-        unpauseAssistedBP = var()
-    end
-    Options.unpauseOnce.OnChange = function(var)
-        unpauseOnce = var()
-    end
+    BindOptions()
     import("/lua/ui/game/gamemain.lua").AddBeatFunction(UpdateUI, true)
 end

@@ -74,11 +74,11 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
             scoreboard:ApplyToViews(function(armyId, armyView)
                 if _teamColorAsBG then
-                    LayoutFor(armyView._color)
+                    armyView.Layouter(armyView._color)
                         :Fill(armyView)
                         :Color(UMT.ColorUtils.SetAlpha(armyView.TeamColor(), _teamColorAlpha))
                 else
-                    LayoutFor(armyView._color)
+                    armyView.Layouter(armyView._color)
                         :Top(armyView.Top)
                         :Bottom(armyView.Bottom)
                         :Right(armyView.Left)
@@ -106,6 +106,36 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
             end)
 
         end
+
+        Options.showFullResourceData:Bind(function(var)
+            local showFullResourceData = var()
+
+            scoreboard:SetFullDataView(showFullResourceData)
+            scoreboard:ResetWidthComponents()
+
+            scoreboard:ApplyToViews(function(armyId, armyView)
+                armyView:ResetFont()
+
+                local layouter = armyView.Layouter
+                if armyView.isAlly then
+                    if showFullResourceData then
+                        layouter(armyView._massBtn)
+                            :Width(85)
+                        layouter(armyView._energyBtn)
+                            :Width(85)
+                        layouter(armyView._mass)
+                            :AtRightIn(armyView, 110)
+                    else
+                        layouter(armyView._massBtn)
+                            :Width(35)
+                        layouter(armyView._energyBtn)
+                            :Width(35)
+                        layouter(armyView._mass)
+                            :AtRightIn(armyView, 50)
+                    end
+                end
+            end)
+        end)
 
         Options.useNickNameArmyColor.OnChange = function(var)
             local useNickNameColor = var()
@@ -140,7 +170,7 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
 
                 local SnowFlake = UMT.Views.Snowflake
                 local snowFlakeCount = Options.snowflakesCount()
-                local speed =  Options.snowflakesSpeed()
+                local speed = Options.snowflakesSpeed()
                 for i = 1, snowFlakeCount do
                     SnowFlake(
                         scoreboard.snowflakes,
@@ -157,20 +187,20 @@ if ExistGlobal "UMT" and UMT.Version >= 11 then
         end
         Options.snowflakesCount.OnChange = function()
             if not Options.snowflakes() then return end
-            
+
             if scoreboard.snowflakes then
                 scoreboard.snowflakes:Destroy()
             end
-            
+
             scoreboard.snowflakes = UMT.Controls.Group(scoreboard)
             LayoutFor(scoreboard.snowflakes)
                 :Fill(scoreboard)
                 :DisableHitTest(true)
-                
-                local SnowFlake = UMT.Views.Snowflake
-                local snowFlakeCount =  Options.snowflakesCount()
-                local speed =  Options.snowflakesSpeed()
-                for i = 1, snowFlakeCount do
+
+            local SnowFlake = UMT.Views.Snowflake
+            local snowFlakeCount = Options.snowflakesCount()
+            local speed = Options.snowflakesSpeed()
+            for i = 1, snowFlakeCount do
                 SnowFlake(
                     scoreboard.snowflakes,
                     speed,

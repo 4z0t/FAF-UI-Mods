@@ -7,5 +7,5 @@ do
         })
     end
 
-    actions['HBO'] = import("/mods/HBO/modules/views/view.lua").init
+    actions['HBO'] = function() import("/mods/HBO/modules/views/view.lua").init() end
 end

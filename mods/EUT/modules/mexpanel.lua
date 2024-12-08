@@ -5,7 +5,10 @@ local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutHelpers = import("/lua/maui/layouthelpers.lua")
 local Prefs = import("/lua/user/prefs.lua")
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Options = import("Options.lua")
+
+local Options = UMT.Options.Mods["EUT"]
+local From = import("/mods/UMT/modules/linq.lua").From
+local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
 local mexCategories = import("mexcategories.lua").mexCategories
 local MexManager = import("mexmanager.lua")
@@ -38,7 +41,11 @@ local function MexPanelHandleEvent(control, event, category)
                 end
             else
                 if event.Modifiers.Ctrl then
-                    MexManager.UpgradeOnScreen(id)
+                    if id == 4 and Options.upgradeRounded() then
+                        MexManager.UpgradeOnScreenCapped(id)
+                    else
+                        MexManager.UpgradeOnScreen(id)
+                    end
                 else
                     MexManager.SelectOnScreen(id)
                 end
@@ -52,7 +59,11 @@ local function MexPanelHandleEvent(control, event, category)
                 end
             else
                 if event.Modifiers.Ctrl then
-                    MexManager.UpgradeAll(id)
+                    if id == 4 and Options.upgradeRounded() then
+                        MexManager.UpgradeAllCapped(id)
+                    else
+                        MexManager.UpgradeAll(id)
+                    end
                 else
                     MexManager.SelectAll(id)
                 end
@@ -78,9 +89,7 @@ MexPanel = UMT.Class(Group) {
 
     __init = function(self, parent)
         Group.__init(self, parent)
-        self.Layouter = UMT.Layouter.FloorLayouter(function()
-            return Options.panelScale() / 100
-        end)
+        self.Layouter = UMT.Layouter.RoundLayouter(UMT.Layouter.Functions.Div(Options.panelScale:Raw(), 100))
 
         local pos = self:_LoadPosition()
         LayoutHelpers.AtLeftTopIn(self, parent, pos.left, pos.top)
@@ -88,7 +97,7 @@ MexPanel = UMT.Class(Group) {
         self.Layouter(self)
             :Width(170)
             :Height(60)
-            :EnableHitTest()
+            :DisableHitTest()
             :Over(parent, 100)
 
         self.contents = Group(self)
@@ -97,7 +106,11 @@ MexPanel = UMT.Class(Group) {
             :Width(168)
             :Height(50)
             :AtCenterIn(self)
+            :DisableHitTest()
 
+    end,
+
+    InitLayout = function(self)
         self:InitMexPanels(self.contents)
     end,
 

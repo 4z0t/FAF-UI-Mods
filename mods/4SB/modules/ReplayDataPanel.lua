@@ -145,10 +145,7 @@ DataPanel = UMT.Class(Group)
         end
 
         self._replayId = Text(self)
-    end,
 
-    __post_init = function(self)
-        self:Layout()
         self:_SetupCheckBoxes()
         self._sb:SetDataSetup(self._setup)
         self._replayId:SetText(tostring(UIUtil.GetReplayId() or ""))
@@ -156,8 +153,7 @@ DataPanel = UMT.Class(Group)
 
     ---@param self DataPanel
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
-
+    InitLayout = function(self, layouter)
 
         local dropdownsCount = table.getn(self._dropdowns)
 

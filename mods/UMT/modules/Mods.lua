@@ -1,3 +1,4 @@
+---@type table<string, true>
 local mods = {}
 
 function Load(isReplay)

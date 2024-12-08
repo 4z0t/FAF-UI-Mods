@@ -1,4 +1,4 @@
-local Group = import('/lua/maui/group.lua').Group
+local Group = UMT.Controls.Group
 import("Views/__Init__.lua")
 local Utils = import("Utils.lua")
 local ArmyViews = import("ArmyView.lua")
@@ -9,9 +9,7 @@ local ArmyViewsContainer = import("ArmyViewsContainer.lua").ArmyViewsContainer
 local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
 local LazyVar = import('/lua/lazyvar.lua').Create
 
-
-local LazyImport = UMT.LazyImport
-local Scores = LazyImport("/lua/ui/game/score.lua")
+local Scores = UMT.LazyImport("/lua/ui/game/score.lua")
 
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
@@ -29,7 +27,7 @@ local slideForward = UMT.Animation.Factory.Base
     :Create()
 
 
----@class ScoreBoard : Group, ILayoutable
+---@class ScoreBoard : UMT.Group
 ---@field GameSpeed PropertyTable<ScoreBoard, integer>
 ---@field protected _armyViews table<integer, ArmyView>
 ---@field protected _title TitlePanel
@@ -37,14 +35,14 @@ local slideForward = UMT.Animation.Factory.Base
 ---@field protected _focusArmy integer
 ---@field protected _lines ArmyView[]
 ---@field protected isHovered boolean
-ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
+ScoreBoard = UMT.Class(Group)
 {
     ---@param self ScoreBoard
     ---@param parent Control
     ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent)
-        self.Layouter = UMT.Layouter.FloorLayouter(LazyVar(1))
+        self.Layouter = UMT.Layouter.RoundLayouter(LazyVar(1))
 
         self._focusArmy = GetFocusArmy()
         self._title = false
@@ -55,27 +53,35 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
         self:ResetWidthComponents()
+        self:_InitArmyViews()
+        self._mode = "income"
     end,
 
     ---@param self ScoreBoard
     ResetWidthComponents = function(self)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
-        ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
+
+        if self._mode == "full" then
+            ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 260))
+        else
+            ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
+        end
     end,
 
-    ---@param self ScoreBoard
-    __post_init = function(self)
-
-        self:_InitArmyViews()
-        self:Layout()
-
-        self._mode = "income"
+    SetFullDataView = function(self, val)
+        if val then
+            self._mode = "full"
+        else
+            self._mode = "income"
+        end
+        local data = Scores.GetScoreCache()
+        self:UpdateArmiesData(data)
     end,
 
     ---@param self ScoreBoard
     ---@param layouter LayouterFunctor
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         if self._title then
             layouter(self._title)
                 :AtRightTopIn(self)
@@ -194,6 +200,7 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
         self:UpdateArmiesData(data)
     end,
+
     UpdateArmiesData = function(self, data)
         if data then
             local mode = self._mode
@@ -228,10 +235,11 @@ ScoreBoard = UMT.Class(Group, UMT.Interfaces.ILayoutable)
         end
     end,
 
-    ---comment
     ---@param self ScoreBoard
     ---@param delta number
     OnFrame = function(self, delta)
+        if self._mode == "full" then return end
+
         local isCtrl = IsKeyDown("control")
         local update = false
         if not isCtrl and self.isHovered and self._mode ~= "storage" then
@@ -288,18 +296,16 @@ ReplayScoreBoard = UMT.Class(ScoreBoard)
     __init = function(self, parent, isTitle)
         ScoreBoard.__init(self, parent, isTitle)
 
-        self._armiesContainer = ArmyViewsContainer(self)
-        self._teamsContainer = TeamViewsContainer(self)
         self._obs = ObserverPanel(self)
         self._dataPanel = DataPanel(self)
     end,
 
-
-    __post_init = function(self)
-        self:_Layout()
+    _InitArmyViews = function(self)
+        self._armiesContainer = ArmyViewsContainer(self)
+        self._teamsContainer = TeamViewsContainer(self)
     end,
 
-    _Layout = function(self)
+    InitLayout = function(self)
         if self._title then
             LayoutFor(self._title)
                 :AtRightTopIn(self)

@@ -7,6 +7,7 @@ local Prefs = import("/lua/user/prefs.lua")
 ---@field _o string
 ---@field _lv LazyVar
 ---@field _prev any
+---@operator call:any
 ---@field OnChange fun(self : OptionVar)
 ---@field OnSave fun(self : OptionVar)
 local OptionVarMetaTable = {}
@@ -65,6 +66,13 @@ end
 ---called when option data has been saved
 ---@return LazyVar
 function OptionVarMetaTable:OnSave()
+end
+
+---Sets OnChange function and calls it
+---@param fn fun(opt: OptionVar)
+function OptionVarMetaTable:Bind(fn)
+    self.OnChange = fn
+    self:OnChange()
 end
 
 ---creates optionvar with default value if there is no saved one with given name

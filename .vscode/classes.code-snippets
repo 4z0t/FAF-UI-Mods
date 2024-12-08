@@ -28,26 +28,76 @@
     },
     "classlayoutable": {
         "body": [
-            "${1:class} = Class(${2:Base})",
+            "---@class ${1:class} : ${2:Base}",
+            "${1:class} = UMT.Class(${2:Base})",
             "{",
             "",
-            "__init = function(self, parent)",
-            "   ${2:Base}.__init(self, parent)",
-            "end,",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      ${2:Base}.__init(self, parent)",
             "",
-            "__post_init = function(self)",
-            "   self:_Layout()",
-            "end,",
+            "   end,",
             "",
-            "_Layout = function(self)",
-            "end,",
-            "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "   end,",
             "}"
         ],
         "prefix": [
             "classlayoutable"
         ],
         "description": "class with layout interface"
+    },
+    "uigroup": {
+        "body": [
+            "local Group = UMT.Controls.Group"
+            "---@class ${1:class} : UMT.Group",
+            "${1:class} = UMT.Class(Group)",
+            "{",
+            "",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      Group.__init(self, parent)",
+            "",
+            "   end,",
+            "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "",
+            "   end,",
+            "}"
+        ],
+        "prefix": [
+            "uigroup"
+        ],
+        "description": "UI class inherited from UMT.Group"
+    },
+    "uibitmap": {
+        "body": [
+            "local Bitmap = UMT.Controls.Bitmap"
+            "---@class ${1:class} : UMT.Bitmap",
+            "${1:class} = UMT.Class(Bitmap)",
+            "{",
+            "",
+            "   ---@param self ${1:class}",
+            "   __init = function(self, parent)",
+            "      Bitmap.__init(self, parent)",
+            "",
+            "   end,",
+            "",
+            "   ---@param self ${1:class}",
+            "   ---@param layouter UMT.Layouter",
+            "   InitLayout = function(self, layouter)",
+            "",
+            "   end,",
+            "}"
+        ],
+        "prefix": [
+            "uibitmap"
+        ],
+        "description": "UI class inherited from UMT.Bitmap"
     },
     "classscrollable": {
         "body": [

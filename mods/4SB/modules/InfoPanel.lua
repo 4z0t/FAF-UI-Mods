@@ -44,13 +44,9 @@ InfoPanel = UMT.Class(Group)
         self._mapSize = Text(self)
     end,
 
-    __post_init = function(self)
-        self:Layout()
-    end,
-
     ---@param self InfoPanel
     ---@param layouter UMT.Layouter
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         local parent = self:GetParent()
 
         self._mapName:SetFont(Options.title.font.mapName:Raw(), textSize)

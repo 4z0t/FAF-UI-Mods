@@ -117,6 +117,55 @@ function LoopOverMexes(onScreen, upgrade)
     end
 end
 
+function UpgradeMexGotoNextNearestIdle()
+    do
+        local selectedUnits = GetSelectedUnits()
+        if selectedUnits then
+            import('/lua/keymap/hotbuild.lua').buildAction('Upgrades')
+        end
+    end
+    ConExecute "UI_SelectByCategory +inview MASSEXTRACTION STRUCTURE"
+    ---@type UserUnit[]
+    local mexes = GetSelectedUnits()
+    if not mexes then
+        return
+    end
+    local underUpgrade = {}
+    for _, mex in ipairs(mexes) do
+        if mex:IsInCategory "TECH3" then
+            continue
+        end
+        local focus = mex:GetFocus()
+        if focus then
+            underUpgrade[focus] = true
+        end
+    end
+    ConExecute "UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH1"
+    local mexes = GetSelectedUnits()
+    if not mexes then
+        ConExecute "UI_SelectByCategory +inview +idle MASSEXTRACTION STRUCTURE TECH2"
+        mexes = GetSelectedUnits()
+        if not mexes then
+            return
+        end
+    end
+
+    local minDist = nil
+    local idleMex = nil
+    local mousePos = GetMouseWorldPos()
+    for _, mex in ipairs(mexes) do
+        local mexPos = mex:GetPosition()
+        local dist = VDist3(mousePos, mexPos)
+        if not underUpgrade[mex] and (not minDist or dist < minDist) then
+            minDist = dist
+            idleMex = mex
+        end
+    end
+    if idleMex then
+        SelectUnits { idleMex }
+    end
+end
+
 KeyMapper.SetUserKeyAction("Remove last ququed unit in factory", {
     action = "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").RemoveLastItem()",
     category = "orders",
@@ -234,7 +283,7 @@ KeyMapper.SetUserKeyAction("Select all radars", {
 
 
 KeyMapper.SetUserKeyAction("Upgrade mex, select next nearest", {
-    action = "UI_Lua import('/lua/keymap/hotbuild.lua').buildAction('Upgrades'); UI_SelectByCategory +inview +idle +nearest MASSEXTRACTION STRUCTURE",
+    action = "UI_Lua import('/lua/keymap/misckeyactions.lua').UpgradeMexGotoNextNearestIdle()",
     category = "selection",
     order = 29
 })
@@ -252,7 +301,7 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         if not selection then return end
 
         local isAllFactories = selection
-            | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' end)
+            | LuaQ.all(function(_, unit) return unit:IsInCategory 'FACTORY' or unit:IsInCategory 'EXTERNALFACTORY' end)
 
         if not isAllFactories then
             import("/lua/ui/game/orders.lua").EnterOverchargeMode()
@@ -260,11 +309,14 @@ if ExistGlobal "UMT" and UMT.Version >= 8 then
         end
 
         local isRepeatBuild = selection
-            | LuaQ.any(function(_, unit) return unit:IsRepeatQueue() end)
+            | LuaQ.all(function(_, unit) return unit:IsRepeatQueue() end)
             and 'false'
             or 'true'
         for _, unit in selection do
             unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
+                unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            end
         end
     end
 else
@@ -278,37 +330,39 @@ KeyMapper.SetUserKeyAction("Toggle repeat build of factories / OC mode", {
     category = "order"
 })
 
+do -- upgrades
+
+    KeyMapper.SetUserKeyAction("Order Tech upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTechUpgrade()",
+        category = "Upgrade"
+    })
+    KeyMapper.SetUserKeyAction("Order Engineering upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/SACUEnhancements.lua').OrderTechUpgrade()",
+        category = "Upgrade"
+    })
+    KeyMapper.SetUserKeyAction("Order RAS upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderRASUpgrade()",
+        category = "Upgrade"
+    })
+    KeyMapper.SetUserKeyAction("Order Gun upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderGunUpgrade()",
+        category = "Upgrade"
+    })
+
+    KeyMapper.SetUserKeyAction("Order Shield / Stealth / Nano upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderNanoUpgrade()",
+        category = "Upgrade"
+    })
+
+    KeyMapper.SetUserKeyAction("Order Laser / Chrono / Gun splash / Billy nuke upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderSpecialUpgrade()",
+        category = "Upgrade"
+    })
 
 
-KeyMapper.SetUserKeyAction("Order Tech upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTechUpgrade()",
-    category = "Upgrade"
-})
-KeyMapper.SetUserKeyAction("Order Engineering upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/SACUEnhancements.lua').OrderTechUpgrade()",
-    category = "Upgrade"
-})
-KeyMapper.SetUserKeyAction("Order RAS upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderRASUpgrade()",
-    category = "Upgrade"
-})
-KeyMapper.SetUserKeyAction("Order Gun upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderGunUpgrade()",
-    category = "Upgrade"
-})
+    KeyMapper.SetUserKeyAction("Order Tele upgrade", {
+        action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
+        category = "Upgrade"
+    })
 
-KeyMapper.SetUserKeyAction("Order Shield / Stealth / Nano upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderNanoUpgrade()",
-    category = "Upgrade"
-})
-
-KeyMapper.SetUserKeyAction("Order Laser / Chrono / Gun splash / Billy nuke upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderSpecialUpgrade()",
-    category = "Upgrade"
-})
-
-
-KeyMapper.SetUserKeyAction("Order Tele upgrade", {
-    action = "UI_Lua import('/mods/AOE/modules/ACUEnhancements.lua').OrderTeleUpgrade()",
-    category = "Upgrade"
-})
+end

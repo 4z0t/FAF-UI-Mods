@@ -39,14 +39,10 @@ ArmyViewsContainer = UMT.Class(Group)
         self._sortDirection = false
 
         self._dataSetup = { 1, 1, 1, 1, 1 }
-    end,
-
-    __post_init = function(self)
         self:_InitArmyViews()
-        self:Layout()
     end,
 
-    _Layout = function(self, layouter)
+    InitLayout = function(self, layouter)
         local last
         local first
         for i, armyView in self._lines do

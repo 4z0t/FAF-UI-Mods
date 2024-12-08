@@ -2,6 +2,7 @@ local MathAbs = math.abs
 
 local Text = UMT.Controls.Text
 
+local Options = import("Options.lua")
 local isReplay = import("/lua/ui/game/gamemain.lua").GetReplayState()
 local sessionInfo = SessionGetScenarioInfo()
 
@@ -26,6 +27,10 @@ end
 ---@field teamId integer
 ---@field division string
 
+function ShortAIName(name)
+    return string.gsub(name, '^(%S+) %((AI[Xx]?): .+%)$', '%1 (%2)')
+end
+
 ---returns army data
 ---@return ArmyData[]
 function GetArmiesFormattedTable()
@@ -40,13 +45,16 @@ function GetArmiesFormattedTable()
                 local nickname = armyData.nickname
                 local clanTag  = sessionInfo.Options.ClanTags[nickname] or ""
                 local name     = nickname
+                if Options.shortenAINickName() then
+                    name = ShortAIName(name)
+                end
                 if clanTag ~= "" then
                     name = ("[%s] %s"):format(clanTag, nickname)
                 end
                 local data = {
                     faction = armyData.faction,
                     name = name,
-                    nickname = armyData.nickname,
+                    nickname = nickname,
                     color = armyData.color,
                     isAlly = not IsObserver() and IsAlly(focusArmy, armyIndex),
                     id = armyIndex,

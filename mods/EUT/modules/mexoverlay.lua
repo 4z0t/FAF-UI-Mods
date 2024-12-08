@@ -1,27 +1,29 @@
+local IsDestroyed = IsDestroyed
+
 local Bitmap = import("/lua/maui/bitmap.lua").Bitmap
 local UIUtil = import("/lua/ui/uiutil.lua")
 local LayoutFor = UMT.Layouter.ReusedLayoutFor
 
-local Options = import("options.lua")
+local Options = UMT.Options.Mods["EUT"]
 
 ---@type WorldView
 local worldView = import("/lua/ui/game/worldview.lua").viewLeft
 
 local overlays = UMT.Weak.Value {}
 
-local showOverlay = Options.overlayOption()
-local useNumberOverlay = Options.useNumberOverlay()
+local showOverlay
+local useNumberOverlay
 
 local overlaySize = Options.overlaySize:Raw()
 
 function init()
-    Options.overlayOption.OnChange = function(var)
+    Options.overlayOption:Bind(function(var)
         showOverlay = var()
-    end
+    end)
 
-    Options.useNumberOverlay.OnChange = function(var)
+    Options.useNumberOverlay:Bind(function(var)
         useNumberOverlay = var()
-    end
+    end)
 end
 
 local upgradeColor = "ff00ff00"
@@ -67,14 +69,15 @@ local NumberMexOverlay = Class(Overlay)
 
         local text = "0"
         if unit:IsInCategory("TECH1") then
-            text = "1"
+            text = Options.t1MexText()
         elseif unit:IsInCategory("TECH2") then
-            text = "2"
+            text = Options.t2MexText()
         elseif unit:IsInCategory("TECH3") then
-            text = "3"
+            text = Options.t3MexText()
         end
 
         self.text = UIUtil.CreateText(self, text, 10, UIUtil.bodyFont)
+
         self.progress = Bitmap(self)
 
         LayoutFor(self)

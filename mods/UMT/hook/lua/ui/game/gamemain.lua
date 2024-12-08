@@ -18,3 +18,21 @@ do
 
     end
 end
+
+local LOG = LOG
+local WARN = WARN
+local error = error
+local StringFormat = string.format
+local unpack = unpack
+
+function _G.LogF(formatString, ...)
+    LOG(StringFormat(formatString, unpack(arg)))
+end
+
+function _G.WarnF(formatString, ...)
+    WARN(StringFormat(formatString, unpack(arg)))
+end
+
+function _G.ErrorF(formatString, ...)
+    error(StringFormat(formatString, unpack(arg)))
+end

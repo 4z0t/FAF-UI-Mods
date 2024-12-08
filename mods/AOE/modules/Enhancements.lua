@@ -3,7 +3,7 @@ local EnhancementQueueFile = import("/lua/ui/notify/enhancementqueue.lua")
 
 local LuaQ = UMT.LuaQ
 
-
+---@param unit UserUnit
 function HasOrderedUpgrades(unit)
     if not unit:IsIdle() then
         local cmdqueue = unit:GetCommandQueue()
@@ -26,6 +26,10 @@ function GetBluePrintEnhancements(bp)
     end)
 end
 
+---@alias Upgrade string
+
+---@param unit UserUnit
+---@return Upgrade[]
 function GetAllInstalledEnhancements(unit)
 
     local id = unit:GetEntityId()
@@ -36,25 +40,72 @@ function GetAllInstalledEnhancements(unit)
     local enhancements = {}
 
     for _, enh in existingEnhancements do
-        table.insert(enhancements, enh)
-        if bpEnhancements[enh].Prerequisite then
-            table.insert(enhancements, bpEnhancements[enh].Prerequisite)
-        end
+        local prerequisite = enh
+        repeat
+            table.insert(enhancements, prerequisite)
+            prerequisite = bpEnhancements[prerequisite].Prerequisite
+        until not prerequisite
     end
 
     return enhancements
 end
 
 ---@param unit UserUnit
+---@param upgrade Upgrade
+---@return boolean
+function IsInstalled(unit, upgrade)
+
+    local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return false end
+
+    local existingEnhancements = EnhanceCommon.GetEnhancements(unit:GetEntityId())
+    if not existingEnhancements then return false end
+
+    for _, enh in existingEnhancements do
+        local prerequisite = enh
+        repeat
+            if upgrade == prerequisite then
+                return true
+            end
+            prerequisite = bpEnhancements[prerequisite].Prerequisite
+        until not prerequisite
+    end
+
+    return false
+end
+
+function IsOccupiedSlotFor(unit, enhancement)
+    local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
+    if not bpEnhancements then return false end
+
+    if not bpEnhancements[enhancement] then return false end
+
+    local id = unit:GetEntityId()
+    local existingEnhancements = EnhanceCommon.GetEnhancements(id) or {}
+    if table.empty(existingEnhancements) then return false end
+
+    local slot = bpEnhancements[enhancement].Slot
+    local prerequisite = bpEnhancements[enhancement].Prerequisite
+
+    for _, enh in existingEnhancements do
+        if prerequisite ~= enh and bpEnhancements[enh].Slot == slot then
+            return bpEnhancements[enh].Name
+        end
+    end
+    return false
+end
+
+---@param unit UserUnit
 ---@param enhancement any
-function OrderUnitEnhancement(unit, enhancement)
+---@param noClear? boolean
+function OrderUnitEnhancement(unit, enhancement, noClear)
 
     local bpEnhancements = GetBluePrintEnhancements(unit:GetBlueprint())
     if not bpEnhancements then return end
 
     if not bpEnhancements[enhancement] then return end
 
-    if GetAllInstalledEnhancements(unit) | LuaQ.contains(enhancement) then return end
+    if IsInstalled(unit, enhancement) then return end
 
     local id = unit:GetEntityId()
 
@@ -76,7 +127,6 @@ function OrderUnitEnhancement(unit, enhancement)
                 table.insert(orders, enh .. "Remove")
             end
         end
-
     end
 
     RemoveUpgradeInRequiredSlot()
@@ -95,9 +145,7 @@ function OrderUnitEnhancement(unit, enhancement)
 
     table.insert(orders, enhancement)
 
-
-    local cleanOrder = not HasOrderedUpgrades(unit)
-
+    local cleanOrder = not HasOrderedUpgrades(unit) and not noClear
 
     for _, order in orders do
         IssueCommand("UNITCOMMAND_Script",
@@ -108,10 +156,9 @@ function OrderUnitEnhancement(unit, enhancement)
             cleanOrder)
         cleanOrder = false
     end
-
-
 end
 
+---@param fn fun(unit:UserUnit)
 function ApplyToSelectedUnits(fn)
     local selection = GetSelectedUnits()
     if not selection then return end
@@ -124,23 +171,24 @@ function ApplyToSelectedUnits(fn)
     end)
 end
 
+---@param unit UserUnit
+---@param prerequisite Upgrade
 function HasPrerequisite(unit, prerequisite)
 
     local id = unit:GetEntityId()
 
-    local installedEnhancements = GetAllInstalledEnhancements(unit)
     local enhancementQueue = EnhancementQueueFile.getEnhancementQueue()
     local orderedEnhancements = enhancementQueue[id] or {}
 
-    local pre = installedEnhancements | LuaQ.contains(prerequisite)
-
-    return pre or orderedEnhancements | LuaQ.first(function(tbl)
+    return IsInstalled(unit, prerequisite) or orderedEnhancements | LuaQ.first(function(tbl)
         return tbl.ID == prerequisite
     end)
 end
 
-function OrderEnhancement(enhancement)
+---@param enhancement string
+---@param noClearOrders? boolean
+function OrderEnhancement(enhancement, noClearOrders)
     ApplyToSelectedUnits(function(unit)
-        OrderUnitEnhancement(unit, enhancement)
+        OrderUnitEnhancement(unit, enhancement, noClearOrders)
     end)
 end

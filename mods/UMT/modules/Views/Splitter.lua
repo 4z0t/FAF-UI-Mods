@@ -4,10 +4,10 @@ local LayoutFor = UMT.Layouter.ReusedLayoutFor
 Splitter = Class(Bitmap)
 {
     __post_init = function(self, parent, color)
-        self:_Layout(parent, color)
+        self:InitLayout(parent, color)
     end,
 
-    _Layout = function(self, parent, color)
+    InitLayout = function(self, parent, color)
         LayoutFor(self)
             :Height(2)
             :Color(color)

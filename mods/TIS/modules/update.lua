@@ -1,8 +1,4 @@
-local AddBeatFunction = import('/lua/ui/game/gamemain.lua').AddBeatFunction
-local Prefs = import('/lua/user/prefs.lua')
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
-
-
 local GetUnits = import("/mods/UMT/modules/units.lua").Get
 
 local Exp = import('exp.lua')
@@ -10,25 +6,21 @@ local Nuke = import('nuke.lua')
 local Smd = import('smd.lua')
 local Data = import('data.lua')
 
-
+local ScaleNumber = LayoutHelpers.ScaleNumber
+local MathFloor = math.floor
 
 function AtCenterInOffset(control, parent)
     control.Left:Set(function()
-        return math.floor(parent.Left() +
-            (((parent.Width() / 2) - (control.Width() / 2)) +
-                LayoutHelpers.ScaleNumber(control.offsetX())))
+        return MathFloor(parent.Left() + (parent.Width() - control.Width()) * 0.5 + ScaleNumber(control.offsetX()))
     end)
     control.Top:Set(function()
-        return math.floor(parent.Top() +
-            (((parent.Height() / 2) - (control.Height() / 2)) +
-                LayoutHelpers.ScaleNumber(control.offsetY())))
+        return MathFloor(parent.Top() + (parent.Height() - control.Height()) * 0.5 + ScaleNumber(control.offsetY()))
     end)
 end
 
-
 local listeners = {}
 local function UpdateUnitsListeners()
-    local units =GetUnits()
+    local units = GetUnits()
     for _, unit in units do
         if (not unit:IsDead()) then
             if not listeners[unit:GetEntityId()] then
@@ -56,5 +48,5 @@ end
 
 function init(isReplay)
     -- Smd.init(isReplay)
-    AddBeatFunction(UpdateUnitsListeners, true)
+    import('/lua/ui/game/gamemain.lua').AddBeatFunction(UpdateUnitsListeners, true)
 end

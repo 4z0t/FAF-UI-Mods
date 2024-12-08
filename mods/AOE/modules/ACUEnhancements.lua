@@ -71,20 +71,11 @@ function UpgradeSpecial(unit)
     Enhancements.OrderUnitEnhancement(unit, upgrade)
 end
 
-local nano1UpgradeMap =
-{
-    ["url0001"] = "StealthGenerator",
-    ["uel0001"] = "Shield",
-    ["xsl0001"] = "DamageStabilization",
-    ["ual0001"] = "Shield",
-}
-
-local nano2UpgradeMap =
-{
-    ["url0001"] = "CloakingGenerator",
-    ["uel0001"] = "ShieldGeneratorField",
-    ["xsl0001"] = "DamageStabilizationAdvanced",
-    ["ual0001"] = "ShieldHeavy",
+local nanoUpgrades = {
+    ["url0001"] = { "StealthGenerator", "FAF_SelfRepairSystem", "CloakingGenerator", },
+    ["uel0001"] = { "Shield", "ShieldGeneratorField", },
+    ["xsl0001"] = { "DamageStabilization", "DamageStabilizationAdvanced", },
+    ["ual0001"] = { "Shield", "ShieldHeavy", },
 }
 
 ---@param unit UserUnit
@@ -92,16 +83,16 @@ function UpgradeNano(unit)
     local bpEnhancements = Enhancements.GetBluePrintEnhancements(unit:GetBlueprint())
     if not bpEnhancements then return end
 
-    local upgrade = nano1UpgradeMap[unit:GetBlueprint().BlueprintId:lower()]
-    if not upgrade then return end
+    local bpId = unit:GetBlueprint().BlueprintId:lower()
+    local upgrades = nanoUpgrades[bpId]
+    if not upgrades then return end
 
-
-
-    if Enhancements.HasPrerequisite(unit, upgrade) then
-        upgrade = nano2UpgradeMap[unit:GetBlueprint().BlueprintId:lower()]
-        if not upgrade then return end
+    for _, upgrade in upgrades do
+        if not Enhancements.HasPrerequisite(unit, upgrade) then
+            Enhancements.OrderUnitEnhancement(unit, upgrade)
+            break
+        end
     end
-    Enhancements.OrderUnitEnhancement(unit, upgrade)
 end
 
 function OrderTechUpgrade()
@@ -123,6 +114,7 @@ end
 function OrderNanoUpgrade()
     Enhancements.ApplyToSelectedUnits(UpgradeNano)
 end
+
 function OrderSpecialUpgrade()
     Enhancements.ApplyToSelectedUnits(UpgradeSpecial)
 end

@@ -22,7 +22,7 @@ end
 ---@return fun(scoreboard:ScoreBoard)
 Layout = function(scoreboard, layouter)
 
-    scoreboard:Layout()
+    scoreboard:InitLayout(layouter)
     scoreboard._bracket = UMT.Views.FactionRightBracket(scoreboard)
 
     scoreboard._border = Group(scoreboard)

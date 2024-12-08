@@ -1,6 +1,3 @@
-local Prefs = import('/lua/user/prefs.lua')
-local Edit = import('/lua/maui/edit.lua').Edit
-local Text = import('/lua/maui/text.lua').Text
 local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
@@ -18,7 +15,7 @@ local Combo = import('/lua/ui/controls/combo.lua').Combo
 
 local LayoutFor = import("/mods/UMT/modules/Layouter.lua").ReusedLayoutFor
 local LazyVar = import('/lua/lazyvar.lua')
-local IScrollable = import('IScrollable.lua').IScrollable
+local Scrollable = import('Scrollable.lua').Scrollable
 local BPItem = import('BlueprintItem.lua')
 local BlueprintItem = BPItem.BlueprintItem
 local BPITEM_WIDTH = BPItem.BPITEM_WIDTH
@@ -44,11 +41,13 @@ function CreateUI(parent)
     ViewModel.SetActive()
     local group = Group(parent)
 
-    group.popup = Popup(parent, group)
     LayoutFor(group)
         :Width(1300)
         :Height(900)
         :AtCenterIn(parent)
+
+    group.popup = Popup(parent, group)
+    LayoutFor(group)
         :Over(group.popup, 10)
 
 
@@ -110,14 +109,20 @@ function CreateUI(parent)
         ViewModel.SendActiveBuildTable()
     end
 
+    ---@type Edit
     group.edit = Edit(group)
     LayoutFor(group.edit)
-        :AtLeftTopIn(group, 100, 40)
-        :Width(200)
-        :Height(20)
+        :AtTopCenterIn(group, 40)
+        :Width(700)
+        :Height(30)
 
-    UIUtil.SetupEditStd(group.edit, UIUtil.factionTextColor, nil, UIUtil.highlightColor, UIUtil.consoleBGColor, nil,
-        nil, 20)
+    UIUtil.SetupEditStd(group.edit,
+        UIUtil.factionTextColor,
+        nil,
+        UIUtil.highlightColor,
+        UIUtil.consoleBGColor,
+        "Arial", 24, 50
+    )
 
     group.edit.OnEnterPressed = function(self, text)
         return true
@@ -132,7 +137,7 @@ function CreateUI(parent)
         UpdateUI()
     end
     LayoutFor(group.combo)
-        :AtLeftTopIn(group, 50, 20)
+        :LeftOf(group.edit, 20)
         :Width(200)
 
     group.construction = ConstructionScrollArea(group, ViewModel.FetchConstructionBlueprints(), 5)
@@ -143,7 +148,7 @@ function CreateUI(parent)
         :Below(group.construction, 10)
         :Height(500)
         :Width(group.construction.Width)
-    
+
     local function CreateSingleCategory(category, catParent)
         local categoryGroup = Group(catParent)
         local name = UIUtil.CreateText(categoryGroup, category, 20, UIUtil.titleFont, true)
@@ -218,45 +223,39 @@ function CreateUI(parent)
 end
 
 function UpdateUI()
-    if not IsDestroyed(GUI) then
-        GUI.construction:SetSize(ViewModel.FetchConstructionCount())
-        GUI.construction:CalcVisible()
-        for name, category in GUI.categories do
-            for faction, selector in category.selectors do
-                selector:SetBlueprint(ViewModel.FetchBlueprint(name, faction))
-            end
+    if IsDestroyed(GUI) then return end
+
+    GUI.construction:SetSize(ViewModel.FetchConstructionCount())
+    GUI.construction:CalcVisible()
+    for name, category in GUI.categories do
+        for faction, selector in category.selectors do
+            selector:SetBlueprint(ViewModel.FetchBlueprint(name, faction))
         end
     end
+
 end
 
 function UpdateItems(item)
-    if not IsDestroyed(GUI) then
-        local curItem
-        if item then
-            curItem = item
-        else
-            _, curItem = GUI.combo:GetItem()
-        end
-        GUI.combo:ClearItems()
-        local items = ViewModel.FetchHotBuilds(true)
-        local index = 1
-        for k, v in items do
-            if v == curItem then
-                index = k
-                break
-            end
-        end
-        GUI.combo:AddItems(items, index)
+    if IsDestroyed(GUI) then return end
 
+    local curItem
+    if item then
+        curItem = item
+    else
+        _, curItem = GUI.combo:GetItem()
     end
+    GUI.combo:ClearItems()
+    local items = ViewModel.FetchHotBuilds(true)
+    local index = (items | UMT.LuaQ.contains(curItem)) or 1
+    GUI.combo:AddItems(items, index)
 end
 
 local swapColor = LazyVar.Create("ff00ffff")
 MAX_ITEMS = 7
 
-BlueprintSelector = Class(IScrollable) {
+BlueprintSelector = Class(Scrollable) {
     __init = function(self, parent, blueprintArray, skin, maxItems)
-        IScrollable.__init(self, parent)
+        Scrollable.__init(self, parent)
         LayoutHelpers.DepthOverParent(self, parent, 20)
         self._topLine = 1
         self._blueprints = blueprintArray
@@ -320,15 +319,19 @@ BlueprintSelector = Class(IScrollable) {
 }
 DEFAULT_CONSTRUCTION_ITEM_COUNT = 4
 
-ConstructionScrollArea = Class(IScrollable) {
+---@class ConstructionScrollArea : Scrollable
+---@field _title Text
+ConstructionScrollArea = Class(Scrollable) {
+    ---@param self ConstructionScrollArea
+    ---@param parent Control
+    ---@param blueprints any
+    ---@param itemCount number
     __init = function(self, parent, blueprints, itemCount)
-        IScrollable.__init(self, parent)
+        Scrollable.__init(self, parent)
         LayoutHelpers.DepthOverParent(self, parent, 10)
 
+        self:Setup(1, itemCount or DEFAULT_CONSTRUCTION_ITEM_COUNT, DEFAULT_CONSTRUCTION_ITEM_COUNT)
         self._blueprints = blueprints
-        self._topLine = 1
-        self._numLines = DEFAULT_CONSTRUCTION_ITEM_COUNT
-        self._dataSize = itemCount or DEFAULT_CONSTRUCTION_ITEM_COUNT
         self._swapIndex = false
 
         self._title = UIUtil.CreateText(self, 'Construction', 20, UIUtil.titleFont, true)
@@ -338,11 +341,7 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     SetSize = function(self, size)
-        if size > DEFAULT_CONSTRUCTION_ITEM_COUNT then
-            self._dataSize = size
-        else
-            self._dataSize = DEFAULT_CONSTRUCTION_ITEM_COUNT
-        end
+        self._dataSize = math.max(size, DEFAULT_CONSTRUCTION_ITEM_COUNT)
     end,
 
     CreateItems = function(self, skin)
@@ -481,8 +480,10 @@ ConstructionScrollArea = Class(IScrollable) {
     end,
 
     DecreaseSize = function(self)
-        if ViewModel.IsEmpty(self._dataSize) and ViewModel.IsEmpty(self._dataSize - 1) and
-            (self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT) then
+        if ViewModel.IsEmpty(self._dataSize) and
+            ViewModel.IsEmpty(self._dataSize - 1) and
+            self._dataSize > DEFAULT_CONSTRUCTION_ITEM_COUNT
+        then
             self._dataSize = self._dataSize - 1
             self._topLine = math.max(math.min(self._dataSize - self._numLines + 1, self._topLine), 1)
         end
