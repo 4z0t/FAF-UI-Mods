@@ -20,13 +20,13 @@ function Main()
     local options = UMT.Options.Mods["RFA"]
     Options.AddOptions("RFA", "Rings For All",
         {
-            Options.Strings("Hover Preview key (restart required)",
+            Options.Strings("Hover Preview key",
                 {
                     "SHIFT",
                     "CONTROL"
                 },
                 options.hoverPreviewKey),
-            Options.Strings("Selected Preview key (restart required)",
+            Options.Strings("Selected Preview key",
                 {
                     "SHIFT",
                     "CONTROL"
@@ -42,7 +42,7 @@ function Main()
             Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Filter("Show Sonar range", options.showSonar, 4),
             Options.Filter("Show Counter-intel range", options.showCounterIntel, 4),
-            Options.Strings("Build Preview key (restart required)",
+            Options.Strings("Build Preview key",
                 {
                     "SHIFT",
                     "CONTROL"

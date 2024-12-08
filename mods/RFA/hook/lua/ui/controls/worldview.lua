@@ -60,6 +60,21 @@ do
             minimap._showRings = opt()
         end
     end)
+    options.hoverPreviewKey:Bind(function(opt)
+        for _, view in GetWorldViews() do
+            view.HoverPreviewKey = opt()
+        end
+    end)
+    options.selectedPreviewKey:Bind(function(opt)
+        for _, view in GetWorldViews() do
+            view.SelectedPreviewKey = opt()
+        end
+    end)
+    options.buildPreviewKey:Bind(function(opt)
+        for _, view in GetWorldViews() do
+            view.BuildPreviewKey = opt()
+        end
+    end)
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
 
