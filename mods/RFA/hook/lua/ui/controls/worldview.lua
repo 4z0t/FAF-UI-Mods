@@ -69,10 +69,10 @@ do
             end
         end
         if bp.Intel ~= nil then
-            if showOmni and bp.Intel.OmniRadius then
+            if showOmni and bp.Intel.OmniRadius > 0 then
                 TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
             end
-            if showRadar and bp.Intel.RadarRadius then
+            if showRadar and bp.Intel.RadarRadius > 0 then
                 TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
             end
         end
