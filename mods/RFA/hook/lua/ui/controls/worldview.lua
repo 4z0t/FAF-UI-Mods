@@ -75,6 +75,18 @@ do
                 TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
             end
         end
+        local sortOrder = {
+            ["AllMilitary"] = 1,
+            ["IndirectFire"] = 2,
+            ["AntiAir"] = 3,
+            ["Defense"] = 4,
+            ["AntiNavy"] = 5,
+            ["Omni"] = 6,
+            ["Radar"] = 7,
+        }
+        table.sort(weapons, function(a, b)
+            return sortOrder[a[1]] > sortOrder[b[1]]
+        end)
 
         return weapons
     end
