@@ -11,6 +11,7 @@ do
     local options = UMT.Options.Mods["RFA"]
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
+    local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
 
     ---@class RingData
     ---@field [1] string # type
@@ -52,6 +53,12 @@ do
     end)
     options.showCounterIntel:Bind(function(opt)
         showCounterIntel = opt()
+    end)
+    options.showInMinimap:Bind(function(opt)
+        local minimap = GetWorldViews()["MiniMap"]
+        if minimap then
+            minimap._showRings = opt()
+        end
     end)
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
@@ -179,7 +186,7 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
-            local render = self.SetCustomRender and self:GetName() ~= "MiniMap"
+            local render = self.SetCustomRender
             if render then
                 self._hoverRings = {}
                 self._selectionRings = {}

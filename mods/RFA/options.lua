@@ -12,6 +12,7 @@ UMT.Options.Mods["RFA"] = {
     showRadar = Opt(true),
     showSonar = Opt(true),
     showCounterIntel = Opt(true),
+    showInMinimap = Opt(false),
 }
 
 function Main()
@@ -31,6 +32,7 @@ function Main()
                     "CONTROL"
                 },
                 options.selectedPreviewKey),
+            Options.Filter("Show range rings in minimap", options.showInMinimap, 4),
             Options.Filter("Show Direct Fire weapon range", options.showDirectFire, 4),
             Options.Filter("Show Indirect Fire weapon range", options.showIndirectFire, 4),
             Options.Filter("Show Anti air weapon range", options.showAntiAir, 4),
