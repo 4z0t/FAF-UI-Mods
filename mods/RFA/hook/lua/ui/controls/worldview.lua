@@ -24,6 +24,7 @@ do
     local showOmni = false
     local showRadar = false
     local showSonar = false
+    local showCounterIntel = false
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -48,6 +49,9 @@ do
     end)
     options.showSonar:Bind(function(opt)
         showSonar = opt()
+    end)
+    options.showCounterIntel:Bind(function(opt)
+        showCounterIntel = opt()
     end)
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
@@ -81,6 +85,9 @@ do
             end
             if showSonar and bp.Intel.SonarRadius > 0 then
                 TableInsert(weapons, { "Sonar", bp.Intel.SonarRadius })
+            end
+            if showCounterIntel and (bp.Intel.CloakFieldRadius > 0 or bp.Intel.SonarStealthFieldRadius > 0 or bp.Intel.SonarStealthFieldRadius > 0) then
+                TableInsert(weapons, {"CounterIntel", MathMax(bp.Intel.CloakFieldRadius, bp.Intel.SonarStealthFieldRadius, bp.Intel.SonarStealthFieldRadius)})
             end
         end
         local sortOrder = {

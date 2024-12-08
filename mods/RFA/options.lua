@@ -11,6 +11,7 @@ UMT.Options.Mods["RFA"] = {
     showOmni = Opt(true),
     showRadar = Opt(true),
     showSonar = Opt(true),
+    showCounterIntel = Opt(true),
 }
 
 function Main()
@@ -38,6 +39,7 @@ function Main()
             Options.Filter("Show Omni range", options.showOmni, 4),
             Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Filter("Show Sonar range", options.showSonar, 4),
+            Options.Filter("Show Counter-intel range", options.showCounterIntel, 4),
             Options.Strings("Build Preview key (restart required)",
                 {
                     "SHIFT",
