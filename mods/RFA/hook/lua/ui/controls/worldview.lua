@@ -186,10 +186,10 @@ do
                         self:ClearSelectionRings()
                     end
 
-                    if IsKeyDown(self.BuildPreviewKey) then
-                        self:UpdateBuildRings()
-                    elseif IsKeyDown(18) then --alt
+                    if IsKeyDown(18) then --alt
                         self:UpdateReclaimRings()
+                    elseif IsKeyDown(self.BuildPreviewKey) then
+                        self:UpdateBuildRings()
                     else
                         self:ClearBuildRings()
                     end
