@@ -245,6 +245,24 @@ do
             return oldWorldView.OnUpdateCursor(self)
         end,
 
+        --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
+        ---@param self WorldView
+        ---@param event KeyEvent
+        ---@return boolean
+        HandleEvent = function(self, event)
+            if event.Type == "MouseExit" then
+                self:ClearBuildRings()
+                if self._hoverRings then
+                    self:ClearHoverRings()
+                end
+                if self._selectionRings then
+                    self:ClearSelectionRings()
+                end
+            end
+
+            return oldWorldView.HandleEvent(self, event)
+        end,
+
         ---@param self WorldView
         UpdateHoverRings = function(self)
             local info = GetRolloverInfo()
