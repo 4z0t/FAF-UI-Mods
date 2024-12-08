@@ -45,6 +45,8 @@ do
         showRadar = opt()
     end)
 
+    local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
+
     ---@param bp UnitBlueprint
     ---@return RingData[]?
     local function GetBPInfo(bp)
@@ -247,8 +249,8 @@ do
                 self:ClearBuildRings()
                 return
             end
-            local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
-            if TableEmpty(engineers) then
+            local builders = EntityCategoryFilterDown(buildersCategory, selection)
+            if TableEmpty(builders) then
                 self:ClearBuildRings()
                 return
             end
