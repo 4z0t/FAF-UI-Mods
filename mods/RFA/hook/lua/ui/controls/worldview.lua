@@ -121,12 +121,34 @@ do
         if commandMode[1] == 'build' then
             local bpPhysics = __blueprints[commandMode[2].name].Physics
             if bpPhysics then
-                buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ) or 1
+                buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ)
+            end
+        elseif commandMode[1] == 'order' then
+            local orderName = commandMode[2].name
+            if orderName == "RULEUCC_Repair" then
+                local info = GetRolloverInfo()
+                if info and IsAlly(info.armyIndex + 1, GetFocusArmy()) then
+                    local bpPhysics = __blueprints[info.blueprintId].Physics
+                    if bpPhysics then
+                        buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ)
+                    end
+                end
+            elseif orderName == "RULEUCC_Reclaim" then
+                local info = GetRolloverInfo()
+                if info then
+                    local bpFoot = __blueprints[info.blueprintId].Footprint
+                    if bpFoot then
+                        ---@diagnostic disable-next-line: cast-local-type
+                        buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
+                    end
+                end
             end
         end
 
         local bp = unit:GetBlueprint()
-        return (bp.Economy.MaxBuildDistance or 5) + bp.Footprint.SizeZ + buildPreviewSkirtSize
+        local bpFoot = bp.Footprint
+        ---@diagnostic disable-next-line: need-check-nil
+        return (bp.Economy.MaxBuildDistance or 5) + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
     end
 
     local function GetColorAndThickness(type)
@@ -245,7 +267,13 @@ do
                     else
                         self:ClearBuildRings()
                     end
-                elseif self._buildRing or commandMode[1] == "build" then
+                elseif self._buildRing
+                    or commandMode[1] == "build"
+                    or commandMode[1] == 'order'
+                    and (commandMode[2].name == "RULEUCC_Repair"
+                        or commandMode[2].name == "RULEUCC_Reclaim"
+                        or commandMode[2].name == "RULEUCC_Guard"
+                    ) then
                     self:UpdateBuildRings(false)
                 end
             end
