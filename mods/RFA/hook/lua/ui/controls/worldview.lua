@@ -48,8 +48,8 @@ do
     ---@param bp UnitBlueprint
     ---@return RingData[]?
     local function GetBPInfo(bp)
+        local weapons = {}
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
-            local weapons = {}
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
                 if showDirectFire and w.RangeCategory == "UWRC_DirectFire" then
@@ -64,17 +64,17 @@ do
                     TableInsert(weapons, { "AntiNavy", radius })
                 end
             end
-            return weapons
-        elseif bp.Intel ~= nil then
-            local weapons = {}
+        end
+        if bp.Intel ~= nil then
             if showOmni and bp.Intel.OmniRadius then
                 TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
             end
             if showRadar and bp.Intel.RadarRadius then
                 TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
             end
-            return weapons
         end
+
+        return weapons
     end
 
     local function GetColorAndThickness(type)
