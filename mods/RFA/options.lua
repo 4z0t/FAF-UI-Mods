@@ -10,6 +10,7 @@ UMT.Options.Mods["RFA"] = {
     showCountermeasure = Opt(true),
     showOmni = Opt(true),
     showRadar = Opt(true),
+    showSonar = Opt(true),
 }
 
 function Main()
@@ -36,6 +37,7 @@ function Main()
             Options.Filter("Show Anti navy weapon range", options.showAntiNavy, 4),
             Options.Filter("Show Omni range", options.showOmni, 4),
             Options.Filter("Show Radar range", options.showRadar, 4),
+            Options.Filter("Show Sonar range", options.showSonar, 4),
             Options.Strings("Build Preview key (restart required)",
                 {
                     "SHIFT",

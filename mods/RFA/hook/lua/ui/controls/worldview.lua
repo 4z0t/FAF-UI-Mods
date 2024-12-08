@@ -23,6 +23,7 @@ do
     local showCountermeasure = false
     local showOmni = false
     local showRadar = false
+    local showSonar = false
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -44,6 +45,9 @@ do
     end)
     options.showRadar:Bind(function(opt)
         showRadar = opt()
+    end)
+    options.showSonar:Bind(function(opt)
+        showSonar = opt()
     end)
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
@@ -75,6 +79,9 @@ do
             if showRadar and bp.Intel.RadarRadius > 0 then
                 TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
             end
+            if showSonar and bp.Intel.SonarRadius > 0 then
+                TableInsert(weapons, { "Sonar", bp.Intel.SonarRadius })
+            end
         end
         local sortOrder = {
             ["AllMilitary"] = 1,
@@ -84,6 +91,7 @@ do
             ["AntiNavy"] = 5,
             ["Omni"] = 6,
             ["Radar"] = 7,
+            ["Sonar"] = 8,
         }
         table.sort(weapons, function(a, b)
             return sortOrder[a[1]] > sortOrder[b[1]]
