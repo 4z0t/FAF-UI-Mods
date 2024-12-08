@@ -170,26 +170,29 @@ do
         OnUpdateCursor = function(self)
             if self._showRings then
                 local commandMode = GetCommandMode()
-                if IsKeyDown(self.HoverPreviewKey) and not commandMode[2] then
+                local givingMoveOrder = commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move"
+                local notIssuingOrder = not commandMode[2]
+
+                if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
                     self:UpdateHoverRings()
                 else
                     self:ClearHoverRings()
                 end
 
-                if IsKeyDown(self.SelectedPreviewKey) and
-                    (not commandMode[2] or commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move") then
-                    self:UpdateSelectionRings()
-                else
-                    self:ClearSelectionRings()
-                end
+                if notIssuingOrder or givingMoveOrder then
+                    if IsKeyDown(self.SelectedPreviewKey) then
+                        self:UpdateSelectionRings()
+                    else
+                        self:ClearSelectionRings()
+                    end
 
-                if IsKeyDown(self.BuildPreviewKey) and
-                    (not commandMode[2] or commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move") then
-                    self:UpdateBuildRings()
-                elseif IsKeyDown(18) then --alt
-                    self:UpdateReclaimRings()
-                else
-                    self:ClearBuildRings()
+                    if IsKeyDown(self.BuildPreviewKey) then
+                        self:UpdateBuildRings()
+                    elseif IsKeyDown(18) then --alt
+                        self:UpdateReclaimRings()
+                    else
+                        self:ClearBuildRings()
+                    end
                 end
             end
             return oldWorldView.OnUpdateCursor(self)
