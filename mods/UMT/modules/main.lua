@@ -111,10 +111,35 @@ function TestOptions()
         })
 end
 
+function TestFunctional()
+    local Fun = UMT.Functional
+    local sel = next
+        | Fun.where(function(v) return v > 3 end)
+        | Fun.select(function(v) return v * v end)
+
+    local toArray = sel | Fun.toArray
+    local toTable = sel | Fun.toTable
+    local iterate = sel | Fun.toIterator
+
+    local t = { 1, 2, 3, 4, 5 }
+
+    reprsl(toArray(t))
+    reprsl(toTable(t))
+
+    for k, v in iterate(t) do
+        LOG(k, v)
+    end
+
+end
+
 function Main(isReplay)
-    TestUIClass()
-    TestLuaQ()
-    TestOptions()
+    safecall("UMT.Test error:", function()
+
+        -- TestUIClass()
+        -- TestLuaQ()
+        -- TestOptions()
+        TestFunctional()
+    end)
 end
 
 function __moduleinfo.OnReload()
