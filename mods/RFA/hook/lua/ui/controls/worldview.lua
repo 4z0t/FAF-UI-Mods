@@ -78,6 +78,17 @@ do
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
 
+    local overlaySortOrder = {
+        ["AllMilitary"] = 1,
+        ["IndirectFire"] = 2,
+        ["AntiAir"] = 3,
+        ["Defense"] = 4,
+        ["AntiNavy"] = 5,
+        ["Omni"] = 6,
+        ["Radar"] = 7,
+        ["Sonar"] = 8,
+    }
+
     ---@param bp UnitBlueprint
     ---@return RingData[]?
     local function GetBPInfo(bp)
@@ -112,18 +123,8 @@ do
                 TableInsert(weapons, {"CounterIntel", MathMax(bp.Intel.CloakFieldRadius, bp.Intel.SonarStealthFieldRadius, bp.Intel.SonarStealthFieldRadius)})
             end
         end
-        local sortOrder = {
-            ["AllMilitary"] = 1,
-            ["IndirectFire"] = 2,
-            ["AntiAir"] = 3,
-            ["Defense"] = 4,
-            ["AntiNavy"] = 5,
-            ["Omni"] = 6,
-            ["Radar"] = 7,
-            ["Sonar"] = 8,
-        }
         table.sort(weapons, function(a, b)
-            return sortOrder[a[1]] > sortOrder[b[1]]
+            return overlaySortOrder[a[1]] > overlaySortOrder[b[1]]
         end)
 
         return weapons
