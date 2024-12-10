@@ -751,8 +751,7 @@ Functors = {
 
     execute = LightweightFunctorExecutor(),
 
-    enumerate = function(t)
-        return LightweightFunctor(t)
-    end
+    ---@type LightweightFunctor
+    enumerate = LightweightFunctor
 
 }
