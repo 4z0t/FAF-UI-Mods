@@ -384,7 +384,7 @@ do
                 local unit = builders[1]
                 local pos = unit:GetPosition()
                 local queue = unit:GetCommandQueue()
-                for i = table.getn(queue), 0, -1 do
+                for i = table.getn(queue), 1, -1 do
                     local commandType = queue[i].type
                     if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or commandType == "Patrol" then
                         pos = queue[i].position
