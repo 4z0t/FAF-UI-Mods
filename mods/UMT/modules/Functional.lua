@@ -350,6 +350,7 @@ Some Functor | Functor will return function only. It is done to ensure that resu
 
 ---@alias IteratorFunc fun(t, k):(any, any)
 ---@alias TransformerFunc fun(t:table):table
+---@alias EndFunc fun(t:table):any
 
 ---@class Functor
 ---@field iterator IteratorFunc
@@ -393,6 +394,23 @@ local function FunctorBORBase(l, r)
     error "Unexpected BOR for Functor"
 end
 
+---@class EndFunctor
+---@field fn fun(t:table):any
+EndFunctor = ClassSimple {
+    ---@param self EndFunctor
+    ---@param f EndFunc
+    __init = function(self, f)
+        self.fn = f
+    end,
+
+    ---@param self EndFunctor
+    ---@param t table
+    ---@return any
+    __call = function(self, t)
+        return self.fn(t)
+    end,
+}
+
 ---@class BaseFunctor : Functor
 BaseFunctor = ClassSimple
 {
@@ -422,25 +440,15 @@ BaseFunctor = ClassSimple
     ---@param iterator IteratorFunc
     ---@param transformer TransformerFunc
     ---@return Functor
-    CreateNew = function(self, iterator, transformer)
+    ContinueFunctor = function(self, iterator, transformer)
         return BaseFunctor(iterator, transformer)
-    end
-}
-
----@class EndFunctor
----@field fn fun(t:table):any
-EndFunctor = ClassSimple {
-    ---@param self EndFunctor
-    ---@param f any
-    __init = function(self, f)
-        self.fn = f
     end,
 
-    ---@param self EndFunctor
-    ---@param t table
-    ---@return any
-    __call = function(self, t)
-        return self.fn(t)
+    ---@param self BaseFunctor
+    ---@param endFunc EndFunc
+    ---@return Functor
+    EndFunctor = function(self, endFunc)
+        return EndFunctor(endFunc)
     end,
 }
 
@@ -481,7 +489,7 @@ FunctorExtender = ClassSimple
     ---@return Functor
     Extend = function(self, f)
         local iterator, transformer = self:extender(f.iterator, f.transformer)
-        return f:CreateNew(iterator, transformer)
+        return f:ContinueFunctor(iterator, transformer)
     end,
 }
 ---@class FunctorEnder : FunctorExtender
@@ -494,7 +502,7 @@ FunctorEnder = Class(FunctorExtender)
     Extend = function(self, f)
         local iterator, transformer = self:extender(f.iterator, f.transformer)
         assert(transformer == nil, "Functor Ender mustn't have transformer")
-        return EndFunctor(iterator)
+        return f:EndFunctor(iterator)
     end,
 }
 
@@ -558,10 +566,17 @@ LightweightFunctor = Class(BaseFunctor)
     ---@param iterator IteratorFunc
     ---@param transformer TransformerFunc
     ---@return Functor
-    CreateNew = function(self, iterator, transformer)
+    ContinueFunctor = function(self, iterator, transformer)
         self.iterator = iterator
         self.transformer = transformer
         return self
+    end,
+
+    ---@param self LightweightFunctor
+    ---@param endFunc EndFunc
+    ---@return any
+    EndFunctor = function(self, endFunc)
+        return endFunc(self.t)
     end,
 
     ---@param self LightweightFunctor
