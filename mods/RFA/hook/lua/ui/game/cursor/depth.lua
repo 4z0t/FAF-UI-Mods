@@ -1,0 +1,1 @@
+GetCursorInformationGlobal = GetCursorInformation

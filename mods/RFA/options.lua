@@ -10,6 +10,9 @@ UMT.Options.Mods["RFA"] = {
     showCountermeasure = Opt(true),
     showOmni = Opt(true),
     showRadar = Opt(true),
+    showSonar = Opt(true),
+    showCounterIntel = Opt(true),
+    showInMinimap = Opt(false),
 }
 
 function Main()
@@ -17,18 +20,19 @@ function Main()
     local options = UMT.Options.Mods["RFA"]
     Options.AddOptions("RFA", "Rings For All",
         {
-            Options.Strings("Hover Preview key (restart required)",
+            Options.Strings("Hover Preview key",
                 {
                     "SHIFT",
                     "CONTROL"
                 },
                 options.hoverPreviewKey),
-            Options.Strings("Selected Preview key (restart required)",
+            Options.Strings("Selected Preview key",
                 {
                     "SHIFT",
                     "CONTROL"
                 },
                 options.selectedPreviewKey),
+            Options.Filter("Show range rings in minimap", options.showInMinimap, 4),
             Options.Filter("Show Direct Fire weapon range", options.showDirectFire, 4),
             Options.Filter("Show Indirect Fire weapon range", options.showIndirectFire, 4),
             Options.Filter("Show Anti air weapon range", options.showAntiAir, 4),
@@ -36,7 +40,9 @@ function Main()
             Options.Filter("Show Anti navy weapon range", options.showAntiNavy, 4),
             Options.Filter("Show Omni range", options.showOmni, 4),
             Options.Filter("Show Radar range", options.showRadar, 4),
-            Options.Strings("Build Preview key (restart required)",
+            Options.Filter("Show Sonar range", options.showSonar, 4),
+            Options.Filter("Show Counter-intel range", options.showCounterIntel, 4),
+            Options.Strings("Build Preview key",
                 {
                     "SHIFT",
                     "CONTROL"

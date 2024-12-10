@@ -1,7 +1,10 @@
 do
+    local IsKeyDown = IsKeyDown
+    local MathMax = math.max
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
+    local TableSort = table.sort
     local unpack = unpack
     local UI_DrawCircle = UI_DrawCircle
 
@@ -10,6 +13,7 @@ do
     local options = UMT.Options.Mods["RFA"]
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
+    local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
 
     ---@class RingData
     ---@field [1] string # type
@@ -22,6 +26,8 @@ do
     local showCountermeasure = false
     local showOmni = false
     local showRadar = false
+    local showSonar = false
+    local showCounterIntel = false
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -44,12 +50,81 @@ do
     options.showRadar:Bind(function(opt)
         showRadar = opt()
     end)
+    options.showSonar:Bind(function(opt)
+        showSonar = opt()
+    end)
+    options.showCounterIntel:Bind(function(opt)
+        showCounterIntel = opt()
+    end)
+    options.showInMinimap.OnChange = function(opt)
+        local minimap = GetWorldViews()["MiniMap"]
+        if not minimap then
+            return
+        end
+
+        local isON = opt()
+        if isON then
+            if minimap._showRings then
+                return
+            end
+            local render = minimap.SetCustomRender
+            if render then
+                minimap._hoverRings = {}
+                minimap._selectionRings = {}
+                minimap._buildRing = nil
+                minimap:SetCustomRender(true)
+                minimap._showRings = true
+            end
+        else
+            local render = minimap.SetCustomRender
+            if render then
+                minimap._hoverRings = nil
+                minimap._selectionRings = nil
+                minimap._buildRing = nil
+                minimap:SetCustomRender(false)
+                minimap._showRings = false
+            end
+        end
+    end
+    options.hoverPreviewKey.OnChange = function(opt)
+        for _, view in GetWorldViews() do
+            view.HoverPreviewKey = opt()
+        end
+    end
+    options.selectedPreviewKey.OnChange = function(opt)
+        for _, view in GetWorldViews() do
+            view.SelectedPreviewKey = opt()
+        end
+    end
+    options.buildPreviewKey.OnChange = function(opt)
+        for _, view in GetWorldViews() do
+            view.BuildPreviewKey = opt()
+        end
+    end
+
+    local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
+
+    local overlaySortOrder = {
+        ["AllMilitary"] = 1,
+        ["IndirectFire"] = 2,
+        ["AntiAir"] = 3,
+        ["Defense"] = 4,
+        ["AntiNavy"] = 5,
+        ["Omni"] = 6,
+        ["Radar"] = 7,
+        ["Sonar"] = 8,
+    }
+    ---@param a RingData
+    ---@param b RingData
+    local function OverlaySortFunction(a, b)
+        return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
+    end
 
     ---@param bp UnitBlueprint
     ---@return RingData[]?
     local function GetBPInfo(bp)
+        local weapons = {}
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
-            local weapons = {}
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
                 if showDirectFire and w.RangeCategory == "UWRC_DirectFire" then
@@ -64,17 +139,68 @@ do
                     TableInsert(weapons, { "AntiNavy", radius })
                 end
             end
-            return weapons
-        elseif bp.Intel ~= nil then
-            local weapons = {}
-            if showOmni and bp.Intel.OmniRadius then
-                TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
-            end
-            if showRadar and bp.Intel.RadarRadius then
-                TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
-            end
-            return weapons
         end
+        local intel = bp.Intel
+        if intel ~= nil then
+            if showOmni and intel.OmniRadius > 0 then
+                TableInsert(weapons, { "Omni", intel.OmniRadius })
+            end
+            if showRadar and intel.RadarRadius > 0 then
+                TableInsert(weapons, { "Radar", intel.RadarRadius })
+            end
+            if showSonar and intel.SonarRadius > 0 then
+                TableInsert(weapons, { "Sonar", intel.SonarRadius })
+            end
+            if showCounterIntel and
+                (
+                intel.CloakFieldRadius > 0 or intel.SonarStealthFieldRadius > 0 or
+                    intel.SonarStealthFieldRadius > 0) then
+                TableInsert(weapons,
+                    { "CounterIntel",
+                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.SonarStealthFieldRadius) })
+            end
+        end
+
+        TableSort(weapons, OverlaySortFunction)
+
+        return weapons
+    end
+
+    ---@param unit UserUnit
+    local function GetActualBuildRange(unit)
+        local commandMode = GetCommandMode()
+        local buildPreviewSkirtSize = 1
+        if commandMode[1] == 'build' then
+            local bpPhysics = __blueprints[commandMode[2].name].Physics
+            if bpPhysics then
+                buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ)
+            end
+        elseif commandMode[1] == 'order' then
+            local orderName = commandMode[2].name
+            if orderName == "RULEUCC_Repair" then
+                local info = GetRolloverInfo()
+                if info and IsAlly(info.armyIndex + 1, GetFocusArmy()) then
+                    local bpPhysics = __blueprints[info.blueprintId].Physics
+                    if bpPhysics then
+                        buildPreviewSkirtSize = MathMax(bpPhysics.SkirtSizeX, bpPhysics.SkirtSizeZ)
+                    end
+                end
+            elseif orderName == "RULEUCC_Reclaim" then
+                local info = GetRolloverInfo()
+                if info then
+                    local bpFoot = __blueprints[info.blueprintId].Footprint
+                    if bpFoot then
+                        ---@diagnostic disable-next-line: cast-local-type
+                        buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
+                    end
+                end
+            end
+        end
+
+        local bp = unit:GetBlueprint()
+        local bpFoot = bp.Footprint
+        ---@diagnostic disable-next-line: need-check-nil
+        return (bp.Economy.MaxBuildDistance or 5) + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
     end
 
     local function GetColorAndThickness(type)
@@ -134,7 +260,7 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
-            local render = self.SetCustomRender and self:GetName() ~= "MiniMap"
+            local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
             if render then
                 self._hoverRings = {}
                 self._selectionRings = {}
@@ -170,29 +296,58 @@ do
         OnUpdateCursor = function(self)
             if self._showRings then
                 local commandMode = GetCommandMode()
-                if IsKeyDown(self.HoverPreviewKey) and not commandMode[2] then
+                local orderType = commandMode[1]
+                local orderName = commandMode[2].name
+                local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
+                local notIssuingOrder = not commandMode[2]
+
+                if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
                     self:UpdateHoverRings()
                 else
                     self:ClearHoverRings()
                 end
 
-                if IsKeyDown(self.SelectedPreviewKey) and
-                    (not commandMode[2] or commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move") then
-                    self:UpdateSelectionRings()
-                else
-                    self:ClearSelectionRings()
-                end
+                if notIssuingOrder or givingMoveOrder then
+                    if IsKeyDown(self.SelectedPreviewKey) then
+                        self:UpdateSelectionRings()
+                    else
+                        self:ClearSelectionRings()
+                    end
 
-                if IsKeyDown(self.BuildPreviewKey) and
-                    (not commandMode[2] or commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move") then
-                    self:UpdateBuildRings()
-                elseif IsKeyDown(18) then --alt
-                    self:UpdateReclaimRings()
-                else
-                    self:ClearBuildRings()
+                    if IsKeyDown(18) then --alt
+                        self:UpdateReclaimRings()
+                    elseif IsKeyDown(self.BuildPreviewKey) then
+                        self:UpdateBuildRings(true)
+                    else
+                        self:ClearBuildRings()
+                    end
+                elseif self._buildRing
+                    or orderType == "build" or orderType == 'order'
+                    and
+                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard"
+                    ) then
+                    self:UpdateBuildRings(false)
                 end
             end
             return oldWorldView.OnUpdateCursor(self)
+        end,
+
+        --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
+        ---@param self WorldView
+        ---@param event KeyEvent
+        ---@return boolean
+        HandleEvent = function(self, event)
+            if event.Type == "MouseExit" then
+                self:ClearBuildRings()
+                if self._hoverRings then
+                    self:ClearHoverRings()
+                end
+                if self._selectionRings then
+                    self:ClearSelectionRings()
+                end
+            end
+
+            return oldWorldView.HandleEvent(self, event)
         end,
 
         ---@param self WorldView
@@ -238,26 +393,52 @@ do
             TableClear(self._selectionRings)
         end,
 
-        UpdateBuildRings = function(self)
+        ---@param self WorldView
+        ---@param useMousePos boolean
+        UpdateBuildRings = function(self, useMousePos)
             local selection = GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
             end
-            local engineers = EntityCategoryFilterDown(categories.ENGINEER, selection)
-            if TableEmpty(engineers) then
+            ---@type UserUnit[]
+            local builders = EntityCategoryFilterDown(buildersCategory, selection)
+            if TableEmpty(builders) then
                 self:ClearBuildRings()
                 return
             end
 
-            local radius = selection
-                | LuaQ.select(function(u) return u:GetBlueprint().Economy.MaxBuildDistance end)
+            local radius = builders
+                | LuaQ.select(GetActualBuildRange)
                 | LuaQ.max.value
 
             ---@type Ring
             local ring = Ring()
-            ring.pos = GetMouseWorldPos()
-            ring.radius = (radius or 0) + 2
+            if useMousePos then
+                ring.pos = GetMouseWorldPos()
+            else
+                local unit = builders[1]
+                local pos = unit:GetPosition()
+                local queue = unit:GetCommandQueue()
+                for i = TableGetn(queue), 1, -1 do
+                    local commandType = queue[i].type
+                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
+                        commandType == "Patrol" then
+                        pos = queue[i].position
+                        break
+                    end
+                end
+
+                -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
+                -- local elevation = cursorData.Elevation
+
+                -- local mouseY = GetMouseWorldPos()[2]
+                -- if pos[2] < mouseY then
+                --     pos[2] = mouseY
+                -- end
+                ring.pos = pos
+            end
+            ring.radius = radius
             local color, thick = GetColorAndThickness "Miscellaneous"
             ring.thickness = thick
             ring:SetColor(color)
