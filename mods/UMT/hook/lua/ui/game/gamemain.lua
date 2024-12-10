@@ -1,6 +1,5 @@
 do
     local Fun = UMT.Functional.Functors
-    local addUMTMods = Fun.pairs
     local addUMTMods = Fun.enumerate(__active_mods)
         | Fun.where(function(v) return v.__umt and v.ui_only end)
         | Fun.select(function(v) return string.sub(v.location, 7) --[[cut "/mods/"]] end)
@@ -8,7 +7,7 @@ do
             UMT.Mods.Add(folderName)
             LOG("UML: added " .. folderName)
         end)
-        | Fun.applyTo(__active_mods)
+        | Fun.execute
 
     local _CreateUI = CreateUI
     function CreateUI(isReplay)
