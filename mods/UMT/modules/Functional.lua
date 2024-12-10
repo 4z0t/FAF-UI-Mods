@@ -417,6 +417,14 @@ BaseFunctor = ClassSimple
 
     iterator = next,
     __bor = FunctorBORBase,
+
+    ---@param self BaseFunctor
+    ---@param iterator IteratorFunc
+    ---@param transformer TransformerFunc
+    ---@return Functor
+    CreateNew = function(self, iterator, transformer)
+        return BaseFunctor(iterator, transformer)
+    end
 }
 
 ---@class EndFunctor
@@ -473,7 +481,7 @@ FunctorExtender = ClassSimple
     ---@return Functor
     Extend = function(self, f)
         local iterator, transformer = self:extender(f.iterator, f.transformer)
-        return BaseFunctor(iterator, transformer)
+        return f:CreateNew(iterator, transformer)
     end,
 }
 ---@class FunctorEnder : FunctorExtender
@@ -526,6 +534,46 @@ local FE0 = FunctorExtender
 local FEE = FunctorEnder
 ---@type fun(extender: fun(self:FunctorEnder1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder1Arg
 local FEE1 = FunctorEnder1Arg
+
+
+---@class LightweightFunctor : BaseFunctor
+---@field t table
+LightweightFunctor = Class(BaseFunctor)
+{
+    __init = function(self, t)
+        self.t = t
+    end,
+
+    ---@param self LightweightFunctor
+    __call = function(self)
+        local t = self.t
+        local transformer = self.transformer
+        if transformer then
+            t = transformer(t)
+        end
+        return self.iterator, t
+    end,
+
+    ---@param self LightweightFunctor
+    ---@param iterator IteratorFunc
+    ---@param transformer TransformerFunc
+    ---@return Functor
+    CreateNew = function(self, iterator, transformer)
+        self.iterator = iterator
+        self.transformer = transformer
+        return self
+    end
+}
+---@class LightweightFunctorExecutor : FunctorExtender
+LightweightFunctorExecutor = ClassSimple(FunctorExtender)
+{
+    ---@param self LightweightFunctor
+    ---@param f Functor
+    Extend = function(self, f)
+        for k, v in f() do
+        end
+    end
+}
 
 Functors = {
     select = FE1(function(self, iterator, transformer)
@@ -700,5 +748,11 @@ Functors = {
         for k, v in iterator, t do
         end
     end),
+
+    execute = LightweightFunctorExecutor(),
+
+    enumerate = function(t)
+        return LightweightFunctor(t)
+    end
 
 }

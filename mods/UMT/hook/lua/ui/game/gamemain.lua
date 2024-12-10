@@ -1,6 +1,7 @@
 do
     local Fun = UMT.Functional.Functors
     local addUMTMods = Fun.pairs
+    local addUMTMods = Fun.enumerate(__active_mods)
         | Fun.where(function(v) return v.__umt and v.ui_only end)
         | Fun.select(function(v) return string.sub(v.location, 7) --[[cut "/mods/"]] end)
         | Fun.foreach(function(_, folderName)
