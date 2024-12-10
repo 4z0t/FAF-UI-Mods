@@ -177,8 +177,8 @@ function TestFunctional()
         end
         return s
     end
-    -- LOG(TimeIt(sp1000, n))
-    -- LOG(TimeIt(sumInFirst100_000OfPrimes, n))
+    LOG(TimeIt(sp1000, n))
+    LOG(TimeIt(sumInFirst100_000OfPrimes, n))
     LOG(sp1000())
     LOG(sumInFirst100_000OfPrimes())
     -- local sel = Fun.pairsIterator

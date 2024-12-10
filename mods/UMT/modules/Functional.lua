@@ -458,14 +458,15 @@ RangeFunctor = Class(BaseFunctor)
 {
     __init = function(self, from, to, step)
         step = step or 1
-        local endIndex = to - from + 1
+        from = from - 1
+        local endIndex = to - from
         BaseFunctor.__init(self, function(t, k)
             if k == nil then
-                return 1, from
+                return 1, from + 1
             end
             k = k + step
             if k <= endIndex then
-                return k, k + from - 1
+                return k, k + from
             end
 
             return nil, nil
