@@ -281,6 +281,18 @@ min = MakeFunctionalPipe(function(iterator, self)
     end
 end)
 
+contains = MakeFunctionalPipe(function(iterator, self)
+    local value = PopFn(self)
+    return function(t)
+        for k, v in iterator, t do
+            if value == v then
+                return k
+            end
+        end
+        return nil
+    end
+end)
+
 
 
 ---@class IEnumerable<K, V>: {iter : (fun(t: {[K]:V}, k:K):(K,V)), tbl:table<K,V> }

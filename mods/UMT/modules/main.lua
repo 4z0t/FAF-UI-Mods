@@ -113,7 +113,6 @@ end
 
 function TestFunctional()
 
-    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     local Fun = UMT.Functional
 
     local sel = Fun.pairsIterator
@@ -133,11 +132,9 @@ function TestFunctional()
 
     local t = { 1, 2, 3, 4, 5, a = 6, b = 7 }
 
-    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     local minV = sel | Fun.min
     local maxV = sel | Fun.max
 
-    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     LOG(t | minV)
     LOG(t | maxV)
 
