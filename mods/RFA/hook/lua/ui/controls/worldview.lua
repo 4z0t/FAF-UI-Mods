@@ -1,8 +1,10 @@
 do
+    local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
+    local TableSort = table.sort
     local unpack = unpack
     local UI_DrawCircle = UI_DrawCircle
 
@@ -54,27 +56,51 @@ do
     options.showCounterIntel:Bind(function(opt)
         showCounterIntel = opt()
     end)
-    options.showInMinimap:Bind(function(opt)
+    options.showInMinimap.OnChange = function(opt)
         local minimap = GetWorldViews()["MiniMap"]
-        if minimap then
-            minimap._showRings = opt()
+        if not minimap then
+            return
         end
-    end)
-    options.hoverPreviewKey:Bind(function(opt)
+
+        local isON = opt()
+        if isON then
+            if minimap._showRings then
+                return
+            end
+            local render = minimap.SetCustomRender
+            if render then
+                minimap._hoverRings = {}
+                minimap._selectionRings = {}
+                minimap._buildRing = nil
+                minimap:SetCustomRender(true)
+                minimap._showRings = true
+            end
+        else
+            local render = minimap.SetCustomRender
+            if render then
+                minimap._hoverRings = nil
+                minimap._selectionRings = nil
+                minimap._buildRing = nil
+                minimap:SetCustomRender(false)
+                minimap._showRings = false
+            end
+        end
+    end
+    options.hoverPreviewKey.OnChange = function(opt)
         for _, view in GetWorldViews() do
             view.HoverPreviewKey = opt()
         end
-    end)
-    options.selectedPreviewKey:Bind(function(opt)
+    end
+    options.selectedPreviewKey.OnChange = function(opt)
         for _, view in GetWorldViews() do
             view.SelectedPreviewKey = opt()
         end
-    end)
-    options.buildPreviewKey:Bind(function(opt)
+    end
+    options.buildPreviewKey.OnChange = function(opt)
         for _, view in GetWorldViews() do
             view.BuildPreviewKey = opt()
         end
-    end)
+    end
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
 
@@ -88,6 +114,11 @@ do
         ["Radar"] = 7,
         ["Sonar"] = 8,
     }
+    ---@param a RingData
+    ---@param b RingData
+    local function OverlaySortFunction(a, b)
+        return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
+    end
 
     ---@param bp UnitBlueprint
     ---@return RingData[]?
@@ -109,23 +140,28 @@ do
                 end
             end
         end
-        if bp.Intel ~= nil then
-            if showOmni and bp.Intel.OmniRadius > 0 then
-                TableInsert(weapons, { "Omni", bp.Intel.OmniRadius })
+        local intel = bp.Intel
+        if intel ~= nil then
+            if showOmni and intel.OmniRadius > 0 then
+                TableInsert(weapons, { "Omni", intel.OmniRadius })
             end
-            if showRadar and bp.Intel.RadarRadius > 0 then
-                TableInsert(weapons, { "Radar", bp.Intel.RadarRadius })
+            if showRadar and intel.RadarRadius > 0 then
+                TableInsert(weapons, { "Radar", intel.RadarRadius })
             end
-            if showSonar and bp.Intel.SonarRadius > 0 then
-                TableInsert(weapons, { "Sonar", bp.Intel.SonarRadius })
+            if showSonar and intel.SonarRadius > 0 then
+                TableInsert(weapons, { "Sonar", intel.SonarRadius })
             end
-            if showCounterIntel and (bp.Intel.CloakFieldRadius > 0 or bp.Intel.SonarStealthFieldRadius > 0 or bp.Intel.SonarStealthFieldRadius > 0) then
-                TableInsert(weapons, {"CounterIntel", MathMax(bp.Intel.CloakFieldRadius, bp.Intel.SonarStealthFieldRadius, bp.Intel.SonarStealthFieldRadius)})
+            if showCounterIntel and
+                (
+                intel.CloakFieldRadius > 0 or intel.SonarStealthFieldRadius > 0 or
+                    intel.SonarStealthFieldRadius > 0) then
+                TableInsert(weapons,
+                    { "CounterIntel",
+                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.SonarStealthFieldRadius) })
             end
         end
-        table.sort(weapons, function(a, b)
-            return overlaySortOrder[a[1]] > overlaySortOrder[b[1]]
-        end)
+
+        TableSort(weapons, OverlaySortFunction)
 
         return weapons
     end
@@ -224,7 +260,7 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
-            local render = self.SetCustomRender
+            local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
             if render then
                 self._hoverRings = {}
                 self._selectionRings = {}
@@ -260,7 +296,9 @@ do
         OnUpdateCursor = function(self)
             if self._showRings then
                 local commandMode = GetCommandMode()
-                local givingMoveOrder = commandMode[1] == "order" and commandMode[2].name == "RULEUCC_Move"
+                local orderType = commandMode[1]
+                local orderName = commandMode[2].name
+                local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
                 local notIssuingOrder = not commandMode[2]
 
                 if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
@@ -284,11 +322,9 @@ do
                         self:ClearBuildRings()
                     end
                 elseif self._buildRing
-                    or commandMode[1] == "build"
-                    or commandMode[1] == 'order'
-                    and (commandMode[2].name == "RULEUCC_Repair"
-                        or commandMode[2].name == "RULEUCC_Reclaim"
-                        or commandMode[2].name == "RULEUCC_Guard"
+                    or orderType == "build" or orderType == 'order'
+                    and
+                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard"
                     ) then
                     self:UpdateBuildRings(false)
                 end
@@ -386,12 +422,20 @@ do
                 local queue = unit:GetCommandQueue()
                 for i = TableGetn(queue), 1, -1 do
                     local commandType = queue[i].type
-                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or commandType == "Patrol" then
+                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
+                        commandType == "Patrol" then
                         pos = queue[i].position
                         break
                     end
                 end
-                pos[2] = GetMouseWorldPos()[2]
+
+                -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
+                -- local elevation = cursorData.Elevation
+
+                -- local mouseY = GetMouseWorldPos()[2]
+                -- if pos[2] < mouseY then
+                --     pos[2] = mouseY
+                -- end
                 ring.pos = pos
             end
             ring.radius = radius
