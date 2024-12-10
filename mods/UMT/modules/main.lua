@@ -119,7 +119,6 @@ function TestFunctional()
     local sel = Fun.pairsIterator
         | Fun.where(function(v) return v > 3 end)
         | Fun.select(function(v) return v * v end)
-        | Fun.toIterator
 
     local isel = Fun.ipairsIterator
         | Fun.where(function(v) return v > 3 end)
@@ -134,17 +133,21 @@ function TestFunctional()
 
     local t = { 1, 2, 3, 4, 5, a = 6, b = 7 }
 
-    for k, v in sel(t) do
-        LOG(k, v)
-    end
+    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    local minV = sel | Fun.min
+    local maxV = sel | Fun.max
 
-    for k, v in isel(t) do
-        LOG(k, v)
-    end
+    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    LOG(t | minV)
+    LOG(t | maxV)
 
-    for k, v in irsel(t) do
-        LOG(k, v)
-    end
+    -- for k, v in isel(t) do
+    --     LOG(k, v)
+    -- end
+
+    -- for k, v in irsel(t) do
+    --     LOG(k, v)
+    -- end
 
 
 

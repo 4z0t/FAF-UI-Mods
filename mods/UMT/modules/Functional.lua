@@ -55,12 +55,19 @@ Iterator = {
         return self.fn(t)
     end,
 
-    __bor = function(self, t)
-        local bor = getmetatable(t).__bor
-        if bor then
-            return bor(self, t)
+    __bor = function(l, r)
+
+        local borl = getmetatable(l).__bor
+        local borr = getmetatable(r).__bor
+        if borl and borr then -- we are on left side called by right one
+            return borr(l, r)
         end
-        return self.fn(t)
+
+        if borr then
+            return r.fn(l)
+        end
+
+        error "Unexpected order of Stateless iterator"
     end,
 }
 
@@ -223,6 +230,58 @@ toSet = MakeFunctionalPipe(function(iterator, self)
         return nt
     end
 end)
+
+max = MakeFunctionalPipe(function(iterator, self)
+    local selector = PopFn(self)
+    if selector then
+        return function(t)
+            local valueMax
+            for k, v in iterator, t do
+                local value = selector(v)
+                if not valueMax or value > valueMax then
+                    valueMax = value
+                end
+            end
+            return valueMax
+        end
+    end
+    return function(t)
+        local valueMax
+        for k, v in iterator, t do
+            if not valueMax or v > valueMax then
+                valueMax = v
+            end
+        end
+        return valueMax
+    end
+end)
+
+min = MakeFunctionalPipe(function(iterator, self)
+    local selector = PopFn(self)
+    if selector then
+        return function(t)
+            local valueMin
+            for k, v in iterator, t do
+                local value = selector(v)
+                if not valueMin or value < valueMin then
+                    valueMin = value
+                end
+            end
+            return valueMin
+        end
+    end
+    return function(t)
+        local valueMin
+        for k, v in iterator, t do
+            if not valueMin or v < valueMin then
+                valueMin = v
+            end
+        end
+        return valueMin
+    end
+end)
+
+
 
 ---@class IEnumerable<K, V>: {iter : (fun(t: {[K]:V}, k:K):(K,V)), tbl:table<K,V> }
 IEnumerable = {
