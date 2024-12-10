@@ -2,6 +2,7 @@ local setmetatable = setmetatable
 local iscallable = iscallable
 local TableInsert = table.insert
 local getmetatable = getmetatable
+local next = next
 
 -- ---@generic R
 -- ---@generic K
