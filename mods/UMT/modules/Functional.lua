@@ -562,6 +562,16 @@ LightweightFunctor = Class(BaseFunctor)
         self.iterator = iterator
         self.transformer = transformer
         return self
+    end,
+
+    ---@param self LightweightFunctor
+    ---@return LightweightFunctor
+    Clone = function(self)
+        ---@type LightweightFunctor
+        local lwf = LightweightFunctor(self.t)
+        lwf.iterator = self.iterator
+        lwf.transformer = self.transformer
+        return lwf
     end
 }
 ---@class LightweightFunctorExecutor : FunctorExtender
@@ -572,7 +582,7 @@ LightweightFunctorExecutor = ClassSimple(FunctorExtender)
     Extend = function(self, f)
         for k, v in f() do
         end
-    end
+    end,
 }
 
 Functors = {
