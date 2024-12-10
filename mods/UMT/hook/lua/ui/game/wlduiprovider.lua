@@ -64,5 +64,6 @@ _G.UMT = {
     ExistsGlobal = ExistsGlobal,
     LuaQ         = import("/mods/UMT/modules/LuaQ.lua"),
     ColorUtils   = import("/mods/UMT/modules/ColorUtils.lua"),
-    Mods         = import("/mods/UMT/modules/Mods.lua")
+    Mods         = import("/mods/UMT/modules/Mods.lua"),
+    Functional   = LazyImport("/mods/UMT/modules/Functional.lua"),
 }
