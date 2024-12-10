@@ -420,6 +420,26 @@ BaseFunctor = ClassSimple
     __bor = FunctorBORBase,
 }
 
+---@class RangeFunctor : BaseFunctor
+RangeFunctor = Class(BaseFunctor)
+{
+    __init = function(self, from, to, step)
+        step = step or 1
+        local endIndex = to - from + 1
+        BaseFunctor.__init(self, function(t, k)
+            if k == nil then
+                return 1, from
+            end
+            k = k + step
+            if k <= endIndex then
+                return k, k + from - 1
+            end
+
+            return nil, nil
+        end)
+    end
+}
+
 ---@class FunctorExtender
 ---@field extender fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)
 FunctorExtender = ClassSimple
@@ -545,7 +565,9 @@ Functors = {
     -- end),
 
     pairs = BaseFunctor(),
-    ipairs = BaseFunctor(ipairs)
+    ipairs = BaseFunctor(nexti),
+    range = RangeFunctor,
+
 
 
 }

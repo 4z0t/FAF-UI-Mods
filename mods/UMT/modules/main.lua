@@ -129,6 +129,10 @@ function TestFunctional()
         LOG(k, v)
     end
 
+    local numbers = Fun.range(1, 100) | Fun.select(function(v) return v * v end)
+
+    reprsl({}|numbers)
+
     -- local sel = Fun.pairsIterator
     --     | Fun.where(function(v) return v > 3 end)
     --     | Fun.select(function(v) return v * v end)
