@@ -132,8 +132,15 @@ function TestFunctional()
         | Fun.select(function(v) return v * v end)
 
 
+
     reprsl({}|numbers)
-    reprsl({}|numbers)
+
+    for k, v in numbers() do
+        LOG(v)
+        if v > 500 then
+            break
+        end
+    end
 
     -- local sel = Fun.pairsIterator
     --     | Fun.where(function(v) return v > 3 end)

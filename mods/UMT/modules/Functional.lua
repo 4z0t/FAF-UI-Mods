@@ -338,7 +338,6 @@ Functors work with pipe operators to simplify understanding and maintainability 
 
 Operations:
     Functor | Extender -> Functor
-    (Functor | function -> Functor) -- dont do for now
     table | Functor -> table
     Functor(table) -> iterator, table
 
