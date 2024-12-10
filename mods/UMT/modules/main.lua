@@ -118,8 +118,7 @@ function TestFunctional()
     local uniqueSelector = Fun.pairs
         | Fun.where(function(v) return v > 3 end)
         | Fun.select(function(v) return v * v end)
-        | Fun.toSet
-        | Fun.keys
+        | Fun.distinct
         | Fun.select(function(v) return v / 2 end)
 
     local t = { 1, 2, 3, 4, 5, 8, 2, 3, 4, 6, 5, 5, }
@@ -129,8 +128,11 @@ function TestFunctional()
         LOG(k, v)
     end
 
-    local numbers = Fun.range(1, 100) | Fun.select(function(v) return v * v end)
+    local numbers = Fun.range(1, 100) 
+        | Fun.select(function(v) return v * v end)
 
+
+    reprsl({}|numbers)
     reprsl({}|numbers)
 
     -- local sel = Fun.pairsIterator

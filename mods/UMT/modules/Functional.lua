@@ -522,12 +522,22 @@ Functors = {
     end),
 
     keys = FE0(function(self, iterator, transformer)
-        return function(t, k)
-            local nk, v = iterator(t, k)
-            if nk == nil then return nil, nil end
-
-            return nk, nk
-        end, transformer
+        if transformer then
+            return next, function(t)
+                local nt = {}
+                for k in iterator, transformer(t) do
+                    TableInsert(nt, k)
+                end
+                return nt
+            end
+        end
+        return next, function(t)
+            local nt = {}
+            for k in iterator, t do
+                TableInsert(nt, k)
+            end
+            return nt
+        end
     end),
 
     toSet = FE0(function(self, iterator, transformer)
@@ -546,6 +556,33 @@ Functors = {
                 nt[v] = true
             end
             return nt
+        end
+    end),
+
+    distinct = FE0(function(self, iterator, transformer)
+        if transformer then
+            return next, function(t)
+                local nt = {}
+                for _, v in iterator, transformer(t) do
+                    nt[v] = true
+                end
+                local nta = {}
+                for k in nt do
+                    TableInsert(nta, k)
+                end
+                return nta
+            end
+        end
+        return next, function(t)
+            local nt = {}
+            for _, v in iterator, t do
+                nt[v] = true
+            end
+            local nta = {}
+            for k in nt do
+                TableInsert(nta, k)
+            end
+            return nta
         end
     end),
 
