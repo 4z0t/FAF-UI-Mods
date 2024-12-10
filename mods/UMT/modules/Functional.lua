@@ -490,9 +490,9 @@ FunctorEnder = Class(FunctorExtender)
     end,
 }
 
----@class FunctorExtender1Arg : FunctorExtender
+---@class Functor1Arg
 ---@field arg any
-FunctorExtender1Arg = Class(FunctorExtender)
+Functor1Arg = ClassSimple
 {
     ---@param self FunctorExtender1Arg
     ---@param arg any
@@ -511,6 +511,10 @@ FunctorExtender1Arg = Class(FunctorExtender)
     end,
 }
 
+---@class FunctorExtender1Arg : FunctorExtender, Functor1Arg
+FunctorExtender1Arg = Class(FunctorExtender, Functor1Arg) {}
+---@class FunctorEnder1Arg : FunctorEnder, Functor1Arg
+FunctorEnder1Arg = Class(FunctorEnder, Functor1Arg) {}
 
 
 ---@type fun(extender: fun(self:FunctorExtender1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
@@ -520,6 +524,8 @@ local FE0 = FunctorExtender
 
 ---@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder
 local FEE = FunctorEnder
+---@type fun(extender: fun(self:FunctorEnder1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder1Arg
+local FEE1 = FunctorEnder1Arg
 
 Functors = {
     select = FE1(function(self, iterator, transformer)
@@ -621,6 +627,19 @@ Functors = {
         end
     end),
 
+    foreach = FE1(function(self, iterator, transformer)
+        local func = self:PopArg()
+        return function(t, k)
+            local nk, v = iterator(t, k)
+            if nk == nil then return nil, nil end
+
+            func(nk, v)
+
+            return nk, v
+        end, transformer
+    end),
+
+
     -- reversed = FE0(function(self, iterator, transformer)
     --     return function(t, k)
     --         if k == nil then
@@ -660,5 +679,26 @@ Functors = {
         end
     end),
 
+    iterateOnCall = FEE(function(self, iterator, transformer)
+        if transformer then
+            return function(t)
+                for k, v in iterator, transformer(t) do
+                end
+            end
+        end
+        return function(t)
+            for k, v in iterator, t do
+            end
+        end
+    end),
+
+    applyTo = FEE1(function(self, iterator, transformer)
+        local t = self:PopArg()
+        if transformer then
+            t = transformer(t)
+        end
+        for k, v in iterator, t do
+        end
+    end),
 
 }
