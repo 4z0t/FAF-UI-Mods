@@ -1,6 +1,7 @@
 local setmetatable = setmetatable
 local iscallable = iscallable
 local TableInsert = table.insert
+local getmetatable = getmetatable
 
 ---@generic R
 ---@generic K
@@ -52,7 +53,15 @@ end
 Iterator = {
     __call = function(self, t)
         return self.fn(t)
-    end
+    end,
+
+    __bor = function(self, t)
+        local bor = getmetatable(t).__bor
+        if bor then
+            return bor(self, t)
+        end
+        return self.fn(t)
+    end,
 }
 
 ---@param fn fun(iterator, key):(any,any)
@@ -82,6 +91,7 @@ end
 ---@param t table<K, V>
 ---@param k? K
 function nexti(t, k)
+    k = k or 0
     local v = t[k + 1]
 
     if v == nil then
@@ -93,6 +103,18 @@ end
 
 pairsIterator = CreateGenerator(next)
 ipairsIterator = CreateGenerator(nexti)
+reversedIpairsIterator = CreateGenerator(function(t, k)
+    if k == nil then
+        k = table.getn(t)
+    else
+        k = k - 1
+    end
+    if k == 0 then
+        return nil, nil
+    end
+    local v = t[k]
+    return k, v
+end)
 
 
 ---@class FunctionalPipe
@@ -111,12 +133,14 @@ end
 where = MakeFunctionalPipe(function(iterator, self)
     local selector = PopFn(self)
     return function(t, k)
-        local nk, v = iterator(t, k)
-        if nk == nil then return nil, nil end
-
-        while not selector(v) do
+        local nk = k
+        local v
+        repeat
             nk, v = iterator(t, nk)
-        end
+            if nk == nil then
+                return nil, nil
+            end
+        until selector(v)
         return nk, v
     end
 end)
@@ -178,6 +202,25 @@ end)
 toIterator = MakeFunctionalPipe(function(iterator, self)
     return function(t)
         return iterator, t
+    end
+end)
+
+keys = MakeFunctionalPipe(function(iterator, self)
+    return function(t, k)
+        local nk, v = iterator(t, k)
+        if nk == nil then return nil, nil end
+
+        return nk, nk
+    end
+end)
+
+toSet = MakeFunctionalPipe(function(iterator, self)
+    return function(t)
+        local nt = {}
+        for k in iterator, t do
+            nt[k] = true
+        end
+        return nt
     end
 end)
 

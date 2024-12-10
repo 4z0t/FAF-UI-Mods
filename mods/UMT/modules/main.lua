@@ -119,19 +119,35 @@ function TestFunctional()
     local sel = Fun.pairsIterator
         | Fun.where(function(v) return v > 3 end)
         | Fun.select(function(v) return v * v end)
+        | Fun.toIterator
 
-    local toArray = sel | Fun.toArray
-    local toTable = sel | Fun.toTable
-    local iterate = sel | Fun.toIterator
+    local isel = Fun.ipairsIterator
+        | Fun.where(function(v) return v > 3 end)
+        | Fun.select(function(v) return v * v end)
+        | Fun.toIterator
 
-    local t = { 1, 2, 3, 4, 5 }
 
-    reprsl(toArray(t))
-    reprsl(toTable(t))
+    local irsel = Fun.reversedIpairsIterator
+        | Fun.where(function(v) return v > 3 end)
+        | Fun.select(function(v) return v * v end)
+        | Fun.toIterator
 
-    for k, v in iterate(t) do
+    local t = { 1, 2, 3, 4, 5, a = 6, b = 7 }
+
+    for k, v in sel(t) do
         LOG(k, v)
     end
+
+    for k, v in isel(t) do
+        LOG(k, v)
+    end
+
+    for k, v in irsel(t) do
+        LOG(k, v)
+    end
+
+
+
 
 end
 
