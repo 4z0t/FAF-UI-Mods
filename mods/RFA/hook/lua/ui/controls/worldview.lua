@@ -131,7 +131,7 @@ do
     end
 
     ---@param unit UserUnit
-    local getBuildRangeForUnit = function(unit)
+    local function GetActualBuildRange(unit)
         local commandMode = GetCommandMode()
         local buildPreviewSkirtSize = 1
         if commandMode[1] == 'build' then
@@ -373,7 +373,7 @@ do
             end
 
             local radius = selection
-                | LuaQ.select(getBuildRangeForUnit)
+                | LuaQ.select(GetActualBuildRange)
                 | LuaQ.max.value
 
             ---@type Ring
