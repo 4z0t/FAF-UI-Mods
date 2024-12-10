@@ -112,8 +112,11 @@ function TestOptions()
 end
 
 function TestFunctional()
+
+    LOG("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     local Fun = UMT.Functional
-    local sel = next
+
+    local sel = Fun.pairsIterator
         | Fun.where(function(v) return v > 3 end)
         | Fun.select(function(v) return v * v end)
 
@@ -145,5 +148,3 @@ end
 function __moduleinfo.OnReload()
     Main()
 end
-
-Main()

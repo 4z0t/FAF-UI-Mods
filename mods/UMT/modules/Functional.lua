@@ -41,22 +41,41 @@ end
 ---@class ConditionalKV
 ---@field fn fun(k, v):boolean
 
----@generic K
----@generic V
----@param bor fun(tbl:table<K, V>, self:table):table
----@generic T: fa-class
----@return T
-local function BORPipe(bor)
-    return { __bor = bor }
+---@alias Yielder fun(t:table, k):(any,any)
+
+---@class BORPipe<K,V> : {iterator:fun(iterator:fun(t:table<K,V>, k:K):(K,V), self:FunctionalTransformer):(fun(t:table<K,V>, k:K):(K,V))}
+
+---@class Iterator
+---@field fn fun(iterator, key):(any,any)
+---@operator call(table):Yielder,table
+
+Iterator = {
+    __call = function(self, t)
+        return self.fn(t)
+    end
+}
+
+---@param fn fun(iterator, key):(any,any)
+---@return Iterator
+local function CreateGenerator(fn)
+    return setmetatable({ fn = fn }, Iterator)
 end
+
+BORPipe = table.combine(FunctionalTransformer, {
+    ---@generic K,V
+    ---@param proto Iterator
+    ---@param self BORPipe<K,V>
+    __bor = function(proto, self)
+        return CreateGenerator(self.iterator(proto.fn, self))
+    end
+})
 
 ---@generic K
 ---@generic V
----@param bor fun(iterable:fun(t:table<K,V>, k:K):(K,V), self:FunctionalTransformer):(fun(t:table<K,V>, k:K):(K,V))
 ---@generic Class: fa-class
 ---@return Class
-local function MakePipe(bor)
-    return table.combine(BORPipe(bor), FunctionalTransformer)
+local function MakePipe()
+    return BORPipe
 end
 
 ---@generic K, V
@@ -72,6 +91,10 @@ function nexti(t, k)
     return k + 1, v
 end
 
+pairsIterator = CreateGenerator(next)
+ipairsIterator = CreateGenerator(nexti)
+
+
 ---@class FunctionalPipe
 ---@operator bor(fun(t:table, k):(any,any)):fun(t:table, k):(any,any)
 ---@operator call(fun():any):FunctionalPipe
@@ -79,38 +102,38 @@ end
 
 ---@generic K
 ---@generic V
----@param bor fun(iterable:fun(t:table<K,V>, k:K):(K,V), self:FunctionalTransformer):(fun(t:table<K,V>, k:K):(K,V))
+---@param bor fun(iterator:fun(t:table<K,V>, k:K):(K,V), self:FunctionalTransformer):(fun(t:table<K,V>, k:K):(K,V))
 ---@return FunctionalPipe
 local function MakeFunctionalPipe(bor)
-    return setmetatable({}, MakePipe(bor))
+    return setmetatable({ iterator = bor }, MakePipe())
 end
 
-where = MakeFunctionalPipe(function(iterable, self)
+where = MakeFunctionalPipe(function(iterator, self)
     local selector = PopFn(self)
     return function(t, k)
-        local nk, v = iterable(t, k)
+        local nk, v = iterator(t, k)
         if nk == nil then return nil, nil end
 
         while not selector(v) do
-            nk, v = iterable(t, nk)
+            nk, v = iterator(t, nk)
         end
         return nk, v
     end
 end)
 
 
-select = MakeFunctionalPipe(function(iterable, self)
+select = MakeFunctionalPipe(function(iterator, self)
     local selector = PopFn(self)
 
     if iscallable(selector) then
         return function(t, k)
-            local nk, v = iterable(t, k)
+            local nk, v = iterator(t, k)
             if nk == nil then return nil, nil end
             return nk, selector(v)
         end
     elseif type(selector) == "string" then
         return function(t, k)
-            local nk, v = iterable(t, k)
+            local nk, v = iterator(t, k)
             if nk == nil then return nil, nil end
             return nk, v[selector]
         end
@@ -120,10 +143,10 @@ select = MakeFunctionalPipe(function(iterable, self)
 end)
 
 
-foreach = MakeFunctionalPipe(function(iterable, self)
+foreach = MakeFunctionalPipe(function(iterator, self)
     local func = PopFn(self)
     return function(t, k)
-        local nk, v = iterable(t, k)
+        local nk, v = iterator(t, k)
         if nk == nil then return nil, nil end
 
         func(nk, v)
@@ -132,28 +155,62 @@ foreach = MakeFunctionalPipe(function(iterable, self)
     end
 end)
 
-toArray = MakeFunctionalPipe(function(iterable, self)
+toArray = MakeFunctionalPipe(function(iterator, self)
     return function(t)
         local nt = {}
-        for _, v in iterable, t do
+        for _, v in iterator, t do
             TableInsert(nt, v)
         end
         return nt
     end
 end)
 
-toTable = MakeFunctionalPipe(function(iterable, self)
+toTable = MakeFunctionalPipe(function(iterator, self)
     return function(t)
         local nt = {}
-        for k, v in iterable, t do
+        for k, v in iterator, t do
             nt[k] = v
         end
         return nt
     end
 end)
 
-toIterator = MakeFunctionalPipe(function(iterable, self)
+toIterator = MakeFunctionalPipe(function(iterator, self)
     return function(t)
-        return iterable, t
+        return iterator, t
     end
 end)
+
+---@class IEnumerable<K, V>: {iter : (fun(t: {[K]:V}, k:K):(K,V)), tbl:table<K,V> }
+IEnumerable = {
+    ---@generic K, V
+    ---@param self IEnumerable<K, V>
+    ---@return fun(t: {[K]:V}, k:K):(K,V)
+    ---@return table<K, V>
+    Iterate = function(self)
+        return self.iter, self.tbl
+    end,
+
+    ---@generic K, V
+    ---@param self IEnumerable<K, V>
+    ---@return table<K, V>
+    Enumerate = function(self)
+        local nt = {}
+        for k, v in self:Iterate() do
+            nt[k] = v
+        end
+        return nt
+    end
+}
+
+
+
+---@class StatefulIterator
+StatefulIterator = {
+    __call = function(self, t, key)
+        LOG(key)
+        return next(t, key)
+    end,
+}
+
+iter = setmetatable({}, StatefulIterator)
