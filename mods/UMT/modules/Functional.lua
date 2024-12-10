@@ -419,6 +419,23 @@ BaseFunctor = ClassSimple
     __bor = FunctorBORBase,
 }
 
+---@class EndFunctor
+---@field fn fun(t:table):any
+EndFunctor = ClassSimple {
+    ---@param self EndFunctor
+    ---@param f any
+    __init = function(self, f)
+        self.fn = f
+    end,
+
+    ---@param self EndFunctor
+    ---@param t table
+    ---@return any
+    __call = function(self, t)
+        return self.fn(t)
+    end,
+}
+
 ---@class RangeFunctor : BaseFunctor
 RangeFunctor = Class(BaseFunctor)
 {
@@ -459,6 +476,19 @@ FunctorExtender = ClassSimple
         return BaseFunctor(iterator, transformer)
     end,
 }
+---@class FunctorEnder : FunctorExtender
+---@field extender fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)
+FunctorEnder = Class(FunctorExtender)
+{
+    ---@param self FunctorExtender
+    ---@param f Functor
+    ---@return Functor
+    Extend = function(self, f)
+        local iterator, transformer = self:extender(f.iterator, f.transformer)
+        assert(transformer == nil, "Functor Ender mustn't have transformer")
+        return EndFunctor(iterator)
+    end,
+}
 
 ---@class FunctorExtender1Arg : FunctorExtender
 ---@field arg any
@@ -480,10 +510,16 @@ FunctorExtender1Arg = Class(FunctorExtender)
         return arg
     end,
 }
+
+
+
 ---@type fun(extender: fun(self:FunctorExtender1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
 local FE1 = FunctorExtender1Arg
----@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
+---@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender
 local FE0 = FunctorExtender
+
+---@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder
+local FEE = FunctorEnder
 
 Functors = {
     select = FE1(function(self, iterator, transformer)
@@ -604,6 +640,25 @@ Functors = {
     ipairs = BaseFunctor(nexti),
     range = RangeFunctor,
 
+
+    sum = FEE(function(self, iterator, transformer)
+        if transformer then
+            return function(t)
+                local s = 0
+                for _, v in iterator, transformer(t) do
+                    s = s + v
+                end
+                return s
+            end
+        end
+        return function(t)
+            local s = 0
+            for _, v in iterator, t do
+                s = s + v
+            end
+            return s
+        end
+    end),
 
 
 }

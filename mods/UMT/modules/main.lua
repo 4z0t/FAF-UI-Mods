@@ -128,12 +128,12 @@ function TestFunctional()
         LOG(k, v)
     end
 
-    local numbers = Fun.range(1, 100) 
+    local numbers = Fun.range(1, 100)
         | Fun.select(function(v) return v * v end)
 
 
 
-    reprsl({}|numbers)
+    reprsl({} | numbers)
 
     for k, v in numbers() do
         LOG(v)
@@ -141,7 +141,46 @@ function TestFunctional()
             break
         end
     end
+    local GetGameTimeSeconds = GetSystemTimeSeconds
+    local function TimeIt(f, n)
+        local start = GetGameTimeSeconds()
+        for i = 1, n do
+            f()
+        end
+        return GetGameTimeSeconds() - start
+    end
 
+    local MathMod = math.mod
+    local function IsPrime(n)
+        if (n <= 1) then
+            return false
+        end
+        for i = 2, n - 1 do
+            if MathMod(n, i) == 0 then
+                return false
+            end
+        end
+
+        return true
+    end
+
+    local sumInFirst100_000OfPrimes = Fun.range(1, 1000)
+        | Fun.where(IsPrime)
+        | Fun.sum
+    local n = 1000
+    function sp1000()
+        local s = 0
+        for i = 1, 1000 do
+            if IsPrime(i) then
+                s = s + i
+            end
+        end
+        return s
+    end
+    LOG(TimeIt(sp1000, n))
+    LOG(TimeIt(sumInFirst100_000OfPrimes, n))
+    LOG(sp1000())
+    LOG(sumInFirst100_000OfPrimes())
     -- local sel = Fun.pairsIterator
     --     | Fun.where(function(v) return v > 3 end)
     --     | Fun.select(function(v) return v * v end)
