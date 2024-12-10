@@ -113,30 +113,44 @@ end
 
 function TestFunctional()
 
-    local Fun = UMT.Functional
+    local Fun = UMT.Functional.Functors
 
-    local sel = Fun.pairsIterator
+    local uniqueSelector = Fun.pairs
         | Fun.where(function(v) return v > 3 end)
         | Fun.select(function(v) return v * v end)
+        | Fun.toSet
+        | Fun.keys
+        | Fun.select(function(v) return v / 2 end)
 
-    local isel = Fun.ipairsIterator
-        | Fun.where(function(v) return v > 3 end)
-        | Fun.select(function(v) return v * v end)
-        | Fun.toIterator
+    local t = { 1, 2, 3, 4, 5, 8, 2, 3, 4, 6, 5, 5, }
+    local nt = t | uniqueSelector
+    reprsl(nt)
+    for k, v in uniqueSelector(t) do
+        LOG(k, v)
+    end
+
+    -- local sel = Fun.pairsIterator
+    --     | Fun.where(function(v) return v > 3 end)
+    --     | Fun.select(function(v) return v * v end)
+
+    -- local isel = Fun.ipairsIterator
+    --     | Fun.where(function(v) return v > 3 end)
+    --     | Fun.select(function(v) return v * v end)
+    --     | Fun.toIterator
 
 
-    local irsel = Fun.reversedIpairsIterator
-        | Fun.where(function(v) return v > 3 end)
-        | Fun.select(function(v) return v * v end)
-        | Fun.toIterator
+    -- local irsel = Fun.reversedIpairsIterator
+    --     | Fun.where(function(v) return v > 3 end)
+    --     | Fun.select(function(v) return v * v end)
+    --     | Fun.toIterator
 
-    local t = { 1, 2, 3, 4, 5, a = 6, b = 7 }
+    -- local t = { 1, 2, 3, 4, 5, a = 6, b = 7 }
 
-    local minV = sel | Fun.min
-    local maxV = sel | Fun.max
+    -- local minV = sel | Fun.min
+    -- local maxV = sel | Fun.max
 
-    LOG(t | minV)
-    LOG(t | maxV)
+    -- LOG(t | minV)
+    -- LOG(t | maxV)
 
     -- for k, v in isel(t) do
     --     LOG(k, v)

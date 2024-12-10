@@ -224,8 +224,8 @@ end)
 toSet = MakeFunctionalPipe(function(iterator, self)
     return function(t)
         local nt = {}
-        for k in iterator, t do
-            nt[k] = true
+        for k, v in iterator, t do
+            nt[v] = true
         end
         return nt
     end
@@ -328,3 +328,224 @@ StatefulIterator = {
 }
 
 iter = setmetatable({}, StatefulIterator)
+
+
+--[[
+Functional library logic:
+
+Functor - base interface to process tables and get tables in return.
+Functors work with pipe operators to simplify understanding and maintainability of code.
+
+Operations:
+    Functor | Extender -> Functor
+    (Functor | function -> Functor) -- dont do for now
+    table | Functor -> table
+    Functor(table) -> iterator, table
+
+Functor is made of 2 fields:
+    iterator - function that iterates over input table, it is stateless
+    transformer - function that takes table and returns table; used when result table can't be produced with iterators only (like distinct values or groupBy)
+
+Some Functor | Functor will return function only. It is done to ensure that result is not iterable like in (min, max, first or last)
+]]
+
+---@alias IteratorFunc fun(t, k):(any, any)
+---@alias TransformerFunc fun(t:table):table
+
+---@class Functor
+---@field iterator IteratorFunc
+---@field transformer TransformerFunc
+
+
+---@param f Functor
+---@param iterator IteratorFunc
+---@return Functor
+local function ExtendFunctor(f, iterator)
+    error "Not implemented"
+end
+
+---@param f Functor
+---@param t table
+local function ComputeFunctor(f, t)
+    local nt = {}
+    for k, v in f(t) do
+        nt[k] = v
+    end
+    return nt
+end
+
+---@param l Functor | table
+---@param r FunctorExtender | IteratorFunc
+---@return  Functor | table | IteratorFunc
+local function FunctorBORBase(l, r)
+    local borl = getmetatable(l).__bor
+    if borl and r.IsExtender then -- we are on left side called by right one
+        return r:Extend(l)
+    end
+    local borr = getmetatable(r).__bor
+
+    if borr then -- left is table, right is Functor
+        return ComputeFunctor(r, l)
+    end
+
+    if borl then
+        return ExtendFunctor(l, r)
+    end
+    error "Unexpected BOR for Functor"
+end
+
+---@class BaseFunctor : Functor
+BaseFunctor = ClassSimple
+{
+    ---@param self any
+    ---@param iterator any
+    ---@param transformer any
+    __init = function(self, iterator, transformer)
+        self.iterator = iterator
+        self.transformer = transformer
+    end,
+
+    ---@param self BaseFunctor
+    ---@param t table
+    ---@return IteratorFunc, table
+    __call = function(self, t)
+        local transformer = self.transformer
+        if transformer then
+            t = transformer(t)
+        end
+        return self.iterator, t
+    end,
+
+    iterator = next,
+    __bor = FunctorBORBase,
+}
+
+---@class FunctorExtender
+---@field extender fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)
+FunctorExtender = ClassSimple
+{
+    IsExtender = true,
+
+    ---@param self FunctorExtender
+    ---@param extender fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)
+    __init = function(self, extender)
+        self.extender = extender
+    end,
+
+    ---@param self FunctorExtender
+    ---@param f Functor
+    ---@return Functor
+    Extend = function(self, f)
+        local iterator, transformer = self:extender(f.iterator, f.transformer)
+        return BaseFunctor(iterator, transformer)
+    end,
+}
+
+---@class FunctorExtender1Arg : FunctorExtender
+---@field arg any
+FunctorExtender1Arg = Class(FunctorExtender)
+{
+    ---@param self FunctorExtender1Arg
+    ---@param arg any
+    ---@return FunctorExtender1Arg
+    __call = function(self, arg)
+        self.arg = arg
+        return self
+    end,
+
+    ---@param self FunctorExtender1Arg
+    ---@return any
+    PopArg = function(self)
+        local arg = self.arg
+        self.arg = nil
+        return arg
+    end,
+}
+---@type fun(extender: fun(self:FunctorExtender1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
+local FE1 = FunctorExtender1Arg
+---@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
+local FE0 = FunctorExtender
+
+Functors = {
+    select = FE1(function(self, iterator, transformer)
+        local selector = self:PopArg()
+        if iscallable(selector) then
+            return function(t, k)
+                local nk, v = iterator(t, k)
+                if nk == nil then return nil, nil end
+                return nk, selector(v)
+            end, transformer
+        elseif type(selector) == "string" then
+            return function(t, k)
+                local nk, v = iterator(t, k)
+                if nk == nil then return nil, nil end
+                return nk, v[selector]
+            end, transformer
+        end
+
+        error("Unsupported selector type " .. tostring(selector))
+    end),
+
+    where = FE1(function(self, iterator, transformer)
+        local selector = self:PopArg()
+        return function(t, k)
+            local nk = k
+            local v
+            repeat
+                nk, v = iterator(t, nk)
+                if nk == nil then
+                    return nil, nil
+                end
+            until selector(v)
+            return nk, v
+        end, transformer
+    end),
+
+    keys = FE0(function(self, iterator, transformer)
+        return function(t, k)
+            local nk, v = iterator(t, k)
+            if nk == nil then return nil, nil end
+
+            return nk, nk
+        end, transformer
+    end),
+
+    toSet = FE0(function(self, iterator, transformer)
+        if transformer then
+            return next, function(t)
+                local nt = {}
+                for k, v in iterator, transformer(t) do
+                    nt[v] = true
+                end
+                return nt
+            end
+        end
+        return next, function(t)
+            local nt = {}
+            for k, v in iterator, t do
+                nt[v] = true
+            end
+            return nt
+        end
+    end),
+
+    -- reversed = FE0(function(self, iterator, transformer)
+    --     return function(t, k)
+    --         if k == nil then
+    --             k = table.getn(t)
+    --         else
+    --             k = k - 1
+    --         end
+    --         if k == 0 then
+    --             return nil, nil
+    --         end
+    --         local v = t[k]
+    --         return k, v
+    --     end, transformer
+    -- end),
+
+    pairs = BaseFunctor(),
+    ipairs = BaseFunctor(ipairs)
+
+
+}
