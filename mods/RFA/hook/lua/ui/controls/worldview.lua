@@ -372,7 +372,7 @@ do
                 return
             end
 
-            local radius = selection
+            local radius = builders
                 | LuaQ.select(GetActualBuildRange)
                 | LuaQ.max.value
 
