@@ -346,7 +346,7 @@ Functor is made of 2 fields:
     iterator - function that iterates over input table, it is stateless
     transformer - function that takes table and returns table; used when result table can't be produced with iterators only (like distinct values or groupBy)
 
-Some Functor | Functor will return function only. It is done to ensure that result is not iterable like in (min, max, first or last)
+Some Functor | Extender will return function only. It is done to ensure that result is not iterable like in (min, max, first or last)
 ]]
 
 ---@alias IteratorFunc fun(t, k):(any, any)
@@ -449,7 +449,7 @@ BaseFunctor = ClassSimple
     ---@param endFunc EndFunc
     ---@return Functor
     EndFunctor = function(self, endFunc)
-        return EndFunctor(endFunc)
+        return endFunc
     end,
 }
 
