@@ -8,14 +8,14 @@ local next = next
 ---@param t table<K, V>
 ---@param k? K
 function nexti(t, k)
-    k = k or 0
-    local v = t[k + 1]
+    k = (k or 0) + 1
+    local v = t[k]
 
     if v == nil then
         return nil, nil
     end
 
-    return k + 1, v
+    return k, v
 end
 
 -- pairsIterator = CreateGenerator(next)
@@ -98,19 +98,6 @@ end
 --         return valueMin
 --     end
 -- end)
-
--- contains = MakeFunctionalPipe(function(iterator, self)
---     local value = PopFn(self)
---     return function(t)
---         for k, v in iterator, t do
---             if value == v then
---                 return k
---             end
---         end
---         return nil
---     end
--- end)
-
 
 
 -- ---@class IEnumerable<K, V>: {iter : (fun(t: {[K]:V}, k:K):(K,V)), tbl:table<K,V> }
