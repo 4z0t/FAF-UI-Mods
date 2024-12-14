@@ -509,18 +509,18 @@ FunctorEnder = Class(FunctorExtender)
 }
 
 ---@class Functor1Arg
----@field arg any
+---@field [1] any
 Functor1Arg = ClassSimple
 {
-    ---@param self FunctorExtender1Arg
+    ---@param self Functor1Arg
     ---@param arg any
-    ---@return FunctorExtender1Arg
+    ---@return Functor1Arg
     __call = function(self, arg)
         self[1] = arg
         return self
     end,
 
-    ---@param self FunctorExtender1Arg
+    ---@param self Functor1Arg
     ---@return any
     PopArg = function(self)
         local arg = self[1]
@@ -529,14 +529,48 @@ Functor1Arg = ClassSimple
     end,
 }
 
+---@class Functor2Arg
+---@field [1] any
+---@field [2] any
+Functor2Arg = ClassSimple
+{
+    ---@param self Functor2Arg
+    ---@param arg1 any
+    ---@param arg2 any
+    ---@return Functor2Arg
+    __call = function(self, arg1, arg2)
+        self[1] = arg1
+        self[2] = arg2
+        return self
+    end,
+
+    ---@param self Functor2Arg
+    ---@return any
+    ---@return any
+    PopArg = function(self)
+        local arg1 = self[1]
+        local arg2 = self[2]
+        self[1] = nil
+        self[2] = nil
+        return arg1, arg2
+    end,
+}
+
 ---@class FunctorExtender1Arg : FunctorExtender, Functor1Arg
 FunctorExtender1Arg = Class(FunctorExtender, Functor1Arg) {}
 ---@class FunctorEnder1Arg : FunctorEnder, Functor1Arg
 FunctorEnder1Arg = Class(FunctorEnder, Functor1Arg) {}
 
+---@class FunctorExtender2Arg : FunctorExtender, Functor2Arg
+FunctorExtender2Arg = Class(FunctorExtender, Functor2Arg) {}
+---@class FunctorEnder2Arg : FunctorEnder, Functor2Arg
+FunctorEnder2Arg = Class(FunctorEnder, Functor2Arg) {}
+
 
 ---@type fun(extender: fun(self:FunctorExtender1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender1Arg
 local FE1 = FunctorExtender1Arg
+---@type fun(extender: fun(self:FunctorExtender2Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender2Arg
+local FE2 = FunctorExtender2Arg
 ---@type fun(extender: fun(self:FunctorExtender, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorExtender
 local FE0 = FunctorExtender
 
@@ -544,6 +578,8 @@ local FE0 = FunctorExtender
 local FEE = FunctorEnder
 ---@type fun(extender: fun(self:FunctorEnder1Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder1Arg
 local FEE1 = FunctorEnder1Arg
+---@type fun(extender: fun(self:FunctorEnder2Arg, iterator:IteratorFunc, transformer:TransformerFunc):(IteratorFunc, TransformerFunc)):FunctorEnder2Arg
+local FEE2 = FunctorEnder2Arg
 
 
 ---@class LightweightFunctor : BaseFunctor
@@ -754,6 +790,26 @@ Functors = {
         end
     end),
 
+    reduce = FEE2(function(self, iterator, transformer)
+        local reducer, initial = self:PopArg()
+        if transformer then
+            return function(t)
+                local r = initial
+                for k, v in iterator, transformer(t) do
+                    r = reducer(r, v)
+                end
+                return r
+            end
+        end
+        return function(t)
+            local r = initial
+            for k, v in iterator, t do
+                r = reducer(r, v)
+            end
+            return r
+        end
+    end),
+
     iterateOnCall = FEE(function(self, iterator, transformer)
         if transformer then
             return function(t)
@@ -779,6 +835,16 @@ Functors = {
     execute = LightweightFunctorExecutor(),
 
     ---@type LightweightFunctor
-    enumerate = LightweightFunctor
+    enumerate = LightweightFunctor,
 
+    toFunction = FEE(function(self, iterator, transformer)
+        if transformer then
+            return function(t)
+                return iterator, transformer(t)
+            end
+        end
+        return function(t)
+            return iterator, t
+        end
+    end)
 }
