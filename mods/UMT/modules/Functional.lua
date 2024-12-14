@@ -516,15 +516,15 @@ Functor1Arg = ClassSimple
     ---@param arg any
     ---@return FunctorExtender1Arg
     __call = function(self, arg)
-        self.arg = arg
+        self[1] = arg
         return self
     end,
 
     ---@param self FunctorExtender1Arg
     ---@return any
     PopArg = function(self)
-        local arg = self.arg
-        self.arg = nil
+        local arg = self[1]
+        self[1] = nil
         return arg
     end,
 }
