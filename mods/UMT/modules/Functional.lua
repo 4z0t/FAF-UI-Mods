@@ -666,4 +666,23 @@ Functors = {
             return nt
         end
     end),
+
+    toTable = FEE(function(self, iterator, transformer)
+        if transformer then
+            return function(t)
+                local nt = {}
+                for k, v in iterator, transformer(t) do
+                    nt[k] = v
+                end
+                return nt
+            end
+        end
+        return function(t)
+            local nt = {}
+            for k, v in iterator, t do
+                nt[k] = v
+            end
+            return nt
+        end
+    end),
 }
