@@ -685,4 +685,46 @@ Functors = {
             return nt
         end
     end),
+
+    contains = FEE1(function(self, iterator, transformer)
+        local value = self:PopArg()
+        if transformer then
+            return function(t)
+                for k, v in iterator, transformer(t) do
+                    if v == value then
+                        return k
+                    end
+                end
+                return nil
+            end
+        end
+        return function(t)
+            for k, v in iterator, t do
+                if v == value then
+                    return k
+                end
+            end
+            return nil
+        end
+    end),
+
+    intersect = FE1(function(self, iterator, transformer)
+        local t2 = self:PopArg()
+        return function(t, k)
+            local nk = k
+            local v
+            while true do
+                nk, v = iterator(t, nk)
+                if nk == nil then
+                    return nil, nil
+                end
+
+                for k2, v2 in t2 do
+                    if v == v2 then
+                        return nk, v
+                    end
+                end
+            end
+        end, transformer
+    end)
 }
