@@ -395,23 +395,6 @@ local function FunctorBORBase(l, r)
     error "Unexpected BOR for Functor"
 end
 
----@class EndFunctor
----@field fn fun(t:table):any
-EndFunctor = ClassSimple {
-    ---@param self EndFunctor
-    ---@param f EndFunc
-    __init = function(self, f)
-        self.fn = f
-    end,
-
-    ---@param self EndFunctor
-    ---@param t table
-    ---@return any
-    __call = function(self, t)
-        return self.fn(t)
-    end,
-}
-
 ---@class BaseFunctor : Functor
 BaseFunctor = ClassSimple
 {
