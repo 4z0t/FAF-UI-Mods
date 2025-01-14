@@ -1,6 +1,7 @@
 do
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
+    local MathFloor = math.floor
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
@@ -517,6 +518,8 @@ do
                         if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
                             commandType == "Patrol" then
                             pos = queue[i].position
+                            pos[1] = MathFloor(pos[1]) + 0.5
+                            pos[3] = MathFloor(pos[3]) + 0.5
                             break
                         end
                     end
