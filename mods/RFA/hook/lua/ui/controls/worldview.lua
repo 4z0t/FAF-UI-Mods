@@ -14,6 +14,7 @@ do
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
     local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
+    local GetEnhancements = import("/lua/enhancementcommon.lua").GetEnhancements
 
     ---@class RingData
     ---@field [1] string # type
@@ -118,6 +119,54 @@ do
     ---@param b RingData
     local function OverlaySortFunction(a, b)
         return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
+    end
+
+    ---@type table<UnitId, table<string, true>>
+    local knownRangeEnhancedWeapons = {
+        ual0001 = { "OverCharge", "AutoOverCharge", "RightDisruptor", "ChronoDampener" },
+        uel0001 = { "OverCharge", "AutoOverCharge", "RightZephyr" },
+        url0001 = { "OverCharge", "AutoOverCharge", "RightRipper", "MLG" },
+        xsl0001 = { "OverCharge", "AutoOverCharge", "ChronotronCannon" },
+
+        ual0301 = { "RightReactonCannon" },
+        uel0301 = { "RightHeavyPlasmaCannon" },
+        url0301 = { "RightDisintegrator" },
+        xsl0301 = { "LightChronatronCannon", "OverCharge", "AutoOverCharge" },
+    }
+
+    ---@param unit UserUnit
+    ---@return UnitBlueprint
+    local function GetBlueprintWithEnhancements(unit)
+        local bp = unit:GetBlueprint()
+        local activeEnh = GetEnhancements(unit:GetEntityId())
+        if activeEnh then
+            local rangeEnhancedWeapons = knownRangeEnhancedWeapons[bp.BlueprintId]
+            if rangeEnhancedWeapons then
+
+                local bpEnh = bp.Enhancements
+                local newBp = false
+                for _, enhName in activeEnh do
+                    local newRad = bpEnh[enhName].NewMaxRadius
+                    if newRad then
+                        if not newBp then bp = table.deepcopy(bp)
+                        newBp = true
+                        end
+
+                        for _, w in bp.Weapon do
+                            local weaponName = w.Label
+                            for _, v in rangeEnhancedWeapons do
+                                if weaponName == v then
+                                    w.MaxRadius = newRad
+                                end
+                            end
+                        end
+                    end
+                end
+
+            end
+        end
+
+        return bp
     end
 
     ---@param bp UnitBlueprint
@@ -382,7 +431,7 @@ do
             end
 
             local data = selection
-                | LuaQ.select(function(u) return u:GetBlueprint() end)
+                | LuaQ.select(function(u) return GetBlueprintWithEnhancements(u) end)
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
