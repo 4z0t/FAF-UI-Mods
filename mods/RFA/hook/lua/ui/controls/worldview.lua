@@ -419,13 +419,15 @@ do
             else
                 local unit = builders[1]
                 local pos = unit:GetInterpolatedPosition()
-                local queue = unit:GetCommandQueue()
-                for i = TableGetn(queue), 1, -1 do
-                    local commandType = queue[i].type
-                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
-                        commandType == "Patrol" then
-                        pos = queue[i].position
-                        break
+                if IsKeyDown("Shift") then
+                    local queue = unit:GetCommandQueue()
+                    for i = TableGetn(queue), 1, -1 do
+                        local commandType = queue[i].type
+                        if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
+                            commandType == "Patrol" then
+                            pos = queue[i].position
+                            break
+                        end
                     end
                 end
 
