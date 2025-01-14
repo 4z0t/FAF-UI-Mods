@@ -122,7 +122,7 @@ do
     end
 
     ---@type table<UnitId, table<string, true>>
-    local knownRangeEnhancedWeapons = {
+    local unitsWithWeaponRangeEnh = {
         ual0001 = { "OverCharge", "AutoOverCharge", "RightDisruptor", "ChronoDampener" },
         uel0001 = { "OverCharge", "AutoOverCharge", "RightZephyr" },
         url0001 = { "OverCharge", "AutoOverCharge", "RightRipper", "MLG" },
@@ -134,32 +134,59 @@ do
         xsl0301 = { "LightChronatronCannon", "OverCharge", "AutoOverCharge" },
     }
 
+    local unitsWithIntelEnh = {
+        url0001 = true,
+
+        ual0001 = true,
+        uel0301 = true,
+        xsl0301 = true,
+    }
+
     ---@param unit UserUnit
     ---@return UnitBlueprint
     local function GetBlueprintWithEnhancements(unit)
         local bp = unit:GetBlueprint()
         local activeEnh = GetEnhancements(unit:GetEntityId())
         if activeEnh then
-            local rangeEnhancedWeapons = knownRangeEnhancedWeapons[bp.BlueprintId]
-            if rangeEnhancedWeapons then
+            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
+            local maybeHasIntelEnh = unitsWithIntelEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
 
-                local bpEnh = bp.Enhancements
+            if weaponsAffectedByRangeEnh or maybeHasIntelEnh then
+                local bpEnhs = bp.Enhancements
                 local newBp = false
                 for _, enhName in activeEnh do
-                    local newRad = bpEnh[enhName].NewMaxRadius
-                    if newRad then
-                        if not newBp then bp = table.deepcopy(bp)
-                        newBp = true
-                        end
+                    local bpEnh = bpEnhs[enhName]
+                    if weaponsAffectedByRangeEnh then
+                        local newRad = bpEnh.NewMaxRadius
+                        if newRad then
+                            if not newBp then
+                                bp = table.deepcopy(bp)
+                                newBp = true
+                            end
 
-                        for _, w in bp.Weapon do
-                            local weaponName = w.Label
-                            for _, v in rangeEnhancedWeapons do
-                                if weaponName == v then
-                                    w.MaxRadius = newRad
+                            for _, w in bp.Weapon do
+                                local weaponName = w.Label
+                                for _, v in weaponsAffectedByRangeEnh do
+                                    if weaponName == v then
+                                        w.MaxRadius = newRad
+                                        break
+                                    end
                                 end
                             end
+
                         end
+                    end
+
+                    if maybeHasIntelEnh then
+                        local newOmni = bpEnh.NewOmniRadius
+                        local newSonar = bpEnh.NewSonarRadius
+                        if not newBp and (newOmni or newSonar) then
+                            bp = table.deepcopy(bp)
+                            newBp = true
+                        end
+                        local intel = bp.Intel
+                        if newOmni then intel.OmniRadius = newOmni end
+                        if newSonar then intel.SonarRadius = newSonar end
                     end
                 end
 
