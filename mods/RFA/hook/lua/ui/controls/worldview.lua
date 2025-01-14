@@ -418,7 +418,7 @@ do
                 ring.pos = GetMouseWorldPos()
             else
                 local unit = builders[1]
-                local pos = unit:GetPosition()
+                local pos = unit:GetInterpolatedPosition()
                 local queue = unit:GetCommandQueue()
                 for i = TableGetn(queue), 1, -1 do
                     local commandType = queue[i].type
