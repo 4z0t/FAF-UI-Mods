@@ -281,6 +281,7 @@ do
         ---@param self WorldView
         ---@param delta number
         OnRenderWorld = function(self, delta)
+            oldWorldView.OnRenderWorld(self, delta)
             self:RenderRings(self._hoverRings)
             self:RenderRings(self._selectionRings)
             if self._buildRing then
