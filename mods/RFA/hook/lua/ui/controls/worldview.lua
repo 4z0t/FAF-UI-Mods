@@ -147,13 +147,13 @@ do
     local function GetBlueprintWithEnhancements(unit)
         local bp = unit:GetBlueprint()
         local activeEnh = GetEnhancements(unit:GetEntityId())
+        local newBp = false
+        local bpEnhs = bp.Enhancements
         if activeEnh then
             local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
             local maybeHasIntelEnh = unitsWithIntelEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
 
             if weaponsAffectedByRangeEnh or maybeHasIntelEnh then
-                local bpEnhs = bp.Enhancements
-                local newBp = false
                 for _, enhName in activeEnh do
                     local bpEnh = bpEnhs[enhName]
                     if weaponsAffectedByRangeEnh then
@@ -190,6 +190,20 @@ do
                     end
                 end
 
+            end
+        end
+
+        ---@param w WeaponBlueprint
+        for i, w in bp.Weapon do
+            local enh = w.EnabledByEnhancement
+            if enh and activeEnh[bpEnhs[enh].Slot] ~= enh then
+                if not newBp then
+                    bp = table.deepcopy(bp)
+                    newBp = true
+                    w = bp.Weapon[i]
+                end
+
+                w.RangeCategory = nil
             end
         end
 
