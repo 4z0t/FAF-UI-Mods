@@ -2,6 +2,7 @@ do
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local MathFloor = math.floor
+    local TableDeepcopy = table.deepcopy
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
@@ -161,7 +162,7 @@ do
                         local newRad = bpEnh.NewMaxRadius
                         if newRad then
                             if not newBp then
-                                bp = table.deepcopy(bp)
+                                bp = TableDeepcopy(bp)
                                 newBp = true
                             end
 
@@ -182,7 +183,7 @@ do
                         local newOmni = bpEnh.NewOmniRadius
                         local newSonar = bpEnh.NewSonarRadius
                         if not newBp and (newOmni or newSonar) then
-                            bp = table.deepcopy(bp)
+                            bp = TableDeepcopy(bp)
                             newBp = true
                         end
                         local intel = bp.Intel
@@ -199,7 +200,7 @@ do
             local enh = w.EnabledByEnhancement
             if enh and activeEnh[bpEnhs[enh].Slot] ~= enh then
                 if not newBp then
-                    bp = table.deepcopy(bp)
+                    bp = TableDeepcopy(bp)
                     newBp = true
                     w = bp.Weapon[i]
                 end
