@@ -123,7 +123,7 @@ do
         return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
     end
 
-    ---@type table<UnitId, table<string, true>>
+    ---@type table<UnitId, string[]>
     local unitsWithWeaponRangeEnh = {
         ual0001 = { "OverCharge", "AutoOverCharge", "RightDisruptor", "ChronoDampener" },
         uel0001 = { "OverCharge", "AutoOverCharge", "RightZephyr" },
@@ -175,6 +175,9 @@ do
         ---@type UnitBlueprint | IUnitBlueprint
         local bp = obp
         local bpEnhs = bp.Enhancements
+        if not bpEnhs then
+            return bp
+        end
 
         if activeEnh then
             local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
