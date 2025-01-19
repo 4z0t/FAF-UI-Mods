@@ -144,7 +144,7 @@ do
         xsl0301 = true,
     }
 
-    --- 
+    ---
     ---@param bp UnitBlueprint
     ---@param activeEnh EnhancementSyncData
     ---@return UnitBlueprint
@@ -152,7 +152,8 @@ do
         local newBp = false
         local bpEnhs = bp.Enhancements
         if activeEnh then
-            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
+            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[
+                bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
             local maybeHasIntelEnh = unitsWithIntelEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
 
             if weaponsAffectedByRangeEnh or maybeHasIntelEnh then
@@ -221,7 +222,7 @@ do
     ---@param bpId UnitId
     ---@return UnitBlueprint
     local function GetEnhancedBlueprintFromId(bpId)
-        local bp = __blueprints[bpId]--[[@as UnitBlueprint]]
+        local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
         -- hide unused weapons on units with presets (SACU), but don't hide them on units without presets (ACU)
         local presetEnh = bp.EnhancementPresetAssigned.Enhancements or bp.EnhancementPresets and {}
@@ -241,7 +242,6 @@ do
 
         return bp
     end
-
 
     ---@param bp UnitBlueprint
     ---@return RingData[]
@@ -445,8 +445,7 @@ do
                     else
                         self:ClearBuildRings()
                     end
-                elseif self._buildRing
-                    or orderType == "build" or orderType == 'order'
+                elseif self._buildRing or orderType == "build" or orderType == 'order'
                     and
                     (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard"
                     ) then
