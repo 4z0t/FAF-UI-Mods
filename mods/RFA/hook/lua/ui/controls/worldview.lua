@@ -246,7 +246,7 @@ do
     end
 
     ---@param bpId UnitId
-    ---@return UnitBlueprint
+    ---@return IUnitBlueprint
     local function GetEnhancedBlueprintFromId(bpId)
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
@@ -473,10 +473,10 @@ do
                     else
                         self:ClearBuildRings()
                     end
-                elseif self._buildRing or orderType == "build" or orderType == 'order'
-                    and
-                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard"
-                    ) then
+                elseif self._buildRing or orderType == "build" or
+                    orderType == 'order' and
+                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard")
+                then
                     self:UpdateBuildRings(false)
                 end
             end
@@ -512,7 +512,7 @@ do
 
             local weapons
             local unit = info.userUnit
-            if info.userUnit then
+            if unit then
                 weapons = GetBPInfo(GetEnhancedBlueprintFromUnit(unit))
             else
                 weapons = GetBPInfo(GetEnhancedBlueprintFromId(bpId))
