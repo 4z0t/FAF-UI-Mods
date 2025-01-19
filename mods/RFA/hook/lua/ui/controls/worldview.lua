@@ -383,9 +383,9 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
-            self._isCachedSelection = false
             local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
             if render then
+                self._isCachedSelection = false
                 self._hoverRings = {}
                 self._selectionRings = {}
                 self._buildRing = nil
@@ -514,7 +514,7 @@ do
             end
 
             local data = selection
-                | LuaQ.select(function(u) return GetEnhancedBlueprintFromUnit(u) end)
+                | LuaQ.select(GetEnhancedBlueprintFromUnit)
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
@@ -672,6 +672,8 @@ do
             self._selectionRings = nil
             self._buildRing = nil
             self._showRings = false
+            self._isCachedSelection = false
+            self._cachedSelection = nil
 
             oldWorldView.OnDestroy(self)
         end,
