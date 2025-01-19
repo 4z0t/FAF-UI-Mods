@@ -228,7 +228,7 @@ function SetDomain(i)
     currentDomainOrderOption:Set(i)
     currentDomainOrderOption:Save()
 
-    UpdateDomainsCursor()
+    -- UpdateDomainsCursor()
 end
 
 function RotateDomains()
