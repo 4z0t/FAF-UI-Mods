@@ -144,15 +144,40 @@ do
         xsl0301 = true,
     }
 
-    ---
+    ---@class IWeaponBlueprint
+    ---@field MaxRadius number
+    ---@field RangeCategory WeaponRangeCategory
+
+    ---@class IUnitBlueprint
+    ---@field Weapon? IWeaponBlueprint[]
+    ---@field Intel UnitBlueprintIntel
+
     ---@param bp UnitBlueprint
+    ---@return IUnitBlueprint
+    local function GenerateIBP(bp)
+        ---@type IUnitBlueprint
+        return {
+            Weapon = bp.Weapon | LuaQ.select.keyvalue(function(k, w)
+                return {
+                    MaxRadius = w.MaxRadius,
+                    RangeCategory = w.RangeCategory
+                }
+            end),
+            Intel = bp.Intel | LuaQ.copy
+        }
+    end
+
+    ---@param obp UnitBlueprint
     ---@param activeEnh EnhancementSyncData
-    ---@return UnitBlueprint
-    local function GetBlueprintWithEnhancements(bp, activeEnh)
+    ---@return IUnitBlueprint
+    local function GetBlueprintWithEnhancements(obp, activeEnh)
         local newBp = false
+        ---@type UnitBlueprint | IUnitBlueprint
+        local bp = obp
         local bpEnhs = bp.Enhancements
+
         if activeEnh then
-            local id = bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId
+            local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
             local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
             local maybeHasIntelEnh = unitsWithIntelEnh[id]
 
@@ -163,15 +188,15 @@ do
                         local newRad = bpEnh.NewMaxRadius
                         if newRad then
                             if not newBp then
-                                bp = TableDeepcopy(bp)
+                                bp = GenerateIBP(bp)
                                 newBp = true
                             end
 
-                            for _, w in bp.Weapon do
+                            for i, w in obp.Weapon do
                                 local weaponName = w.Label
                                 for _, v in weaponsAffectedByRangeEnh do
                                     if weaponName == v then
-                                        w.MaxRadius = newRad
+                                        bp.Weapon[i].MaxRadius = newRad
                                         break
                                     end
                                 end
@@ -184,7 +209,7 @@ do
                         local newOmni = bpEnh.NewOmniRadius
                         local newSonar = bpEnh.NewSonarRadius
                         if not newBp and (newOmni or newSonar) then
-                            bp = TableDeepcopy(bp)
+                            bp = GenerateIBP(bp)
                             newBp = true
                         end
                         local intel = bp.Intel
@@ -197,22 +222,23 @@ do
         end
 
         ---@param w WeaponBlueprint
-        for i, w in bp.Weapon do
+        for i, w in obp.Weapon do
             local enh = w.EnabledByEnhancement
             if enh and activeEnh[bpEnhs[enh].Slot] == enh then
                 if not newBp then
-                    bp = TableDeepcopy(bp)
+                    bp = GenerateIBP(bp)
                     newBp = true
-                    w = bp.Weapon[i]
                 end
 
-                w.RangeCategory = nil
+                bp.Weapon[i].RangeCategory = nil
             end
         end
 
         return bp
     end
 
+    ---@param unit UserUnit
+    ---@return IUnitBlueprint
     local function GetEnhancedBlueprintFromUnit(unit)
         local bp = unit:GetBlueprint()
         local activeEnh = GetEnhancements(unit:GetEntityId())
@@ -241,7 +267,7 @@ do
         return bp
     end
 
-    ---@param bp UnitBlueprint
+    ---@param bp IUnitBlueprint
     ---@return RingData[]
     local function GetBPInfo(bp)
         local weapons = {}
