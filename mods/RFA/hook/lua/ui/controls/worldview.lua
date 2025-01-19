@@ -376,6 +376,8 @@ do
     ---@field _selectionRings Ring[]
     ---@field _buildRing Ring
     ---@field _showRings boolean
+    ---@field _cachedSelection UserUnit[]?
+    ---@field _isCachedSelection boolean
     WorldView = Class(oldWorldView) {
 
         ---@param self WorldView
@@ -383,6 +385,7 @@ do
         __post_init = function(self, spec)
             oldWorldView.__post_init(self, spec)
             self._showRings = false
+            self._isCachedSelection = false
             local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
             if render then
                 self._hoverRings = {}
@@ -424,6 +427,7 @@ do
                 local orderName = commandMode[2].name
                 local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
                 local notIssuingOrder = not commandMode[2]
+                self._isCachedSelection = false
 
                 if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
                     self:UpdateHoverRings()
@@ -505,7 +509,7 @@ do
 
         ---@param self WorldView
         UpdateSelectionRings = function(self)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearSelectionRings()
                 return
@@ -527,7 +531,7 @@ do
         ---@param self WorldView
         ---@param useMousePos boolean
         UpdateBuildRings = function(self, useMousePos)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
@@ -581,7 +585,7 @@ do
         end,
 
         UpdateReclaimRings = function(self)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
@@ -687,6 +691,17 @@ do
         UnregisterRenderable = function(self, id)
             self.Renderables[id] = nil
         end,
+
+        ---@param self WorldView
+        ---@return UserUnit[]?
+        GetSelectedUnits = function(self)
+            if self._isCachedSelection then
+                return self._cachedSelection
+            end
+            self._cachedSelection = GetSelectedUnits()
+            self._isCachedSelection = true
+            return self._cachedSelection
+        end
     }
 
 end
