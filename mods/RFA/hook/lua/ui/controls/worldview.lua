@@ -152,9 +152,9 @@ do
         local newBp = false
         local bpEnhs = bp.Enhancements
         if activeEnh then
-            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[
-                bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
-            local maybeHasIntelEnh = unitsWithIntelEnh[bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId]
+            local id = bp.EnhancementPresetAssigned.BaseBlueprintId or bp.BlueprintId
+            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
+            local maybeHasIntelEnh = unitsWithIntelEnh[id]
 
             if weaponsAffectedByRangeEnh or maybeHasIntelEnh then
                 for _, enhName in activeEnh do
@@ -199,7 +199,7 @@ do
         ---@param w WeaponBlueprint
         for i, w in bp.Weapon do
             local enh = w.EnabledByEnhancement
-            if enh and (activeEnh[bpEnhs[enh].Slot] ~= enh) then
+            if enh and activeEnh[bpEnhs[enh].Slot] == enh then
                 if not newBp then
                     bp = TableDeepcopy(bp)
                     newBp = true
@@ -225,16 +225,14 @@ do
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
         -- hide unused weapons on units with presets (SACU), but don't hide them on units without presets (ACU)
-        local presetEnh = bp.EnhancementPresetAssigned.Enhancements or bp.EnhancementPresets and {}
+        local presetEnh = bp.EnhancementPresetAssigned.Enhancements and bp.EnhancementPresets
         if presetEnh then
             ---@type EnhancementSyncData
             local activeEnh = {}
-            if presetEnh then
-                local bpEnh = bp.Enhancements
-                for _, enhName in presetEnh do
-                    local enh = bpEnh[enhName]
-                    activeEnh[enh.Slot] = enhName
-                end
+            local bpEnh = bp.Enhancements
+            for _, enhName in presetEnh do
+                local enh = bpEnh[enhName]
+                activeEnh[enh.Slot] = enhName
             end
 
             return GetBlueprintWithEnhancements(bp, activeEnh)
