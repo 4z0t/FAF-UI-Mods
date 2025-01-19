@@ -325,5 +325,5 @@ function Main(_isReplay)
 
     InitOptionsExoticCategories()
 
-    UpdateDomainsCursor()
+    -- UpdateDomainsCursor()
 end
