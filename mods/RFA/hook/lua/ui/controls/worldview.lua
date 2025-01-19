@@ -22,6 +22,7 @@ do
     ---@field [1] string # type
     ---@field [2] number # range
 
+    --#region Options
     local showDirectFire = false
     local showIndirectFire = false
     local showAntiAir = false
@@ -104,6 +105,7 @@ do
             view.BuildPreviewKey = opt()
         end
     end
+    --#endregion
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
 
