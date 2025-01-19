@@ -144,11 +144,11 @@ do
         xsl0301 = true,
     }
 
-    ---@param unit UserUnit
+    --- 
+    ---@param bp UnitBlueprint
+    ---@param activeEnh EnhancementSyncData
     ---@return UnitBlueprint
-    local function GetBlueprintWithEnhancements(unit)
-        local bp = unit:GetBlueprint()
-        local activeEnh = GetEnhancements(unit:GetEntityId())
+    local function GetBlueprintWithEnhancements(bp, activeEnh)
         local newBp = false
         local bpEnhs = bp.Enhancements
         if activeEnh then
@@ -198,7 +198,7 @@ do
         ---@param w WeaponBlueprint
         for i, w in bp.Weapon do
             local enh = w.EnabledByEnhancement
-            if enh and activeEnh[bpEnhs[enh].Slot] ~= enh then
+            if enh and (activeEnh[bpEnhs[enh].Slot] ~= enh) then
                 if not newBp then
                     bp = TableDeepcopy(bp)
                     newBp = true
@@ -212,8 +212,39 @@ do
         return bp
     end
 
+    local function GetEnhancedBlueprintFromUnit(unit)
+        local bp = unit:GetBlueprint()
+        local activeEnh = GetEnhancements(unit:GetEntityId())
+        return GetBlueprintWithEnhancements(bp, activeEnh)
+    end
+
+    ---@param bpId UnitId
+    ---@return UnitBlueprint
+    local function GetEnhancedBlueprintFromId(bpId)
+        local bp = __blueprints[bpId]--[[@as UnitBlueprint]]
+
+        -- hide unused weapons on units with presets (SACU), but don't hide them on units without presets (ACU)
+        local presetEnh = bp.EnhancementPresetAssigned.Enhancements or bp.EnhancementPresets and {}
+        if presetEnh then
+            ---@type EnhancementSyncData
+            local activeEnh = {}
+            if presetEnh then
+                local bpEnh = bp.Enhancements
+                for _, enhName in presetEnh do
+                    local enh = bpEnh[enhName]
+                    activeEnh[enh.Slot] = enhName
+                end
+            end
+
+            return GetBlueprintWithEnhancements(bp, activeEnh)
+        end
+
+        return bp
+    end
+
+
     ---@param bp UnitBlueprint
-    ---@return RingData[]?
+    ---@return RingData[]
     local function GetBPInfo(bp)
         local weapons = {}
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
@@ -446,12 +477,20 @@ do
         ---@param self WorldView
         UpdateHoverRings = function(self)
             local info = GetRolloverInfo()
-            if not (info and info.blueprintId ~= "unknown") then
+            local bpId = info.blueprintId
+            if not (info and bpId ~= "unknown") then
                 self:ClearHoverRings()
                 return
             end
 
-            local weapons = GetBPInfo(__blueprints[info.blueprintId])
+            local weapons
+            local unit = info.userUnit
+            if info.userUnit then
+                weapons = GetBPInfo(GetEnhancedBlueprintFromUnit(unit))
+            else
+                weapons = GetBPInfo(GetEnhancedBlueprintFromId(bpId))
+            end
+
             if TableEmpty(weapons) then
                 self:ClearHoverRings()
                 return
@@ -474,7 +513,7 @@ do
             end
 
             local data = selection
-                | LuaQ.select(function(u) return GetBlueprintWithEnhancements(u) end)
+                | LuaQ.select(function(u) return GetEnhancedBlueprintFromUnit(u) end)
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
