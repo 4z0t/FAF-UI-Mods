@@ -229,7 +229,7 @@ do
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
             local enh = w.EnabledByEnhancement
-            if enh and activeEnh[bpEnhs[enh].Slot] == enh then
+            if enh and activeEnh[bpEnhs[enh].Slot] ~= enh then
                 if not newBp then
                     bp = GenerateIBP(bp--[[@as UnitBlueprint]] )
                     newBp = true
