@@ -8,6 +8,7 @@ do
     local TableEmpty = table.empty
     local TableSort = table.sort
     local unpack = unpack
+    local next = next
     local UI_DrawCircle = UI_DrawCircle
 
     local LuaQ = UMT.LuaQ
@@ -260,10 +261,12 @@ do
         if presetEnh then
             ---@type EnhancementSyncData
             local activeEnh = {}
-            local bpEnh = bp.Enhancements
-            for _, enhName in presetEnh do
-                local enh = bpEnh[enhName]
-                activeEnh[enh.Slot] = enhName
+            if next(presetEnh) then
+                local bpEnh = bp.Enhancements
+                for _, enhName in presetEnh do
+                    local enh = bpEnh[enhName]
+                    activeEnh[enh.Slot] = enhName
+                end
             end
 
             return GetBlueprintWithEnhancements(bp, activeEnh)
