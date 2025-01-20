@@ -316,8 +316,6 @@ do
             end
         end
 
-        TableSort(weapons, OverlaySortFunction)
-
         return weapons
     end
 
@@ -530,7 +528,7 @@ do
                 self:ClearHoverRings()
                 return
             end
-
+            TableSort(weapons, OverlaySortFunction)
             self:UpdateRings(self._hoverRings, weapons)
         end,
 
@@ -552,6 +550,8 @@ do
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
+
+            TableSort(data, OverlaySortFunction)
             self:UpdateRings(self._selectionRings, data)
         end,
 
