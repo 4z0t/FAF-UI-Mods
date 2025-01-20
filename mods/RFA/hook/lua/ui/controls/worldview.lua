@@ -171,7 +171,7 @@ do
 
     ---@param obp UnitBlueprint
     ---@param activeEnh EnhancementSyncData
-    ---@return IUnitBlueprint
+    ---@return IUnitBlueprint | UnitBlueprint
     local function GetBlueprintWithEnhancements(obp, activeEnh)
         local newBp = false
         ---@type UnitBlueprint | IUnitBlueprint
@@ -193,7 +193,7 @@ do
                         local newRad = bpEnh.NewMaxRadius
                         if newRad then
                             if not newBp then
-                                bp = GenerateIBP(bp)
+                                bp = GenerateIBP(bp--[[@as UnitBlueprint]] )
                                 newBp = true
                             end
 
@@ -231,7 +231,7 @@ do
             local enh = w.EnabledByEnhancement
             if enh and activeEnh[bpEnhs[enh].Slot] == enh then
                 if not newBp then
-                    bp = GenerateIBP(bp)
+                    bp = GenerateIBP(bp--[[@as UnitBlueprint]] )
                     newBp = true
                 end
 
@@ -243,7 +243,7 @@ do
     end
 
     ---@param unit UserUnit
-    ---@return IUnitBlueprint
+    ---@return IUnitBlueprint | UnitBlueprint
     local function GetEnhancedBlueprintFromUnit(unit)
         local bp = unit:GetBlueprint()
         local activeEnh = GetEnhancements(unit:GetEntityId())
@@ -251,7 +251,7 @@ do
     end
 
     ---@param bpId UnitId
-    ---@return IUnitBlueprint
+    ---@return IUnitBlueprint | UnitBlueprint
     local function GetEnhancedBlueprintFromId(bpId)
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
