@@ -256,7 +256,7 @@ do
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
         -- hide unused weapons on units with presets (SACU), but don't hide them on units without presets (ACU)
-        local presetEnh = bp.EnhancementPresetAssigned.Enhancements and bp.EnhancementPresets
+        local presetEnh = bp.EnhancementPresetAssigned.Enhancements or (bp.EnhancementPresets and {})
         if presetEnh then
             ---@type EnhancementSyncData
             local activeEnh = {}
