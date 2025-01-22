@@ -117,8 +117,9 @@ do
         ["Defense"] = 4,
         ["AntiNavy"] = 5,
         ["Omni"] = 6,
-        ["Radar"] = 7,
-        ["Sonar"] = 8,
+        ["CounterIntel"] = 7,
+        ["Radar"] = 8,
+        ["Sonar"] = 9,
     }
     ---@param a RingData
     ---@param b RingData
