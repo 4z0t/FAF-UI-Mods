@@ -308,11 +308,14 @@ do
             end
             if showCounterIntel and
                 (
-                intel.CloakFieldRadius > 0 or intel.SonarStealthFieldRadius > 0 or
-                    intel.SonarStealthFieldRadius > 0) then
+                    intel.CloakFieldRadius > 0
+                    or intel.SonarStealthFieldRadius > 0
+                    or intel.RadarStealthFieldRadius > 0
+                )
+            then
                 TableInsert(weapons,
                     { "CounterIntel",
-                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.SonarStealthFieldRadius) })
+                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.RadarStealthFieldRadius) })
             end
         end
 
