@@ -10,6 +10,7 @@ do
     local unpack = unpack
     local next = next
     local UI_DrawCircle = UI_DrawCircle
+    local EmptyTable = EmptyTable
 
     local LuaQ = UMT.LuaQ
 
@@ -127,17 +128,17 @@ do
         return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
     end
 
-    ---@type table<UnitId, string[]>
+    ---@type table<UnitId, table<string, true>>
     local unitsWithWeaponRangeEnh = {
-        ual0001 = { "OverCharge", "AutoOverCharge", "RightDisruptor", "ChronoDampener" },
-        uel0001 = { "OverCharge", "AutoOverCharge", "RightZephyr" },
-        url0001 = { "OverCharge", "AutoOverCharge", "RightRipper", "MLG" },
-        xsl0001 = { "OverCharge", "AutoOverCharge", "ChronotronCannon" },
+        ual0001 = { OverCharge = true, AutoOverCharge = true, RightDisruptor = true, ChronoDampener = true },
+        uel0001 = { OverCharge = true, AutoOverCharge = true, RightZephyr = true },
+        url0001 = { OverCharge = true, AutoOverCharge = true, RightRipper = true, MLG = true },
+        xsl0001 = { OverCharge = true, AutoOverCharge = true, ChronotronCannon = true },
 
-        ual0301 = { "RightReactonCannon" },
-        uel0301 = { "RightHeavyPlasmaCannon" },
-        url0301 = { "RightDisintegrator" },
-        xsl0301 = { "LightChronatronCannon", "OverCharge", "AutoOverCharge" },
+        ual0301 = { RightReactonCannon = true },
+        uel0301 = { RightHeavyPlasmaCannon = true },
+        url0301 = { RightDisintegrator = true },
+        xsl0301 = { LightChronatronCannon = true, OverCharge = true, AutoOverCharge = true },
     }
 
     local unitsWithIntelEnh = {
@@ -148,6 +149,69 @@ do
         xsl0301 = true,
     }
 
+    local intelToEnhancement = {
+        OmniRadius = "NewOmniRadius",
+        RadarRadius = "NewRadarRadius",
+    }
+
+    local intelWithRangeRing = {
+        OmniRadius = true,
+        RadarRadius = true,
+        SonarRadius = true,
+        CloakFieldRadius = true,
+        SonarStealthFieldRadius = true,
+        RadarStealthFieldRadius = true,
+    }
+
+    ---@type table<UnitId, IUnitBlueprint>
+    local IBPByBpIdCache = UMT.Weak.Value({})
+    ---@type table<UserUnit, IUnitBlueprint>
+    local IBPByUnitCache = UMT.Weak.Key({})
+    local EntityIdToUnitCache = UMT.Weak.Value({})
+
+    local lastEnhSyncTable = {}
+    AddOnSyncHashedCallback(
+        ---@param enhSyncTable EnhancementSyncTable
+        function(enhSyncTable)
+            -- sim re-evaluates all enhancements for all units every time an enhancement is built/removed...
+            -- Check for changes to prevent trashing our IBPs
+
+            for entityId, enhSync in enhSyncTable do
+                local lastEnhSync = lastEnhSyncTable[entityId]
+                -- unit got first enhancement and was added to table
+                if not lastEnhSync then
+                    local unit = EntityIdToUnitCache[entityId]
+                    if unit then
+                        IBPByUnitCache[unit] = nil
+                    end
+                else -- unit's enhancements may have changed
+                    local changed = false
+                    for slot, enh in enhSync do
+                        if lastEnhSync[slot] ~= enh then
+                            IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
+                            changed = true
+                            break
+                        end
+                    end
+
+                    -- set nil so we don't check it again later on
+                    lastEnhSyncTable[entityId] = nil
+
+                    if changed then continue end
+                end
+            end
+
+            -- unit lost all enh and was removed from table
+            for entityId, enhSync in lastEnhSyncTable do
+                IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
+            end
+
+            lastEnhSyncTable = enhSyncTable
+        end
+        , "UserUnitEnhancements"
+        , 'RFA_DirtyIBPByUnitCache'
+    )
+
     ---@class IWeaponBlueprint
     ---@field MaxRadius number
     ---@field RangeCategory WeaponRangeCategory
@@ -156,100 +220,74 @@ do
     ---@field Weapon? IWeaponBlueprint[]
     ---@field Intel UnitBlueprintIntel
 
-    ---@param bp UnitBlueprint
-    ---@return IUnitBlueprint
-    local function GenerateIBP(bp)
-        ---@type IUnitBlueprint
-        return {
-            Weapon = bp.Weapon | LuaQ.select.keyvalue(function(k, w)
-                return {
-                    MaxRadius = w.MaxRadius,
-                    RangeCategory = w.RangeCategory
-                }
-            end),
-            Intel = bp.Intel | LuaQ.copy
-        }
-    end
-
     ---@param obp UnitBlueprint
-    ---@param activeEnh EnhancementSyncData
-    ---@return IUnitBlueprint | UnitBlueprint
-    local function GetBlueprintWithEnhancements(obp, activeEnh)
-        local newBp = false
-        ---@type UnitBlueprint | IUnitBlueprint
-        local bp = obp
-        local bpEnhs = bp.Enhancements
-        if not bpEnhs then
-            return bp
-        end
+    ---@param activeEnhs? EnhancementSyncData | Enhancement[]
+    ---@return IUnitBlueprint
+    local function GenerateIBP(obp, activeEnhs)
+        if not activeEnhs then activeEnhs = EmptyTable end
 
-        if activeEnh then
-            local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
-            local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
-            local maybeHasIntelEnh = unitsWithIntelEnh[id]
+        ---@type IUnitBlueprint
+        local ibp = {
+            Weapon = {},
+            Intel = {},
+        }
 
-            if weaponsAffectedByRangeEnh or maybeHasIntelEnh then
-                for _, enhName in activeEnh do
-                    local bpEnh = bpEnhs[enhName]
-                    if weaponsAffectedByRangeEnh then
-                        local newRad = bpEnh.NewMaxRadius
-                        if newRad then
-                            if not newBp then
-                                bp = GenerateIBP(bp--[[@as UnitBlueprint]] )
-                                newBp = true
-                            end
+        local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
+        local obpEnh = obp.Enhancements --[[@as table<Enhancement, UnitBlueprintEnhancement>]] -- function only gets called after we checked for enhancements
 
-                            for i, w in obp.Weapon do
-                                local weaponName = w.Label
-                                for _, v in weaponsAffectedByRangeEnh do
-                                    if weaponName == v then
-                                        bp.Weapon[i].MaxRadius = newRad
-                                        break
-                                    end
-                                end
-                            end
-
-                        end
-                    end
-
-                    if maybeHasIntelEnh then
-                        local newOmni = bpEnh.NewOmniRadius
-                        local newSonar = bpEnh.NewSonarRadius
-                        if not newBp and (newOmni or newSonar) then
-                            bp = GenerateIBP(bp)
-                            newBp = true
-                        end
-                        local intel = bp.Intel
-                        if newOmni then intel.OmniRadius = newOmni end
-                        if newSonar then intel.SonarRadius = newSonar end
-                    end
-                end
-
-            end
-        end
-
+        local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
+        local newMaxRadius = obpEnh
+         | LuaQ.select.keyvalue(function(k, v) return (activeEnhs | LuaQ.contains(k) and v.NewMaxRadius) or nil end)
+         | LuaQ.max
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
+            -- Skip adding disabled weapons to IBp
             local enh = w.EnabledByEnhancement
-            if enh and activeEnh[bpEnhs[enh].Slot] ~= enh then
-                if not newBp then
-                    bp = GenerateIBP(bp--[[@as UnitBlueprint]] )
-                    newBp = true
-                end
+            if enh and not (activeEnhs | LuaQ.contains(enh)) then
+                continue
+            end
 
-                bp.Weapon[i].RangeCategory = nil
+            TableInsert(ibp.Weapon, {
+                RangeCategory = w.RangeCategory,
+                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius
+            })
+        end
+
+        if unitsWithIntelEnh[id] then
+            local ibpIntel = ibp.Intel
+            for intelType, v in obp.Intel do
+                if intelWithRangeRing[intelType] then
+                    local enhKey = intelToEnhancement[intelType]
+
+                    ibpIntel[intelType] = (enhKey and obpEnh
+                        | LuaQ.select(enhKey)
+                        | LuaQ.max
+                        )
+                        or v
+                end
             end
         end
 
-        return bp
+        return ibp
     end
 
     ---@param unit UserUnit
     ---@return IUnitBlueprint | UnitBlueprint
     local function GetEnhancedBlueprintFromUnit(unit)
         local bp = unit:GetBlueprint()
-        local activeEnh = GetEnhancements(unit:GetEntityId())
-        return GetBlueprintWithEnhancements(bp, activeEnh)
+
+        if bp.Enhancements then
+            local cachedBP = IBPByUnitCache[unit]
+            if not cachedBP then
+                local id = unit:GetEntityId()
+                cachedBP = GenerateIBP(bp, GetEnhancements(id))
+                IBPByUnitCache[unit] = cachedBP
+                EntityIdToUnitCache[id] = unit
+            end
+            return cachedBP
+        end
+
+        return bp
     end
 
     ---@param bpId UnitId
@@ -257,26 +295,21 @@ do
     local function GetEnhancedBlueprintFromId(bpId)
         local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
 
-        -- hide unused weapons on units with presets (SACU), but don't hide them on units without presets (ACU)
-        local presetEnh = bp.EnhancementPresetAssigned.Enhancements or (bp.EnhancementPresets and {})
-        if presetEnh then
-            ---@type EnhancementSyncData
-            local activeEnh = {}
-            if next(presetEnh) then
-                local bpEnh = bp.Enhancements
-                for _, enhName in presetEnh do
-                    local enh = bpEnh[enhName]
-                    activeEnh[enh.Slot] = enhName
-                end
+        -- Check for `bp.EnhancementPresets` instead of `bp.Enhancements` so that ACUs always show all weapons, since they're likely upgraded while SACU are not
+        -- `bp.EnhancementPresets == nil` for units with presets
+        if bp.EnhancementPresets or bp.EnhancementPresetAssigned then
+            local cachedBP = IBPByBpIdCache[bpId]
+            if not cachedBP then
+                cachedBP = GenerateIBP(bp, bp.EnhancementPresetAssigned.Enhancements)
+                IBPByBpIdCache[bpId] = cachedBP
             end
-
-            return GetBlueprintWithEnhancements(bp, activeEnh)
+            return cachedBP
         end
 
         return bp
     end
 
-    ---@param bp IUnitBlueprint
+    ---@param bp IUnitBlueprint | UnitBlueprint
     ---@return RingData[]
     local function GetBPInfo(bp)
         local weapons = {}
