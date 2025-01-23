@@ -1,3 +1,4 @@
+LOG('RFA worldview.lua startline:', debug.getinfo(1, 'l').currentline)
 do
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
@@ -175,11 +176,13 @@ do
         function(enhSyncTable)
             -- sim re-evaluates all enhancements for all units every time an enhancement is built/removed...
             -- Check for changes to prevent trashing our IBPs
+            -- LOG('enhsync', '\nOld:', repr(lastEnhSyncTable), '\nNew:', repr(enhSyncTable))
 
             for entityId, enhSync in enhSyncTable do
                 local lastEnhSync = lastEnhSyncTable[entityId]
                 -- unit got first enhancement and was added to table
                 if not lastEnhSync then
+                    LOG('unit got first enh', entityId)
                     local unit = EntityIdToUnitCache[entityId]
                     if unit then
                         IBPByUnitCache[unit] = nil
@@ -188,6 +191,7 @@ do
                     local changed = false
                     for slot, enh in enhSync do
                         if lastEnhSync[slot] ~= enh then
+                            LOG('changed table for ', entityId)
                             IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
                             changed = true
                             break
@@ -203,6 +207,7 @@ do
 
             -- unit lost all enh and was removed from table
             for entityId, enhSync in lastEnhSyncTable do
+                LOG('unit lost all enh', entityId)
                 IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
             end
 
@@ -280,6 +285,7 @@ do
             local cachedBP = IBPByUnitCache[unit]
             if not cachedBP then
                 local id = unit:GetEntityId()
+                LOG(('generating bp for unit %s with bpid %s'):format(id, bp.BlueprintId))
                 cachedBP = GenerateIBP(bp, GetEnhancements(id))
                 IBPByUnitCache[unit] = cachedBP
                 EntityIdToUnitCache[id] = unit
