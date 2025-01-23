@@ -203,7 +203,10 @@ do
 
             -- unit lost all enh and was removed from table
             for entityId, enhSync in lastEnhSyncTable do
-                IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
+                local unit = EntityIdToUnitCache[entityId]
+                if unit then
+                    IBPByUnitCache[unit] = nil
+                end
             end
 
             lastEnhSyncTable = enhSyncTable
