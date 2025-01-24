@@ -164,14 +164,14 @@ do
     }
 
     ---@type table<UnitId, IUnitBlueprint>
-    local IBPByBpIdCache = UMT.Weak.Value({})
+    local IBPByBpIdCache = UMT.Weak.Value {}
     ---@type table<UserUnit, IUnitBlueprint>
-    local IBPByUnitCache = UMT.Weak.Key({})
-    local EntityIdToUnitCache = UMT.Weak.Value({})
+    local IBPByUnitCache = UMT.Weak.Key {}
+    local EntityIdToUnitCache = UMT.Weak.Value {}
 
     local lastEnhSyncTable = {}
     AddOnSyncHashedCallback(
-        ---@param enhSyncTable EnhancementSyncTable
+    ---@param enhSyncTable EnhancementSyncTable
         function(enhSyncTable)
             -- sim re-evaluates all enhancements for all units every time an enhancement is built/removed...
             -- Check for changes to prevent trashing our IBPs
@@ -183,7 +183,7 @@ do
 
                 -- unit got first enhancement and was added to table
                 if not lastEnhSync then
-                        IBPByUnitCache[unit] = nil
+                    IBPByUnitCache[unit] = nil
                 else -- unit's enhancements may have changed
                     local changed = false
                     for slot, enh in enhSync do
@@ -236,12 +236,14 @@ do
         }
 
         local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
-        local obpEnh = obp.Enhancements --[[@as table<Enhancement, UnitBlueprintEnhancement>]] -- function only gets called after we checked for enhancements
+        local obpEnh = obp.Enhancements --[[@as table<Enhancement, UnitBlueprintEnhancement>]]
+        -- function only gets called after we checked for enhancements
 
         local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
         local newMaxRadius = obpEnh
-         | LuaQ.select.keyvalue(function(k, v) return (activeEnhs | LuaQ.contains(k) and v.NewMaxRadius) or nil end)
-         | LuaQ.max
+            | LuaQ.select.keyvalue(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
+            | LuaQ.max
+
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
             -- Skip adding disabled weapons to IBp
@@ -345,7 +347,7 @@ do
             end
             if showCounterIntel and
                 (
-                    intel.CloakFieldRadius > 0
+                intel.CloakFieldRadius > 0
                     or intel.SonarStealthFieldRadius > 0
                     or intel.RadarStealthFieldRadius > 0
                 )
@@ -590,8 +592,8 @@ do
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
+                | LuaQ.sort(OverlaySortFunction)
 
-            TableSort(data, OverlaySortFunction)
             self:UpdateRings(self._selectionRings, data)
         end,
 
