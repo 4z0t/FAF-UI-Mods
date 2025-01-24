@@ -2,13 +2,11 @@ do
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local MathFloor = math.floor
-    local TableDeepcopy = table.deepcopy
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
     local TableSort = table.sort
     local unpack = unpack
-    local next = next
     local UI_DrawCircle = UI_DrawCircle
     local EmptyTable = EmptyTable
 
