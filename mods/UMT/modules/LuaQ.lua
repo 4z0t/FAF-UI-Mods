@@ -462,7 +462,17 @@ lastIndex = CreatePipe(LuaQLastI)
 ---Returns table of distinct values of given table
 ---@class LuaQDistinctPipeTable
 LuaQDistinct = BORPipe(function(tbl, self)
-    return tbl | toSet | keys
+    local result = {}
+    local _set = {}
+
+    for _, v in tbl do
+        if not _set[v] then
+            TableInsert(result, v)
+            _set[v] = true
+        end
+    end
+
+    return result
 end)
 ---@type LuaQDistinctPipeTable
 distinct = CreatePipe(LuaQDistinct)
