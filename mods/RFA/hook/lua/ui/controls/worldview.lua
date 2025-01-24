@@ -274,20 +274,6 @@ do
         return ibp
     end
 
-    local focusArmy = GetFocusArmy()
-    AddOnSyncHashedCallback(
-        ---@param data { new: number, old: number }
-        function(data)
-            focusArmy = data.new
-        end
-        , "FocusArmyChanged"
-        , "RFA_FocusArmyObserver"
-    )
-
-    local function UnitIsInFocusArmy(unit)
-        return unit:GetArmy() == focusArmy
-    end
-
     ---@param unit UserUnit
     ---@return IUnitBlueprint | UnitBlueprint
     local function GetEnhancedBlueprintFromUnit(unit)
@@ -599,29 +585,8 @@ do
                 return
             end
 
-            local selectionFocusArmy = {}
-            local selectionOtherArmy = {}
-            do
-                local i1, i2 = 1, 1
-                for _, u in selection do
-                    if u:GetArmy() == focusArmy or focusArmy == -1 then
-                        selectionFocusArmy[i1] = u
-                        i1 = i1 + 1
-                    else
-                        selectionOtherArmy[i2] = u
-                        i2 = i2 + 1
-                    end
-                end
-            end
-            local data = selectionFocusArmy
+            local data = selection
                 | LuaQ.select(GetEnhancedBlueprintFromUnit)
-
-            table.destructiveCat(data
-                , selectionOtherArmy
-                | LuaQ.select(selection[1].GetUnitId)
-                | LuaQ.select(GetEnhancedBlueprintFromId)
-            )
-            data = data
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
