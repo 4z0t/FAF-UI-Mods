@@ -3,6 +3,8 @@ local ipairs = ipairs
 local setmetatable = setmetatable
 local TableSort = table.sort
 local TableGetN = table.getn
+local type = type
+local iscallable = iscallable
 
 ---@class BORTable : table
 ---@operator bor(table):table
