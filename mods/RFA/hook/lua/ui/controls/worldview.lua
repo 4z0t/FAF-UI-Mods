@@ -178,17 +178,17 @@ do
 
             for entityId, enhSync in enhSyncTable do
                 local lastEnhSync = lastEnhSyncTable[entityId]
+                local unit = EntityIdToUnitCache[entityId]
+                if not unit then continue end
+
                 -- unit got first enhancement and was added to table
                 if not lastEnhSync then
-                    local unit = EntityIdToUnitCache[entityId]
-                    if unit then
                         IBPByUnitCache[unit] = nil
-                    end
                 else -- unit's enhancements may have changed
                     local changed = false
                     for slot, enh in enhSync do
                         if lastEnhSync[slot] ~= enh then
-                            IBPByUnitCache[EntityIdToUnitCache[entityId]] = nil
+                            IBPByUnitCache[unit] = nil
                             changed = true
                             break
                         end
