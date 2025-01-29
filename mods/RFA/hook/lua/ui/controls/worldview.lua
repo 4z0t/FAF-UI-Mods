@@ -153,12 +153,12 @@ do
     }
 
     local intelWithRangeRing = {
-        OmniRadius = true,
-        RadarRadius = true,
-        SonarRadius = true,
-        CloakFieldRadius = true,
-        SonarStealthFieldRadius = true,
-        RadarStealthFieldRadius = true,
+        "OmniRadius",
+        "RadarRadius",
+        "SonarRadius",
+        "CloakFieldRadius",
+        "SonarStealthFieldRadius",
+        "RadarStealthFieldRadius",
     }
 
     ---@type table<UnitId, IUnitBlueprint>
@@ -258,17 +258,15 @@ do
 
         if unitsWithIntelEnh[id] then
             local ibpIntel = ibp.Intel
-            for intelType, v in obp.Intel do
-                if intelWithRangeRing[intelType] then
-                    local enhKey = intelToEnhancement[intelType]
-
-                    ibpIntel[intelType] = (enhKey and obpEnh
-                        | LuaQ.select(enhKey)
-                        | LuaQ.max
-                        )
-                        or v
+            local obpIntel = obp.Intel
+            for _, intelType in intelWithRangeRing do
+                local enhIntel = intelToEnhancement[intelType]
+                ibpIntel[intelType] = activeEnhs
+                    | LuaQ.max(function(k, v) return obpEnh[v][enhIntel] end)
+                    or obpIntel[intelType]
                 end
-            end
+        else
+            ibp.Intel = obp.Intel
         end
 
         return ibp
