@@ -239,8 +239,7 @@ do
 
         local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
         local newMaxRadius = obpEnh
-            | LuaQ.select.keyvalue(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
-            | LuaQ.max
+         | LuaQ.max(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
 
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
