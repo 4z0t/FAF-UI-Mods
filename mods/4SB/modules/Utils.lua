@@ -98,11 +98,12 @@ end
 function FormatNumber(n)
     if n == nil then return "" end
 
-    if MathAbs(n) < 1000 then
+    local an = MathAbs(n)
+    if an < 1000 then
         return ("%01.0f"):format(n)
-    elseif MathAbs(n) < 10000 then
+    elseif an < 10000 then
         return ("%01.1fk"):format(n / 1000)
-    elseif MathAbs(n) < 1000000 then
+    elseif an < 1000000 then
         return ("%01.0fk"):format(n / 1000)
     else
         return ("%01.1fm"):format(n / 1000000)
