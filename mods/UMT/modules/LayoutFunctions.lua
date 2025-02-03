@@ -31,11 +31,13 @@ end
 ---@param n2 NumberVar
 ---@return NumberFunction
 function Mult(n1, n2)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return n1() * n2() end
     end
-    if iscallable(n1) then return _MultVarAndValue(n1, n2) end
-    if iscallable(n2) then return _MultVarAndValue(n2, n1) end
+    if iscallable1 then return _MultVarAndValue(n1, n2) end
+    if iscallable2 then return _MultVarAndValue(n2, n1) end
     return n1 * n2
 end
 
@@ -47,16 +49,18 @@ end
 ---@param n2 NumberVar
 ---@return NumberFunction
 function Div(n1, n2)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return n1() / n2() end
     end
-    if iscallable(n1) then
+    if iscallable1 then
         assert(n2 ~= 0, "Attempt to divide by zero")
         return function()
             return n1() / n2
         end
     end
-    if iscallable(n2) then
+    if iscallable2 then
         if n1 == 0 then
             return 0
         end
@@ -90,11 +94,13 @@ end
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Max(n1, n2, scale)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return math.max(n1(), n2()) end
     end
-    if iscallable(n1) then return _MaxVarOrValue(n1, n2, scale) end
-    if iscallable(n2) then return _MaxVarOrValue(n2, n1, scale) end
+    if iscallable1 then return _MaxVarOrValue(n1, n2, scale) end
+    if iscallable2 then return _MaxVarOrValue(n2, n1, scale) end
 
     scale = scale or defaultScaleFactor
     return Mult(math.max(n1, n2), scale)
@@ -123,11 +129,13 @@ end
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Min(n1, n2, scale)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return math.min(n1(), n2()) end
     end
-    if iscallable(n1) then return _MinVarOrValue(n1, n2, scale) end
-    if iscallable(n2) then return _MinVarOrValue(n2, n1, scale) end
+    if iscallable1 then return _MinVarOrValue(n1, n2, scale) end
+    if iscallable2 then return _MinVarOrValue(n2, n1, scale) end
 
     scale = scale or defaultScaleFactor
     return Mult(math.min(n1, n2), scale)
@@ -172,11 +180,13 @@ end
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Diff(n1, n2, scale)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return n1() - n2() end
     end
-    if iscallable(n1) then return _DiffVarAndValue(n1, n2, scale) end
-    if iscallable(n2) then return _DiffValueAndVar(n1, n2, scale) end
+    if iscallable1 then return _DiffVarAndValue(n1, n2, scale) end
+    if iscallable2 then return _DiffValueAndVar(n1, n2, scale) end
 
     scale = scale or defaultScaleFactor
     return Mult(n1 - n2, scale)
@@ -207,11 +217,13 @@ end
 ---@param scale? FunctionalNumber # defaults to pixel scale factor defined in interface options
 ---@return NumberFunction
 function Sum(n1, n2, scale)
-    if iscallable(n1) and iscallable(n2) then
+    local iscallable1 = iscallable(n1)
+    local iscallable2 = iscallable(n2)
+    if iscallable1 and iscallable2 then
         return function() return n1() + n2() end
     end
-    if iscallable(n1) then return _SumVarAndValue(n1, n2, scale) end
-    if iscallable(n2) then return _SumVarAndValue(n2, n1, scale) end
+    if iscallable1 then return _SumVarAndValue(n1, n2, scale) end
+    if iscallable2 then return _SumVarAndValue(n2, n1, scale) end
 
     scale = scale or defaultScaleFactor
     return Mult(n1 + n2, scale)
