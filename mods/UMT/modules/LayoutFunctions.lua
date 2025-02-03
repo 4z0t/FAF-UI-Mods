@@ -56,17 +56,13 @@ function Div(n1, n2)
     end
     if iscallable1 then
         assert(n2 ~= 0, "Attempt to divide by zero")
-        return function()
-            return n1() / n2
-        end
+        return function() return n1() / n2 end
     end
     if iscallable2 then
         if n1 == 0 then
             return 0
         end
-        return function()
-            return n1 / n2()
-        end
+        return function() return n1 / n2() end
     end
     return n1 / n2
 end
