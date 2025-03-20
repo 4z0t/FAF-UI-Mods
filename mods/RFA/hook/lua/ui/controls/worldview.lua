@@ -1,5 +1,6 @@
 do
     --#region Upvalues
+    local GetMouseWorldPos = GetMouseWorldPos
     local GetRolloverInfo = GetRolloverInfo
     local GetFocusArmy = GetFocusArmy
     local IsKeyDown = IsKeyDown
