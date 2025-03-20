@@ -590,7 +590,12 @@ local LuaQContainsMetaTable = {
         return self
     end
 }
----@type ContainsPipeTable
+
+--- Returns the key which contains the given value, or nil
+---```lua
+--- ... | contains(V)
+---```
+---@class LuaQContains : ContainsPipeTable
 contains = setmetatable({}, LuaQContainsMetaTable)
 
 local LuaQReduceMetaTable = {

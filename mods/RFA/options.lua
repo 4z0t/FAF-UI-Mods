@@ -13,6 +13,7 @@ UMT.Options.Mods["RFA"] = {
     showSonar = Opt(true),
     showCounterIntel = Opt(true),
     showInMinimap = Opt(false),
+    displayActualBuildRange = Opt(false),
 }
 
 function Main()
@@ -42,6 +43,7 @@ function Main()
             Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Filter("Show Sonar range", options.showSonar, 4),
             Options.Filter("Show Counter-intel range", options.showCounterIntel, 4),
+            Options.Filter("Display actual build range (including skirt size)", options.displayActualBuildRange, 4),
             Options.Strings("Build Preview key",
                 {
                     "SHIFT",

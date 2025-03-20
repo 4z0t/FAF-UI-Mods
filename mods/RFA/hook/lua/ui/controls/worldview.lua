@@ -1,12 +1,19 @@
 do
+    --#region Upvalues
+    local GetMouseWorldPos = GetMouseWorldPos
+    local GetRolloverInfo = GetRolloverInfo
+    local GetFocusArmy = GetFocusArmy
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
+    local MathFloor = math.floor
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
     local TableSort = table.sort
     local unpack = unpack
     local UI_DrawCircle = UI_DrawCircle
+    local EmptyTable = EmptyTable
+    --#endregion
 
     local LuaQ = UMT.LuaQ
 
@@ -14,11 +21,13 @@ do
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
     local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
+    local GetEnhancements = import("/lua/enhancementcommon.lua").GetEnhancements
 
     ---@class RingData
     ---@field [1] string # type
     ---@field [2] number # range
 
+    --#region Options
     local showDirectFire = false
     local showIndirectFire = false
     local showAntiAir = false
@@ -101,6 +110,7 @@ do
             view.BuildPreviewKey = opt()
         end
     end
+    --#endregion
 
     local buildersCategory = categories.REPAIR + categories.RECLAIM + categories.xrl0403
 
@@ -111,8 +121,9 @@ do
         ["Defense"] = 4,
         ["AntiNavy"] = 5,
         ["Omni"] = 6,
-        ["Radar"] = 7,
-        ["Sonar"] = 8,
+        ["CounterIntel"] = 7,
+        ["Radar"] = 8,
+        ["Sonar"] = 9,
     }
     ---@param a RingData
     ---@param b RingData
@@ -120,8 +131,191 @@ do
         return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
     end
 
-    ---@param bp UnitBlueprint
-    ---@return RingData[]?
+    ---@type table<UnitId, table<string, true>>
+    local unitsWithWeaponRangeEnh = {
+        ual0001 = { OverCharge = true, AutoOverCharge = true, RightDisruptor = true, ChronoDampener = true },
+        uel0001 = { OverCharge = true, AutoOverCharge = true, RightZephyr = true },
+        url0001 = { OverCharge = true, AutoOverCharge = true, RightRipper = true, MLG = true },
+        xsl0001 = { OverCharge = true, AutoOverCharge = true, ChronotronCannon = true },
+
+        ual0301 = { RightReactonCannon = true },
+        uel0301 = { RightHeavyPlasmaCannon = true },
+        url0301 = { RightDisintegrator = true },
+        xsl0301 = { LightChronatronCannon = true, OverCharge = true, AutoOverCharge = true },
+    }
+
+    local unitsWithIntelEnh = {
+        url0001 = true,
+
+        ual0001 = true,
+        uel0301 = true,
+        xsl0301 = true,
+    }
+
+    local intelToEnhancement = {
+        OmniRadius = "NewOmniRadius",
+        RadarRadius = "NewRadarRadius",
+    }
+
+    local intelWithRangeRing = {
+        "OmniRadius",
+        "RadarRadius",
+        "SonarRadius",
+        "CloakFieldRadius",
+        "SonarStealthFieldRadius",
+        "RadarStealthFieldRadius",
+    }
+
+    ---@type table<UnitId, IUnitBlueprint>
+    local IBPByBpIdCache = UMT.Weak.Value {}
+    ---@type table<UserUnit, IUnitBlueprint>
+    local IBPByUnitCache = UMT.Weak.Key {}
+    local EntityIdToUnitCache = UMT.Weak.Value {}
+
+    local lastEnhSyncTable = {}
+    AddOnSyncHashedCallback(
+    ---@param enhSyncTable EnhancementSyncTable
+        function(enhSyncTable)
+            -- sim re-evaluates all enhancements for all units every time an enhancement is built/removed...
+            -- Check for changes to prevent trashing our IBPs
+
+            for entityId, enhSync in enhSyncTable do
+                local lastEnhSync = lastEnhSyncTable[entityId]
+                local unit = EntityIdToUnitCache[entityId]
+                if not unit then continue end
+
+                -- unit got first enhancement and was added to table
+                if not lastEnhSync then
+                    IBPByUnitCache[unit] = nil
+                else -- unit's enhancements may have changed
+                    local changed = false
+                    for slot, enh in enhSync do
+                        if lastEnhSync[slot] ~= enh then
+                            IBPByUnitCache[unit] = nil
+                            changed = true
+                            break
+                        end
+                    end
+
+                    -- set nil so we don't check it again later on
+                    lastEnhSyncTable[entityId] = nil
+
+                    if changed then continue end
+                end
+            end
+
+            -- unit lost all enh and was removed from table
+            for entityId, enhSync in lastEnhSyncTable do
+                local unit = EntityIdToUnitCache[entityId]
+                if unit then
+                    IBPByUnitCache[unit] = nil
+                end
+            end
+
+            lastEnhSyncTable = enhSyncTable
+        end
+        , "UserUnitEnhancements"
+        , 'RFA_DirtyIBPByUnitCache'
+    )
+
+    ---@class IWeaponBlueprint
+    ---@field MaxRadius number
+    ---@field RangeCategory WeaponRangeCategory
+
+    ---@class IUnitBlueprint
+    ---@field Weapon? IWeaponBlueprint[]
+    ---@field Intel UnitBlueprintIntel
+
+    ---@param obp UnitBlueprint
+    ---@param activeEnhs? EnhancementSyncData | Enhancement[]
+    ---@return IUnitBlueprint
+    local function GenerateIBP(obp, activeEnhs)
+        if not activeEnhs then activeEnhs = EmptyTable end
+
+        ---@type IUnitBlueprint
+        local ibp = {
+            Weapon = {},
+            Intel = {},
+        }
+
+        local id = obp.EnhancementPresetAssigned.BaseBlueprintId or obp.BlueprintId
+        local obpEnh = obp.Enhancements --[[@as table<Enhancement, UnitBlueprintEnhancement>]]
+        -- function only gets called after we checked for enhancements
+
+        local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
+        local newMaxRadius = obpEnh
+            | LuaQ.max(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
+
+        ---@param w WeaponBlueprint
+        for i, w in obp.Weapon do
+            -- Skip adding disabled weapons to IBp
+            local enh = w.EnabledByEnhancement
+            if enh and not (activeEnhs | LuaQ.contains(enh)) then
+                continue
+            end
+
+            TableInsert(ibp.Weapon, {
+                RangeCategory = w.RangeCategory,
+                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius
+            })
+        end
+
+        if unitsWithIntelEnh[id] then
+            local ibpIntel = ibp.Intel
+            local obpIntel = obp.Intel
+            for _, intelType in intelWithRangeRing do
+                local enhIntel = intelToEnhancement[intelType]
+                ibpIntel[intelType] = activeEnhs
+                    | LuaQ.max(function(k, v) return obpEnh[v][enhIntel] end)
+                    or obpIntel[intelType]
+            end
+        else
+            ibp.Intel = obp.Intel
+        end
+
+        return ibp
+    end
+
+    ---@param unit UserUnit
+    ---@return IUnitBlueprint | UnitBlueprint
+    local function GetEnhancedBlueprintFromUnit(unit)
+        local bp = unit:GetBlueprint()
+
+        if bp.Enhancements then
+            local cachedBP = IBPByUnitCache[unit]
+            if not cachedBP then
+                local id = unit:GetEntityId()
+                cachedBP = GenerateIBP(bp, GetEnhancements(id))
+                IBPByUnitCache[unit] = cachedBP
+                EntityIdToUnitCache[id] = unit
+            end
+            return cachedBP
+        end
+
+        return bp
+    end
+
+    ---@param bpId UnitId
+    ---@return IUnitBlueprint | UnitBlueprint
+    local function GetEnhancedBlueprintFromId(bpId)
+        local bp = __blueprints[bpId] --[[@as UnitBlueprint]]
+
+        -- Check for `bp.EnhancementPresets` instead of `bp.Enhancements` so that ACUs always show all weapons, since they're likely upgraded while SACU are not
+        -- `bp.EnhancementPresets == nil` for units with presets
+        if bp.EnhancementPresets or bp.EnhancementPresetAssigned then
+            local cachedBP = IBPByBpIdCache[bpId]
+            if not cachedBP then
+                cachedBP = GenerateIBP(bp, bp.EnhancementPresetAssigned.Enhancements)
+                IBPByBpIdCache[bpId] = cachedBP
+            end
+            return cachedBP
+        end
+
+        return bp
+    end
+
+    ---@param bp IUnitBlueprint | UnitBlueprint
+    ---@return RingData[]
     local function GetBPInfo(bp)
         local weapons = {}
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
@@ -153,15 +347,16 @@ do
             end
             if showCounterIntel and
                 (
-                intel.CloakFieldRadius > 0 or intel.SonarStealthFieldRadius > 0 or
-                    intel.SonarStealthFieldRadius > 0) then
+                intel.CloakFieldRadius > 0
+                    or intel.SonarStealthFieldRadius > 0
+                    or intel.RadarStealthFieldRadius > 0
+                )
+            then
                 TableInsert(weapons,
                     { "CounterIntel",
-                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.SonarStealthFieldRadius) })
+                        MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.RadarStealthFieldRadius) })
             end
         end
-
-        TableSort(weapons, OverlaySortFunction)
 
         return weapons
     end
@@ -202,6 +397,24 @@ do
         ---@diagnostic disable-next-line: need-check-nil
         return (bp.Economy.MaxBuildDistance or 5) + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
     end
+
+    ---@param unit UserUnit
+    local function GetSimpleBuildRange(unit)
+        local bp = unit:GetBlueprint()
+        ---@diagnostic disable-next-line: need-check-nil
+        return (bp.Economy.MaxBuildDistance or 5) + 2
+    end
+
+    ---@type fun(unit:UserUnit):number
+    local buildRangeFunc
+
+    options.displayActualBuildRange:Bind(function(opt)
+        if opt() then
+            buildRangeFunc = GetActualBuildRange
+        else
+            buildRangeFunc = GetSimpleBuildRange
+        end
+    end)
 
     local function GetColorAndThickness(type)
         return ("ff%s"):format((overlayParams[type].NormalColor):sub(3)),
@@ -253,6 +466,8 @@ do
     ---@field _selectionRings Ring[]
     ---@field _buildRing Ring
     ---@field _showRings boolean
+    ---@field _cachedSelection UserUnit[]?
+    ---@field _isCachedSelection boolean
     WorldView = Class(oldWorldView) {
 
         ---@param self WorldView
@@ -262,6 +477,7 @@ do
             self._showRings = false
             local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
             if render then
+                self._isCachedSelection = false
                 self._hoverRings = {}
                 self._selectionRings = {}
                 self._buildRing = nil
@@ -281,6 +497,7 @@ do
         ---@param self WorldView
         ---@param delta number
         OnRenderWorld = function(self, delta)
+            oldWorldView.OnRenderWorld(self, delta)
             self:RenderRings(self._hoverRings)
             self:RenderRings(self._selectionRings)
             if self._buildRing then
@@ -300,6 +517,7 @@ do
                 local orderName = commandMode[2].name
                 local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
                 local notIssuingOrder = not commandMode[2]
+                self._isCachedSelection = false
 
                 if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
                     self:UpdateHoverRings()
@@ -321,11 +539,10 @@ do
                     else
                         self:ClearBuildRings()
                     end
-                elseif self._buildRing
-                    or orderType == "build" or orderType == 'order'
-                    and
-                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard"
-                    ) then
+                elseif self._buildRing or orderType == "build" or
+                    orderType == 'order' and
+                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard")
+                then
                     self:UpdateBuildRings(false)
                 end
             end
@@ -353,17 +570,25 @@ do
         ---@param self WorldView
         UpdateHoverRings = function(self)
             local info = GetRolloverInfo()
-            if not (info and info.blueprintId ~= "unknown") then
+            local bpId = info.blueprintId
+            if not (info and bpId ~= "unknown") then
                 self:ClearHoverRings()
                 return
             end
 
-            local weapons = GetBPInfo(__blueprints[info.blueprintId])
+            local weapons
+            local unit = info.userUnit
+            if unit then
+                weapons = GetBPInfo(GetEnhancedBlueprintFromUnit(unit))
+            else
+                weapons = GetBPInfo(GetEnhancedBlueprintFromId(bpId))
+            end
+
             if TableEmpty(weapons) then
                 self:ClearHoverRings()
                 return
             end
-
+            TableSort(weapons, OverlaySortFunction)
             self:UpdateRings(self._hoverRings, weapons)
         end,
 
@@ -374,17 +599,19 @@ do
 
         ---@param self WorldView
         UpdateSelectionRings = function(self)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearSelectionRings()
                 return
             end
 
             local data = selection
-                | LuaQ.select(function(u) return u:GetBlueprint() end)
+                | LuaQ.select(GetEnhancedBlueprintFromUnit)
                 | LuaQ.distinct
                 | LuaQ.select(GetBPInfo)
                 | LuaQ.concat
+                | LuaQ.sort(OverlaySortFunction)
+
             self:UpdateRings(self._selectionRings, data)
         end,
 
@@ -396,7 +623,7 @@ do
         ---@param self WorldView
         ---@param useMousePos boolean
         UpdateBuildRings = function(self, useMousePos)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
@@ -409,7 +636,7 @@ do
             end
 
             local radius = builders
-                | LuaQ.select(GetActualBuildRange)
+                | LuaQ.select(buildRangeFunc)
                 | LuaQ.max.value
 
             ---@type Ring
@@ -418,14 +645,18 @@ do
                 ring.pos = GetMouseWorldPos()
             else
                 local unit = builders[1]
-                local pos = unit:GetPosition()
-                local queue = unit:GetCommandQueue()
-                for i = TableGetn(queue), 1, -1 do
-                    local commandType = queue[i].type
-                    if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
-                        commandType == "Patrol" then
-                        pos = queue[i].position
-                        break
+                local pos = unit:GetInterpolatedPosition()
+                if IsKeyDown("Shift") then
+                    local queue = unit:GetCommandQueue()
+                    for i = TableGetn(queue), 1, -1 do
+                        local commandType = queue[i].type
+                        if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
+                            commandType == "Patrol" then
+                            pos = queue[i].position
+                            pos[1] = MathFloor(pos[1]) + 0.5
+                            pos[3] = MathFloor(pos[3]) + 0.5
+                            break
+                        end
                     end
                 end
 
@@ -446,7 +677,7 @@ do
         end,
 
         UpdateReclaimRings = function(self)
-            local selection = GetSelectedUnits()
+            local selection = self:GetSelectedUnits()
             if not selection then
                 self:ClearBuildRings()
                 return
@@ -535,6 +766,8 @@ do
             self._selectionRings = nil
             self._buildRing = nil
             self._showRings = false
+            self._isCachedSelection = false
+            self._cachedSelection = nil
 
             oldWorldView.OnDestroy(self)
         end,
@@ -552,6 +785,17 @@ do
         UnregisterRenderable = function(self, id)
             self.Renderables[id] = nil
         end,
+
+        ---@param self WorldView
+        ---@return UserUnit[]?
+        GetSelectedUnits = function(self)
+            if self._isCachedSelection then
+                return self._cachedSelection
+            end
+            self._cachedSelection = GetSelectedUnits()
+            self._isCachedSelection = true
+            return self._cachedSelection
+        end
     }
 
 end
