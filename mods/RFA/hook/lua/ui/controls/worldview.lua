@@ -1,4 +1,7 @@
 do
+    --#region Upvalues
+    local GetRolloverInfo = GetRolloverInfo
+    local GetFocusArmy = GetFocusArmy
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local MathFloor = math.floor
@@ -9,6 +12,7 @@ do
     local unpack = unpack
     local UI_DrawCircle = UI_DrawCircle
     local EmptyTable = EmptyTable
+    --#endregion
 
     local LuaQ = UMT.LuaQ
 
@@ -239,7 +243,7 @@ do
 
         local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
         local newMaxRadius = obpEnh
-         | LuaQ.max(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
+            | LuaQ.max(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
 
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
@@ -263,7 +267,7 @@ do
                 ibpIntel[intelType] = activeEnhs
                     | LuaQ.max(function(k, v) return obpEnh[v][enhIntel] end)
                     or obpIntel[intelType]
-                end
+            end
         else
             ibp.Intel = obp.Intel
         end
@@ -392,6 +396,24 @@ do
         ---@diagnostic disable-next-line: need-check-nil
         return (bp.Economy.MaxBuildDistance or 5) + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
     end
+
+    ---@param unit UserUnit
+    local function GetSimpleBuildRange(unit)
+        local bp = unit:GetBlueprint()
+        ---@diagnostic disable-next-line: need-check-nil
+        return (bp.Economy.MaxBuildDistance or 5) + 2
+    end
+
+    ---@type fun(unit:UserUnit):number
+    local buildRangeFunc
+
+    options.displayActualBuildRange:Bind(function(opt)
+        if opt() then
+            buildRangeFunc = GetActualBuildRange
+        else
+            buildRangeFunc = GetSimpleBuildRange
+        end
+    end)
 
     local function GetColorAndThickness(type)
         return ("ff%s"):format((overlayParams[type].NormalColor):sub(3)),
@@ -613,7 +635,7 @@ do
             end
 
             local radius = builders
-                | LuaQ.select(GetActualBuildRange)
+                | LuaQ.select(buildRangeFunc)
                 | LuaQ.max.value
 
             ---@type Ring
