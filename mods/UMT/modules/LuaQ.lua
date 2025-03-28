@@ -1,6 +1,10 @@
 local TableInsert = table.insert
 local ipairs = ipairs
 local setmetatable = setmetatable
+local TableSort = table.sort
+local TableGetN = table.getn
+local type = type
+local iscallable = iscallable
 
 ---@class BORTable : table
 ---@operator bor(table):table
@@ -125,7 +129,7 @@ where = CreatePipe(LuaQWhere, LuaQWhereKV)
 ---@class LuaQSortPipeTable : Comparator
 LuaQSort = MakePipe(function(tbl, self)
     local func = PopFn(self)
-    table.sort(tbl, func)
+    TableSort(tbl, func)
     return tbl
 end)
 ---@type LuaQSortPipeTable
@@ -398,7 +402,7 @@ first = CreatePipe(LuaQFirst)
 
 ---Returns index of the first value satisfying the condition, if none - nil
 ---```lua
---- ... | first(function(v) return v > 0 end)
+--- ... | firstIndex(function(v) return v > 0 end)
 ---```
 ---@class LuaQFirstIPipeTable : Conditional
 LuaQFirstI = MakePipe(function(tbl, self)
@@ -415,10 +419,60 @@ end)
 ---@type LuaQFirstIPipeTable
 firstIndex = CreatePipe(LuaQFirstI)
 
+---Returns the last value that satisfy the condition, if none - nil
+---```lua
+--- ... | last(function(v) return v > 0 end)
+---```
+---@class LuaQLastPipeTable : Conditional
+LuaQLast = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for i = TableGetN(tbl), 1, -1 do
+        local v = tbl[i]
+        if condition(v) then
+            return v
+        end
+    end
+
+    return nil
+end)
+---@type LuaQLastPipeTable
+last = CreatePipe(LuaQLast)
+
+---Returns index of the last value satisfying the condition, if none - nil
+---```lua
+--- ... | lastIndex(function(v) return v > 0 end)
+---```
+---@class LuaQLastIPipeTable : Conditional
+LuaQLastI = MakePipe(function(tbl, self)
+    local condition = PopFn(self)
+
+    for i = TableGetN(tbl), 1, -1 do
+        local v = tbl[i]
+        if condition(v) then
+            return i
+        end
+    end
+
+    return nil
+end)
+---@type LuaQLastIPipeTable
+lastIndex = CreatePipe(LuaQLastI)
+
 ---Returns table of distinct values of given table
 ---@class LuaQDistinctPipeTable
 LuaQDistinct = BORPipe(function(tbl, self)
-    return tbl | toSet | keys
+    local result = {}
+    local _set = {}
+
+    for _, v in tbl do
+        if not _set[v] then
+            TableInsert(result, v)
+            _set[v] = true
+        end
+    end
+
+    return result
 end)
 ---@type LuaQDistinctPipeTable
 distinct = CreatePipe(LuaQDistinct)
@@ -468,7 +522,7 @@ LuaQCount = MakePipe(function(tbl, self)
     local condition = PopFn(self)
 
     if not condition then
-        return table.getn(tbl)
+        return TableGetN(tbl)
     end
 
     local count = 0
