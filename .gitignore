@@ -42,3 +42,7 @@ luac.out
 
 .vscode/settings.json
 
+# SyncThing
+.stfolder/
+.stignore
+
