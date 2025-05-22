@@ -1,6 +1,6 @@
 name = "Rings For All"
-uid = "rings-for-all-v05"
-version = 5
+uid = "rings-for-all-v06"
+version = 6
 copyright = ""
 description = [[
 Shows radiuses of weapons of selected units and build range. Also shows them with unit under mouse.
