@@ -498,6 +498,10 @@ do
         ---@param delta number
         OnRenderWorld = function(self, delta)
             oldWorldView.OnRenderWorld(self, delta)
+            if not self._showRings then
+                return
+            end
+
             self:RenderRings(self._hoverRings)
             self:RenderRings(self._selectionRings)
             if self._buildRing then
