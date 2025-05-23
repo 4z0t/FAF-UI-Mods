@@ -49,6 +49,33 @@ function BindOptions()
     end)
 end
 
+function ToggleLayerFilter()
+    layer = not layer
+    if layer then
+        print "ASE: Domain filter ON"
+    else
+        print "ASE: Domain filter OFF"
+    end
+end
+
+function ToggleExoticFilter()
+    exotic = not exotic
+    if exotic then
+        print "ASE: Exotic filter ON"
+    else
+        print "ASE: Exotic filter OFF"
+    end
+end
+
+function ToggleAssisterFilter()
+    assisters = not assisters
+    if assisters then
+        print "ASE: Assisters filter ON"
+    else
+        print "ASE: Assisters filter OFF"
+    end
+end
+
 function Main(_isReplay)
     isReplay = _isReplay
     if isReplay then return end
@@ -59,7 +86,6 @@ function Main(_isReplay)
     Lock.Main(_isReplay)
     Selection.Main(_isReplay)
     BindOptions()
-
 end
 
 function SelectionChanged(oldSelection, newSelection, added, removed)
