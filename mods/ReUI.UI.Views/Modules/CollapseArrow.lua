@@ -2,7 +2,7 @@ local Checkbox = ReUI.UI.Controls.CheckBox
 local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class ReUI.UI.Views.VerticalCollapseArrow : ReUI.UI.Controls.CheckBox
-VerticalCollapseArrow = UMT.Class(Checkbox)
+VerticalCollapseArrow = ReUI.Core.Class(Checkbox)
 {
     ---@param self ReUI.UI.Views.VerticalCollapseArrow
     ---@param parent Control

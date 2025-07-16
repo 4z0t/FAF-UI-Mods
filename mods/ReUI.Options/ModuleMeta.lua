@@ -55,12 +55,15 @@ end
 ---@param name string
 ---@param fontSize? number
 ---@param fontFamily? string
----@param fontColor? string
+---@param fontColor? LazyOrValue<Color>
 ---@param indent? number
 function ReUI.Options.Builder.Title(name, fontSize, fontFamily, fontColor, indent)
 end
 
 function ReUI.Options.Builder.Color(name, optionVar, indent)
+end
+
+function ReUI.Options.Builder.Column(name, optionVar, indent)
 end
 
 function ReUI.Options.Builder.Filter(name, optionVar, indent)

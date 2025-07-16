@@ -43,7 +43,7 @@ end
 ---@class ReUI.Core : ReUI.Module
 ReUI.Core = {}
 
----@alias HookCallback fun(field: any, module:table):any
+---@alias HookCallback<T> fun(field: T, module:table):T
 ---@alias OnCreateUICallback fun(isReplay:boolean)
 
 ---Replaces given field in module with one returned by callback.
@@ -69,15 +69,39 @@ ReUI.Core = {}
 ---Example from Engineer Alt Selection mod.
 ---
 ---After UI is loaded it is forbidden to create new hooks.
+---@generic T
 ---@param moduleName FileName
 ---@param fieldName string
----@param callback HookCallback
+---@param callback HookCallback<T>
 function ReUI.Core.Hook(moduleName, fieldName, callback)
 end
 
----Returns function that hooks fields from module with given name.
+---Creates object that hooks module's fields according to given hooking function:
+---```lua
+---local EconomyHook = ReUI.Core.HookModule "/lua/ui/game/economy.lua"
+---
+---EconomyHook("CreateEconomyBar", function(field, module)
+---    return function(parent)
+---        ...
+---        return ...
+---    end
+---end)
+---```
+---You can also do this way:
+---
+---```lua
+---local EconomyHook = ReUI.Core.HookModule "/lua/ui/game/economy.lua"
+---
+---function EconomyHook.CreateEconomyBar(field, module)
+---    return function(parent)
+---        ...
+---        return ...
+---    end
+---end
+---```
+---@generic T
 ---@param moduleName FileName
----@return fun(fieldName:string, callback:HookCallback)
+---@return table<string, HookCallback<T>> | (fun(fieldName:string, callback:HookCallback<T>):T)
 function ReUI.Core.HookModule(moduleName)
 end
 

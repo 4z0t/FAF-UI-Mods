@@ -18,4 +18,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.LINQ=1.0.0'
+ReUI = 'ReUI.LINQ=1.1.0'

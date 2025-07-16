@@ -8,8 +8,8 @@ local LayoutHelpers = import('/lua/maui/layouthelpers.lua')
 local defaultScaleFactor = LayoutHelpers.GetPixelScaleFactor()
 
 
----@alias NumberVar LazyVar<number>
----@alias NumberFunction fun():number | NumberVar
+---@alias NumberVar Lazy<number>
+---@alias NumberFunction NumberVar
 
 ---@alias FunctionalNumber NumberFunction|number
 
@@ -241,6 +241,12 @@ function Round(n)
     return MathRound(n)
 end
 
+---@param base NumberFunction
+---@param baseLen NumberFunction
+---@param len NumberFunction
+---@param offset number
+---@param scale NumberVar
+---@return NumberFunction
 function AtCenterOffset(base, baseLen, len, offset, scale)
     if offset == 0 then
         return function()
