@@ -1,5 +1,6 @@
 name = "Advanced Selection Extension"
-version = 1
+version = 2
+uid = "advanced-selection-extension-v02"
 copyright = ""
 description = [[QoL Selection functions:
     - deselection of assisting land scouts, mobile shields and deceiver
@@ -12,7 +13,6 @@ Required UI Mod Tools.
 ]]
 author = "4z0t"
 url = ""
-uid = "advanced-selection-extension-v01"
 icon = "/mods/ASE/icon.png"
 selectable = true
 enabled = true
