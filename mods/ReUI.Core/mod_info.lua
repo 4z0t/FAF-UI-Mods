@@ -16,4 +16,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Core=1.0.0'
+ReUI = 'ReUI.Core=1.1.0'

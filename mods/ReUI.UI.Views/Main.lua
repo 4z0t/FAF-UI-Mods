@@ -8,10 +8,13 @@ function Main(isReplay)
     return {
         Brackets = {
             RightGlow = Brackets.RightGlow,
+            FactionRight = Brackets.FactionRightBracket,
         },
+        WindowFrame = import("Modules/WindowFrame.lua").WindowFrame,
         VerticalCollapseArrow = import("Modules/CollapseArrow.lua").VerticalCollapseArrow,
         EscapeCover = import("Modules/EscapeCover.lua").EscapeCover,
         StaticScrollable = import("Modules/StaticScrollable.lua").StaticScrollable,
         DynamicScrollable = import("Modules/DynamicScrollable.lua").DynamicScrollable,
+        GlowBorder = import("Modules/GlowBorder.lua").GlowBorder,
     }
 end

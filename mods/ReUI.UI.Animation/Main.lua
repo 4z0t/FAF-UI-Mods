@@ -500,6 +500,40 @@ function Main(isReplay)
     local colorAnimationFactory = ColorAnimationFactory()
     local delayedAnimationFactory = DelayedAnimationFactory()
 
+    local delayAnimation = delayedAnimationFactory
+        :Create()
+
+    local function ApplySequentialAnimation(animation, delay, controls, initialDelay)
+        local curDelay = initialDelay or 0
+        for i, control in controls do
+            delayAnimation:Apply(control, curDelay, animation)
+            curDelay = delay + curDelay
+        end
+    end
+
+    ---@class SequentialAnimation
+    ---@field _animation ReUI.UI.Animation.Animation
+    ---@field _delay number
+    ---@field _initialDelay number
+    local SequentialAnimation = ClassSimple {
+
+        ---@param self SequentialAnimation
+        ---@param animation ReUI.UI.Animation.Animation
+        ---@param delay number
+        ---@param initialDelay number
+        __init = function(self, animation, delay, initialDelay)
+            self._delay = delay
+            self._animation = animation
+            self._initialDelay = initialDelay or 0
+        end,
+
+        ---@param self SequentialAnimation
+        ---@param controls ReUI.UI.Controls.Control[]
+        Apply = function(self, controls)
+            ApplySequentialAnimation(self._animation, self._delay, controls, self._initialDelay)
+        end
+    }
+
     --#endregion
 
     return {
@@ -509,6 +543,7 @@ function Main(isReplay)
             Alpha = alphaAnimationFactory,
             Delay = delayedAnimationFactory,
         },
+        Sequential = SequentialAnimation,
         Animator = Animator,
         ApplyAnimation = ApplyAnimation,
         StopAnimation = StopAnimation,

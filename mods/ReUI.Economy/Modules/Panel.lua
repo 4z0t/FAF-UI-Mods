@@ -274,7 +274,7 @@ ResourceBlock = ReUI.Core.Class(Group)
         })
         layouter(self._bg)
             :AtCenterIn(self, 0, -1)
-        -- :Under(self, 10)
+            :Alpha(0)
 
         layouter(self._icon)
             :Texture(UIUtil.UIFile(self.Style.icon.texture))
@@ -473,9 +473,9 @@ EconomyPanel = ReUI.Core.Class(Group)
 
         self._arrow.OnCheck = function(arrow, checked)
             if checked then
-                expandAnimation:Apply(self, animationSpeed, 16)
+                self:Expand()
             else
-                contractAnimation:Apply(self, animationSpeed, 16)
+                self:Contract()
             end
         end
     end,
@@ -491,12 +491,12 @@ EconomyPanel = ReUI.Core.Class(Group)
 
     ---@param self EconomyPanel
     Contract = function(self)
-
+        contractAnimation:Apply(self, animationSpeed, 16)
     end,
 
     ---@param self EconomyPanel
     Expand = function(self)
-
+        expandAnimation:Apply(self, animationSpeed, 16)
     end,
 
     ---@param self EconomyPanel

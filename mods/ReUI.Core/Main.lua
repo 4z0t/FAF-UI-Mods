@@ -14,7 +14,7 @@ function Main()
     local function MakeHook(hook)
         LOG(("ReUI.Core: Hooking '%s':%s"):format(hook.moduleName, hook.fieldName))
         local module = import(hook.moduleName)
-        local originalField = module[hook.fieldName]
+        local originalField = rawget(module, hook.fieldName)
         local newField = hook.callback(originalField, module)
         module[hook.fieldName] = newField
     end
@@ -62,16 +62,28 @@ function Main()
 
     local ReUIClass = import("Modules/Class.lua")
 
+    ---@class ModuleHook
+    local ModuleHookMeta = {
+        __newindex = function(self, key, value)
+            PerformHook(self.__moduleName, key, value)
+        end,
+
+        __call = function(self, key, value)
+            PerformHook(self.__moduleName, key, value)
+        end
+    }
+
     return {
         Hook = PerformHook,
 
         ---@param moduleName FileName
         HookModule = function(moduleName)
-            ---@param fieldName string
-            ---@param callback HookCallback
-            return function(fieldName, callback)
-                PerformHook(moduleName, fieldName, callback)
-            end
+            return setmetatable({ __moduleName = moduleName }, ModuleHookMeta)
+            -- ---@param fieldName string
+            -- ---@param callback HookCallback
+            -- return function(fieldName, callback)
+            --     PerformHook(moduleName, fieldName, callback)
+            -- end
         end,
 
         OnPreCreateUI = ReUIOnCreateUI.AddPreCreateCallback,
