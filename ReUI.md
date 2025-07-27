@@ -15,10 +15,13 @@ Previously "EzReclaim" and "Optimized reclaim view". It provides with better loo
 ## Libraries
 
 ### ReUI.Core
+Core library of ReUI. Provides functions for hooking into existing files of the game and executing code before and after UI is created. And functions for creating classes with properties and tables with weak keys/values.
+
 ### ReUI.Options
 ### ReUI.UI
 #### ReUI.UI.Controls
 #### ReUI.UI.Views
 #### ReUI.UI.Animation
+#### ReUI.UI.Color
 ### ReUI.LINQ
 
