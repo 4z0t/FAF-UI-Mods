@@ -479,10 +479,15 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
                 return
             end
 
+            if queue[1].id == id then
+                IncreaseBuildCountInQueue(1, count)
+                return
+            end
+
             local queueToRestore = {}
             for index = table.getn(queue), 1, -1 do
                 local count = queue[index].count
-                if index == 1 and factory:GetWorkProgress() > 0 then
+                if index == 1 then
                     count = count - 1
                 end
                 DecreaseBuildCountInQueue(index, count)
