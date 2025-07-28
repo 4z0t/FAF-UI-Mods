@@ -476,6 +476,7 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             local factory = selection[1]
             local queue = SetCurrentFactoryForQueueDisplay(factory)
             if table.empty(queue) then
+                self:OrderConstruction(selection, id, count)
                 return
             end
 
