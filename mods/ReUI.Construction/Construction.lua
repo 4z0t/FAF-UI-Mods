@@ -353,7 +353,7 @@ function Main(isReplay)
     ---@class ReUI.Construction.Grid : LazyGrid
     ---@field panel ReUI.Construction.Panel
     ---@field _scroller HorizontalGridScroller
-    ---@field _componentClasses table<string, fun(item:ActionsGridItem):AItemComponent>
+    ---@field _componentClasses table<string, fun(item:ReUI.Construction.Grid.Item):AItemComponent>
     ---@field _selectionHandlers ConstructionHandlerData[]
     ---@field _btnNext ButtonWithOverlay
     ---@field _btnPrev ButtonWithOverlay
@@ -366,7 +366,7 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Grid
         ---@param parent ReUI.Construction.Panel
-        ---@param componentClasses table<string, fun(item:ActionsGridItem):AItemComponent>
+        ---@param componentClasses table<string, fun(item:ReUI.Construction.Grid.Item):AItemComponent>
         __init = function(self, parent, componentClasses)
             LazyGrid.__init(self, parent)
 
