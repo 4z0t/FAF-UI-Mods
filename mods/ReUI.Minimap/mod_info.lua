@@ -1,0 +1,19 @@
+name = "ReUI.Minimap"
+uid = "reui-Minimap-1.1.0"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+icon = "/mods/ReUI.Minimap/icon.png"
+url = ""
+selectable = true
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
+
+ReUI = 'ReUI.Minimap=1.1.0'
