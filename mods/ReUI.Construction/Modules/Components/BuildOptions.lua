@@ -486,12 +486,12 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
 
             local queueToRestore = {}
             for index = table.getn(queue), 1, -1 do
-                local count = queue[index].count
+                local c = queue[index].count
                 if index == 1 then
-                    count = count - 1
+                    c = c - 1
                 end
-                DecreaseBuildCountInQueue(index, count)
-                table.insert(queueToRestore, { id = queue[index].id, count = count })
+                DecreaseBuildCountInQueue(index, c)
+                table.insert(queueToRestore, { id = queue[index].id, count = c })
             end
             self:OrderConstruction(selection, id, count)
 
