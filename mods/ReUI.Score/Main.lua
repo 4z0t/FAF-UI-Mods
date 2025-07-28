@@ -1,7 +1,8 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.0.0",
-    "ReUI.LINQ >= 1.0.0",
+    "ReUI.LINQ >= 1.3.0",
+    "ReUI.UI >= 1.1.0",
     "ReUI.UI.Color >= 1.0.0",
     "ReUI.UI.Animation >= 1.1.0",
     "ReUI.UI.Controls >= 1.0.0",
@@ -10,6 +11,8 @@ ReUI.Require
 }
 
 function Main(isReplay)
+    local ReUI = ReUI
+
     local _IsDestroyed = IsDestroyed
 
     local Utils = import("Modules/Utils.lua")
@@ -113,6 +116,7 @@ function Main(isReplay)
                     armyView:ResetFont()
 
                     local layouter = armyView.Layouter
+                    ---@cast armyView AllyView
                     if armyView.isAlly then
                         if showFullResourceData then
                             layouter(armyView._massBtn)
@@ -221,7 +225,7 @@ function Main(isReplay)
                 local objectivesControls = import('/lua/ui/game/objectives2.lua').controls
                 LayoutHelpers.AnchorToBottom(scoreboard, objectivesControls.bg.bracketBottom, 10)
             else
-                LayoutHelpers.AtTopIn(scoreboard, GetFrame(0), 20)
+                LayoutHelpers.AtTopIn(scoreboard, GetFrame(0)--[[@as Frame]] , 20)
             end
         end
     end)
@@ -295,7 +299,7 @@ function Main(isReplay)
                 return
             end
             local armyLine = scoreboard:GetArmyViews()[army]
-            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC(text), armyLine)
+            import("/lua/ui/game/announcement.lua").CreateAnnouncement(LOC(text)--[[@as string]] , armyLine)
         end
     end)
 
@@ -375,6 +379,7 @@ function Main(isReplay)
         local WorldViewDisplayPing = WorldView.DisplayPing
 
         WorldView.__init = function(self, ...)
+            ---@diagnostic disable-next-line:deprecated
             WorldView__init(self, unpack(arg))
             self._isMiniMap = arg[4] or false
         end

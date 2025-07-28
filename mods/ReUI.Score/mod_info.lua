@@ -11,4 +11,4 @@ enabled = true
 exclusive = false
 ui_only = true
 
-ReUI = 'ReUI.Score=1.0.0'
+ReUI = 'ReUI.Score=1.1.1'

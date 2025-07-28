@@ -1,5 +1,7 @@
 --#region Header
 --#region Upvalues
+---@diagnostic disable-next-line:deprecated
+local TableGetN = table.getn
 
 --#endregion
 
@@ -317,7 +319,7 @@ ArmyView = ReUI.Core.Class(Group)
 
             if division ~= "unlisted" then
                 self.Layouter(self._div)
-                    :Texture("/textures/divisions/" .. division .. "_medium.png", 0)
+                    :Texture("/textures/divisions/" .. division .. "_medium.png"--[[@as FileName]] , 0)
             else
                 self.Layouter(self._div)
                     :Width(20)
@@ -664,7 +666,7 @@ ReplayArmyView = ReUI.Core.Class(ArmyView)
         ArmyView.__init(self, parent)
 
         self._data = {}
-        for i = 1, table.getn(checkboxes) do
+        for i = 1, TableGetN(checkboxes) do
             self._data[i] = Text(self)
         end
     end,
@@ -675,7 +677,7 @@ ReplayArmyView = ReUI.Core.Class(ArmyView)
         ArmyView.InitLayout(self, layouter)
 
         local first
-        local dataSize = table.getn(self._data)
+        local dataSize = TableGetN(self._data)
         for i = 1, dataSize do
             local dataText = self._data[i]
             local nextText = self._data[i + 1]
@@ -753,9 +755,9 @@ ReplayArmyView = ReUI.Core.Class(ArmyView)
     end,
 
     ContractData = function(self, id)
-        assert(table.getn(self._data) >= id, "pain")
+        assert(TableGetN(self._data) >= id, "pain")
 
-        if table.getn(self._data) == id then
+        if TableGetN(self._data) == id then
             local nextControl = self
             local control = self._data[id]
 
@@ -770,9 +772,9 @@ ReplayArmyView = ReUI.Core.Class(ArmyView)
     end,
 
     ExpandData = function(self, id)
-        assert(table.getn(self._data) >= id, "pain")
+        assert(TableGetN(self._data) >= id, "pain")
 
-        if table.getn(self._data) == id then
+        if TableGetN(self._data) == id then
             local nextControl = self
             local control = self._data[id]
 
@@ -807,7 +809,7 @@ ReplayTeamView = ReUI.Core.Class(ReplayArmyView)
         self._armies = armies
         self._faction:SetAlpha(0)
 
-        self:SetAliveCount(table.getsize(armies))
+        self:SetAliveCount(table.getsize(armies)--[[@as integer]] )
     end,
 
     ---@param self ReplayTeamView
