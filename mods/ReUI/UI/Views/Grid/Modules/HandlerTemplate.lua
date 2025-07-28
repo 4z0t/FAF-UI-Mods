@@ -43,6 +43,13 @@ ExampleHandler = ReUI.Core.Class(ASelectionHandler)
         HandleEvent = function(self, item, event)
         end,
 
+        ---Called when grid item is updated on frame
+        ---@param self ExampleItem
+        ---@param item AGridItem
+        ---@param delta number
+        OnFrame = function(self, item, delta)
+        end,
+
         ---Called when item is activated with this component event handling
         ---@param self ExampleItem
         ---@param item AGridItem
