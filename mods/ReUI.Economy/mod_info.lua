@@ -1,5 +1,5 @@
 name = "ReUI.Economy"
-uid = "reui-economy-1.0.0"
+uid = "reui-economy-1.1.0"
 version = 1
 copyright = ""
 description = [[]]
@@ -16,4 +16,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Economy=1.0.1'
+ReUI = 'ReUI.Economy=1.1.0'
