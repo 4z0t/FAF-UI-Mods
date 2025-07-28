@@ -149,6 +149,8 @@ local TopInfoPanel = ReUI.Core.Class(Group)
                     return true
                 end
             end
+        else
+            self._time:DisableHitTest()
         end
     end,
 
@@ -160,9 +162,8 @@ local TopInfoPanel = ReUI.Core.Class(Group)
             :AtLeftIn(self, 10)
             :AtVerticalCenterIn(self)
             :Color(options.title.color.time:Raw())
-            :DisableHitTest()
-        self._time:SetFont(options.title.font.time:Raw(), timeTextSize)
 
+        self._time:SetFont(options.title.font.time:Raw(), timeTextSize)
 
         layouter(self._speed)
             :AtCenterIn(self, 0, -30)

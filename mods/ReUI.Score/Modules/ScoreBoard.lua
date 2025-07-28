@@ -4,8 +4,6 @@ local GetFocusArmy = GetFocusArmy
 --#endregion
 
 --#region Base Lua imports
-local LazyVar = import('/lua/lazyvar.lua').Create
-
 --#endregion
 
 --#region ReUI modules / classes
@@ -52,10 +50,10 @@ ScoreBoard = ReUI.Core.Class(Group)
     ---@param isTitle boolean
     __init = function(self, parent, isTitle)
         Group.__init(self, parent, "ReUI.ScoreBoard")
-        self.Layouter = ReUI.UI.RoundLayouter(LazyVar(1))
+        self.Layouter = ReUI.UI.RoundLayouter(1)
 
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        self._focusArmy = GetFocusArmy()
+        self._focusArmy = GetFocusArmy() --[[@as integer]]
+
         ---@diagnostic disable-next-line:assign-type-mismatch
         self._title = false
         self.isHovered = false

@@ -9,6 +9,7 @@ TeamViewsContainer = ReUI.Core.Class(ArmyViewsContainer)
     ---@param self TeamViewsContainer
     _InitArmyViews = function(self)
         local Enumerate = ReUI.LINQ.Enumerate
+        local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 
         self._armyViews = {}
 
@@ -24,17 +25,18 @@ TeamViewsContainer = ReUI.Core.Class(ArmyViewsContainer)
 
         teams = Enumerate(teams, next)
             :Select(function(_, id)
+                local sameTeamArmiesEnumerator = IPairsEnumerator
+                    :Where(function(armyData) return armyData.teamId == id end)
+
                 return {
                     id = id,
                     name = ("Team %d"):format(id),
-                    armies = Enumerate(armiesData)
-                        :Where(function(armyData) return armyData.teamId == id end)
+                    armies = sameTeamArmiesEnumerator:Enumerate(armiesData)
                         :Select "id"
                         :AsSet()
                         :ToTable(),
-                    color = (Enumerate(armiesData):First(function(armyData) return armyData.teamId == id end)).teamColor,
-                    rating = Enumerate(armiesData)
-                        :Where(function(armyData) return armyData.teamId == id end)
+                    color = sameTeamArmiesEnumerator:Enumerate(armiesData):First().teamColor,
+                    rating = sameTeamArmiesEnumerator:Enumerate(armiesData)
                         :Select(function(armyData) return armyData.rating end)
                         :Sum()
                 }

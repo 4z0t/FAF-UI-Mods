@@ -1,0 +1,19 @@
+name = "ReUI.UI.Views.Grid"
+uid = "reui-ui-views-grid-1.0.0"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+icon = "/mods/ReUI.UI.Views.Grid/icon.png"
+url = ""
+selectable = false
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
+
+ReUI = 'ReUI.UI.Views.Grid=1.0.0'

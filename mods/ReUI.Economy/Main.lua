@@ -1,9 +1,10 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.0.0",
+    "ReUI.UI >= 1.4.0",
     "ReUI.UI.Animation >= 1.0.0",
     "ReUI.UI.Controls >= 1.0.0",
-    "ReUI.UI.Views >= 1.0.0",
+    "ReUI.UI.Views >= 1.2.0",
     "ReUI.Options >= 1.0.0"
 }
 
@@ -14,13 +15,18 @@ function Main(isReplay)
 
     function EconomyHook.CreateEconomyBar(field, module)
         return function(parent)
-            local scale = ReUI.Options.Mods["ReUI.Economy"].scale:Raw()
+            local options = ReUI.Options.Mods["ReUI.Economy"]
+            local scale = options.scale:Raw()
 
             ---@type EconomyPanel
             local panel = ReUI.Economy.EconomyPanel(parent)
             panel.Layouter.Scale = ReUI.UI.LayoutFunctions.Div(scale, 100)
-            ReUI.UI.Global["EconomyPanel"] = panel
 
+            options.style:Bind(function(var)
+                panel.Layout = ReUI.Economy.Layouts[var()]
+            end)
+
+            ReUI.UI.Global["EconomyPanel"] = panel
             module.GUI.bg = panel
 
             local GM = import("/lua/ui/game/gamemain.lua")
@@ -74,6 +80,9 @@ function Main(isReplay)
     end)
 
     return {
+        Layouts = {
+            ["default"] = false,
+        },
         EconomyPanel = import("Modules/Panel.lua").EconomyPanel,
     }
 end

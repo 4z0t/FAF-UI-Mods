@@ -1,0 +1,19 @@
+name = "ReUI.Core"
+uid = "reui-core-1.1.0"
+version = 1
+copyright = ""
+description = [[]]
+author = "4z0t"
+icon = "/mods/ReUI.Core/icon.png"
+url = ""
+selectable = false
+enabled = true
+exclusive = false
+ui_only = true
+requires = {}
+requiresNames = {}
+conflicts = {}
+before = {}
+after = {}
+
+ReUI = 'ReUI.Core=1.2.0'

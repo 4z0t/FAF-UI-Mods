@@ -7,8 +7,8 @@ local animationSpeed = 500
 
 
 ---A clear function for additional layout
----@param scoreboard ScoreBoard
----@param layouter LayouterFunctor
+---@param scoreboard ReUI.Score.ScoreBoard
+---@param layouter ReUI.UI.Layouter
 local Clear = function(scoreboard, layouter)
     scoreboard._border:Destroy()
     scoreboard._border = nil
@@ -31,15 +31,15 @@ local Clear = function(scoreboard, layouter)
 end
 
 ---inital animation for scoreboard
----@param scoreboard ReplayScoreBoard
+---@param scoreboard ReUI.Score.ScoreBoard
 local InitialAnimation = function(scoreboard)
     Animations.slideAnimation:Apply(scoreboard, animationSpeed, 25)
 end
 
 ---A layout function for scoreboard
----@param scoreboard ReplayScoreBoard
----@param layouter LayouterFunctor
----@return fun(scoreboard : ReplayScoreBoard)
+---@param scoreboard ReUI.Score.ScoreBoard
+---@param layouter ReUI.UI.Layouter
+---@return fun(scoreboard : ReUI.Score.ScoreBoard)
 Layout = function(scoreboard, layouter)
 
     scoreboard:InitLayout(layouter)
@@ -51,7 +51,7 @@ Layout = function(scoreboard, layouter)
 
     layouter(scoreboard._arrow)
         :AtTopIn(scoreboard, 10)
-        :NoScale(function(_layouter)
+        :DefaultScale(function(_layouter)
             _layouter:AtRightIn(GetFrame(0), -3)
         end)
         :Over(scoreboard, 20)

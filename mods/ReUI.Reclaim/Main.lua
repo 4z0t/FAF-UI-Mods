@@ -1,7 +1,6 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.0.0",
-    "ReUI.GamemainFix >= 1.0.0"
 }
 
 function Main(isReplay)

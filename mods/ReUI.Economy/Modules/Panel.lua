@@ -3,7 +3,6 @@ local GetSimTicksPerSecond = GetSimTicksPerSecond
 local math = math
 
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LazyVar = import('/lua/lazyvar.lua').Create
 
 local Group = ReUI.UI.Controls.Group
 local Bitmap = ReUI.UI.Controls.Bitmap
@@ -133,6 +132,8 @@ end
 ---@field _reclaimTotal ReUI.UI.Controls.Text
 ResourceBlock = ReUI.Core.Class(Group)
 {
+    AutoLayout = false,
+
     ---@class ResourceBlockStyleIcon
     ---@field texture FileName
     ---@field width number
@@ -173,21 +174,37 @@ ResourceBlock = ReUI.Core.Class(Group)
         self._reclaimTotal = Text.Create(self, UIUtil.bodyFont, 10)
 
         self._bg._state = ''
-        self._bg.SetState = function(bg, state)
-            if bg._state == state then
-                return
-            end
-            bg._state = state
+    end,
 
-            if state == 'red' then
-                bg:SetFrame(0)
-                bgBlinkAnimation:Apply(bg, 1.6)
-            elseif state == 'yellow' then
-                bg:SetFrame(1)
-                bgBlinkAnimation:Apply(bg, 1.25)
-            elseif state == "hide" then
-                fadeAnimation:Apply(bg)
-            end
+    ---@param self ResourceBlock
+    ---@param mode "yellow"|"red"
+    SetBGMode = function(self, mode)
+        local bg = self._bg
+
+        if mode == 'red' then
+            bg:SetFrame(0)
+        elseif mode == 'yellow' then
+            bg:SetFrame(1)
+        end
+    end,
+
+    ---@param self ResourceBlock
+    ---@param state "yellow"|"hide"|"red"
+    SetBGState = function(self, state)
+        local bg = self._bg
+        if bg._state == state then
+            return
+        end
+        bg._state = state
+
+        if state == 'red' then
+            self:SetBGMode "red"
+            bgBlinkAnimation:Apply(bg, 1.6)
+        elseif state == 'yellow' then
+            self:SetBGMode "yellow"
+            bgBlinkAnimation:Apply(bg, 1.25)
+        elseif state == "hide" then
+            fadeAnimation:Apply(bg)
         end
     end,
 
@@ -269,8 +286,8 @@ ResourceBlock = ReUI.Core.Class(Group)
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
         self._bg:SetTexture({
-            UIUtil.UIFile('/game/resource-panel/alert-' .. self._type .. '-panel_bmp.dds'),
-            UIUtil.UIFile('/game/resource-panel/caution-' .. self._type .. '-panel_bmp.dds')
+            UIUtil.UIFile('/game/resource-panel/alert-' .. self._type .. '-panel_bmp.dds'--[[@as FileName]] ),
+            UIUtil.UIFile('/game/resource-panel/caution-' .. self._type .. '-panel_bmp.dds'--[[@as FileName]] )
         })
         layouter(self._bg)
             :AtCenterIn(self, 0, -1)
@@ -357,11 +374,11 @@ MassBlock = ReUI.Core.Class(ResourceBlock)
     UpdateWarning = function(self, rateVal, storedVal, maxStorageVal)
         local storedRatio = storedVal / maxStorageVal
         if storedRatio <= 0.8 then
-            self._bg:SetState('hide')
+            self:SetBGState('hide')
         elseif storedRatio <= 0.9 and rateVal > 0 then
-            self._bg:SetState('yellow')
+            self:SetBGState('yellow')
         elseif storedRatio > 0.9 and rateVal > 0 then
-            self._bg:SetState('red')
+            self:SetBGState('red')
         end
 
         if rateVal < 0 then
@@ -409,23 +426,21 @@ EnergyBlock = ReUI.Core.Class(ResourceBlock)
     UpdateWarning = function(self, rateVal, storedVal, maxStorageVal)
         local storedRatio = storedVal / maxStorageVal
         if storedRatio >= 0.2 then
-            self._bg:SetState('hide')
+            self:SetBGState('hide')
         elseif storedRatio > 0.1 and rateVal < 0 then
-            self._bg:SetState('yellow')
+            self:SetBGState('yellow')
         elseif storedRatio <= 0.1 and rateVal < 0 then
-            self._bg:SetState('red')
+            self:SetBGState('red')
         end
 
-        if rateVal < 0 then
-            if storedRatio <= 0 then
-                self._rate:SetColor('red')
-            elseif storedRatio <= 0.2 then
-                self._rate:SetColor(self:FlipFlop() and "ffffffff" or "ff404040")
-            else
-                self._rate:SetColor('yellow')
-            end
-        else
+        if rateVal >= 0 then
             self._rate:SetColor('ffb7e75f')
+        elseif storedRatio <= 0 then
+            self._rate:SetColor('red')
+        elseif storedRatio <= 0.2 then
+            self._rate:SetColor(self:FlipFlop() and "ffffffff" or "ff404040")
+        else
+            self._rate:SetColor('yellow')
         end
     end,
 
@@ -457,7 +472,7 @@ EconomyPanel = ReUI.Core.Class(Group)
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
-        self.Layouter = ReUI.UI.RoundLayouter(LazyVar(1))
+        self.Layouter = ReUI.UI.RoundLayouter(1)
 
         self._bg = Bitmap(self)
         self._bracket = Bitmap(self)
@@ -534,13 +549,15 @@ EconomyPanel = ReUI.Core.Class(Group)
 
         layouter(self._mass)
             :AtCenterIn(self, -15)
+            :PerformLayout()
 
         layouter(self._energy)
             :AtCenterIn(self, 15)
+            :PerformLayout()
 
         layouter(self._arrow)
             :AtVerticalCenterIn(self)
-            :NoScale(function(_layouter)
+            :DefaultScale(function(_layouter)
                 _layouter:AtLeftIn(GetFrame(0), -3)
             end)
             :Over(self, 20)
