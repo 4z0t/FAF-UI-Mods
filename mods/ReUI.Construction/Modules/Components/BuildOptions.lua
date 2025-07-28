@@ -468,6 +468,33 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end,
 
+        ---@param self BuildOptionsFactoryItem
+        ---@param selection UserUnit[]
+        ---@param id string
+        ---@param count number
+        InsertFrontQueue = function(self, selection, id, count)
+            local factory = selection[1]
+            local queue = SetCurrentFactoryForQueueDisplay(factory)
+            if table.empty(queue) then
+                return
+            end
+
+            local queueToRestore = {}
+            for index = table.getn(queue), 1, -1 do
+                local count = queue[index].count
+                if index == 1 and factory:GetWorkProgress() > 0 then
+                    count = count - 1
+                end
+                DecreaseBuildCountInQueue(index, count)
+                table.insert(queueToRestore, { id = queue[index].id, count = count })
+            end
+            self:OrderConstruction(selection, id, count)
+
+            for i = table.getn(queueToRestore), 1, -1 do
+                self:OrderConstruction(selection, queueToRestore[i].id, queueToRestore[i].count)
+            end
+        end,
+
         ---Called when grid item receives an event
         ---@param self BuildOptionsFactoryItem
         ---@param item ReUI.Construction.Grid.Item
@@ -475,17 +502,15 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
         HandleEvent = function(self, item, event)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
                 local modifiers = event.Modifiers
-
                 local count = 1
                 if modifiers.Shift or modifiers.Ctrl then
                     count = 5
                 end
 
-                local id = self.data.id
-
-                local selection = GetSelectedUnits()
-                if selection then
-                    self:OrderConstruction(selection, id, count)
+                if modifiers.Alt and table.getn(self.context.selection) == 1 then
+                    self:InsertFrontQueue(self.context.selection, self.data.id, count)
+                else
+                    self:OrderConstruction(self.context.selection, self.data.id, count)
                 end
 
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
