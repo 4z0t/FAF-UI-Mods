@@ -1592,7 +1592,7 @@ function Main(isReplay)
     --[x] tech enhancements don't show available construction options
     --[x] display support factories for acus if corresponding hq presents
     --[ ] improve items logic of the grid
-    --[ ] bottom panel doesn't display other things in enhancements mode
+    --[x] bottom panel doesn't display other things in enhancements mode
     --[x] add reui error messages into game chat
     --[x] fix tech switch when queue is changed
     -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
