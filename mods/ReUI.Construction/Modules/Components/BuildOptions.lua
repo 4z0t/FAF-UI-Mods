@@ -178,11 +178,10 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end
 
+        context.panel:SetActiveTech(tech)
         if tech == "NONE" then
             return
         end
-
-        context.panel:SetActiveTech(tech)
 
         local techCategory = categories[tech]
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories * techCategory)
@@ -364,11 +363,11 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end
 
+        context.panel:SetActiveTech(tech)
         if tech == "NONE" then
             return
         end
 
-        context.panel:SetActiveTech(tech)
 
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories *
             (techBuildables[tech] or categories.ALLUNITS))

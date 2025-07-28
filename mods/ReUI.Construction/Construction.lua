@@ -1107,6 +1107,7 @@ function Main(isReplay)
             self:ApplyToTabs(self.ShowCheckBox)
             self:ApplyToSlots(self.HideCheckBox)
 
+            self._context.tab = "construction"
             self:SetCurrentTab("construction")
             self:Refresh()
         end,
@@ -1120,6 +1121,7 @@ function Main(isReplay)
             self:ApplyToTabs(self.HideCheckBox)
             self:ApplyToSlots(self.HideCheckBox)
 
+            self._context.tab = "selection"
             self:SetCurrentTab("selection")
             self:Refresh()
         end,
@@ -1134,6 +1136,7 @@ function Main(isReplay)
                 slot:Show()
                 slot:SetCheck(slot.slot == self._context.slot, true)
             end
+            self._context.tab = "enhancements"
             self:SetCurrentTab("enhancements")
             self:Refresh()
         end,
@@ -1142,7 +1145,6 @@ function Main(isReplay)
         ---@param tab Tabs
         SetCurrentTab = function(self, tab)
             self._currentTab = tab
-            self._context.tab = tab
             self._constructionTab:SetCheck(tab == "construction", true)
             self._selectionTab:SetCheck(tab == "selection", true)
             self._enhancementsTab:SetCheck(tab == "enhancements", true)
@@ -1288,13 +1290,14 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         ---@param handlers ConstructionHandlerData[]
+        ---@param anyTab? boolean
         ---@return ConstructionHandlerData?
         ---@return any[]?
         ---@return any?
-        GetActionsFor = function(self, handlers)
+        GetActionsFor = function(self, handlers, anyTab)
             local selfContext = self._context
             local activeTab = selfContext.tab
-            local acceptAllTabs = activeTab == "all" or activeTab == "construction"
+            local acceptAllTabs = activeTab == "all" or activeTab == "construction" or anyTab
 
             ---@param handlerData ConstructionHandlerData
             for _, handlerData in handlers do
@@ -1319,7 +1322,8 @@ function Main(isReplay)
             self._context.reason = reason
 
             local primaryHandlerData, primaryActions, primaryContext = self:GetActionsFor(self.PrimaryHandlers)
-            local secondaryHandlerData, secondaryActions, secondaryContext = self:GetActionsFor(self.SecondaryHandlers)
+            local secondaryHandlerData, secondaryActions, secondaryContext = self:GetActionsFor(self.SecondaryHandlers,
+                self._context.tab == "enhancements")
 
             if not primaryHandlerData and not secondaryHandlerData then
                 self:Hide()
@@ -1389,13 +1393,21 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         ---@param selection UserUnit[]?
-        OnSelectionChanged = function(self, selection)
+        ---@param isOldSelection? boolean
+        OnSelectionChanged = function(self, selection, isOldSelection)
             self:Show()
 
-            self._context.tab = "all"
-            self._context.selection = selection
-            self._context.tech = "NONE"
-            self._context.slot = "Back"
+            if isOldSelection then
+                -- self._context.tab = "all"
+                -- self._context.selection = selection
+                -- self._context.tech = "NONE"
+                -- self._context.slot = "Back"
+            else
+                self._context.tab = "all"
+                self._context.selection = selection
+                self._context.tech = "NONE"
+                self._context.slot = "Back"
+            end
 
             self:Update("selection")
         end,
@@ -1548,7 +1560,7 @@ function Main(isReplay)
             --     return
             -- end
 
-            panel:OnSelectionChanged(selection)
+            panel:OnSelectionChanged(selection, isOldSelection)
         end
     end)
 
@@ -1581,6 +1593,8 @@ function Main(isReplay)
     --[x] display support factories for acus if corresponding hq presents
     --[ ] improve items logic of the grid
     --[ ] bottom panel doesn't display other things in enhancements mode
+    --[ ] add reui error messages into game chat
+    --[ ] fix tech switch when queue is changed
     -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
 
     return {
