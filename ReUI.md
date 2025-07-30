@@ -28,6 +28,7 @@ Improvements over original construction panel:
 Core library of ReUI. Provides functions for hooking into existing files of the game and executing code before and after UI is created. And functions for creating classes with properties and tables with weak keys/values.
 
 ### ReUI.Options
+Module with functions to create and manage options for your mod. It provides with `OptionVar` class to create reactive options for your needs; builder to create options menus with various types of options: filters, scrollers, selectors and etc. Use cases can be found in almost every mod in `Options.lua`.
 ### ReUI.UI
 #### ReUI.UI.Controls
 #### ReUI.UI.Views
