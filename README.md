@@ -2,6 +2,8 @@
 
 Ecosystem of UI mods for [FAF](https://www.faforever.com/).
 
+Currently working on [ReUI](./ReUI.md).
+
 ## 4z0t's ScoreBoard
 
 ![icon](./mods/4SB/icon.png)
