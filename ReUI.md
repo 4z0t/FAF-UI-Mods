@@ -29,10 +29,11 @@ Core library of ReUI. Provides functions for hooking into existing files of the 
 
 ### ReUI.Options
 Module with functions to create and manage options for your mod. It provides with `OptionVar` class to create reactive options for your needs; builder to create options menus with various types of options: filters, scrollers, selectors and etc. Use cases can be found in almost every mod in `Options.lua`.
+
 ### ReUI.UI
 #### ReUI.UI.Controls
 #### ReUI.UI.Views
 #### ReUI.UI.Animation
 #### ReUI.UI.Color
 ### ReUI.LINQ
-
+An icing on cake. A [.Net LINQ inspired library](https://github.com/4z0t/LuaLINQ) adapted for FAF needs and environment. This is superior version of LINQ (LuaQ) from deprecated UI mod tools. Way faster and more flexible. Basically it is a collection of functions to manipulate collections in effictient, easy to read and extend way. 
