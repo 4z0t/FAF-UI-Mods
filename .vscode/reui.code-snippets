@@ -1,0 +1,117 @@
+{
+    "ReUI.Property": {
+        "body": [
+            "${1:PropertyName} = ReUI.Core.Property",
+            "{",
+            "\tget = function(self)",
+            "\t\treturn",
+            "\tend,",
+            "",
+            "\tset = function(self, value)",
+            "",
+            "\tend",
+            "},"
+        ],
+        "prefix": "reuiproperty",
+        "description": "creates basic ReUI property"
+    },
+    "ReUI.InitLayout": {
+        "body": [
+            "---@param self ${1:ClassName}",
+            "---@param layouter ReUI.UI.Layouter",
+            "InitLayout = function(self, layouter)",
+            "\t",
+            "end,"
+        ],
+        "prefix": "reuiinitlayout",
+        "description": "Creates InitLayout method for class"
+    },
+    "ReUI.Regions": {
+        "body": [
+            "--#region Header",
+            "--#region Upvalues",
+            "",
+            "--#endregion",
+            "",
+            "--#region Base Lua imports",
+            "",
+            "--#endregion",
+            "",
+            "--#region ReUI modules / classes",
+            "",
+            "--#endregion",
+            "",
+            "--#region Local Modules",
+            "",
+            "--#endregion",
+            "",
+            "--#region Local Variables",
+            "",
+            "--#endregion",
+            "--#endregion",
+        ],
+        "scope": "lua",
+        "prefix": "reuiregions",
+        "description": "Creates InitLayout method for class"
+    },
+    "ReUI.Layout": {
+        "body": [
+            "---@class ${1:ClassName} : ReUI.UI.BaseLayout",
+            "local ${1:ClassName} = Class(ReUI.UI.BaseLayout)",
+            "{",
+            "    ---@param self ${1:ClassName}",
+            "    ---@param control ReUI.UI.Layoutable",
+            "    ---@param layouter? ReUILayouter",
+            "    Apply = function(self, control, layouter)",
+            "        ",
+            "    end,",
+            "",
+            "    ---@param self ${1:ClassName}",
+            "    ---@param control ReUI.UI.Layoutable",
+            "    Restore = function(self, control)",
+            "        ",
+            "    end",
+            "}",
+        ],
+        "scope": "lua",
+        "prefix": "reuilayout",
+        "description": "Layout class"
+    },
+    "ReUI.Class": {
+        "body": [
+            "---@class ${1:ClassName} : ${2:BaseClass}",
+            "${1:ClassName} = ReUI.Core.Class(${2:BaseClass})",
+            "{",
+            "    ---@param self ${1:ClassName}",
+            "    ---@param parent ReUI.UI.Controls.Control",
+            "    __init = function(self, parent)",
+            "        ${2:BaseClass}.__init(self, parent)",
+            "    end,",
+            "}",
+        ],
+        "scope": "lua",
+        "prefix": "reuiclass",
+        "description": "ReUI Class"
+    },
+    "ReUI.LINQ": {
+        "body": [
+            "local Enumerate = ReUI.LINQ.Enumerate",
+            "local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator",
+            "local PairsEnumerator = ReUI.LINQ.PairsEnumerator",
+        ],
+        "scope": "lua",
+        "prefix": "usingreuilinq",
+        "description": "ReUI LINQ import"
+    },
+    "ReUI.UI.Controls": {
+        "body": [
+            "local Bitmap = ReUI.UI.Controls.Bitmap",
+            "local Text = ReUI.UI.Controls.Text",
+            "local CheckBox = ReUI.UI.Controls.CheckBox",
+            "local Group = ReUI.UI.Controls.Group",
+        ],
+        "scope": "lua",
+        "prefix": "usingreuicontrols",
+        "description": "ReUI Controls import"
+    },
+}
