@@ -83,14 +83,15 @@ local function CheckACUBuildOptions(acus)
         return buildableCategories
     end
 
-    local supportFactories = buildableCategories - categories.SUPPORTFACTORY
     ReUI.Units.HiddenSelect(function(currentSelection)
         UISelectionByCategory("RESEARCH", false, false, false, false)
         local hqs = GetSelectedUnits()
         if table.empty(hqs) then
+            buildableCategories = buildableCategories - categories.SUPPORTFACTORY
             return
         end
 
+        local supportFactories = buildableCategories - categories.SUPPORTFACTORY
         ---@param hq UserUnit
         for _, hq in hqs do
             local faction = string.upper(hq:GetBlueprint().General.FactionName)
@@ -106,16 +107,20 @@ local function CheckACUBuildOptions(acus)
 
             if EntityCategoryContains(categories.LAND, hq) then
                 supportCategory = supportCategory * categories.LAND
-            elseif EntityCategoryContains(categories.AIR, hq) then
+            end
+            if EntityCategoryContains(categories.AIR, hq) then
                 supportCategory = supportCategory * categories.AIR
-            elseif EntityCategoryContains(categories.NAVAL, hq) then
+            end
+            if EntityCategoryContains(categories.NAVAL, hq) then
                 supportCategory = supportCategory * categories.NAVAL
             end
             supportFactories = supportFactories + supportCategory
         end
+
+        buildableCategories = buildableCategories * supportFactories
     end)
 
-    return buildableCategories * supportFactories
+    return buildableCategories
 end
 
 ---@class BuildOptionsHandler : ASelectionHandler
