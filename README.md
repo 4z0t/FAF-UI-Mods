@@ -6,7 +6,7 @@ Currently working on [ReUI](./ReUI.md).
 
 ## 4z0t's ScoreBoard
 
-![icon](./mods/4SB/icon.png)
+![icon](./deprecated/4SB/icon.png)
 
 A mod replacing default scoreboard with a new one with its own features:
 
@@ -15,7 +15,7 @@ A mod replacing default scoreboard with a new one with its own features:
 * Flexible replay ScoreBoard
 * Coop support
 
-See [Full doc about it](./mods/4SB/README.md) for more info.
+See [Full doc about it](./deprecated/4SB/README.md) for more info.
 
 ## UI Mod Tools
 
