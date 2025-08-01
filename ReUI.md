@@ -6,8 +6,20 @@ ReUI is a project that combines all UI mods into one - an overhaul of whole UI o
 ### ReUI.Score
 Previously "4z0t's scoreboard". As originally it is completely rewamped scoreboard panel with various new features and fixes.
 
+![Scoreboard](./Media/s1.png)
+![Scoreboard](./Media/s2.png)
+
+Mode about scoreboard [here](./Deprecated/4SB/README.md).
+
 ### ReUI.Economy
 It is simply updated panel of economy with scale and custom layout capabilities.
+
+![Economy](./Media/economy.png)
+
+#### Middle layout
+Mod "EconomyMiddle" allows you to select middle layout for economy panel.
+
+![EconomyMiddle](./Media/economy_middle.png)
 
 ### ReUI.Reclaim
 Previously "EzReclaim" and "Optimized reclaim view". It provides with better looking reclaim labels and also shows them in reclaim command mode.
@@ -20,6 +32,12 @@ Improvements over original construction panel:
 * can be scaled
 * order of units in selection is deterministic and is sorted in this order: engineers -> Land units -> Air units -> Naval units -> Structures and everything else
 * queue drag is more stable and also works for mobile factories
+
+
+![Build options](./Media/reui_construction_build_options.jpg)
+![Selection](./Media/reui_construction_selection.jpg)
+![Enhancements](./Media/reui_construction_enhancements.jpg)
+![Upgrade chain](./Media/reui_construction_upgrade_chains.jpg)
 
 
 ## Libraries
