@@ -1393,11 +1393,10 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         ---@param selection UserUnit[]?
-        ---@param isOldSelection? boolean
-        OnSelectionChanged = function(self, selection, isOldSelection)
+        OnSelectionChanged = function(self, selection)
             self:Show()
 
-            if isOldSelection then
+            if table.equal(self._context.selection, selection) then
                 -- self._context.tab = "all"
                 -- self._context.selection = selection
                 -- self._context.tech = "NONE"
@@ -1562,7 +1561,7 @@ function Main(isReplay)
             --     return
             -- end
 
-            panel:OnSelectionChanged(selection, isOldSelection)
+            panel:OnSelectionChanged(selection)
         end
     end)
 

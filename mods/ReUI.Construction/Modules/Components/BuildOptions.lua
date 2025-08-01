@@ -529,6 +529,7 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
                 else
                     self:OrderConstruction(self.context.selection, self.data.id, count)
                 end
+                item:UpdatePanel()
 
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
             elseif event.Type == "MouseEnter" then
