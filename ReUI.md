@@ -24,6 +24,8 @@ Mod "EconomyMiddle" allows you to select middle layout for economy panel.
 ### ReUI.Reclaim
 Previously "EzReclaim" and "Optimized reclaim view". It provides with better looking reclaim labels and also shows them in reclaim command mode.
 
+![reclaim](./Media/reclaim.png)
+
 ### ReUI.Construction
 ReUI.Construction is complete overhaul of original construction panel. Optimized, extendable and improved with new features over original one.
 Currently it is missing some of the features of original panel, such as templates, but it will be added in future.
