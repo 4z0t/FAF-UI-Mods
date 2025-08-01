@@ -1412,6 +1412,8 @@ function Main(isReplay)
             self:Update("selection")
         end,
 
+        ---@param self ReUI.Construction.Panel
+        ---@param canScroll boolean
         SetCanScroll = function(self, canScroll)
             self._canScroll = canScroll
             self._primary._canScroll = canScroll
