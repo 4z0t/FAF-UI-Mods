@@ -9,7 +9,7 @@ Previously "4z0t's scoreboard". As originally it is completely rewamped scoreboa
 ![Scoreboard](./Media/s1.png)
 ![Scoreboard](./Media/s2.png)
 
-Mode about scoreboard [here](./Deprecated/4SB/README.md).
+More about scoreboard [here](./Deprecated/4SB/README.md).
 
 ### ReUI.Economy
 It is simply updated panel of economy with scale and custom layout capabilities.
