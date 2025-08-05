@@ -51,7 +51,17 @@ Core library of ReUI. Provides functions for hooking into existing files of the 
 Module with functions to create and manage options for your mod. It provides with `OptionVar` class to create reactive options for your needs; builder to create options menus with various types of options: filters, scrollers, selectors and etc. Use cases can be found in almost every mod in `Options.lua`.
 
 ### ReUI.UI
+
+Provides with 3 crucial classes for ReUI's controls: Layouter, Layout and Layoutable.
+
+Layouter is responsoble for performing layout on a given control. Supports reactive scaling. Each control by default uses parent's layouter.
+Layout is a class that represents layout of given control and can switched on the fly to alter control's layout. By default each control uses layout that is done inside `InitLayout` method.
+Layoutable is a class that stores Layouter and Layout references and applies them when needed. You can inherit this class to use Layouter and Layout in your control. 
+
 #### ReUI.UI.Controls
+
+Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox (no idea why this one is here :D).
+
 #### ReUI.UI.Views
 #### ReUI.UI.Animation
 #### ReUI.UI.Color
