@@ -9,6 +9,7 @@ ReUI.Require
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.0.0",
     "ReUI.Options >= 1.0.0",
+    "ReUI.Units >= 1.0.0",
     "ReUI.Units.Enhancements >= 1.2.0",
 }
 

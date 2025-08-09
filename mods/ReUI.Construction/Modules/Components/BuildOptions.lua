@@ -54,12 +54,13 @@ local function CheckACUBuildOptions(acus)
         local buildCat = bp.Economy.BuildableCategory
 
         local tech = 1
-        if Enhancements.IsQueued(acu, "AdvancedEngineering") and not Enhancements.IsInstalled(acu, "AdvancedEngineering") then
-            tech = 2
-            foundUpgrading = true
-        end
-        if Enhancements.IsQueued(acu, "T3Engineering") and not Enhancements.IsInstalled(acu, "T3Engineering") then
+        if Enhancements.IsQueued(acu, "T3Engineering") and
+            not Enhancements.IsInstalled(acu, "T3Engineering") then
             tech = 3
+            foundUpgrading = true
+        elseif Enhancements.IsQueued(acu, "AdvancedEngineering") and
+            not Enhancements.IsInstalled(acu, "AdvancedEngineering") then
+            tech = 2
             foundUpgrading = true
         end
 
