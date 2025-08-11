@@ -71,6 +71,8 @@ Provides with primitive classes that inherit Layoutable class. These are Group, 
 
 #### ReUI.UI.Views
 
+Provides with generic controls such as button, arrow, border, bracket, scrollable control and grid.
+
 #### ReUI.UI.Animation
 
 #### ReUI.UI.Color
