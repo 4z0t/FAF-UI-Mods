@@ -43,33 +43,46 @@ local techToCategory = {
     ["EXPERIMENTAL"] = categories.EXPERIMENTAL,
 }
 
+---@param buildableCategories string[]
+---@param tech number
+---@return string
+local function BuildCategoriesToString(buildableCategories, tech)
+    local s = ""
+    for i = 1, tech do
+        local cat = buildableCategories[i]
+        if cat then
+            s = s .. cat
+            if i < tech then
+                s = s .. ","
+            end
+        end
+    end
+    return s
+end
+
 ---@param acus UserUnit[]
 ---@return EntityCategory
 local function CheckACUBuildOptions(acus)
     local foundUpgrading = false
     ---@type EntityCategory
     local buildableCategories
+    ---@param acu UserUnit
     for _, acu in acus do
         local bp = acu:GetBlueprint()
         local buildCat = bp.Economy.BuildableCategory
 
         local tech = 1
-        if Enhancements.IsQueued(acu, "AdvancedEngineering") and not Enhancements.IsInstalled(acu, "AdvancedEngineering") then
+        if Enhancements.IsQueued(acu, "T3Engineering") and
+            not Enhancements.IsInstalled(acu, "T3Engineering") then
+            tech = 3
+            foundUpgrading = true
+        elseif Enhancements.IsQueued(acu, "AdvancedEngineering") and
+            not Enhancements.IsInstalled(acu, "AdvancedEngineering") then
             tech = 2
             foundUpgrading = true
         end
-        if Enhancements.IsQueued(acu, "T3Engineering") and not Enhancements.IsInstalled(acu, "T3Engineering") then
-            tech = 3
-            foundUpgrading = true
-        end
 
-        local buildable = ParseEntityCategory(buildCat[1])
-        if tech >= 2 then
-            buildable = buildable + ParseEntityCategory(buildCat[2])
-        end
-        if tech >= 3 then
-            buildable = buildable + ParseEntityCategory(buildCat[3])
-        end
+        local buildable = ParseEntityCategory(BuildCategoriesToString(buildCat, tech))
 
         if not buildableCategories then
             buildableCategories = buildable
@@ -83,14 +96,15 @@ local function CheckACUBuildOptions(acus)
         return buildableCategories
     end
 
-    local supportFactories = buildableCategories - categories.SUPPORTFACTORY
     ReUI.Units.HiddenSelect(function(currentSelection)
         UISelectionByCategory("RESEARCH", false, false, false, false)
         local hqs = GetSelectedUnits()
         if table.empty(hqs) then
+            buildableCategories = buildableCategories - categories.SUPPORTFACTORY
             return
         end
 
+        local supportFactories = buildableCategories - categories.SUPPORTFACTORY
         ---@param hq UserUnit
         for _, hq in hqs do
             local faction = string.upper(hq:GetBlueprint().General.FactionName)
@@ -106,16 +120,20 @@ local function CheckACUBuildOptions(acus)
 
             if EntityCategoryContains(categories.LAND, hq) then
                 supportCategory = supportCategory * categories.LAND
-            elseif EntityCategoryContains(categories.AIR, hq) then
+            end
+            if EntityCategoryContains(categories.AIR, hq) then
                 supportCategory = supportCategory * categories.AIR
-            elseif EntityCategoryContains(categories.NAVAL, hq) then
+            end
+            if EntityCategoryContains(categories.NAVAL, hq) then
                 supportCategory = supportCategory * categories.NAVAL
             end
             supportFactories = supportFactories + supportCategory
         end
+
+        buildableCategories = buildableCategories * supportFactories
     end)
 
-    return buildableCategories * supportFactories
+    return buildableCategories
 end
 
 ---@class BuildOptionsHandler : ASelectionHandler
@@ -178,11 +196,10 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end
 
+        context.panel:SetActiveTech(tech)
         if tech == "NONE" then
             return
         end
-
-        context.panel:SetActiveTech(tech)
 
         local techCategory = categories[tech]
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories * techCategory)
@@ -192,24 +209,23 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
         end
 
         return Enumerate(buildableUnits)
-            :OrderBy(function(value)
-                return value
-            end, function(bp1, bp2)
-                local n1, n2 = FirstMatch(bp1), FirstMatch(bp2)
-                if n1 ~= n2 then
-                    return n1 < n2
-                end
+            :OrderBy(function(value) return value end,
+                function(bp1, bp2)
+                    local n1, n2 = FirstMatch(bp1), FirstMatch(bp2)
+                    if n1 ~= n2 then
+                        return n1 < n2
+                    end
 
-                n1, n2 = __blueprints[bp1], __blueprints[bp2]
-                n1 = n1.BuildIconSortPriority or n1.StrategicIconSortPriority
-                n2 = n2.BuildIconSortPriority or n2.StrategicIconSortPriority
+                    n1, n2 = __blueprints[bp1], __blueprints[bp2]
+                    n1 = n1.BuildIconSortPriority or n1.StrategicIconSortPriority
+                    n2 = n2.BuildIconSortPriority or n2.StrategicIconSortPriority
 
-                if n1 ~= n2 then
-                    return n1 < n2
-                end
+                    if n1 ~= n2 then
+                        return n1 < n2
+                    end
 
-                return bp1 < bp2
-            end)
+                    return bp1 < bp2
+                end)
             :Select(function(bpID)
                 return { id = bpID }
             end)
@@ -364,11 +380,11 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end
 
+        context.panel:SetActiveTech(tech)
         if tech == "NONE" then
             return
         end
 
-        context.panel:SetActiveTech(tech)
 
         local buildableUnits = EntityCategoryGetUnitList(buildableCategories *
             (techBuildables[tech] or categories.ALLUNITS))
@@ -468,6 +484,46 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end,
 
+        ---@param self BuildOptionsFactoryItem
+        ---@param selection UserUnit[]
+        ---@param id string
+        ---@param count number
+        InsertFrontQueue = function(self, selection, id, count)
+            local factory = selection[1]
+            local queue = SetCurrentFactoryForQueueDisplay(factory)
+            if table.empty(queue) then
+                self:OrderConstruction(selection, id, count)
+                return
+            end
+
+            if queue[1].id == id then
+                IncreaseBuildCountInQueue(1, count)
+                return
+            end
+
+            local queueToRestore = {}
+            -- Unstable
+            -- for index = table.getn(queue), 1, -1 do
+            --     local c = queue[index].count
+            --     if index == 1 then
+            --         c = c - 1
+            --     end
+            --     DecreaseBuildCountInQueue(index, c)
+            --     table.insert(queueToRestore, { id = queue[index].id, count = c })
+            -- end
+
+            for index = table.getn(queue), 2, -1 do
+                local c = queue[index].count
+                DecreaseBuildCountInQueue(index, c)
+                table.insert(queueToRestore, { id = queue[index].id, count = c })
+            end
+            self:OrderConstruction(selection, id, count)
+
+            for i = table.getn(queueToRestore), 1, -1 do
+                self:OrderConstruction(selection, queueToRestore[i].id, queueToRestore[i].count)
+            end
+        end,
+
         ---Called when grid item receives an event
         ---@param self BuildOptionsFactoryItem
         ---@param item ReUI.Construction.Grid.Item
@@ -475,18 +531,17 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
         HandleEvent = function(self, item, event)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
                 local modifiers = event.Modifiers
-
                 local count = 1
                 if modifiers.Shift or modifiers.Ctrl then
                     count = 5
                 end
 
-                local id = self.data.id
-
-                local selection = GetSelectedUnits()
-                if selection then
-                    self:OrderConstruction(selection, id, count)
+                if modifiers.Alt and table.getn(self.context.selection) == 1 then
+                    self:InsertFrontQueue(self.context.selection, self.data.id, count)
+                else
+                    self:OrderConstruction(self.context.selection, self.data.id, count)
                 end
+                item:UpdatePanel()
 
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
             elseif event.Type == "MouseEnter" then

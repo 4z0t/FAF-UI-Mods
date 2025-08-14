@@ -1,12 +1,11 @@
-name = "ReUI.Reclaim"
-uid = "reui-reclaim-1.1.0"
+name = "ReUI.ActionsPanel"
+uid = "reui-actionspanel-1.0.0"
 version = 1
 copyright = ""
 description = [[
-Provides with better looking reclaim labels and also shows them in reclaim command mode.
 ]]
 author = "4z0t"
-icon = "/mods/ReUI.Reclaim/icon.png"
+icon = "/mods/ReUI.ActionsPanel/icon.png"
 url = ""
 selectable = true
 enabled = true
@@ -18,4 +17,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Reclaim=1.1.0'
+ReUI = 'ReUI.ActionsPanel=1.0.0'

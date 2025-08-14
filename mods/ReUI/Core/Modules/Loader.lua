@@ -28,6 +28,7 @@ local _assert = assert
 ---| "=="
 ---| "="
 
+local callMain = false
 local isReplay = false
 local disposed = true
 ---@type table<string, ReUI.Module|"failed">
@@ -96,7 +97,7 @@ end
 ---@return string
 local function GetLastPartOfModuleName(moduleName)
     local splitName = DemangleName(moduleName)
-    return splitName[table.getn(splitName)]
+    return splitName[table.getn(splitName)] or ""
 end
 
 ---Returns whether v1 is equal to v2
@@ -158,14 +159,20 @@ local ModuleMeta = {
 ---@return ReUI.Module
 local function LoadModule(moduleName)
     local moduleVersion, modPath = GetModulePathAndInfo(moduleName)
-    local mainPath = modPath .. "Main.lua"
+    local mainPath = modPath .. GetLastPartOfModuleName(moduleName) .. ".lua"
     if not exists(mainPath) then
-        mainPath = modPath .. GetLastPartOfModuleName(moduleName) .. ".lua"
+        mainPath = modPath .. "Main.lua"
     end
     local m = import(mainPath)
+
     ---@type ReUI.Module
-    local module = setmetatable(m.Main(isReplay) or {}, ModuleMeta)
-    m.Main = nil
+    local module
+    if callMain then
+        module = setmetatable(m.Main(isReplay) or {}, ModuleMeta)
+        m.Main = nil
+    else
+        module = setmetatable({ Main = m.Main }, ModuleMeta)
+    end
 
     module.Name = moduleName
     module.Version = moduleVersion
@@ -323,6 +330,14 @@ local function TryLoad(marker)
     return module
 end
 
+function Init()
+    disposed             = false
+    loadedModules        = {}
+    loadedModulesInOrder = {}
+    modulesInProgress    = {}
+    loadingErrors        = {}
+end
+
 function Load(marker)
     local ok, result = _pcall(TryLoad, marker)
     if not ok then
@@ -330,13 +345,21 @@ function Load(marker)
     end
 end
 
-function Init(_isReplay)
+function LoadMains(_isReplay)
+    callMain = true
     isReplay = _isReplay
-    disposed = false
-    loadedModules = {}
-    loadedModulesInOrder = {}
-    modulesInProgress = {}
-    loadingErrors = {}
+    for _, module in ipairs(loadedModulesInOrder) do
+        local main = rawget(module, "Main")
+        if main then
+            local r = main(isReplay)
+            if r then
+                for k, v in r do
+                    rawset(module, k, v)
+                end
+            end
+            module.Main = nil
+        end
+    end
 end
 
 function Dispose()

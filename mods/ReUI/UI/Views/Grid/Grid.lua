@@ -3,6 +3,7 @@ ReUI.Require
     "ReUI.Core >= 1.1.0",
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.0.0",
+    "ReUI.ECS >= 1.0.0"
 }
 
 function Main(isReplay)

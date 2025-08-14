@@ -225,7 +225,9 @@ BuildQueueHandler = ReUI.Core.Class(ASelectionHandler)
             return {}, queueContext
         end
 
-        return BuildQueueToQueueData(currentCommandQueue), queueContext
+        local queue = BuildQueueToQueueData(currentCommandQueue)
+        queue[1].showProgress = true
+        return queue, queueContext
     end,
 
     ---@param self BuildQueueHandler

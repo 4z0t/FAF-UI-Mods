@@ -28,11 +28,13 @@ BaseGridItem = ReUI.Core.Class(AGridItem)
 
     ---@param self BaseGridItem
     ---@param name string
-    ---@return fun(instance: BaseGridItem):AItemComponent
-    GetComponentClassByName = function(self, name)
+    ---@return AItemComponent
+    CreateComponent = function(self, name)
         local class = self._componentClasses[name]
-        assert(class ~= nil, "There is no class for component '" .. name .. "'")
-        return class
+        if class == nil then
+            error(("There is no class for component '%s'"):format(name))
+        end
+        return class(self)
     end,
 
     ---@param self BaseGridItem

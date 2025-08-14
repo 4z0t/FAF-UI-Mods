@@ -24,3 +24,9 @@ end
 ---@param name? string @optional formatted name
 function ReUI.Actions.SelectionAction(description, func, category, name)
 end
+
+---Returns formatted name for the action
+---@param name string
+---@return string
+function ReUI.Actions.FormatActionName(name)
+end
