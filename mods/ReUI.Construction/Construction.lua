@@ -9,6 +9,7 @@ ReUI.Require
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.0.0",
     "ReUI.Options >= 1.0.0",
+    "ReUI.Units >= 1.0.0",
     "ReUI.Units.Enhancements >= 1.2.0",
 }
 
@@ -1107,6 +1108,7 @@ function Main(isReplay)
             self:ApplyToTabs(self.ShowCheckBox)
             self:ApplyToSlots(self.HideCheckBox)
 
+            self._context.tab = "construction"
             self:SetCurrentTab("construction")
             self:Refresh()
         end,
@@ -1120,6 +1122,7 @@ function Main(isReplay)
             self:ApplyToTabs(self.HideCheckBox)
             self:ApplyToSlots(self.HideCheckBox)
 
+            self._context.tab = "selection"
             self:SetCurrentTab("selection")
             self:Refresh()
         end,
@@ -1134,6 +1137,7 @@ function Main(isReplay)
                 slot:Show()
                 slot:SetCheck(slot.slot == self._context.slot, true)
             end
+            self._context.tab = "enhancements"
             self:SetCurrentTab("enhancements")
             self:Refresh()
         end,
@@ -1142,7 +1146,6 @@ function Main(isReplay)
         ---@param tab Tabs
         SetCurrentTab = function(self, tab)
             self._currentTab = tab
-            self._context.tab = tab
             self._constructionTab:SetCheck(tab == "construction", true)
             self._selectionTab:SetCheck(tab == "selection", true)
             self._enhancementsTab:SetCheck(tab == "enhancements", true)
@@ -1288,13 +1291,14 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         ---@param handlers ConstructionHandlerData[]
+        ---@param anyTab? boolean
         ---@return ConstructionHandlerData?
         ---@return any[]?
         ---@return any?
-        GetActionsFor = function(self, handlers)
+        GetActionsFor = function(self, handlers, anyTab)
             local selfContext = self._context
             local activeTab = selfContext.tab
-            local acceptAllTabs = activeTab == "all" or activeTab == "construction"
+            local acceptAllTabs = activeTab == "all" or activeTab == "construction" or anyTab
 
             ---@param handlerData ConstructionHandlerData
             for _, handlerData in handlers do
@@ -1319,7 +1323,8 @@ function Main(isReplay)
             self._context.reason = reason
 
             local primaryHandlerData, primaryActions, primaryContext = self:GetActionsFor(self.PrimaryHandlers)
-            local secondaryHandlerData, secondaryActions, secondaryContext = self:GetActionsFor(self.SecondaryHandlers)
+            local secondaryHandlerData, secondaryActions, secondaryContext = self:GetActionsFor(self.SecondaryHandlers,
+                self._context.tab == "enhancements")
 
             if not primaryHandlerData and not secondaryHandlerData then
                 self:Hide()
@@ -1392,14 +1397,20 @@ function Main(isReplay)
         OnSelectionChanged = function(self, selection)
             self:Show()
 
-            self._context.tab = "all"
-            self._context.selection = selection
-            self._context.tech = "NONE"
-            self._context.slot = "Back"
+            if table.equal(self._context.selection, selection) then
+
+            else
+                self._context.tab = "all"
+                self._context.selection = selection
+                self._context.tech = "NONE"
+                self._context.slot = "Back"
+            end
 
             self:Update("selection")
         end,
 
+        ---@param self ReUI.Construction.Panel
+        ---@param canScroll boolean
         SetCanScroll = function(self, canScroll)
             self._canScroll = canScroll
             self._primary._canScroll = canScroll
@@ -1492,7 +1503,7 @@ function Main(isReplay)
                     :AnchorToRight(ordersControl, 55)
             else
                 LayoutFor(panel)
-                    :AtLeftIn(parent, 460)
+                    :AtLeftIn(parent, 55)
             end
 
             LayoutFor(panel)
@@ -1543,11 +1554,6 @@ function Main(isReplay)
                 return
             end
 
-            -- if isOldSelection then -- This for some reason causes an error with destroyed units
-            --     panel:Refresh()
-            --     return
-            -- end
-
             panel:OnSelectionChanged(selection)
         end
     end)
@@ -1574,13 +1580,16 @@ function Main(isReplay)
     --[x] Progress bar for construction
     --[x] don't display count for upgrades of factories
     --[ ] display keybinds in construction menu
-    --[ ] old selection check is incorrect and must be done elsewhere
+    --[x] old selection check is incorrect and must be done elsewhere
     --[x] fix progress bar with enhancements and regular construction
     --[ ] fix order of items with queue and enhancements (including cases with deleting items and when upgrades are reset)
     --[x] tech enhancements don't show available construction options
     --[x] display support factories for acus if corresponding hq presents
     --[ ] improve items logic of the grid
-    --[ ] bottom panel doesn't display other things in enhancements mode
+    --[x] bottom panel doesn't display other things in enhancements mode
+    --[x] add reui error messages into game chat
+    --[x] fix tech switch when queue is changed
+    --[ ] fix queue and chain upgrades for t2 shields of UEF and Seraphim (use command queue instead of factory queue)
     -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
 
     return {

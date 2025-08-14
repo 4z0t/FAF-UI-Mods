@@ -1,130 +1,112 @@
-# FAF-UI-Mods
+# ReUI
 
-Ecosystem of UI mods for [FAF](https://www.faforever.com/).
+ReUI is a project that combines all UI mods into one - an overhaul of whole UI of Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.
 
-Currently working on [ReUI](./ReUI.md).
+## Mods
 
-## 4z0t's ScoreBoard
+### ReUI.Score
 
-![icon](./Deprecated/4SB/icon.png)
+Previously "4z0t's scoreboard". As originally it is completely rewamped scoreboard panel with various new features and fixes.
 
-A mod replacing default scoreboard with a new one with its own features:
+![Scoreboard](./Media/s1.png)
+![Scoreboard](./Media/s2.png)
 
-* Minimalistic and simple design
-* Animations
-* Flexible replay ScoreBoard
-* Coop support
+[More about scoreboard](./Deprecated/4SB/README.md).
 
-See [Full doc about it](./Deprecated/4SB/README.md) for more info.
+### ReUI.Economy
 
-## UI Mod Tools
+It is simply updated panel of economy with scale and custom layout capabilities.
 
-A library for all other mods.
-It contains tools for building various options for mods (filters, sliders, color selectors, color sliders), processing units, layouting UI controls, and views for scrolling.
+![Economy](./Media/economy.png)
 
-## TeamInfo Share
+#### Middle layout
 
-A mod sharing data between teammates about nuke/smd silo counts, progress, etas of construction and EXP units time construction.
+Mod "EconomyMiddle" allows you to select middle layout for economy panel.
 
-Mod has options for positioning of timers, counters and progress. Each timer can be disabled, but data would be sent to teammate anyway.
+![EconomyMiddle](./Media/economy_middle.png)
 
-## Selected Units Info
+### ReUI.Reclaim
 
-![icon](./mods/SUI/icon.png)
+Previously "EzReclaim" and "Optimized reclaim view". It provides with better looking reclaim labels and also shows them in reclaim command mode.
 
-A mod displaying totals of selected units, such as total mass and energy used, build power, mass and energy consumption, mass killed.
+![reclaim](./Media/reclaim.png)
 
-Panel is located on top of UI and can be moved horizonally with middle mouse button.
+There are several options that can be adjusted for your needs and hardware
+* **max labels**: maximum number of reclaim labels that can be shown at the same time
+* **zoom threshold**: minimum zoom level at which reclaim labels will start to batch together
+* **grouping distance**: radius at which reclaim labels will be grouped together
+* **update rate**: delay in ms between updates of reclaim labels
 
-## Specific Target Priorities
+![reclaim options](./Media/reclaim_options.png)
 
-A mod is used to target specific type of a unit.
+### ReUI.Construction
 
-To use it bind a hotkey in **Target priorities** section, hover over unit with a mouse and press the key.
-All selected units will target units of its type.
+ReUI.Construction is complete overhaul of original construction panel. Optimized, extendable and improved with new features over original one.
+Currently it is missing some of the features of original panel, such as templates, but it will be added in future.
 
-## Smart Ring Display
+Improvements over original construction panel:
 
-A mod displaying unit's weapon ranges when hovering over it with a mouse and shift pressed.
+* can be scaled
+* order of units in selection is deterministic and is sorted in this order: engineers -> Land units -> Air units -> Naval units -> Structures and everything else
+* queue drag is more stable and also works for mobile factories
 
-Unpack textures of the mod before using it.
+![Build options](./Media/reui_construction_build_options.jpg)
+![Selection](./Media/reui_construction_selection.jpg)
+![Enhancements](./Media/reui_construction_enhancements.jpg)
+![Upgrade chain](./Media/reui_construction_upgrade_chains.jpg)
 
-## Idle Engineers Light
+### ReUI.Hotbuild
 
-![icon](./mods/IEL/icon.png)
+Previously "HotBuild Overhaul". Currently it is slightly improved HotBuild Overhaul mod. But in addition it allows you to use templates in building sets.
 
-A mod displaying units' states with various icons over them.
+Template items are highlighted with yellow color. **Fill** button will convert template for all factions.
 
-* Engineers being idle
-* Factories being idle, upgrading, building in loop or only engineers
-* TMLs/Nukes/SMDs being loaded
-* Mexes upgrading.
+![reuihotbuild](./Media/reuihotbuild.png)
 
-All these icons can be disabled/enabled separately.
+ReUI.Hotbuild changes default mechanism of hotbuild and fixes previously addressed [issue](#69) with it. Since now on factory sets are picking only ***one*** item, you can't have multiple items for a factory as it was before.
 
-## HotBuild Overhaul
+### ReUI.Minimap
 
-![icon](./mods/HBO/icon.png)
+Adds option to lock zoom and automatically adjusts minimap size to map size.
 
-A mod for creating custom hotbuild actions.
-See [full doc about it](./mods/HBO/README.md) for more info.
+### ReUI.ActionsPanel
 
-## EzReclaim
+Previously "Actions Grid Panel".
 
-A mod displaying reclaim labels in reclaim mode.
+## Libraries
 
-## ECO UI Tools
+### ReUI.Core
 
-A mod providing UI for better ECO management.
+Core library of ReUI. Provides functions for hooking into existing files of the game and executing code before and after UI is created. And functions for creating classes with properties and tables with weak keys/values.
 
-### Mex panel
+### ReUI.Options
 
-Shows counts of mexes in different states (idle, upgrading, paused) and progress of upgrade on a bottom of each state.
+Module with functions to create and manage options for your mod. It provides with `OptionVar` class to create reactive options for your needs; builder to create options menus with various types of options: filters, scrollers, selectors and etc. Use cases can be found in almost every mod in `Options.lua`.
 
-Panel has functions when clicking on a mex state:
+### ReUI.UI
 
-* T1/T2 mexes
-  * [Left]              select all
-  * [Right]             select all on screen
-  * [Ctrl + Left]       start upgrading and pause
-  * [Ctrl + Right]      start upgrading and pause for those on screen
-* T1/T2 upgrading mexes
-  * [Left]              select all
-  * [Right]             pause all
-  * [Ctrl + Left]       select one with highest progress
-  * [Ctrl + Right]      pause one with lowest progress
-* T1/T2 upgrading paused mexes
-  * [Left]              select all
-  * [Right]             unpause all
-  * [Ctrl + Left]       select one with highest progress
-  * [Ctrl + Right]      unpause one with highest progress
-* T3 mexes
-  * [Left]              select all
-  * [Right]             select all on screen
+Provides with 3 crucial classes for ReUI's controls: Layouter, Layout and Layoutable.
 
-Panel is movable with middle mouse button.
+Layouter is responsoble for performing layout on a given control. Supports reactive scaling. Each control by default uses parent's layouter.
+Layout is a class that represents layout of given control and can switched on the fly to alter control's layout. By default each control uses layout that is done inside `InitLayout` method.
+Layoutable is a class that stores Layouter and Layout references and applies them when needed. You can inherit this class to use Layouter and Layout in your control.
 
-### Overlay
+#### ReUI.UI.Controls
 
-You can enable overlay in options that shows mexes with numbers in squares.
+Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox (no idea why this one is here :D).
 
-### Key bindings
+#### ReUI.UI.Views
 
-All actions in mex panel can be binded to a key.
+Provides with generic controls such as button, arrow, border, bracket, scrollable control and grid.
 
-### Automation
+#### ReUI.UI.Animation
 
-You can enable functions for automatic mex actions, such as
+#### ReUI.UI.Color
 
-* upgrade and pause for t1 mexes
-* upgrade and pause for capped t2 mexes
-* unpause mexes under assist of set amount of BP
-* unpause mexes once
+### ReUI.LINQ
 
-## Engineer Alt Selection
+An icing on cake. A [.Net LINQ inspired library](https://github.com/4z0t/LuaLINQ) adapted for FAF needs and environment. This is superior version of LINQ (LuaQ) from deprecated UI mod tools. Way faster and more flexible. Basically it is a collection of functions to manipulate collections in efficient, easy to read and extend way.
 
-A mod allowing selection of engineers when holding Alt key.
+### ReUI.WorldView
 
-## Additional Orders Extension
-
-A mod adding various QoL key actions.
+Extends original WorldView with ECS. Applications can be seen in **[ReUI.Reclaim](#reuireclaim)** and **RFA**.

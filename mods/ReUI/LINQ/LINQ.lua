@@ -132,10 +132,11 @@ function Main(isReplay)
     ---@param t T
     ---@return fun(k:K):K,V
     local function CreateDistinctIterator(iterator, t)
-        local seen = {}
+        local seen
         ---@generic K
         ---@param sk K
         return function(sk)
+            seen = seen or {}
             for k, v in iterator, t, sk do
                 if not seen[v] then
                     seen[v] = true
@@ -562,81 +563,41 @@ function Main(isReplay)
         end
     end
 
-    ---@generic K,V,R
-    ---@param iterator fun(t:table, k:K):K,V
-    ---@param transformer? fun(t:table):table<K,V>
+    ---@generic V,R
     ---@param selector fun(value:V):R
-    ---@param comparator? fun(left: V, right: V): boolean
-    ---@return fun(table: V[], i?: integer):integer, V
-    ---@return fun(t:table):V[]
-    local function OrderByTransformer(iterator, transformer, selector, comparator)
-
-        local sortFunc
-        if comparator then
-            sortFunc = function(a, b)
-                return comparator(selector(a), selector(b))
-            end
-        else
-            sortFunc = function(a, b)
-                return selector(a) < selector(b)
+    ---@param comparer? fun(left: R, right: R): boolean
+    local function AscendingSortFunction(selector, comparer)
+        if comparer then
+            return function(a, b)
+                return comparer(selector(a), selector(b))
             end
         end
+        return function(a, b)
+            return selector(a) < selector(b)
+        end
+    end
 
-        if iterator == _ipairs then
-            if transformer then
-                return _ipairs, function(t)
-                    local nt = transformer(t)
-                    TableSort(nt, sortFunc)
-                    return nt
-                end
-            end
-            return _ipairs, function(t)
-                TableSort(t, sortFunc)
-                return t
+    ---@generic V,R
+    ---@param selector fun(value:V):R
+    ---@param comparer? fun(left: R, right: R): boolean
+    local function DescendingSortFunction(selector, comparer)
+        if comparer then
+            return function(a, b)
+                return not comparer(selector(b), selector(a))
             end
         end
-
-        if transformer then
-            return _ipairs, function(t)
-                local nt = {}
-                for _, v in iterator, transformer(t) do
-                    TableInsert(nt, v)
-                end
-                TableSort(nt, sortFunc)
-                return nt
-            end
-        end
-
-        return _ipairs, function(t)
-            local nt = {}
-            for _, v in iterator, t do
-                TableInsert(nt, v)
-            end
-            TableSort(nt, sortFunc)
-            return nt
+        return function(a, b)
+            return selector(b) > selector(a)
         end
     end
 
     ---@generic K,V,R
     ---@param iterator fun(t:table, k:K):K,V
     ---@param transformer? fun(t:table):table<K,V>
-    ---@param selector fun(value:V):R
-    ---@param comparator? fun(left: V, right: V): boolean
+    ---@param sortFunc fun(left: V, right: V): boolean
     ---@return fun(table: V[], i?: integer):integer, V
     ---@return fun(t:table):V[]
-    local function OrderByDescendingTransformer(iterator, transformer, selector, comparator)
-
-        local sortFunc
-        if comparator then
-            sortFunc = function(a, b)
-                return not comparator(selector(a), selector(b))
-            end
-        else
-            sortFunc = function(a, b)
-                return selector(a) > selector(b)
-            end
-        end
-
+    local function OrderByTransformer(iterator, transformer, sortFunc)
         if iterator == _ipairs then
             if transformer then
                 return _ipairs, function(t)
@@ -816,7 +777,8 @@ function Main(isReplay)
     ---@param comparer? fun(left:R, right:R):boolean
     ---@return Enumerator
     function EnumeratorMeta:OrderBy(selector, comparer)
-        return EnumeratorCreate(OrderByTransformer(self.iterator, self.transformer, selector, comparer))
+        return EnumeratorCreate(OrderByTransformer(self.iterator, self.transformer,
+            AscendingSortFunction(selector, comparer)))
     end
 
     ---@generic V,R
@@ -824,7 +786,8 @@ function Main(isReplay)
     ---@param comparer? fun(left:R, right:R):boolean
     ---@return Enumerator
     function EnumeratorMeta:OrderByDescending(selector, comparer)
-        return EnumeratorCreate(OrderByDescendingTransformer(self.iterator, self.transformer, selector, comparer))
+        return EnumeratorCreate(OrderByTransformer(self.iterator, self.transformer,
+            DescendingSortFunction(selector, comparer)))
     end
 
     ---@return Enumerator
@@ -1541,7 +1504,8 @@ function Main(isReplay)
     ---@param comparer? fun(left:R, right:R):boolean
     ---@return Enumerable
     function EnumerableMeta:OrderBy(selector, comparer)
-        self.iterator, self.transformer = OrderByTransformer(self.iterator, self.transformer, selector, comparer)
+        self.iterator, self.transformer = OrderByTransformer(self.iterator, self.transformer,
+            AscendingSortFunction(selector, comparer))
         return self
     end
 
@@ -1550,8 +1514,8 @@ function Main(isReplay)
     ---@param comparer? fun(left:R, right:R):boolean
     ---@return Enumerable
     function EnumerableMeta:OrderByDescending(selector, comparer)
-        self.iterator, self.transformer = OrderByDescendingTransformer(self.iterator, self.transformer,
-            selector, comparer)
+        self.iterator, self.transformer = OrderByTransformer(self.iterator, self.transformer,
+            DescendingSortFunction(selector, comparer))
         return self
     end
 

@@ -1,1 +1,0 @@
-HeightRatio = 0.012

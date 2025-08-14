@@ -1,10 +1,12 @@
-name = "ReUI.Core"
-uid = "reui-core-1.3.0"
+name = "ReUI.ECS"
+uid = "reui-ECS-1.0.0"
 version = 1
 copyright = ""
-description = [[]]
+description = [[
+
+]]
 author = "4z0t"
-icon = "/mods/ReUI.Core/icon.png"
+icon = "/mods/ReUI.ECS/icon.png"
 url = ""
 selectable = false
 enabled = true
@@ -16,4 +18,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Core=1.3.0'
+ReUI = 'ReUI.ECS=1.0.0'

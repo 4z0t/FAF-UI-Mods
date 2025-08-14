@@ -1,6 +1,6 @@
 local Bitmap = ReUI.UI.Controls.Bitmap
 
-local ALazyComponentContainer = import("ECS/ALazyComponentContainer.lua").ALazyComponentContainer
+local ALazyComponentContainer = ReUI.ECS.ALazyComponentContainer
 
 ---@class AGridItem : ReUI.UI.Controls.Bitmap, ALazyComponentContainer
 ---@field _activeComponent string

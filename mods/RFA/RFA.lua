@@ -1,5 +1,15 @@
-do
+ReUI.Require
+{
+    "ReUI.Core >= 1.3.0",
+    "ReUI.LINQ >= 1.4.0",
+    "ReUI.Options >= 1.0.0",
+    "ReUI.WorldView >= 1.0.0",
+}
+
+function Main(isReplay)
+
     --#region Upvalues
+    local GetSelectedUnits = GetSelectedUnits
     local GetMouseWorldPos = GetMouseWorldPos
     local GetRolloverInfo = GetRolloverInfo
     local GetFocusArmy = GetFocusArmy
@@ -15,9 +25,14 @@ do
     local EmptyTable = EmptyTable
     --#endregion
 
-    local LuaQ = UMT.LuaQ
+    local options = ReUI.Options.Mods["RFA"]
 
-    local options = UMT.Options.Mods["RFA"]
+    local Enumerate = ReUI.LINQ.Enumerate
+    local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+    local PairsEnumerator = ReUI.LINQ.PairsEnumerator
+
+    local Contains = PairsEnumerator:Contains()
+
     local GetCommandMode = import("/lua/ui/game/commandmode.lua").GetCommandMode
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
     local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
@@ -66,48 +81,60 @@ do
         showCounterIntel = opt()
     end)
     options.showInMinimap.OnChange = function(opt)
-        local minimap = GetWorldViews()["MiniMap"]
-        if not minimap then
-            return
-        end
+        -- local minimap = GetWorldViews()["MiniMap"]
+        -- if not minimap then
+        --     return
+        -- end
 
-        local isON = opt()
-        if isON then
-            if minimap._showRings then
-                return
-            end
-            local render = minimap.SetCustomRender
-            if render then
-                minimap._hoverRings = {}
-                minimap._selectionRings = {}
-                minimap._buildRing = nil
-                minimap:SetCustomRender(true)
-                minimap._showRings = true
-            end
-        else
-            local render = minimap.SetCustomRender
-            if render then
-                minimap._hoverRings = nil
-                minimap._selectionRings = nil
-                minimap._buildRing = nil
-                minimap:SetCustomRender(false)
-                minimap._showRings = false
-            end
-        end
+        -- local isON = opt()
+        -- if isON then
+        --     if minimap._showRings then
+        --         return
+        --     end
+        --     local render = minimap.SetCustomRender
+        --     if render then
+        --         minimap._hoverRings = {}
+        --         minimap._selectionRings = {}
+        --         minimap._buildRing = nil
+        --         minimap:SetCustomRender(true)
+        --         minimap._showRings = true
+        --     end
+        -- else
+        --     local render = minimap.SetCustomRender
+        --     if render then
+        --         minimap._hoverRings = nil
+        --         minimap._selectionRings = nil
+        --         minimap._buildRing = nil
+        --         minimap:SetCustomRender(false)
+        --         minimap._showRings = false
+        --     end
+        -- end
     end
     options.hoverPreviewKey.OnChange = function(opt)
+        ---@param view ReUI.WorldView.WorldView
         for _, view in GetWorldViews() do
-            view.HoverPreviewKey = opt()
+            local rfa = view:GetComponent("RFA") --[[@as RFAWorldViewComponent]]
+            if rfa then
+                rfa.HoverPreviewKey = opt()
+            end
         end
     end
     options.selectedPreviewKey.OnChange = function(opt)
+        ---@param view ReUI.WorldView.WorldView
         for _, view in GetWorldViews() do
-            view.SelectedPreviewKey = opt()
+            local rfa = view:GetComponent("RFA") --[[@as RFAWorldViewComponent]]
+            if rfa then
+                rfa.SelectedPreviewKey = opt()
+            end
         end
     end
     options.buildPreviewKey.OnChange = function(opt)
+        ---@param view ReUI.WorldView.WorldView
         for _, view in GetWorldViews() do
-            view.BuildPreviewKey = opt()
+            local rfa = view:GetComponent("RFA") --[[@as RFAWorldViewComponent]]
+            if rfa then
+                rfa.BuildPreviewKey = opt()
+            end
         end
     end
     --#endregion
@@ -125,12 +152,6 @@ do
         ["Radar"] = 8,
         ["Sonar"] = 9,
     }
-    ---@param a RingData
-    ---@param b RingData
-    local function OverlaySortFunction(a, b)
-        return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
-    end
-
     ---@type table<UnitId, table<string, true>>
     local unitsWithWeaponRangeEnh = {
         ual0001 = { OverCharge = true, AutoOverCharge = true, RightDisruptor = true, ChronoDampener = true },
@@ -167,10 +188,10 @@ do
     }
 
     ---@type table<UnitId, IUnitBlueprint>
-    local IBPByBpIdCache = UMT.Weak.Value {}
+    local IBPByBpIdCache = ReUI.Core.Weak.Value {}
     ---@type table<UserUnit, IUnitBlueprint>
-    local IBPByUnitCache = UMT.Weak.Key {}
-    local EntityIdToUnitCache = UMT.Weak.Value {}
+    local IBPByUnitCache = ReUI.Core.Weak.Key {}
+    local EntityIdToUnitCache = ReUI.Core.Weak.Value {}
 
     local lastEnhSyncTable = {}
     AddOnSyncHashedCallback(
@@ -213,9 +234,9 @@ do
             end
 
             lastEnhSyncTable = enhSyncTable
-        end
-        , "UserUnitEnhancements"
-        , 'RFA_DirtyIBPByUnitCache'
+        end,
+        "UserUnitEnhancements",
+        'RFA_DirtyIBPByUnitCache'
     )
 
     ---@class IWeaponBlueprint
@@ -243,14 +264,20 @@ do
         -- function only gets called after we checked for enhancements
 
         local weaponsAffectedByRangeEnh = unitsWithWeaponRangeEnh[id]
-        local newMaxRadius = obpEnh
-            | LuaQ.max(function(k, v) return activeEnhs | LuaQ.contains(k) and v.NewMaxRadius or nil end)
+        local newMaxRadius = Enumerate(obpEnh, next)
+            :Where(function(value, key)
+                return Contains(activeEnhs, key)
+            end)
+            :Select(function(value, key)
+                return value.NewMaxRadius
+            end)
+            :Max()
 
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
             -- Skip adding disabled weapons to IBp
             local enh = w.EnabledByEnhancement
-            if enh and not (activeEnhs | LuaQ.contains(enh)) then
+            if enh and not Contains(activeEnhs, enh) then
                 continue
             end
 
@@ -265,8 +292,9 @@ do
             local obpIntel = obp.Intel
             for _, intelType in intelWithRangeRing do
                 local enhIntel = intelToEnhancement[intelType]
-                ibpIntel[intelType] = activeEnhs
-                    | LuaQ.max(function(k, v) return obpEnh[v][enhIntel] end)
+                ibpIntel[intelType] = Enumerate(activeEnhs, next)
+                    :Select(function(value, key) return obpEnh[value][enhIntel] end)
+                    :Max()
                     or obpIntel[intelType]
             end
         else
@@ -362,6 +390,7 @@ do
     end
 
     ---@param unit UserUnit
+    ---@return number
     local function GetActualBuildRange(unit)
         local commandMode = GetCommandMode()
         local buildPreviewSkirtSize = 1
@@ -374,6 +403,7 @@ do
             local orderName = commandMode[2].name
             if orderName == "RULEUCC_Repair" then
                 local info = GetRolloverInfo()
+                ---@diagnostic disable-next-line: param-type-mismatch
                 if info and IsAlly(info.armyIndex + 1, GetFocusArmy()) then
                     local bpPhysics = __blueprints[info.blueprintId].Physics
                     if bpPhysics then
@@ -399,9 +429,9 @@ do
     end
 
     ---@param unit UserUnit
+    ---@return number
     local function GetSimpleBuildRange(unit)
         local bp = unit:GetBlueprint()
-        ---@diagnostic disable-next-line: need-check-nil
         return (bp.Economy.MaxBuildDistance or 5) + 2
     end
 
@@ -416,9 +446,32 @@ do
         end
     end)
 
+    ---@param a RingData
+    ---@param b RingData
+    local function OverlaySortFunction(a, b)
+        return overlaySortOrder[ a[1] ] > overlaySortOrder[ b[1] ]
+    end
+
+    local GetSelectionRingData = IPairsEnumerator
+        :Select(GetEnhancedBlueprintFromUnit)
+        :Distinct()
+        :Select(GetBPInfo)
+        :SelectMany()
+        :OrderByDescending(function(value)
+            return overlaySortOrder[ value[1] ]
+        end)
+        :ToArray()
+
+    local GetMaxBuildRange = IPairsEnumerator
+        :Select(function(unit) return buildRangeFunc(unit) end)
+        :Max()
+
+    ---@param type string
+    ---@return string
+    ---@return number
     local function GetColorAndThickness(type)
-        return ("ff%s"):format((overlayParams[type].NormalColor):sub(3)),
-            overlayParams[type].Outer[1] / overlayParams[type].Type
+        local params = overlayParams[type]
+        return ("ff%s"):format((params.NormalColor):sub(3)), params.Outer[1] / params.Type
     end
 
     local function TableClear(t)
@@ -432,7 +485,7 @@ do
     ---@field color string
     ---@field radius number
     ---@field thickness number
-    Ring = ClassSimple
+    local Ring = ClassSimple
     {
         __init = function(self, color, radius)
             self.pos = Vector(0, 0, 0)
@@ -460,33 +513,52 @@ do
 
     }
 
-    local oldWorldView = WorldView
-    ---@class WorldView : WorldView
+    local function CreateRing(type, range)
+        local ring = Ring()
+        local color, thick = GetColorAndThickness(type)
+        ring:SetColor(color)
+        ring:SetRadius(range)
+        ring:SetPosition(GetMouseWorldPos())
+        ring.thickness = thick
+        ring.type = type
+        ring.range = range
+        return ring
+    end
+
+    ---@class RFAWorldViewComponent : ReUI.WorldView.Component, UIShape
     ---@field _hoverRings Ring[]
     ---@field _selectionRings Ring[]
     ---@field _buildRing Ring
     ---@field _showRings boolean
     ---@field _cachedSelection UserUnit[]?
     ---@field _isCachedSelection boolean
-    WorldView = Class(oldWorldView) {
+    local RFAWorldViewComponent = ReUI.Core.Class(ReUI.WorldView.Component)
+    {
+        HoverPreviewKey = options.hoverPreviewKey(),
+        SelectedPreviewKey = options.selectedPreviewKey(),
+        BuildPreviewKey = options.buildPreviewKey(),
 
-        ---@param self WorldView
-        ---@param spec any
-        __post_init = function(self, spec)
-            oldWorldView.__post_init(self, spec)
-            self._showRings = false
-            local render = self.SetCustomRender and (self:GetName() ~= "MiniMap" or options.showInMinimap())
-            if render then
-                self._isCachedSelection = false
-                self._hoverRings = {}
-                self._selectionRings = {}
-                self._buildRing = nil
-                self:SetCustomRender(true)
-                self._showRings = true
-            end
+        ---Called when component is initialized
+        ---@param self RFAWorldViewComponent
+        OnInit = function(self)
+            self._isCachedSelection = false
+            self._hoverRings = {}
+            self._selectionRings = {}
+            self._buildRing = nil
+            self._showRings = true
         end,
 
-        ---@param self WorldView
+        ---@param self RFAWorldViewComponent
+        OnEnabled = function(self)
+            self.worldView:AddShape(self, self.name)
+        end,
+
+        ---@param self RFAWorldViewComponent
+        OnDisabled = function(self)
+            self.worldView:RemoveShape(self.name)
+        end,
+
+        ---@param self RFAWorldViewComponent
         ---@param rings Ring[]
         RenderRings = function(self, rings)
             for _, ring in rings do
@@ -494,10 +566,11 @@ do
             end
         end,
 
-        ---@param self WorldView
+        OnRender = true,
+
+        ---@param self RFAWorldViewComponent
         ---@param delta number
-        OnRenderWorld = function(self, delta)
-            oldWorldView.OnRenderWorld(self, delta)
+        Render = function(self, delta)
             if not self._showRings then
                 return
             end
@@ -509,69 +582,101 @@ do
             end
         end,
 
-        HoverPreviewKey = options.hoverPreviewKey(),
-        SelectedPreviewKey = options.selectedPreviewKey(),
-        BuildPreviewKey = options.buildPreviewKey(),
-
-        ---@param self WorldView
-        OnUpdateCursor = function(self)
-            if self._showRings then
-                local commandMode = GetCommandMode()
-                local orderType = commandMode[1]
-                local orderName = commandMode[2].name
-                local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
-                local notIssuingOrder = not commandMode[2]
-                self._isCachedSelection = false
-
-                if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
-                    self:UpdateHoverRings()
-                else
-                    self:ClearHoverRings()
-                end
-
-                if notIssuingOrder or givingMoveOrder then
-                    if IsKeyDown(self.SelectedPreviewKey) then
-                        self:UpdateSelectionRings()
-                    else
-                        self:ClearSelectionRings()
-                    end
-
-                    if IsKeyDown(18) then --alt
-                        self:UpdateReclaimRings()
-                    elseif IsKeyDown(self.BuildPreviewKey) then
-                        self:UpdateBuildRings(true)
-                    else
-                        self:ClearBuildRings()
-                    end
-                elseif self._buildRing or orderType == "build" or
-                    orderType == 'order' and
-                    (orderName == "RULEUCC_Repair" or orderName == "RULEUCC_Reclaim" or orderName == "RULEUCC_Guard")
-                then
-                    self:UpdateBuildRings(false)
-                end
-            end
-            return oldWorldView.OnUpdateCursor(self)
+        ---@param self RFAWorldViewComponent
+        ClearBuildRings = function(self)
+            self._buildRing = nil
         end,
 
-        --- Called whenever the mouse moves and clicks in the world view. If it returns false then the engine further processes the event for orders
-        ---@param self WorldView
+        ---@param self RFAWorldViewComponent
+        ClearSelectionRings = function(self)
+            local rings = self._selectionRings
+            if not rings then return end
+
+            TableClear(rings)
+        end,
+
+        ---@param self RFAWorldViewComponent
+        ClearHoverRings = function(self)
+            local rings = self._hoverRings
+            if not rings then return end
+
+            TableClear(rings)
+        end,
+
+        ---@param self RFAWorldViewComponent
+        ---@return UserUnit[]?
+        GetSelectedUnits = function(self)
+            if self._isCachedSelection then
+                return self._cachedSelection
+            end
+            self._cachedSelection = GetSelectedUnits()
+            self._isCachedSelection = true
+            return self._cachedSelection
+        end,
+
+        ---Called when grid worldview receives an event
+        ---@param self RFAWorldViewComponent
         ---@param event KeyEvent
         ---@return boolean
-        HandleEvent = function(self, event)
+        OnHandleEvent = function(self, event)
             if event.Type == "MouseExit" then
                 self:ClearBuildRings()
-                if self._hoverRings then
-                    self:ClearHoverRings()
-                end
-                if self._selectionRings then
-                    self:ClearSelectionRings()
-                end
+                self:ClearHoverRings()
+                self:ClearSelectionRings()
             end
-
-            return oldWorldView.HandleEvent(self, event)
+            return false
         end,
 
-        ---@param self WorldView
+        ---@param self RFAWorldViewComponent
+        ---@param rings Ring[]
+        ---@param ringsData RingData[]
+        UpdateRings = function(self, rings, ringsData)
+            if TableGetn(ringsData) > TableGetn(rings) then
+                for i, d in ringsData do
+                    local ring = rings[i]
+                    if ring then
+                        self.UpdateRing(ring, unpack(d))
+                    else
+                        rings[i] = CreateRing(unpack(d))
+                    end
+                end
+            else
+                for i, ring in rings do
+                    local d = ringsData[i]
+                    if d then
+                        self.UpdateRing(ring, unpack(d))
+                    else
+                        rings[i] = nil
+                    end
+                end
+            end
+        end,
+
+        ---@param self RFAWorldViewComponent
+        UpdateReclaimRings = function(self)
+            local selection = self:GetSelectedUnits()
+            if not selection then
+                self:ClearBuildRings()
+                return
+            end
+
+            local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.FACTORY, selection)
+            if TableEmpty(engineers) then
+                self:ClearBuildRings()
+                return
+            end
+
+            ---@type Ring
+            local ring = Ring()
+            ring.pos = GetMouseWorldPos()
+            ring.radius = 28
+            local color, thick = GetColorAndThickness "AllMilitary"
+            ring.thickness = thick
+            ring:SetColor(color)
+            self._buildRing = ring
+        end,
+
+        ---@param self RFAWorldViewComponent
         UpdateHoverRings = function(self)
             local info = GetRolloverInfo()
             local bpId = info.blueprintId
@@ -596,12 +701,24 @@ do
             self:UpdateRings(self._hoverRings, weapons)
         end,
 
-        ---@param self WorldView
-        ClearHoverRings = function(self)
-            TableClear(self._hoverRings)
+        ---@param ring Ring
+        ---@param type string
+        ---@param range number
+        UpdateRing = function(ring, type, range)
+            if ring.type ~= type then
+                local color, thick = GetColorAndThickness(type)
+                ring:SetColor(color)
+                ring.type = type
+                ring.thickness = thick
+            end
+            if ring.range ~= range then
+                ring:SetRadius(range)
+                ring.range = range
+            end
+            ring:SetPosition(GetMouseWorldPos())
         end,
 
-        ---@param self WorldView
+        ---@param self RFAWorldViewComponent
         UpdateSelectionRings = function(self)
             local selection = self:GetSelectedUnits()
             if not selection then
@@ -609,22 +726,10 @@ do
                 return
             end
 
-            local data = selection
-                | LuaQ.select(GetEnhancedBlueprintFromUnit)
-                | LuaQ.distinct
-                | LuaQ.select(GetBPInfo)
-                | LuaQ.concat
-                | LuaQ.sort(OverlaySortFunction)
-
-            self:UpdateRings(self._selectionRings, data)
+            self:UpdateRings(self._selectionRings, GetSelectionRingData(selection))
         end,
 
-        ---@param self WorldView
-        ClearSelectionRings = function(self)
-            TableClear(self._selectionRings)
-        end,
-
-        ---@param self WorldView
+        ---@param self RFAWorldViewComponent
         ---@param useMousePos boolean
         UpdateBuildRings = function(self, useMousePos)
             local selection = self:GetSelectedUnits()
@@ -639,9 +744,7 @@ do
                 return
             end
 
-            local radius = builders
-                | LuaQ.select(buildRangeFunc)
-                | LuaQ.max.value
+            local radius = GetMaxBuildRange(builders)
 
             ---@type Ring
             local ring = Ring()
@@ -654,8 +757,10 @@ do
                     local queue = unit:GetCommandQueue()
                     for i = TableGetn(queue), 1, -1 do
                         local commandType = queue[i].type
-                        if commandType == "Move" or commandType == "Teleport" or commandType == "AggressiveMove" or
-                            commandType == "Patrol" then
+                        if commandType == "Move"
+                            or commandType == "Teleport"
+                            or commandType == "AggressiveMove"
+                            or commandType == "Patrol" then
                             pos = queue[i].position
                             pos[1] = MathFloor(pos[1]) + 0.5
                             pos[3] = MathFloor(pos[3]) + 0.5
@@ -680,89 +785,51 @@ do
             self._buildRing = ring
         end,
 
-        UpdateReclaimRings = function(self)
-            local selection = self:GetSelectedUnits()
-            if not selection then
-                self:ClearBuildRings()
-                return
-            end
 
-            local engineers = EntityCategoryFilterDown(categories.ENGINEER + categories.FACTORY, selection)
-            if TableEmpty(engineers) then
-                self:ClearBuildRings()
-                return
-            end
+        ---@param self RFAWorldViewComponent
+        OnUpdateCursor = function(self)
+            if not self._showRings then return end
 
-            ---@type Ring
-            local ring = Ring()
-            ring.pos = GetMouseWorldPos()
-            ring.radius = 28
-            local color, thick = GetColorAndThickness "AllMilitary"
-            ring.thickness = thick
-            ring:SetColor(color)
-            self._buildRing = ring
-        end,
+            local commandMode = GetCommandMode()
+            local orderType = commandMode[1]
+            local orderName = commandMode[2].name
+            local givingMoveOrder = orderType == "order" and orderName == "RULEUCC_Move"
+            local notIssuingOrder = not commandMode[2]
+            self._isCachedSelection = false
 
-        ClearBuildRings = function(self)
-            self._buildRing = nil
-        end,
-
-        ---@param self WorldView
-        ---@param rings Ring[]
-        ---@param ringsData RingData[]
-        UpdateRings = function(self, rings, ringsData)
-            if TableGetn(ringsData) > TableGetn(rings) then
-                for i, d in ringsData do
-                    local ring = rings[i]
-                    if ring then
-                        self.UpdateRing(ring, unpack(d))
-                    else
-                        rings[i] = self.CreateRing(unpack(d))
-                    end
-                end
+            if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
+                self:UpdateHoverRings()
             else
+                self:ClearHoverRings()
+            end
 
-                for i, ring in rings do
-                    local d = ringsData[i]
-                    if d then
-                        self.UpdateRing(ring, unpack(d))
-                    else
-                        rings[i] = nil
-                    end
+            if notIssuingOrder or givingMoveOrder then
+                if IsKeyDown(self.SelectedPreviewKey) then
+                    self:UpdateSelectionRings()
+                else
+                    self:ClearSelectionRings()
                 end
+
+                if IsKeyDown(18) then --alt
+                    self:UpdateReclaimRings()
+                elseif IsKeyDown(self.BuildPreviewKey) then
+                    self:UpdateBuildRings(true)
+                else
+                    self:ClearBuildRings()
+                end
+            elseif self._buildRing
+                or orderType == "build"
+                or orderType == 'order'
+                and (orderName == "RULEUCC_Repair"
+                    or orderName == "RULEUCC_Reclaim"
+                    or orderName == "RULEUCC_Guard")
+            then
+                self:UpdateBuildRings(false)
             end
         end,
 
-        CreateRing = function(type, range)
-            local ring = Ring()
-            local color, thick = GetColorAndThickness(type)
-            ring:SetColor(color)
-            ring:SetRadius(range)
-            ring:SetPosition(GetMouseWorldPos())
-            ring.thickness = thick
-            ring.type = type
-            ring.range = range
-            return ring
-        end,
-
-        ---@param ring Ring
-        ---@param type string
-        ---@param range number
-        UpdateRing = function(ring, type, range)
-            if ring.type ~= type then
-                local color, thick = GetColorAndThickness(type)
-                ring:SetColor(color)
-                ring.type = type
-                ring.thickness = thick
-            end
-            if ring.range ~= range then
-                ring:SetRadius(range)
-                ring.range = range
-            end
-            ring:SetPosition(GetMouseWorldPos())
-        end,
-
-        ---@param self WorldView
+        ---Called when component is destroyed
+        ---@param self RFAWorldViewComponent
         OnDestroy = function(self)
             self:ClearHoverRings()
             self._hoverRings = nil
@@ -772,34 +839,8 @@ do
             self._showRings = false
             self._isCachedSelection = false
             self._cachedSelection = nil
-
-            oldWorldView.OnDestroy(self)
         end,
-
-        ---@param self WorldView
-        ---@param renderable Renderable
-        ---@param id string
-        RegisterRenderable = function(self, renderable, id)
-            self.Trash:Add(renderable)
-            self.Renderables[id] = renderable
-        end,
-
-        ---@param self WorldView
-        ---@param id string
-        UnregisterRenderable = function(self, id)
-            self.Renderables[id] = nil
-        end,
-
-        ---@param self WorldView
-        ---@return UserUnit[]?
-        GetSelectedUnits = function(self)
-            if self._isCachedSelection then
-                return self._cachedSelection
-            end
-            self._cachedSelection = GetSelectedUnits()
-            self._isCachedSelection = true
-            return self._cachedSelection
-        end
     }
 
+    ReUI.WorldView.PrimaryComponents.RFA = RFAWorldViewComponent
 end

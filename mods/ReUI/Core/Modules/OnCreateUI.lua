@@ -4,21 +4,24 @@ local _pcall = pcall
 ---@diagnostic disable-next-line:different-requires
 local Loader = import("Loader.lua")
 
+function Init()
+    Loader.Init()
+    for _, mod in __active_mods do
+        if mod.ReUI and mod.ui_only then
+            Loader.Load(mod.ReUI)
+        end
+    end
+end
 
 ---@type OnCreateUICallback[]
 local preCreateCallbacks
 ---@type OnCreateUICallback[]
 local postCreateCallbacks
 ---@param isReplay boolean
-function Init(isReplay)
-    Loader.Init(isReplay)
+function Load(isReplay)
     preCreateCallbacks = {}
     postCreateCallbacks = {}
-    for _, mod in __active_mods do
-        if mod.ReUI and mod.ui_only then
-            Loader.Load(mod.ReUI)
-        end
-    end
+    Loader.LoadMains(isReplay)
 end
 
 ---@param callback fun(isReplay:boolean)

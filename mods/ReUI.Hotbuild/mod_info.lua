@@ -1,12 +1,12 @@
-name = "ReUI.Core"
-uid = "reui-core-1.3.0"
+name = "ReUI.Hotbuild"
+uid = "reui-Hotbuild-1.1.0"
 version = 1
 copyright = ""
 description = [[]]
 author = "4z0t"
-icon = "/mods/ReUI.Core/icon.png"
+icon = "/mods/ReUI.Hotbuild/icon.png"
 url = ""
-selectable = false
+selectable = true
 enabled = true
 exclusive = false
 ui_only = true
@@ -16,4 +16,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Core=1.3.0'
+ReUI = 'ReUI.Hotbuild=1.1.0'

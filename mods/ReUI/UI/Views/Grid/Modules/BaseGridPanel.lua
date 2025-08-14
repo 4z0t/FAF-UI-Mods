@@ -289,7 +289,7 @@ BaseGridPanel = ReUI.Core.Class(Bitmap)
     ---@param class fun(instance:BaseGridItem):AItemComponent
     AddItemComponent = function(self, name, class)
         self:IterateItemsVertically(function(grid, item, row, column)
-            item:AddComponent(name, class)
+            item:AddComponent(name, class(item))
         end)
     end,
 

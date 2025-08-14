@@ -4,6 +4,7 @@ local ASelectionHandler = ReUI.UI.Views.Grid.Abstract.ASelectionHandler
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Enumerate = ReUI.LINQ.Enumerate
+local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 
 ---@class SelectedUnitsData
 ---@field [1] string # bp ID
@@ -14,7 +15,7 @@ local sortOrder = {
     categories.STRUCTURE,
     categories.NAVAL,
     categories.AIR,
-    categories.LAND,
+    -- categories.LAND,
     categories.LAND - categories.ENGINEER,
     categories.ENGINEER,
     categories.ALLUNITS,
@@ -39,6 +40,7 @@ local techCatOrder = {
     ["TECH3"] = 3,
     ["EXPERIMENTAL"] = 4,
 }
+
 
 ---@class SelectedUnitsListHandler : ASelectionHandler
 ---@field _blueprintSortOrder table<string, integer>
@@ -89,16 +91,31 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
             end)
             :ToTable()
 
-        local sectionOrder = Enumerate(bpIds, next)
-            :ToTable(function(bpId)
-                return bpId, FirstMatch(bpId)
-            end)
+        -- local sectionOrder = Enumerate(bpIds, next)
+        --     :ToTable(function(bpId)
+        --         return bpId, FirstMatch(bpId)
+        --     end)
 
         local bpSortOrder = Enumerate(bpIds, next)
             :ToTable(function(bpId)
                 local bp = __blueprints[bpId]
                 return bpId, techCatOrder[bp.TechCategory] or 5
             end)
+
+
+        local TechLevelSorter = IPairsEnumerator
+            :OrderBy(function(value)
+                return value[1]
+            end, function(id1, id2)
+                local n1, n2 = bpSortOrder[id1], bpSortOrder[id2]
+                if n1 ~= n2 then
+                    return n1 > n2
+                end
+
+                return id1 < id2
+            end)
+            :ToArray()
+
 
         ---@type SelectedUnitsData[]
         local bpIdToCount = Enumerate(bpIds, next)
@@ -108,23 +125,25 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
             :Select(function(count, bpId)
                 return { bpId, count }
             end)
-            :OrderByDescending(function(value) return value[1] end, function(bp1, bp2)
-                local n1, n2 = sectionOrder[bp1], sectionOrder[bp2]
-                if n1 ~= n2 then
-                    return n1 < n2
-                end
-
-                n1, n2 = bpSortOrder[bp1], bpSortOrder[bp2]
-                if n1 ~= n2 then
-                    return n1 > n2
-                end
-
-                return bp1 < bp2
-
+            ---@param value SelectedUnitsData
+            :GroupBy(function(value)
+                return FirstMatch(value[1])
             end)
-            :ToArray()
+            :ToTable(function(key, value)
+                return key, TechLevelSorter(value)
+            end)
 
-        return bpIdToCount
+        local sortedData = {}
+        for i = table.getn(sortOrder), 1, -1 do
+            local selectedDataArray = bpIdToCount[i]
+            if selectedDataArray then
+                for _, data in selectedDataArray do
+                    table.insert(sortedData, data)
+                end
+            end
+        end
+
+        return sortedData
     end,
 
     ---@param self SelectedUnitsListHandler

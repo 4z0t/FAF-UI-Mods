@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line: different-requires
 local ComponentContainer = import("ComponentContainer.lua").ComponentContainer
 
 ---@class ALazyComponentContainer : ComponentContainer
@@ -7,11 +8,10 @@ ALazyComponentContainer = Class(ComponentContainer)
     ---@param name string
     ---@return IComponent
     GetComponent = function(self, name)
-        local component = self._components[name]
+        local component = ComponentContainer.GetComponent(self, name)
 
         if not component then
-            local componentClass = self:GetComponentClassByName(name)
-            self:AddComponent(name, componentClass)
+            self:AddComponent(name, self:CreateComponent(name))
             component = self._components[name]
         end
 
@@ -20,8 +20,8 @@ ALazyComponentContainer = Class(ComponentContainer)
 
     ---@param self ALazyComponentContainer
     ---@param name string
-    ---@return fun(instance: ALazyComponentContainer):IComponent
-    GetComponentClassByName = function(self, name)
-        error("'GetComponentClassByName' Must be implemented!!")
+    ---@return IComponent
+    CreateComponent = function(self, name)
+        error("'ALazyComponentContainer.CreateComponent' Must be implemented!!")
     end,
 }

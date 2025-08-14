@@ -54,7 +54,8 @@ function Main()
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(formattedName,
             {
                 action = action.action,
-                category = action.category
+                category = action.category,
+                ReUI = true,
             })
 
         local keyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
@@ -216,11 +217,21 @@ function Main()
         end
     }
 
+    local Prefs = import('/lua/user/prefs.lua')
+    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
+    for name, action in actions do
+        if action.category == 'ReUI.Actions' or action.ReUI then
+            actions[name] = nil
+        end
+    end
+    Prefs.SetToCurrentProfile("UserKeyActions", actions)
+
     return {
-        CategoryMatcher = CategoryMatcher,
-        CategoryAction  = CategoryAction,
-        SelectionAction = SelectionAction,
-        ProcessAction   = ProcessAction,
-        AddSimpleAction = AddSimpleAction,
+        CategoryMatcher  = CategoryMatcher,
+        CategoryAction   = CategoryAction,
+        SelectionAction  = SelectionAction,
+        ProcessAction    = ProcessAction,
+        AddSimpleAction  = AddSimpleAction,
+        FormatActionName = GetFormattedName,
     }
 end
