@@ -31,6 +31,14 @@ Previously "EzReclaim" and "Optimized reclaim view". It provides with better loo
 
 ![reclaim](./Media/reclaim.png)
 
+There are several options that can be adjusted for your needs and hardware
+* **max labels**: maximum number of reclaim labels that can be shown at the same time
+* **zoom threshold**: minimum zoom level at which reclaim labels will start to batch together
+* **grouping distance**: radius at which reclaim labels will be grouped together
+* **update rate**: delay in ms between updates of reclaim labels
+
+![reclaim options](./Media/reclaim_options.png)
+
 ### ReUI.Construction
 
 ReUI.Construction is complete overhaul of original construction panel. Optimized, extendable and improved with new features over original one.
@@ -46,6 +54,24 @@ Improvements over original construction panel:
 ![Selection](./Media/reui_construction_selection.jpg)
 ![Enhancements](./Media/reui_construction_enhancements.jpg)
 ![Upgrade chain](./Media/reui_construction_upgrade_chains.jpg)
+
+### ReUI.Hotbuild
+
+Previously "HotBuild Overhaul". Currently it is slightly improved HotBuild Overhaul mod. But in addition it allows you to use templates in building sets.
+
+Template items are highlighted with yellow color. **Fill** button will convert template for all factions.
+
+![reuihotbuild](./Media/reuihotbuild.png)
+
+ReUI.Hotbuild changes default mechanism of hotbuild and fixes previously addressed [issue](#69) with it. Since now on factory sets are picking only ***one*** item, you can't have multiple items for a factory as it was before.
+
+### ReUI.Minimap
+
+Adds option to lock zoom and automatically adjusts minimap size to map size.
+
+### ReUI.ActionsPanel
+
+Previously "Actions Grid Panel".
 
 ## Libraries
 
@@ -80,3 +106,7 @@ Provides with generic controls such as button, arrow, border, bracket, scrollabl
 ### ReUI.LINQ
 
 An icing on cake. A [.Net LINQ inspired library](https://github.com/4z0t/LuaLINQ) adapted for FAF needs and environment. This is superior version of LINQ (LuaQ) from deprecated UI mod tools. Way faster and more flexible. Basically it is a collection of functions to manipulate collections in efficient, easy to read and extend way.
+
+### ReUI.WorldView
+
+Extends original WorldView with ECS. Applications can be seen in **[ReUI.Reclaim](#reuireclaim)** and **RFA**.
