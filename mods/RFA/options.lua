@@ -1,5 +1,6 @@
-local Opt = UMT.Options.Opt
-UMT.Options.Mods["RFA"] = {
+local Options = ReUI.Options.Builder
+local Opt = ReUI.Options.Opt
+ReUI.Options.Mods["RFA"] = {
     hoverPreviewKey = Opt "SHIFT",
     selectedPreviewKey = Opt "SHIFT",
     buildPreviewKey = Opt "SHIFT",
@@ -17,8 +18,7 @@ UMT.Options.Mods["RFA"] = {
 }
 
 function Main()
-    local Options = UMT.Options
-    local options = UMT.Options.Mods["RFA"]
+    local options = ReUI.Options.Mods["RFA"]
     Options.AddOptions("RFA", "Rings For All",
         {
             Options.Strings("Hover Preview key",
