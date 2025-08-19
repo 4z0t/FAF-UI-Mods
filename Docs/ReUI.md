@@ -75,9 +75,10 @@ ReUI = 'MyMod=1.0.0'
 
 ```lua
 
-
 function Main(isReplay)
-    
 end
 
 ```
+
+Basically this is enough for mod to work. But it is empty and does nothing.
+
