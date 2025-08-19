@@ -205,6 +205,20 @@ local function VersionToString(version)
     return ("%d.%d.%d"):format(version.major, version.minor, version.revision)
 end
 
+---@param module ReUI.Module
+local function LoadMainOf(module)
+    local main = rawget(module, "Main")
+    if main then
+        local r = main(isReplay)
+        if r then
+            for k, v in r do
+                rawset(module, k, v)
+            end
+        end
+        module.Main = nil
+    end
+end
+
 ---@param parts string[]
 ---@param module ReUI.Module
 local function AssignModule(parts, module)
@@ -301,6 +315,10 @@ function Require(deps)
             _error(("Required module '%s' does not exist!"):format(name))
         end
 
+        if callMain then
+            LoadMainOf(module)
+        end
+
         if not CheckVersion(module.Version, op, version) then
             local msg = ("Module '%s' doesn't match required version: current: %s, required: %s%s")
                 :format(
@@ -349,16 +367,7 @@ function LoadMains(_isReplay)
     callMain = true
     isReplay = _isReplay
     for _, module in ipairs(loadedModulesInOrder) do
-        local main = rawget(module, "Main")
-        if main then
-            local r = main(isReplay)
-            if r then
-                for k, v in r do
-                    rawset(module, k, v)
-                end
-            end
-            module.Main = nil
-        end
+        LoadMainOf(module)
     end
 end
 
