@@ -49,7 +49,7 @@ Once you setup your dev environment you can start creating your first mod.
 
 ## Modding
 
-In official mod development guide in order to make a mod you have to create so called *hook*. It is a way to insert your own code into the base game code. But it has a huge downside, which can easily break your mod. You can't know in what order mods will be loaded, so, as hook. Of course, you can specify the order of mods to be loaded, but whenever you change mod version -> you have to change it in all other mods too, that depend on your mod. This circle of hell completely eliminates the idea of slitting mods into multiple, because you'll just suffer from updating each mod every time, including other modders that will try to use your mod.
+In official mod development guide in order to make a mod you have to create so called *hook*. It is a way to insert your own code into the base game code. But it has a huge downside, which can easily break your mod. You can't know in what order mods will be loaded, so, as hook. Of course, you can specify the order of mods to be loaded, but whenever you change mod version -> you have to change it in all other mods too, that depend on your mod. This circle of hell completely eliminates the idea of splitting mods into multiple, because you'll just suffer from updating each mod every time, including other modders that will try to use your mod.
 
 Since we are going to create UI mods only, it is not that critical for mod order, but still important. Let's start with simple.
 
