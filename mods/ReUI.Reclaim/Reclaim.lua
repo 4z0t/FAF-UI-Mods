@@ -3,6 +3,7 @@ ReUI.Require
     "ReUI.Core >= 1.3.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.WorldView >= 1.0.0",
+    "ReUI.Options >= 1.0.0"
 }
 
 

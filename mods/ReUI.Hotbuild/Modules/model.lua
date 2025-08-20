@@ -119,7 +119,8 @@ function FilterBlueprints()
         end)
         :ToTable()
 
-    local templates = Templates.GetTemplates()
+    local templates = Templates.GetTemplates() or {}
+
     for i, div in divisions do
         globalBPs[div.name] = {}
         for j, skin in skins do
