@@ -1,6 +1,7 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.2.0",
+    "ReUI.Actions >= 1.2.0",
     "ReUI.LINQ >= 1.4.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.UI.Animation >= 1.0.0",
