@@ -3,6 +3,7 @@ ReUI.Require
     "ReUI.Core >= 1.3.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.WorldView >= 1.0.0",
+    "ReUI.Options >= 1.0.0"
 }
 
 
@@ -579,6 +580,7 @@ function Main(isReplay)
             local order = cm and cm.name
             if order == "RULEUCC_Reclaim" then
                 self._enabledWithReclaimMode = true
+                self._forceRefresh = true
             elseif order ~= "RULEUCC_Move" and self._enabledWithReclaimMode then
                 self._enabledWithReclaimMode = false
             end

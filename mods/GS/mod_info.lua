@@ -21,4 +21,5 @@ requiresNames = {}
 conflicts = {}
 before = {}
 after = {}
-__umt = true
+
+ReUI = 'GS=1.0.0'
