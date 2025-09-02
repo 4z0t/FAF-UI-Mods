@@ -1,15 +1,15 @@
-local Options = UMT.Options
-local Opt = UMT.Options.Opt
+local Opt = ReUI.Options.Opt
 
-UMT.Options.Mods["Ctrl"] = {
+ReUI.Options.Mods["Ctrl"] = {
     enableCtrlCopy = Opt(true),
     enableCtrlMove = Opt(true),
 }
 
 function Main()
-    local options = UMT.Options.Mods["Ctrl"]
-    Options.AddOptions("Ctrl", "Ctrl", {
-        Options.Filter("Enable Ctrl-copy feature", options.enableCtrlCopy),
-        Options.Filter("Enable Ctrl-move feature", options.enableCtrlMove),
+    local options = ReUI.Options.Mods["Ctrl"]
+    local builder = ReUI.Options.Builder
+    builder.AddOptions("Ctrl", "Ctrl", {
+        builder.Filter("Enable Ctrl-copy feature", options.enableCtrlCopy),
+        builder.Filter("Enable Ctrl-move feature", options.enableCtrlMove),
     })
 end
