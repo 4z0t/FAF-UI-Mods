@@ -15,3 +15,5 @@ requiresNames = {}
 conflicts = {}
 before = {}
 after = {}
+
+ReUI = "EAS=1.0.0"
