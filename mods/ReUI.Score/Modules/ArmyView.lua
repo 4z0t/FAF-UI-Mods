@@ -340,6 +340,7 @@ ArmyView = ReUI.Core.Class(Group)
         self._faction.Faction = faction
     end,
 
+    ---@param self AllyView
     ResetFont = function(self)
         local font = GetFocusArmy() == self.id and focusArmyNameFont or armyViewNameFont
         self._name:SetFont(font, armyViewTextPointSize)
@@ -401,6 +402,7 @@ ArmyView = ReUI.Core.Class(Group)
         end,
     },
 
+    ---@type Color
     PlainColor = ReUI.Core.Property
     {
         get = function(self)
@@ -422,6 +424,7 @@ ArmyView = ReUI.Core.Class(Group)
         end
     end,
 
+    ---@param self ArmyView
     MarkOutOfGame = function(self)
         self.isOutOfGame = true
         self.ArmyColor = outOfGameColor
@@ -603,6 +606,7 @@ AllyView = ReUI.Core.Class(ArmyView)
             :Width(allyViewWidth)
     end,
 
+    ---@param self AllyView
     HandleEvent = function(self, event)
         if event.Type == 'MouseExit' then
             appearAnimation:Apply(self._faction)
@@ -614,7 +618,10 @@ AllyView = ReUI.Core.Class(ArmyView)
         return false
     end,
 
-    Update = function(self, data, mode)
+    ---@param self AllyView
+    ---@param data ArmyScoreData
+    ---@param display IResourceDisplay
+    Update = function(self, data, display)
         ArmyView.Update(self, data)
 
         if self.isOutOfGame then return end
@@ -622,29 +629,12 @@ AllyView = ReUI.Core.Class(ArmyView)
         local resources = data.resources
         if not resources then return end
 
-        if mode == "full" then
-            self._energy:SetText(("%s / %s +%s"):format(
-                FormatNumber(resources.storage.storedEnergy),
-                FormatNumber(resources.storage.maxEnergy),
-                FormatNumber(resources.energyin.rate * 10)
-            ))
-            self._mass:SetText(("%s / %s +%s"):format(
-                FormatNumber(resources.storage.storedMass),
-                FormatNumber(resources.storage.maxMass),
-                FormatNumber(resources.massin.rate * 10)
-            ))
-        elseif mode == "income" then
-            self._energy:SetText(FormatNumber(resources.energyin.rate * 10))
-            self._mass:SetText(FormatNumber(resources.massin.rate * 10))
-        elseif mode == "storage" then
-            self._energy:SetText(FormatNumber(resources.storage.storedEnergy))
-            self._mass:SetText(FormatNumber(resources.storage.storedMass))
-        elseif mode == "maxstorage" then
-            self._energy:SetText(FormatNumber(resources.storage.maxEnergy))
-            self._mass:SetText(FormatNumber(resources.storage.maxMass))
-        end
+        local mass, energy = display:GetResourceStrings(resources)
+        self._mass:SetText(mass)
+        self._energy:SetText(energy)
     end,
 
+    ---@param self AllyView
     MarkOutOfGame = function(self)
         ArmyView.MarkOutOfGame(self)
         self._energy:SetText("")
@@ -653,8 +643,6 @@ AllyView = ReUI.Core.Class(ArmyView)
         self._energyBtn:DisableHitTest()
         self._unitsBtn:DisableHitTest()
     end,
-
-
 
 }
 

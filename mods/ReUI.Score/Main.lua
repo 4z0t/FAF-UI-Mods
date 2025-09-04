@@ -11,8 +11,6 @@ ReUI.Require
 }
 
 function Main(isReplay)
-    local ReUI = ReUI
-
     local _IsDestroyed = IsDestroyed
 
     local Utils = import("Modules/Utils.lua")
@@ -32,8 +30,8 @@ function Main(isReplay)
             local scoreboard
             if isReplay or IsObserver() then
                 ---@diagnostic disable-next-line:assign-type-mismatch
-                ReUI.Score.Layouts["minimal"] = false
-                ReUI.Score.Layouts["glow border"] = import("Modules/Layouts/ReplayGlowBorder.lua").Layout
+                ReUI.Score.Layouts["minimal"]       = false
+                ReUI.Score.Layouts["glow border"]   = import("Modules/Layouts/ReplayGlowBorder.lua").Layout
                 ReUI.Score.Layouts["window border"] = import("Modules/Layouts/ReplayWindowFrame.lua").Layout
 
                 ---@type ReUI.Score.ReplayScoreBoard
@@ -44,8 +42,8 @@ function Main(isReplay)
                 end)
             else
                 ---@diagnostic disable-next-line:assign-type-mismatch
-                ReUI.Score.Layouts["minimal"] = false
-                ReUI.Score.Layouts["glow border"] = import("Modules/Layouts/GameGlowBorder.lua").Layout
+                ReUI.Score.Layouts["minimal"]       = false
+                ReUI.Score.Layouts["glow border"]   = import("Modules/Layouts/GameGlowBorder.lua").Layout
                 ReUI.Score.Layouts["window border"] = import("Modules/Layouts/GameWindowFrame.lua").Layout
 
                 ---@type ReUI.Score.ScoreBoard
@@ -106,33 +104,26 @@ function Main(isReplay)
 
             end)
 
-            options.showFullResourceData:Bind(function(var)
-                local showFullResourceData = var()
+            local ResourceDisplay = import("Modules/ResourceDisplay.lua")
+            ---@type  table<string, IResourceDisplay>
+            local displays =
+            {
+                ["default"]                   = ResourceDisplay.DefaultResourceDisplay(),
+                ["income+storage"]            = ResourceDisplay.PairResourceDisplay(),
+                ["income+storage+maxstorage"] = ResourceDisplay.FullResourceDisplay(),
+            }
 
-                scoreboard:SetFullDataView(showFullResourceData)
-                scoreboard:ResetWidthComponents()
+            options.displayMode:Bind(function(var)
+                ---@type string
+                local mode = var()
+
+                scoreboard:SetDisplay(displays[mode] or displays["default"])
 
                 scoreboard:ApplyToViews(function(armyId, armyView)
                     armyView:ResetFont()
-
-                    local layouter = armyView.Layouter
                     ---@cast armyView AllyView
                     if armyView.isAlly then
-                        if showFullResourceData then
-                            layouter(armyView._massBtn)
-                                :Width(85)
-                            layouter(armyView._energyBtn)
-                                :Width(85)
-                            layouter(armyView._mass)
-                                :AtRightIn(armyView, 110)
-                        else
-                            layouter(armyView._massBtn)
-                                :Width(35)
-                            layouter(armyView._energyBtn)
-                                :Width(35)
-                            layouter(armyView._mass)
-                                :AtRightIn(armyView, 50)
-                        end
+                        scoreboard._display:Apply(armyView)
                     end
                 end)
             end)
