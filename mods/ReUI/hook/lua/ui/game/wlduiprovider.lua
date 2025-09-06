@@ -1,8 +1,25 @@
 do
-    ---@diagnostic disable-next-line:different-requires
-    local __ReUI = { Require = import("/mods/ReUI/Core/Modules/Loader.lua").Require }
+
+    local __ReUI = {}
+    ---@type ReUI.Loader
+    local loader = import("/mods/ReUI/Core/Modules/Loader.lua").Loader(__ReUI,
+        {
+            --[[ internal modules list]]
+        })
+
+    ---@param tag string
+    ---@return ReUI.Module?
+    function __ReUI.Exists(tag)
+        return loader:Exists(tag)
+    end
+
+    ---@param deps string[]
+    function __ReUI.Require(deps)
+        return loader:Require(deps)
+    end
+
     ---@type ReUI
-    local ReUI = setmetatable({ __data = __ReUI, },
+    local ReUI = setmetatable({ __loader = loader, },
         {
             __newindex = function(self, k, v)
                 error("Manual assignment into ReUI is forbidden")
