@@ -6,6 +6,25 @@ ReUI.Require
     "ReUI.Options >= 1.0.0"
 }
 
+local MathAbs = math.abs
+local StringFormat = string.format
+---Formats number as large one
+---@param n number | nil
+---@return string
+local function FormatNumber(n)
+    if n == nil then return "" end
+
+    local an = MathAbs(n)
+    if an < 1000 then
+        return StringFormat("%01.0f", n)
+    elseif an < 10000 then
+        return StringFormat("%01.2fk", n / 1000)
+    elseif an < 1000000 then
+        return StringFormat("%01.1fk", n / 1000)
+    else
+        return StringFormat("%01.1fm", n / 1000000)
+    end
+end
 
 local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
 local function RefreshReclaim()
@@ -114,6 +133,7 @@ function Main(isReplay)
     local UIUtil = import('/lua/ui/uiutil.lua')
     local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
     local Group = import('/lua/maui/group.lua').Group
+    local Text = import('/lua/maui/text.lua').Text
 
     local LayoutFor = ReUI.UI.FloorLayoutFor
 
@@ -365,7 +385,8 @@ function Main(isReplay)
     ---@field _usedReclaimData number
     ---@field _totalReclaimData number
     ---@field _labels ReclaimLabel[]
-    ---@field _reclaimGroup ReUI.UI.Controls.Group
+    ---@field _reclaimGroup Group
+    ---@field _totalReclaimText Text
     local WVReclaimComponent = ReUI.Core.Class(ReUI.WorldView.Component)
     {
         ---@param self WVReclaimComponent
@@ -388,6 +409,36 @@ function Main(isReplay)
             LayoutFor(self._reclaimGroup)
                 :DisableHitTest()
                 :Fill(self.worldView)
+        end,
+
+        ---@param self WVReclaimComponent
+        ---@return Text
+        GetTotalText = function(self)
+            local text = self._totalReclaimText
+            if not text then
+                text = Text(self._reclaimGroup)
+                LayoutFor(text)
+                    :Depth(10000)
+                    :Color("ffd7ff05")
+                    :DropShadow(true)
+                    :DisableHitTest()
+                    :Hide()
+
+                local economyPanel = import("/lua/ui/game/economy.lua").GUI.bg
+                if not IsDestroyed(economyPanel) and self.worldView._cameraName == "WorldCamera" then
+                    LayoutFor(text)
+                        :AtRightIn(economyPanel, 4)
+                        :AnchorToBottom(economyPanel)
+                else
+                    LayoutFor(text)
+                        :AtHorizontalCenterIn(self._reclaimGroup)
+                        :AtTopIn(self._reclaimGroup, 200)
+                end
+
+                text:SetFont("Arial", 14)
+                self._totalReclaimText = text
+            end
+            return text
         end,
 
         ---@param self WVReclaimComponent
@@ -531,10 +582,12 @@ function Main(isReplay)
             local reclaimDataPool = self._reclaimData
             local labels = self._labels
             local toDraw = MathMin(self._usedReclaimData, maxLabels)
+            local totalReclaim = 0
 
             local positions = {}
             for i = 1, toDraw do
                 local reclaim = reclaimDataPool[i]
+                totalReclaim = totalReclaim + reclaim.mass
                 positions[i] = reclaim.position
             end
 
@@ -552,6 +605,11 @@ function Main(isReplay)
                 label:DisplayReclaim(reclaim)
             end
 
+            local text = self:GetTotalText()
+            if text then
+                text:SetText(("Total reclaim: %s"):format(FormatNumber(totalReclaim)))
+                text:Show()
+            end
         end,
 
         ---@param self WVReclaimComponent
@@ -590,6 +648,9 @@ function Main(isReplay)
         OnDestroy = function(self)
             self._reclaimGroup:Destroy()
             self._reclaimGroup = nil
+            self._totalReclaimText = nil
+            self._labels = nil
+            self._reclaimData = nil
         end
     }
 
