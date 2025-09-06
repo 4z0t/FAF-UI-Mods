@@ -7,7 +7,7 @@ ReUI.Options.Mods["ReUI.Reclaim"] = {
     maxLabels     = Opt(1000),
     zoomThreshold = Opt(150),
     heightRatio   = Opt(12),
-    updateRate    = Opt(17),
+    updateRate    = Opt(100),
 
 }
 
