@@ -1,3 +1,5 @@
+# ReUI
+
 ReUI is a powerful framework for creating UI mods for Supreme Commander: Forged Alliance Forever. And this guide will show you the ropes of using it!
 
 ## Setup
