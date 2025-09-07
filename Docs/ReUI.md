@@ -36,8 +36,10 @@ Once you downloaded installed VSCode and extension you need to point out paths f
     "Lua.workspace.library": [
         // Here you list paths to FA repo and folder with ReUI modules
         // For example:
-        "C:\\Users\\username\\Documents\\GitHub\\FA", // FA repo
-        "C:\\Users\\username\\Documents\\GitHub\\FAF-UI-Mods\\mods", // ReUI modules
+        // FA repo
+        "C:\\Users\\username\\Documents\\GitHub\\FA", 
+        // ReUI modules
+        "C:\\Users\\username\\Documents\\GitHub\\FAF-UI-Mods\\mods",
     ],
     "Lua.workspace.checkThirdParty": false,
 }
