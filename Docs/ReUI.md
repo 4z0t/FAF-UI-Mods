@@ -120,10 +120,13 @@ function Main(isReplay)
         -- Why do we need it when having the main function?
         -- There is a difference!
 
-        -- You see Main function returns a value, 
+        -- You see Main function returns a value,
         -- Which is used as a module.
         -- Other mods can require your module and
         -- extend it.
+        -- Secondly at this point all hooks are
+        -- applied, which means all your mod's
+        -- logic is properly loaded.
 
         -- And after that here you will be able to access your module
         -- completely ready:
