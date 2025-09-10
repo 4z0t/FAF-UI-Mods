@@ -1,7 +1,7 @@
 # ReUI
 
 ReUI is a project that combines all UI mods into one - an overhaul of whole UI of Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.
-[Project Discord server](https://discord.gg/UZeAEXHV).
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/UZeAEXHV).
 
 ## Mods
 
