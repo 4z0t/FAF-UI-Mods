@@ -39,7 +39,7 @@ local slideForward = ReUI.UI.Animation.Factory.Base
 ---@field GameSpeed integer
 ---@field _armyViews table<integer, ArmyView>
 ---@field _title TitlePanel
----@field _mode "storage"| "maxstorage"| "income"
+---@field _display IResourceDisplay
 ---@field _focusArmy integer
 ---@field _lines ArmyView[]
 ---@field isHovered boolean
@@ -64,7 +64,6 @@ ScoreBoard = ReUI.Core.Class(Group)
         end
         self:ResetWidthComponents()
         self:_InitArmyViews()
-        self._mode = "income"
     end,
 
     ---@type ArmyScoreData[]?
@@ -85,22 +84,16 @@ ScoreBoard = ReUI.Core.Class(Group)
     ResetWidthComponents = function(self)
         ArmyViews.nameWidth:Set(self.Layouter:ScaleVar(75))
         ArmyViews.armyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 80))
-
-        if self._mode == "full" then
-            ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 260))
-        else
-            ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, 160))
-        end
+        ArmyViews.allyViewWidth:Set(self.Layouter:Sum(ArmyViews.nameWidth, self._display.Width or 160))
     end,
 
-    SetFullDataView = function(self, val)
-        if val then
-            self._mode = "full"
-        else
-            self._mode = "income"
-        end
+    ---@param self ReUI.Score.ScoreBoard
+    ---@param display IResourceDisplay
+    SetDisplay = function(self, display)
+        self._display = display
 
         self:UpdateArmiesData(self.ScoreCache)
+        self:ResetWidthComponents()
     end,
 
     ---@param self ReUI.Score.ScoreBoard
@@ -201,7 +194,6 @@ ScoreBoard = ReUI.Core.Class(Group)
                 armyData.teamColor,
                 armyData.division
             )
-
         end
     end,
 
@@ -230,9 +222,9 @@ ScoreBoard = ReUI.Core.Class(Group)
     ---@param data ArmyScoreData[]?
     UpdateArmiesData = function(self, data)
         if data then
-            local mode = self._mode
+            local display = self._display
             for i, armyView in self._armyViews do
-                armyView:Update(data[i], mode)
+                armyView:Update(data[i], display)
             end
         end
     end,
@@ -251,7 +243,6 @@ ScoreBoard = ReUI.Core.Class(Group)
         end
     },
 
-    ---comment
     ---@param self ReUI.Score.ScoreBoard
     ---@param event KeyEvent
     HandleEvent = function(self, event)
@@ -265,22 +256,7 @@ ScoreBoard = ReUI.Core.Class(Group)
     ---@param self ReUI.Score.ScoreBoard
     ---@param delta number
     OnFrame = function(self, delta)
-        if self._mode == "full" then return end
-
-        local isCtrl = IsKeyDown("control")
-        local update = false
-        if not isCtrl and self.isHovered and self._mode ~= "storage" then
-            self._mode = "storage"
-            update = true
-        elseif isCtrl and self._mode ~= "maxstorage" then
-            self._mode = "maxstorage"
-            update = true
-        elseif not isCtrl and not self.isHovered and self._mode ~= "income" then
-            self._mode = "income"
-            update = true
-        end
-
-        if update then
+        if self._display:Update(self) then
             self:UpdateArmiesData(self.ScoreCache)
         end
     end,

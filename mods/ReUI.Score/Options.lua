@@ -49,7 +49,7 @@ ReUI.Options.Mods["ReUI.Score"] = {
     replayStyle = Opt("glow border"),
 
     teamScoreSort = Opt(false),
-    showFullResourceData = Opt(false),
+    displayMode = Opt("default"),
     teamColorAsBG = Opt(true),
     teamColorAlpha = Opt(45),
     useDivisions = Opt(false),
@@ -83,7 +83,11 @@ function Main(isReplay)
             Options.Filter("Use divisions instead of rating", options.useDivisions, 4),
             -- Options.Filter("Use nickname color as army color", options.useNickNameArmyColor, 4),
             Options.Filter("In team score sorting", options.teamScoreSort, 4),
-            Options.Filter("Show all resource data simultaneously", options.showFullResourceData, 4),
+            Options.Strings("Display mode of resource data", {
+                "default",
+                "income+storage",
+                "income+storage+maxstorage",
+            }, options.displayMode, 4),
             Options.ColorSlider("Background", options.player.color.bg, 4),
             Options.Filter("Display Team color as background", options.teamColorAsBG, 4),
             Options.Slider("Team color alpha", 0, 64, 1, options.teamColorAlpha, 4),
