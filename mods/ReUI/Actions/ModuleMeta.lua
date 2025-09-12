@@ -22,7 +22,8 @@ end
 ---@param func fun(selection:UserUnit[]?)
 ---@param category? string
 ---@param name? string @optional formatted name
-function ReUI.Actions.SelectionAction(description, func, category, name)
+---@param modifiers? ActionModifiers
+function ReUI.Actions.SelectionAction(description, func, category, name, modifiers)
 end
 
 ---Returns formatted name for the action
