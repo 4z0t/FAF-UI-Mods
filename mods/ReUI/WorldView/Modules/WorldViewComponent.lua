@@ -4,7 +4,7 @@
 Component = ReUI.Core.Class()
 {
     ---@param self ReUI.WorldView.Component
-    ---@param worldView WorldView
+    ---@param worldView ReUI.WorldView.WorldView
     ---@param name string
     __init = function(self, worldView, name)
         self.name = name
