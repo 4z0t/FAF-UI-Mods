@@ -16,4 +16,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.UI.Views.Grid=1.0.0'
+ReUI = 'ReUI.UI.Views.Grid=1.1.0'
