@@ -32,5 +32,23 @@ ReUI = {}
 function ReUI.Require(deps)
 end
 
+---Returns module with given name if it satisfies version and is loaded.
+---Otherwise returns nil.
+---Example:
+---```lua
+---local module = ReUI.Exists "ReUI.LINQ >= 1.0.0"
+---```
+---Primarily used to check for optional modules.
+--- @param tag string
+--- @return ReUI.Module?
+function ReUI.Exists(tag)
+end
+
+---Returns module with given name.
+--- @param name string
+--- @return ReUI.Module?
+function ReUI.Get(name)
+end
+
 ---@class LazyObj<T> : { Set: fun(self:LazyObj<T>, value: LazyOrValue<T>) }
 ---@alias LazyOrValue<T> Lazy<T>|LazyObj<T>

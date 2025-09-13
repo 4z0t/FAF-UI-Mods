@@ -21,6 +21,6 @@ function Main(isReplay)
         LayoutFunctions = LayoutFunctions,
         BaseLayout = BaseLayout,
 
-        Global = {}
+        Global = ReUI.Core.Weak.Value {}
     }
 end

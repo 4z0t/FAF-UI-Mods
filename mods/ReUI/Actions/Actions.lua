@@ -41,22 +41,33 @@ function Main()
         error("name must be made of only letters A-Z, a-z, 0-9 and _")
     end
 
+    ---@class ActionModifiers
+    ---@field shift boolean?
+    ---@field ctrl boolean?
+    ---@field alt boolean?
+
     ---@class SimpleActionParams
     ---@field category string
     ---@field action string
     ---@field description string
     ---@field formattedName string
+    ---@field modifiers ActionModifiers?
 
     ---@param action SimpleActionParams
     local function AddSimpleAction(action)
         LOG("ReUI.Actions: adding '" .. action.description .. "'")
         local formattedName = CheckFormattedName(action.formattedName or GetFormattedName(action.description))
-        import("/lua/keymap/keymapper.lua").SetUserKeyAction(formattedName,
-            {
-                action = action.action,
-                category = action.category,
-                ReUI = true,
-            })
+
+        local actionTable = {
+            action = action.action,
+            category = action.category,
+            ReUI = true,
+            shift = action.modifiers.shift,
+            ctrl = action.modifiers.ctrl,
+            alt = action.modifiers.alt
+        }
+
+        import("/lua/keymap/keymapper.lua").SetUserKeyAction(formattedName, actionTable)
 
         local keyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
         if keyDescriptions[formattedName] then
@@ -69,7 +80,8 @@ function Main()
     ---@param matcher IAction
     ---@param category? string
     ---@param formattedName? string
-    local function AddAction(name, matcher, category, formattedName)
+    ---@param modifiers? ActionModifiers
+    local function AddAction(name, matcher, category, formattedName, modifiers)
         category      = category or "ReUI.Actions"
         formattedName = formattedName or GetFormattedName(name)
 
@@ -80,7 +92,8 @@ function Main()
             description = name,
             action = "UI_Lua ReUI.Actions.ProcessAction('" .. formattedName .. "')",
             category = category,
-            formattedName = formattedName
+            formattedName = formattedName,
+            modifiers = modifiers
         }
     end
 
@@ -88,9 +101,9 @@ function Main()
     ---@field func fun(selection:UserUnit[]?)
     local SelectionAction = Class()
     {
-        __init = function(self, description, func, category, name)
+        __init = function(self, description, func, category, name, modifiers)
             self.func = func
-            AddAction(description, self, category, name)
+            AddAction(description, self, category, name, modifiers)
         end,
 
         Process = function(self, selection)
@@ -100,6 +113,7 @@ function Main()
 
     ---@class CategoryMatcher : IAction
     ---@field description string
+    ---@field modifiers ActionModifiers
     ---@field _actions CategoryAction[]
     ---@operator call(Action[]):CategoryMatcher
     local CategoryMatcher = Class()
@@ -115,8 +129,16 @@ function Main()
         end,
 
         ---@param self CategoryMatcher
+        ---@param modifiers ActionModifiers
+        ---@return CategoryMatcher
+        Modifiers = function(self, modifiers)
+            self.modifiers = modifiers
+            return self
+        end,
+
+        ---@param self CategoryMatcher
         Register = function(self)
-            AddAction(self.description, self)
+            AddAction(self.description, self, nil, nil, self.modifiers)
         end,
 
         ---@param self CategoryMatcher
@@ -135,11 +157,6 @@ function Main()
             self._actions = table.copy(other._actions)
             self:Register()
             return self
-        end,
-
-        ---@param self CategoryMatcher
-        AddShiftVersion = function(self)
-            AddAction(self.description .. " - SHIFT version", self)
         end,
     }
 
@@ -225,6 +242,63 @@ function Main()
         end
     end
     Prefs.SetToCurrentProfile("UserKeyActions", actions)
+
+
+    ReUI.Core.Hook("/lua/keymap/keymapper.lua", "GenerateHotbuildModifiers", function(field, module)
+        return function()
+            local modifiers = field()
+            local keyDetails = module.GetKeyMappingDetails()
+            for key, info in keyDetails do
+                if info.action.shift then
+                    local modKey = "Shift-" .. key
+                    local bind = keyDetails[modKey]
+                    if bind then
+                        WARN('Hotbuild key ' ..
+                            modKey ..
+                            ' is already bound to action "' .. bind.name .. '" under "' .. bind.category .. '" category')
+                    else
+                        modifiers[modKey] = info.action
+                    end
+                end
+                if info.action.alt then
+                    local modKey = "Alt-" .. key
+                    local bind = keyDetails[modKey]
+                    if bind then
+                        WARN('Hotbuild key ' ..
+                            modKey ..
+                            ' is already bound to action "' .. bind.name .. '" under "' .. bind.category .. '" category')
+                    else
+                        modifiers[modKey] = info.action
+                    end
+                end
+                if info.action.ctrl then
+                    local modKey = "Ctrl-" .. key
+                    local bind = keyDetails[modKey]
+                    if bind then
+                        WARN('Hotbuild key ' ..
+                            modKey ..
+                            ' is already bound to action "' .. bind.name .. '" under "' .. bind.category .. '" category')
+                    else
+                        modifiers[modKey] = info.action
+                    end
+                end
+            end
+            return modifiers
+        end
+    end)
+
+    ReUI.Core.OnPostCreateUI(function(isReplay)
+        ForkThread(function()
+            WaitFrames(1)
+            local KeyMapper = import("/lua/keymap/keymapper.lua")
+            IN_ClearKeyMap()
+            IN_AddKeyMapTable(KeyMapper.GetKeyMappings())
+            if SessionIsActive() then
+                import("/lua/keymap/hotbuild.lua").addModifiers()
+                import("/lua/keymap/hotkeylabels.lua").init()
+            end
+        end)
+    end)
 
     return {
         CategoryMatcher  = CategoryMatcher,
