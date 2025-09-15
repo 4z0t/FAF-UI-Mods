@@ -7,7 +7,7 @@ ReUI.Require
     "ReUI.UI.Animation >= 1.1.0",
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.2.0",
-    "ReUI.UI.Views.Grid >= 1.0.0",
+    "ReUI.UI.Views.Grid >= 1.1.0",
     "ReUI.Options >= 1.0.0",
     "ReUI.Units >= 1.0.0",
     "ReUI.Units.Enhancements >= 1.2.0",
@@ -46,10 +46,10 @@ function Main(isReplay)
         Back = '/game/construct-tech_btn/m_upgrade_btn_',
     }
 
-    local Bitmap = ReUI.UI.Controls.Bitmap
-    local Text = ReUI.UI.Controls.Text
-    local CheckBox = ReUI.UI.Controls.CheckBox
-    local Group = ReUI.UI.Controls.Group
+    local Bitmap       = ReUI.UI.Controls.Bitmap
+    local Text         = ReUI.UI.Controls.Text
+    local CheckBox     = ReUI.UI.Controls.CheckBox
+    local Group        = ReUI.UI.Controls.Group
     local BaseGridItem = ReUI.UI.Views.Grid.BaseGridItem
 
     local Enumerate = ReUI.LINQ.Enumerate
@@ -63,9 +63,9 @@ function Main(isReplay)
     local LazyVar = import('/lua/lazyvar.lua').Create
 
     local HorizontalGridScroller = import("Modules/GridScroller.lua").HorizontalGridScroller
-    local LazyGrid = import("Modules/Views/LazyGrid.lua").LazyGrid
-    local ButtonWithOverlay = import("Modules/Views/ButtonWithOverlay.lua").ButtonWithOverlay
-    local CheckBoxWithOverlay = import("Modules/Views/CheckBoxWithOverlay.lua").CheckBoxWithOverlay
+    local LazyGrid               = import("Modules/Views/LazyGrid.lua").LazyGrid
+    local ButtonWithOverlay      = import("Modules/Views/ButtonWithOverlay.lua").ButtonWithOverlay
+    local CheckBoxWithOverlay    = import("Modules/Views/CheckBoxWithOverlay.lua").CheckBoxWithOverlay
 
 
     local validIcons = { land = true, air = true, sea = true, amph = true }
@@ -539,6 +539,8 @@ function Main(isReplay)
 
             local name = handlerData.name
             local index = scroller.StartIndex
+
+            ---@param item ReUI.Construction.Grid.Item
             self:IterateItemsHorizontally(function(grid, item, row, column)
                 local action = actions[index]
                 if action then
@@ -605,9 +607,42 @@ function Main(isReplay)
         end,
     }
 
-    ---@class ConstructionBorder : ReUI.UI.Views.WindowFrame
-    local ConstructionBorder = ReUI.Core.Class(ReUI.UI.Views.WindowFrame)
+    ---@class ConstructionBorder : ReUI.UI.Controls.Group
+    ---@field l  ReUI.UI.Controls.Bitmap
+    ---@field r  ReUI.UI.Controls.Bitmap
+    ---@field m  ReUI.UI.Controls.Bitmap
+    local ConstructionBorder = ReUI.Core.Class(Group)
     {
+        ---@param self ConstructionBorder
+        ---@param parent Control
+        __init = function(self, parent)
+            Group.__init(self, parent)
+
+            self.l = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_s_bmp_l.dds')
+            self.m = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_m3.dds')
+            self.r = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_r.dds')
+        end,
+
+        ---@param self ConstructionBorder
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+
+            layouter(self.l)
+                :Left(self.Left)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+
+            layouter(self.r)
+                :Right(self.Right)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+
+            layouter(self.m)
+                :Right(self.r.Left)
+                :Left(self.l.Right)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+        end,
     }
 
     ---@class Tab : ReUI.UI.Controls.CheckBox
@@ -870,23 +905,25 @@ function Main(isReplay)
                 self:OnCheckedEnhancementsTab()
             end
 
+            local itemSize = 48
+
             self._primary.Rows = options.rows:Raw()
             self._primary.VerticalSpacing = 2
             self._primary.HorizontalSpacing = 2
-            self._primary.RowHeight = 50
-            self._primary.ColumnWidth = 50
+            self._primary.RowHeight = itemSize
+            self._primary.ColumnWidth = itemSize
 
             self._secondary.Rows = 1
             self._secondary.VerticalSpacing = 2
             self._secondary.HorizontalSpacing = 2
-            self._secondary.RowHeight = 50
-            self._secondary.ColumnWidth = 50
+            self._secondary.RowHeight = itemSize
+            self._secondary.ColumnWidth = itemSize
 
             self._enhancements.Rows = 1
             self._enhancements.VerticalSpacing = 2
             self._enhancements.HorizontalSpacing = 20
-            self._enhancements.RowHeight = 50
-            self._enhancements.ColumnWidth = 50
+            self._enhancements.RowHeight = itemSize
+            self._enhancements.ColumnWidth = itemSize
 
         end,
 
@@ -937,21 +974,21 @@ function Main(isReplay)
 
             layouter(self._secondary)
                 :AtBottomIn(self, 5)
-                :AtLeftIn(self, 85)
+                :AtLeftIn(self, 140)
                 :AtRightIn(self, 50)
                 :PerformLayout()
                 :ResetWidth()
 
             layouter(self._primary)
-                :Above(self._secondary, 3)
-                :AtLeftIn(self, 85)
+                :Above(self._secondary, 4)
+                :AtLeftIn(self, 140)
                 :AtRightIn(self, 50)
                 :PerformLayout()
                 :ResetWidth()
 
             layouter(self._enhancements)
-                :Above(self._secondary, 3)
-                :AtLeftIn(self, 85)
+                :Above(self._secondary, 4)
+                :AtLeftIn(self, 140)
                 :AtRightIn(self, 50)
                 :PerformLayout()
                 :ResetWidth()
@@ -959,7 +996,7 @@ function Main(isReplay)
 
             layouter(self._repeat)
                 :FillVertically(self._enhancements)
-                :AtLeftIn(self, 10)
+                :AtLeftIn(self, 65)
 
             self._repeat:SetNewTextures(
                 textures.midBtn.up,
@@ -977,7 +1014,7 @@ function Main(isReplay)
 
             layouter(self._pause)
                 :FillVertically(self._secondary)
-                :AtLeftIn(self, 10)
+                :AtLeftIn(self, 65)
 
             self._pause:SetNewTextures(
                 textures.midBtn.up,
@@ -992,9 +1029,11 @@ function Main(isReplay)
                 UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
             )
 
-
             layouter(self._border)
-                :FillFixedBorder(self, -2)
+                :Top(self.Top)
+                :Bottom(self.Bottom)
+                :AtLeftIn(self, 58)
+                :Right(self.Right)
                 :Under(self, 5)
                 :DisableHitTest(true)
 
@@ -1073,8 +1112,8 @@ function Main(isReplay)
             end
 
             layouter(self._enhancementsTab)
-                :AnchorToLeft(self, -6)
-                :AtBottomIn(self, -10)
+                :AtLeftIn(self, -10)
+                :AtBottomIn(self, -11)
 
             self._enhancementsTab:SetNewTextures(GetTabTextures(tabFiles.enhancement))
             self._enhancementsTab:UseAlphaHitTest(true)
@@ -1500,10 +1539,10 @@ function Main(isReplay)
 
             if ordersControl then
                 LayoutFor(panel)
-                    :AnchorToRight(ordersControl, 55)
+                    :AnchorToRight(ordersControl, 0)
             else
                 LayoutFor(panel)
-                    :AtLeftIn(parent, 55)
+                    :AtLeftIn(parent)
             end
 
             LayoutFor(panel)
@@ -1575,7 +1614,7 @@ function Main(isReplay)
     --[x] Fix queue display for engineers (upgrades, etc)
     --[x] Fix mobile factory queue logic (drag specifically)
     --[x] Add logic for enhancements
-    --[ ] Fix border of the panel
+    --[x] Fix border of the panel
     --[ ] Expose toggles for shitty keybinds
     --[x] Progress bar for construction
     --[x] don't display count for upgrades of factories
