@@ -1,6 +1,6 @@
 name = "ReUI.Reclaim"
-uid = "reui-reclaim-1.1.0"
-version = 1
+uid = "reui-reclaim-1.1.1"
+version = 2
 copyright = ""
 description = [[
 Provides with better looking reclaim labels and also shows them in reclaim command mode.
@@ -18,4 +18,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Reclaim=1.1.0'
+ReUI = 'ReUI.Reclaim=1.1.1'
