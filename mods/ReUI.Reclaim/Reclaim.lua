@@ -590,6 +590,10 @@ function Main(isReplay)
                 totalReclaim = totalReclaim + reclaim.mass
                 positions[i] = reclaim.position
             end
+            for i = toDraw + 1, self._usedReclaimData do
+                local reclaim = reclaimDataPool[i]
+                totalReclaim = totalReclaim + reclaim.mass
+            end
 
             local view = self.worldView
             local projected = view:ProjectMultiple(positions)
@@ -648,7 +652,10 @@ function Main(isReplay)
         OnDestroy = function(self)
             self._reclaimGroup:Destroy()
             self._reclaimGroup = nil
-            self._totalReclaimText = nil
+            if self._totalReclaimText then
+                self._totalReclaimText:Destroy()
+                self._totalReclaimText = nil
+            end
             self._labels = nil
             self._reclaimData = nil
         end
