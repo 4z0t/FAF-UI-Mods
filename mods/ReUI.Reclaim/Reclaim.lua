@@ -652,7 +652,10 @@ function Main(isReplay)
         OnDestroy = function(self)
             self._reclaimGroup:Destroy()
             self._reclaimGroup = nil
-            self._totalReclaimText = nil
+            if self._totalReclaimText then
+                self._totalReclaimText:Destroy()
+                self._totalReclaimText = nil
+            end
             self._labels = nil
             self._reclaimData = nil
         end
