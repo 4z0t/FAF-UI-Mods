@@ -8,4 +8,5 @@ uid = "factory-templates-v01"
 exclusive = false
 ui_only = true
 conflicts = {}
-AGP = "FactoryTemplatesHandler"
+
+ReUI = 'FactoryTemplates=1.0.0'

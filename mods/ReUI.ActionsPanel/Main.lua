@@ -7,74 +7,25 @@ ReUI.Require
 function Main(isReplay)
     local Prefs = import('/lua/user/prefs.lua')
 
-
     ---@class ExtensionInfo
     ---@field name string
     ---@field description string
     ---@field class ASelectionHandler
     ---@field enabled boolean
 
-    ---@type table<string, ExtensionInfo>
     local extensions = {}
-    local function LoadExtensions()
-        local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
-        local l = {}
-        for _, modInfo in __active_mods do
-            if not (modInfo.AGP and modInfo.ui_only) then
-                continue
-            end
-
-            local modFolder = string.sub(modInfo.location, 7)
-
-            local classes = modInfo.AGP
-            if type(classes) == "table" then
-            elseif type(classes) == "string" then
-                classes = { classes }
-            else
-                WARN("Unsupported type of ReUI.ActionsPanel extension of mod " .. modFolder)
-                continue
-            end
-
-            for _, className in classes do
-                local files = DiskFindFiles("/mods/" .. modFolder .. "/"--[[@as FileName]] , className .. '.lua')
-                if table.empty(files) then
-                    WARN(("Couldn't find class '%s' in folder '%s'"):format(className, modFolder))
-                    continue
-                end
-                for _, file in files do
-                    local ok, module = pcall(import, file)
-                    if not ok then
-                        WARN(module)
-                        continue
-                    end
-                    local class = module[className]
-                    LOG("ReUI.ActionsPanel: added " .. modFolder .. " : " .. className)
-                    table.insert(l, { ("%s.%s"):format(modFolder, className), class })
-                end
-            end
-        end
-
-        for i, info in l do
-            local name         = info[1]
-            local handlerClass = info[2]
-            local enabled      = activeExtensions[name]
-
-            if enabled == nil then
-                enabled = handlerClass.Enabled
-            end
-            activeExtensions[name] = enabled
-            extensions[name] = {
-                name = handlerClass.Name or name,
-                description = handlerClass.Description or "NO DESCRIPTION",
-                class = handlerClass,
-                enabled = enabled,
-            }
-        end
-        Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
+    ---@param name string
+    ---@param handlerClass ASelectionHandler
+    local function AddExtension(name, handlerClass)
+        name = name .. ":" .. handlerClass.Name
+        extensions[name] = {
+            name = name,
+            description = handlerClass.Description or "NO DESCRIPTION",
+            class = handlerClass,
+            enabled = handlerClass.Enabled,
+        }
+        LOG("ReUI.ActionsPanel: added extension '" .. name .. "'")
     end
-
-    LoadExtensions()
-
 
     local function SetLayout()
         local panel = ReUI.UI.Global["ActionsGrid"]
@@ -107,6 +58,17 @@ function Main(isReplay)
     end)
 
     ReUI.Core.OnPostCreateUI(function(isReplay)
+        local activeExtensions = Prefs.GetFromCurrentProfile("ReUIActionsPanel_extensions") or {}
+
+        for name, info in extensions do
+            if activeExtensions[name] == nil then
+                activeExtensions[name] = info.enabled
+            end
+            info.enabled = activeExtensions[name]
+        end
+
+        Prefs.SetToCurrentProfile("ReUIActionsPanel_extensions", activeExtensions)
+
         local IsDestroyed = IsDestroyed
 
         local LayoutFor = ReUI.UI.FloorLayoutFor
@@ -147,6 +109,7 @@ function Main(isReplay)
     local ActionsGrid = import("Modules/ActionsGrid.lua").ActionsGrid
 
     return {
-        ActionsGrid = ActionsGrid
+        ActionsGrid = ActionsGrid,
+        AddExtension = AddExtension,
     }
 end

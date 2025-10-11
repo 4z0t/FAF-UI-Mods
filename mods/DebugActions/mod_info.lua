@@ -8,4 +8,5 @@ uid = "debug-actions-v01"
 exclusive = false
 ui_only = true
 conflicts = {}
-AGP = { "DebugActions", "ConsoleActions" }
+
+ReUI = 'DebugActions=1.0.0'
