@@ -33,10 +33,10 @@ function Main()
         ---@param id string
         ---@param enabled boolean
         selector.OnSelect = function(self, id, enabled)
-            local activeExtensions = Prefs.GetFromCurrentProfile("AGP_extensions") or {}
+            local activeExtensions = Prefs.GetFromCurrentProfile("ReUIActionsPanel_extensions") or {}
             extensions[id].enabled = enabled
             activeExtensions[id] = enabled
-            Prefs.SetToCurrentProfile("AGP_extensions", activeExtensions)
+            Prefs.SetToCurrentProfile("ReUIActionsPanel_extensions", activeExtensions)
         end
 
         selector.OnClose = function(self)
