@@ -1,6 +1,6 @@
 name = "ReUI.ActionsPanel"
-uid = "reui-actionspanel-1.1.0"
-version = 1
+uid = "reui-actionspanel-1.1.1"
+version = 2
 copyright = ""
 description = [[Check on Github and official Discord server for mode details.
 https://github.com/4z0t/FAF-UI-Mods
@@ -15,8 +15,8 @@ exclusive = false
 ui_only = true
 requires = {}
 requiresNames = {}
-conflicts = {}
+conflicts = { "actions-grid-panel-v01" }
 before = {}
 after = {}
 
-ReUI = 'ReUI.ActionsPanel=1.1.0'
+ReUI = 'ReUI.ActionsPanel=1.1.1'

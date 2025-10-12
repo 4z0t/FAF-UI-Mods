@@ -1,7 +1,8 @@
 ReUI.Require
 {
     'ReUI.Core >= 1.1.0',
-    "ReUI.UI.Views.Grid >= 1.0.0"
+    "ReUI.UI.Views.Grid >= 1.0.0",
+    "ReUI.Options >= 1.0.0",
 }
 
 function Main(isReplay)
