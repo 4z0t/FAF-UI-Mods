@@ -105,20 +105,20 @@ local CursorDomains = UMT.Class(Bitmap)
 -- determines whether last selected units not containing active category replace active actegory
 local isAuto
 
-local assistBPs = {
-    -- t1 scouts
-    ["ual0101"] = true, --Spirit
-    ["url0101"] = true, --Mole
-    ["xsl0101"] = true, --Selen
-    ["uel0101"] = true, --Snoop
-    -- mobile shields
-    ["xsl0307"] = true, --Athanah
-    ["uel0307"] = true, --Parashield
-    ["ual0307"] = true, --Asylum
+local onlySupportCategory = categories.ALLUNITS
+    -- units with support capability that also have weapons, such as ML or fatboy
+    - categories.DIRECTFIRE - categories.INDIRECTFIRE - categories.ANTIAIR - categories.ANTINAVY
+	-- air units have special attack categories
+	- categories.GROUNDATTACK - categories.STRATEGICBOMBER - categories.BOMBER
+    -- continental
+    - categories.TRANSPORTATION
 
-    ["url0306"] = true, --Deceiver
-    ["xrs0205"] = true -- mermaid
-}
+local assistCategory =
+    categories.SCOUT * categories.LAND
+    + (categories.MOBILE * categories.SHIELD * onlySupportCategory)
+    -- shouldn't use overlay categories but its the best way to include both stealthfields and cloakfields
+    + (categories.MOBILE * categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL * onlySupportCategory)
+    - categories.DUMMYUNIT - categories.INSIGNIFICANTUNIT - categories.UNSELECTABLE
 
 local layerCategory = {
     NAVAL = categories.NAVAL, -- + categories.LAND * categories.HOVER,
@@ -132,11 +132,15 @@ function SetActiveLayer(layer)
 end
 
 function FilterAssisters(selection)
-    local newSelection = {}
+    local possibleAssisters = EntityCategoryFilterDown(assistCategory, selection)
+    if TableEmpty(possibleAssisters) then
+        return selection, false
+    end
     local changed = false
-    for _, unit in selection do
+    local newSelection = {}
+    for _, unit in possibleAssisters do
         local guard = unit:GetGuardedEntity()
-        if not (assistBPs[unit:GetBlueprint().BlueprintId:lower()] and guard ~= nil) then
+        if guard == nil then
             TableInsert(newSelection, unit)
         else
             changed = true
