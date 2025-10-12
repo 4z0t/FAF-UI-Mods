@@ -118,6 +118,8 @@ local assistCategory =
     + (categories.MOBILE * categories.SHIELD * onlySupportCategory)
     -- shouldn't use overlay categories but its the best way to include both stealthfields and cloakfields
     + (categories.MOBILE * categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL * onlySupportCategory)
+    + categories.ENGINEERSTATION
+    + categories.POD
     - categories.DUMMYUNIT - categories.INSIGNIFICANTUNIT - categories.UNSELECTABLE
 
 local layerCategory = {
