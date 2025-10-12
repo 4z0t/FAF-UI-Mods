@@ -133,6 +133,9 @@ function SetActiveLayer(layer)
     print("Active layer is " .. layer)
 end
 
+local isDoubleClick = false
+local clickedAssister = false
+
 function FilterAssisters(selection)
     local possibleAssisters = EntityCategoryFilterDown(assistCategory, selection)
     if TableEmpty(possibleAssisters) then
@@ -142,7 +145,12 @@ function FilterAssisters(selection)
     local newSelection = {}
     for _, unit in possibleAssisters do
         local guard = unit:GetGuardedEntity()
-        if guard == nil then
+        if not isDoubleClick then
+            clickedAssister = guard ~= nil
+        end
+        if isDoubleClick and clickedAssister and guard ~= nil or
+            (not isDoubleClick or not clickedAssister) and guard == nil
+        then
             TableInsert(newSelection, unit)
         else
             changed = true
@@ -315,6 +323,14 @@ local function InitOptionsExoticCategories()
     UpdateExotics()
 end
 
+local function checkForDoubleClick(mouseEvent)
+    if mouseEvent.Type == "ButtonDClick" then
+        isDoubleClick = true
+    else
+        isDoubleClick = false
+    end
+end
+
 function Main(_isReplay)
     local Options = UMT.Options.Mods["ASE"]
     Options.autoLayer:Bind(function(var)
@@ -331,5 +347,11 @@ function Main(_isReplay)
 
     InitOptionsExoticCategories()
 
+    import("/lua/ui/uimain.lua").AddOnMouseClickedFunc(checkForDoubleClick)
+
     -- UpdateDomainsCursor()
+end
+
+__moduleinfo.OnDirty = function()
+    import("/lua/ui/uimain.lua").RemoveOnMouseClickedFunc(checkForDoubleClick)
 end
