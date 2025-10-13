@@ -105,22 +105,7 @@ local CursorDomains = UMT.Class(Bitmap)
 -- determines whether last selected units not containing active category replace active actegory
 local isAuto
 
-local onlySupportCategory = categories.ALLUNITS
-    -- units with support capability that also have weapons, such as ML or fatboy
-    - categories.DIRECTFIRE - categories.INDIRECTFIRE - categories.ANTIAIR - categories.ANTINAVY
-	-- air units have special attack categories
-	- categories.GROUNDATTACK - categories.STRATEGICBOMBER - categories.BOMBER
-    -- continental
-    - categories.TRANSPORTATION
-
-local assistCategory =
-    categories.SCOUT * categories.LAND
-    + (categories.MOBILE * categories.SHIELD * onlySupportCategory)
-    -- shouldn't use overlay categories but its the best way to include both stealthfields and cloakfields
-    + (categories.MOBILE * categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL * onlySupportCategory)
-    + categories.ENGINEERSTATION
-    + categories.POD
-    - categories.DUMMYUNIT - categories.INSIGNIFICANTUNIT - categories.UNSELECTABLE
+local assistCategory
 
 local layerCategory = {
     NAVAL = categories.NAVAL, -- + categories.LAND * categories.HOVER,
@@ -280,6 +265,38 @@ function FilterLayer(selection)
     return filtered, (TableGetN(filtered) ~= TableGetN(selection))
 end
 
+local function InitOptionAssisterCategories()
+    local Options = UMT.Options.Mods["ASE"]
+    local categories = categories
+
+    local onlySupportCategory = categories.ALLUNITS
+        -- units with support capability that also have weapons, such as ML or fatboy
+        - categories.DIRECTFIRE - categories.INDIRECTFIRE - categories.ANTIAIR - categories.ANTINAVY
+        -- air units have special attack categories
+        - categories.GROUNDATTACK - categories.STRATEGICBOMBER - categories.BOMBER
+        -- continental
+        - categories.TRANSPORTATION
+
+    local originalAssistcategory =
+        categories.SCOUT * categories.LAND
+        + (categories.MOBILE * categories.SHIELD * onlySupportCategory)
+        -- shouldn't use overlay categories but its the best way to include both stealthfields and cloakfields
+        + (categories.MOBILE * categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL * onlySupportCategory)
+
+    local engiStationAssistCategory = originalAssistcategory + categories.ENGINEERSTATION + categories.POD
+    local engiAssistCategory = originalAssistcategory + categories.ENGINEER
+
+    local assistCategories = {
+        ["Disabled"] = originalAssistcategory,
+        ["Engi stations & drones"] = engiStationAssistCategory,
+        ["All engineers"] = engiAssistCategory
+    }
+
+    Options.filterAssistingEngineers:Bind(function(var)
+        assistCategory = assistCategories[var()]
+    end)
+end
+
 local function InitOptionsExoticCategories()
     local filters = UMT.Options.Mods["ASE"].filters
     local categories = categories
@@ -346,6 +363,8 @@ function Main(_isReplay)
     Options.includeHovers:Bind(function(var)
         includeHoverInNavy = var()
     end)
+
+    InitOptionAssisterCategories()
 
     InitOptionsExoticCategories()
 
