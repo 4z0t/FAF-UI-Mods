@@ -133,6 +133,17 @@ function FilterAssisters(selection)
     local newSelection = {}
     for _, unit in possibleAssisters do
         local unitTarget = unit:GetGuardedEntity()
+        if not unitTarget then
+            -- check for instant shield assist target
+            local unitQueue = unit:GetCommandQueue()
+            if unitQueue[1].type == "Repair" and unitQueue[2].type == "Guard" then
+                local pos1 = unitQueue[1].position
+                local pos2 = unitQueue[2].position
+                if pos1.x == pos2.x and pos1.y == pos2.y and pos1.z == pos2.z then
+                    unitTarget = unit:GetFocus()
+                end
+            end
+        end
         if not isDoubleClick then
             clickedAssisterTarget = unitTarget
         end
