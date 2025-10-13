@@ -107,6 +107,9 @@ local isAuto
 
 local assistCategory
 
+-- double click only selects assisters with the same target
+local doubleClickSimilarAssisters
+
 local layerCategory = {
     NAVAL = categories.NAVAL, -- + categories.LAND * categories.HOVER,
     AIR = categories.AIR,
@@ -119,7 +122,7 @@ function SetActiveLayer(layer)
 end
 
 local isDoubleClick = false
-local clickedAssister = false
+local clickedAssisterTarget
 
 function FilterAssisters(selection)
     local possibleAssisters = EntityCategoryFilterDown(assistCategory, selection)
@@ -129,12 +132,16 @@ function FilterAssisters(selection)
     local changed = false
     local newSelection = {}
     for _, unit in possibleAssisters do
-        local guard = unit:GetGuardedEntity()
+        local unitTarget = unit:GetGuardedEntity()
         if not isDoubleClick then
-            clickedAssister = guard ~= nil
+            clickedAssisterTarget = unitTarget
         end
-        if isDoubleClick and clickedAssister and guard ~= nil or
-            (not isDoubleClick or not clickedAssister) and guard == nil
+        if isDoubleClick and clickedAssisterTarget and
+            (
+                not doubleClickSimilarAssisters and unitTarget ~= nil
+                or doubleClickSimilarAssisters and clickedAssisterTarget == unitTarget
+            )
+            or (not isDoubleClick or not clickedAssisterTarget) and unitTarget == nil
         then
             TableInsert(newSelection, unit)
         else
@@ -365,6 +372,10 @@ function Main(_isReplay)
     end)
 
     InitOptionAssisterCategories()
+
+    Options.doubleClickSimilarAssisters:Bind(function(var)
+        doubleClickSimilarAssisters = var()
+    end)
 
     InitOptionsExoticCategories()
 
