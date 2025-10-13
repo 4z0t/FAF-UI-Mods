@@ -8,7 +8,6 @@ UMT.Options.Mods["ASE"] = {
     layerFilter = Opt(true),
     lockedFilter = Opt(true),
     assisterFilter = Opt(true),
-    doubleClickAssisters = Opt(true),
     includeHovers = Opt(true),
     exoticFilter = Opt(true),
     filters = {
@@ -36,7 +35,6 @@ function Main(isReplay)
         Options.Filter("Use auto domain selection", options.autoLayer),
         Options.Filter("Filter locked units", options.lockedFilter),
         Options.Filter("Filter assisters", options.assisterFilter),
-        Options.Filter("Double click assisters to select only assisters", options.doubleClickAssisters, 16),
         Options.Filter("Include hovers in naval domain", options.includeHovers),
         Options.Filter("Filter exotics", options.exoticFilter),
         Options.Title("Land", 12, nil, nil, 16),
