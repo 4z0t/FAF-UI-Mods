@@ -224,6 +224,9 @@ local domainsOrders =
     { key = "AIR   > NAVAL > LAND", value = { "AIR", "NAVAL", "LAND" } },
 }
 
+local includeHoverInNavy
+local hoverUnitsCategory = categories.LAND * categories.HOVER - categories.ENGINEER
+
 local function UpdateDomainsCursor()
     if isAuto then
         return
@@ -260,6 +263,9 @@ function FilterLayer(selection)
         for _, domain in domainOrder do
             filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
             if not TableEmpty(filtered) then
+                if domain == "NAVAL" and includeHoverInNavy then
+                    filtered = EntityCategoryFilterDown(layerCategory[domain] + hoverUnitsCategory, selection)
+                end
                 break
             end
         end
@@ -337,12 +343,8 @@ function Main(_isReplay)
         isAuto = var()
     end)
 
-    Options.includeHovers:Bind(function(opt)
-        if opt() then
-            layerCategory.NAVAL = categories.NAVAL + categories.LAND * categories.HOVER
-        else
-            layerCategory.NAVAL = categories.NAVAL
-        end
+    Options.includeHovers:Bind(function(var)
+        includeHoverInNavy = var()
     end)
 
     InitOptionsExoticCategories()
