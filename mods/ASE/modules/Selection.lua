@@ -133,6 +133,7 @@ function SetActiveLayer(layer)
     print("Active layer is " .. layer)
 end
 
+local doubleClickAssisters
 local isDoubleClick = false
 local clickedAssister = false
 
@@ -145,15 +146,24 @@ function FilterAssisters(selection)
     local newSelection = {}
     for _, unit in possibleAssisters do
         local guard = unit:GetGuardedEntity()
-        if not isDoubleClick then
-            clickedAssister = guard ~= nil
-        end
-        if isDoubleClick and clickedAssister and guard ~= nil or
-            (not isDoubleClick or not clickedAssister) and guard == nil
-        then
-            TableInsert(newSelection, unit)
+        if doubleClickAssisters then
+            if not isDoubleClick then
+                clickedAssister = guard ~= nil
+            end
+
+            if isDoubleClick and clickedAssister and guard ~= nil or
+                (not isDoubleClick or not clickedAssister) and guard == nil
+            then
+                TableInsert(newSelection, unit)
+            else
+                changed = true
+            end
         else
-            changed = true
+            if guard == nil then
+                TableInsert(newSelection, unit)
+            else
+                changed = true
+            end
         end
     end
 
@@ -345,6 +355,10 @@ function Main(_isReplay)
 
     Options.includeHovers:Bind(function(var)
         includeHoverInNavy = var()
+    end)
+
+    Options.doubleClickAssisters:Bind(function(var)
+        doubleClickAssisters = var()
     end)
 
     InitOptionsExoticCategories()
