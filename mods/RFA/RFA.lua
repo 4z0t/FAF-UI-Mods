@@ -430,6 +430,25 @@ function Main(isReplay)
                         buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
                     end
                 end
+            elseif orderName == "RULEUCC_Capture" then
+                local info = GetRolloverInfo()
+                if info then
+                    local bpFoot = __blueprints[info.blueprintId].Footprint
+                    if bpFoot then
+                        ---@diagnostic disable-next-line: cast-local-type
+                        buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
+                    end
+                end
+                local bp = unit:GetBlueprint()
+                local bpFoot = bp.Footprint
+                local captureDistance
+                if bp.Physics.MotionType == "RULEUMT_None" then
+                    captureDistance = 10
+                else
+                    captureDistance = 5
+                end
+                ---@diagnostic disable-next-line: need-check-nil
+                return captureDistance + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
             end
         end
 
@@ -900,10 +919,11 @@ function Main(isReplay)
                 end
             elseif self._buildRing
                 or orderType == "build"
-                or orderType == 'order'
+                or orderType == "order"
                 and (orderName == "RULEUCC_Repair"
                     or orderName == "RULEUCC_Reclaim"
-                    or orderName == "RULEUCC_Guard")
+                    or orderName == "RULEUCC_Guard"
+                    or orderName == "RULEUCC_Capture")
             then
                 self:UpdateBuildRings(false)
             end
