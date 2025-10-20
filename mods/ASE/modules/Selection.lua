@@ -130,7 +130,7 @@ function FilterAssisters(selection)
         return selection, false
     end
     local changed = false
-    local newSelection = {}
+    local newSelection = EntityCategoryFilterOut(assistCategory, selection)
     for _, unit in possibleAssisters do
         local unitTarget = unit:GetGuardedEntity()
         if not unitTarget then
