@@ -191,6 +191,12 @@ function Main(isReplay)
         "RadarStealthFieldRadius",
     }
 
+    local isWaterSurfaceMotionType = {
+        RULEUMT_Water = true,
+        RULEUMT_Hover = true,
+        RULEUMT_AmphibiousFloating = true,
+    }
+
     ---@type table<UnitId, IUnitBlueprint>
     local IBPByBpIdCache = ReUI.Core.Weak.Value {}
     ---@type table<UserUnit, IUnitBlueprint>
@@ -484,6 +490,28 @@ function Main(isReplay)
         end
     end
 
+    --- Retrieves cursor information from the engine statistics
+    ---@return { Position: string, Elevation: number, OCell: string, LODMetric: number }
+    local function GetCursorInformation()
+        local cursor = { }
+        if __EngineStats and __EngineStats.Children then
+            for _, a in __EngineStats.Children do
+                if a.Name == 'Camera' then
+                    for _, b in a.Children do
+                        if b.Name == 'Cursor' then
+                            for _, c in b.Children do
+                                cursor[c.Name] = c.Value
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+
+        return cursor
+    end
+
     ---@class Ring
     ---@field pos Vector
     ---@field color string
@@ -775,11 +803,39 @@ function Main(isReplay)
 
 
                 if displayBuildRingAtMouseHeight then
-                    -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
-                    -- local elevation = cursorData.Elevation
+                    local newY
 
-                    local mouseY = GetMouseWorldPos()[2]
-                    pos[2] = mouseY
+                    local commandMode = GetCommandMode()
+                    local orderType = commandMode[1]
+                    if orderType == "build" then
+                        newY = GetMouseWorldPos()[2]
+                    else
+                        local info = GetRolloverInfo()
+                        if info then
+                            local unit = info.userUnit
+                            if unit then
+                                newY = unit:GetPosition()[2]
+                            else
+                                local rolloverBp = __blueprints[info.blueprintId]
+                                local bpPhysics = rolloverBp.Physics
+                                local motionType = bpPhysics.MotionType
+
+                                if isWaterSurfaceMotionType[motionType]
+                                    or motionType == "RULEUMT_None" and not bpPhysics.BuildOnLayerCaps["LAYER_Seabed"]
+                                then
+                                    newY = GetMouseWorldPos()[2]
+                                elseif motionType == "RULEUMT_SurfacingSub" then
+                                    newY = GetMouseWorldPos()[2] + bpPhysics.Elevation
+                                else
+                                    newY = GetCursorInformation().Elevation
+                                end
+                            end
+                        else
+                            newY = GetCursorInformation().Elevation
+                        end
+                    end
+
+                    pos[2] = newY
                 end
                 ring.pos = pos
             end
