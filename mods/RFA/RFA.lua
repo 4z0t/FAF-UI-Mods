@@ -16,6 +16,7 @@ function Main(isReplay)
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local MathFloor = math.floor
+    local MathSqrt = math.sqrt
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
@@ -53,6 +54,7 @@ function Main(isReplay)
     local showRadar = false
     local showSonar = false
     local showCounterIntel = false
+    local showShield = false
     local displayBuildRingAtMouseHeight = false
 
     options.showDirectFire:Bind(function(opt)
@@ -81,6 +83,9 @@ function Main(isReplay)
     end)
     options.showCounterIntel:Bind(function(opt)
         showCounterIntel = opt()
+    end)
+    options.showShield:Bind(function(opt)
+        showShield = opt()
     end)
     options.displayBuildRingAtMouseHeight:Bind(function (opt)
         displayBuildRingAtMouseHeight = opt()
@@ -394,6 +399,16 @@ function Main(isReplay)
                 TableInsert(weapons,
                     { "CounterIntel",
                         MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.RadarStealthFieldRadius) })
+            end
+        end
+
+        if showShield then
+            local shield = bp.Defense.Shield
+            if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
+                local radius = (shield.ShieldSize or 10) / 2
+                local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+                local range = MathSqrt(radius * radius - height * height)
+                TableInsert(weapons, { "Defense", range })
             end
         end
 
