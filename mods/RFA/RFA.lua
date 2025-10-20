@@ -52,6 +52,7 @@ function Main(isReplay)
     local showRadar = false
     local showSonar = false
     local showCounterIntel = false
+    local displayBuildRingAtMouseHeight = false
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -79,6 +80,9 @@ function Main(isReplay)
     end)
     options.showCounterIntel:Bind(function(opt)
         showCounterIntel = opt()
+    end)
+    options.displayBuildRingAtMouseHeight:Bind(function (opt)
+        displayBuildRingAtMouseHeight = opt()
     end)
     options.showInMinimap.OnChange = function(opt)
         -- local minimap = GetWorldViews()["MiniMap"]
@@ -769,13 +773,14 @@ function Main(isReplay)
                     end
                 end
 
-                -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
-                -- local elevation = cursorData.Elevation
 
-                -- local mouseY = GetMouseWorldPos()[2]
-                -- if pos[2] < mouseY then
-                --     pos[2] = mouseY
-                -- end
+                if displayBuildRingAtMouseHeight then
+                    -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
+                    -- local elevation = cursorData.Elevation
+
+                    local mouseY = GetMouseWorldPos()[2]
+                    pos[2] = mouseY
+                end
                 ring.pos = pos
             end
             ring.radius = radius
