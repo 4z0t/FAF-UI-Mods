@@ -37,6 +37,7 @@ function Main(isReplay)
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
     local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
     local GetEnhancements = import("/lua/enhancementcommon.lua").GetEnhancements
+    local XZDistanceTwoVectorsSquared = import("/lua/utilities.lua").XZDistanceTwoVectorsSquared
 
     ---@class RingData
     ---@field [1] string # type
@@ -477,11 +478,13 @@ function Main(isReplay)
         :Max()
 
     ---@param type string
+    ---@param colorType "NormalColor" | "SelectColor" | "RolloverColor" | nil
     ---@return string
     ---@return number
-    local function GetColorAndThickness(type)
+    local function GetColorAndThickness(type, colorType)
         local params = overlayParams[type]
-        return ("ff%s"):format((params.NormalColor):sub(3)), params.Outer[1] / params.Type
+        if not colorType then colorType = "NormalColor" end
+        return ("ff%s"):format((params[colorType]):sub(3)), params.Outer[1] / params.Type
     end
 
     local function TableClear(t)
@@ -778,11 +781,16 @@ function Main(isReplay)
 
             local radius = GetMaxBuildRange(builders)
 
+            local orderType
+            local colorType
+
             ---@type Ring
             local ring = Ring()
             if useMousePos then
                 ring.pos = GetMouseWorldPos()
             else
+                orderType = GetCommandMode()[1]
+
                 local unit = builders[1]
                 local pos = unit:GetInterpolatedPosition()
                 if IsKeyDown("Shift") then
@@ -802,19 +810,17 @@ function Main(isReplay)
                 end
 
 
+                local info = GetRolloverInfo()
+                local rolloverUnit = info.userUnit
                 if displayBuildRingAtMouseHeight then
                     local newY
 
-                    local commandMode = GetCommandMode()
-                    local orderType = commandMode[1]
                     if orderType == "build" then
                         newY = GetMouseWorldPos()[2]
                     else
-                        local info = GetRolloverInfo()
                         if info then
-                            local unit = info.userUnit
-                            if unit then
-                                newY = unit:GetPosition()[2]
+                            if rolloverUnit then
+                                newY = rolloverUnit:GetPosition()[2]
                             else
                                 local rolloverBp = __blueprints[info.blueprintId]
                                 local bpPhysics = rolloverBp.Physics
@@ -838,9 +844,23 @@ function Main(isReplay)
                     pos[2] = newY
                 end
                 ring.pos = pos
+
+                local targetPos
+                if orderType == "build" then
+                    targetPos = GetMouseWorldPos()
+                    targetPos[1] = MathFloor(targetPos[1]) + 0.5
+                    targetPos[3] = MathFloor(targetPos[3]) + 0.5
+                elseif rolloverUnit then
+                    targetPos = rolloverUnit:GetPosition()
+                else
+                    targetPos = GetMouseWorldPos()
+                end
+                if XZDistanceTwoVectorsSquared(targetPos, pos) <= radius * radius then
+                    colorType = "RolloverColor"
+                end
             end
             ring.radius = radius
-            local color, thick = GetColorAndThickness "Miscellaneous"
+            local color, thick = GetColorAndThickness("Miscellaneous", colorType)
             ring.thickness = thick
             ring:SetColor(color)
             self._buildRing = ring
