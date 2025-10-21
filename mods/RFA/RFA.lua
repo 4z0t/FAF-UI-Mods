@@ -299,7 +299,8 @@ function Main(isReplay)
 
             TableInsert(ibp.Weapon, {
                 RangeCategory = w.RangeCategory,
-                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius
+                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius,
+                MinRadius = w.MinRadius,
             })
         end
 
@@ -365,16 +366,21 @@ function Main(isReplay)
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
+                local minRadius = w.MinRadius
+                local function AddRadii(type)
+                    TableInsert(weapons, { type, radius })
+                    if minRadius > 0 then TableInsert(weapons, { type, minRadius }) end
+                end
                 if showDirectFire and w.RangeCategory == "UWRC_DirectFire" then
-                    TableInsert(weapons, { "AllMilitary", radius })
+                    AddRadii("AllMilitary")
                 elseif showIndirectFire and w.RangeCategory == "UWRC_IndirectFire" then
-                    TableInsert(weapons, { "IndirectFire", radius })
+                    AddRadii("IndirectFire")
                 elseif showAntiAir and w.RangeCategory == "UWRC_AntiAir" then
-                    TableInsert(weapons, { "AntiAir", radius })
+                    AddRadii("AntiAir")
                 elseif showCountermeasure and w.RangeCategory == "UWRC_Countermeasure" then
-                    TableInsert(weapons, { "Defense", radius })
+                    AddRadii("Defense")
                 elseif showAntiNavy and w.RangeCategory == "UWRC_AntiNavy" then
-                    TableInsert(weapons, { "AntiNavy", radius })
+                    AddRadii("AntiNavy")
                 end
             end
         end
