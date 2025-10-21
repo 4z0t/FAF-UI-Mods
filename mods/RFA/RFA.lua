@@ -291,6 +291,10 @@ function Main(isReplay)
 
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
+            local rangeCategory = w.RangeCategory
+            if rangeCategory == "UWRC_Undefined" then
+                continue
+            end
             -- Skip adding disabled weapons to IBp
             local enh = w.EnabledByEnhancement
             if enh and not Contains(activeEnhs, enh) then
@@ -298,7 +302,7 @@ function Main(isReplay)
             end
 
             TableInsert(ibp.Weapon, {
-                RangeCategory = w.RangeCategory,
+                RangeCategory = rangeCategory,
                 MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius,
                 MinRadius = w.MinRadius,
             })
