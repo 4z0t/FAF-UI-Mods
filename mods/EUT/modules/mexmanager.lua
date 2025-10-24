@@ -79,12 +79,9 @@ local function UpgradeMexes(mexes, selector)
     end
 
     if not table.empty(upgrades) then
-        HiddenSelect(function()
-            for upgradesTo, upMexes in upgrades do
-                SelectUnits(upMexes)
-                IssueBlueprintCommand("UNITCOMMAND_Upgrade", upgradesTo, 1, false)
-            end
-        end)
+        for upgradesTo, upMexes in upgrades do
+            IssueBlueprintCommandToUnits(upMexes, "UNITCOMMAND_Upgrade", upgradesTo, 1, false)
+        end
     end
 end
 
