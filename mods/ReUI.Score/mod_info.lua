@@ -1,6 +1,6 @@
 name = "ReUI.Score"
-uid = "reui-score-0.0.1"
-version = 1
+uid = "reui-score-1.2.1"
+version = 2
 copyright = ""
 description = [[]]
 author = "4z0t"
@@ -11,4 +11,4 @@ enabled = true
 exclusive = false
 ui_only = true
 
-ReUI = 'ReUI.Score=1.2.0'
+ReUI = 'ReUI.Score=1.2.1'

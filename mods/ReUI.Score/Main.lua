@@ -229,9 +229,7 @@ function Main(isReplay)
                 return
             end
 
-            if module.currentScores then
-                scoreboard:Update(module.GetScoreCache())
-            end
+            scoreboard:Update(module.currentScores and module.GetScoreCache())
         end
     end)
 
