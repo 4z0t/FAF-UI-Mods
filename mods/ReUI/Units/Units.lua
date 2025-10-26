@@ -14,18 +14,18 @@ function Main(isReplay)
     local GameTick = GameTick
     local UISelectionByCategory = UISelectionByCategory
 
-    local SetIgnoreSelection = import("/lua/ui/game/gamemain.lua").SetIgnoreSelection
+    local GameMain = import("/lua/ui/game/gamemain.lua")
     local CommandMode = import('/lua/ui/game/commandmode.lua')
 
     ---@param callback fun(currentSelection:UserUnit[]?)
     local function HiddenSelect(callback)
-        local currentCommand = CommandMode.GetCommandMode()
+        CommandMode.CacheAndClearCommandMode()
+        GameMain.SetIgnoreSelection(true)
         local oldSelection = GetSelectedUnits()
-        SetIgnoreSelection(true)
         callback(oldSelection)
         SelectUnits(oldSelection)
-        CommandMode.StartCommandMode(currentCommand[1], currentCommand[2])
-        SetIgnoreSelection(false)
+        GameMain.SetIgnoreSelection(false)
+        CommandMode.RestoreCommandMode(true)
     end
 
     ---@param fn fun(unit:UserUnit)
