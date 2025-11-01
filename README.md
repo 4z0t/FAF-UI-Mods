@@ -5,6 +5,8 @@ ReUI project is a collection of UI mods that improve game experience, performanc
 
 ## Mods
 
+Click on link to see full info about a mod.
+
 ### [ReUI.Score](/Docs/Overview/ReUI.Score.md)
 
 ![functionsreplay.gif](/Media/functionsreplay.gif)
