@@ -1,7 +1,7 @@
 # ReUI
 
 ReUI is a project that combines all UI mods into one - an overhaul of whole UI of Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.\
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/UZeAEXHV).
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/UZeAEXHV)
 
 ## Mods
 
@@ -95,7 +95,7 @@ Layoutable is a class that stores Layouter and Layout references and applies the
 
 #### ReUI.UI.Controls
 
-Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox (no idea why this one is here :D).
+Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox.
 
 #### ReUI.UI.Views
 
