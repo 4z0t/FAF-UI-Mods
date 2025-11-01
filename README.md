@@ -46,7 +46,7 @@ ReUI project is a collection of UI mods that improve game experience, performanc
 
 ### Instant Assist
 
-### Advanced Key Actions
+### [Advanced Key Actions](/Docs/Overview/AdvancedKeyActions.md)
 
 ## Libraries
 
