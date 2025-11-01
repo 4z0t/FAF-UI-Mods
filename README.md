@@ -46,7 +46,9 @@ Click on link to see full info about a mod.
 
 ### Rings for all
 
-### Instant Assist
+### [Instant Assist](/Docs/Overview/InstantAssist.md)
+
+![IA1](/Media/IA1.gif)
 
 ### [Advanced Key Actions](/Docs/Overview/AdvancedKeyActions.md)
 
