@@ -1,13 +1,13 @@
 # ReUI
 
 ReUI is a project that combines all UI mods into one - an overhaul of whole UI of Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.\
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/UZeAEXHV).
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/UZeAEXHV)
 
 ## Mods
 
 ### ReUI.Score
 
-Previously "4z0t's scoreboard". As originally it is completely rewamped scoreboard panel with various new features and fixes.
+Previously "4z0t's scoreboard". As originally it is completely revamped scoreboard panel with various new features and fixes.
 
 ![Scoreboard](./Media/s1.png)
 ![Scoreboard](./Media/s2.png)
@@ -33,6 +33,7 @@ Previously "EzReclaim" and "Optimized reclaim view". It provides with better loo
 ![reclaim](./Media/reclaim.png)
 
 There are several options that can be adjusted for your needs and hardware
+
 * **max labels**: maximum number of reclaim labels that can be shown at the same time
 * **zoom threshold**: minimum zoom level at which reclaim labels will start to batch together
 * **grouping distance**: radius at which reclaim labels will be grouped together
@@ -94,7 +95,7 @@ Layoutable is a class that stores Layouter and Layout references and applies the
 
 #### ReUI.UI.Controls
 
-Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox (no idea why this one is here :D).
+Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox.
 
 #### ReUI.UI.Views
 
