@@ -40,7 +40,7 @@ ReUI project is a collection of UI mods that improve game experience, performanc
 
 ### [Engineer Alt Selection](/Docs/Overview/EngineerAltSelection.md)
 
-![eas](/media/eas.gif)
+![eas](/Media/eas.gif)
 
 ### Rings for all
 
