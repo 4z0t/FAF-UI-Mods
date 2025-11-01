@@ -7,7 +7,7 @@ ReUI is a project that combines all UI mods into one - an overhaul of whole UI o
 
 ### ReUI.Score
 
-Previously "4z0t's scoreboard". As originally it is completely rewamped scoreboard panel with various new features and fixes.
+Previously "4z0t's scoreboard". As originally it is completely revamped scoreboard panel with various new features and fixes.
 
 ![Scoreboard](./Media/s1.png)
 ![Scoreboard](./Media/s2.png)
@@ -33,6 +33,7 @@ Previously "EzReclaim" and "Optimized reclaim view". It provides with better loo
 ![reclaim](./Media/reclaim.png)
 
 There are several options that can be adjusted for your needs and hardware
+
 * **max labels**: maximum number of reclaim labels that can be shown at the same time
 * **zoom threshold**: minimum zoom level at which reclaim labels will start to batch together
 * **grouping distance**: radius at which reclaim labels will be grouped together
