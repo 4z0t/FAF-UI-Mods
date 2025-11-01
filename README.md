@@ -44,7 +44,9 @@ Click on link to see full info about a mod.
 
 ![eas](/Media/eas.gif)
 
-### Rings for all
+### [Rings For All](/Docs/Overview/RingsForAll.md)
+
+![rfa1](/Media/rfa1.png)
 
 ### [Instant Assist](/Docs/Overview/InstantAssist.md)
 
