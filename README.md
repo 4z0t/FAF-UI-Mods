@@ -5,75 +5,36 @@ ReUI is a project that combines all UI mods into one - an overhaul of whole UI o
 
 ## Mods
 
-### ReUI.Score
+### [ReUI.Score](/Docs/Overview/ReUI.Score.md)
 
-Previously "4z0t's scoreboard". As originally it is completely revamped scoreboard panel with various new features and fixes.
+![functionsreplay.gif](/Media/functionsreplay.gif)
 
-![Scoreboard](./Media/s1.png)
-![Scoreboard](./Media/s2.png)
+### [ReUI.Economy](/Docs/Overview/ReUI.Economy.md)
 
-[More about scoreboard](./Deprecated/4SB/README.md).
+![Economy](/Media/economy.png)
 
-### ReUI.Economy
+### [ReUI.Reclaim](/Docs/Overview/ReUI.Reclaim.md)
 
-It is simply updated panel of economy with scale and custom layout capabilities.
+![reclaim](/Media/reclaim.png)
 
-![Economy](./Media/economy.png)
+### [ReUI.Construction](/Docs/Overview/ReUI.Construction.md)
 
-#### Middle layout
+![Build options](/Media/reui_construction_build_options.jpg)
+![Selection](/Media/reui_construction_selection.jpg)
+![Enhancements](/Media/reui_construction_enhancements.jpg)
+![Upgrade chain](/Media/reui_construction_upgrade_chains.jpg)
 
-Mod "EconomyMiddle" allows you to select middle layout for economy panel.
+### [ReUI.Hotbuild](/Docs/Overview/ReUI.Hotbuild.md)
 
-![EconomyMiddle](./Media/economy_middle.png)
+![reuihotbuild](/Media/reuihotbuild.png)
 
-### ReUI.Reclaim
+### [ReUI.Minimap](/Docs/Overview/ReUI.Minimap.md)
 
-Previously "EzReclaim" and "Optimized reclaim view". It provides with better looking reclaim labels and also shows them in reclaim command mode.
+### [ReUI.ActionsPanel](/Docs/Overview/ReUI.ActionsPanel.md)
 
-![reclaim](./Media/reclaim.png)
+![ActionsPanel](/Media/enhacements.png)
 
-There are several options that can be adjusted for your needs and hardware
-
-* **max labels**: maximum number of reclaim labels that can be shown at the same time
-* **zoom threshold**: minimum zoom level at which reclaim labels will start to batch together
-* **grouping distance**: radius at which reclaim labels will be grouped together
-* **update rate**: delay in ms between updates of reclaim labels
-
-![reclaim options](./Media/reclaim_options.png)
-
-### ReUI.Construction
-
-ReUI.Construction is complete overhaul of original construction panel. Optimized, extendable and improved with new features over original one.
-Currently it is missing some of the features of original panel, such as templates, but it will be added in future.
-
-Improvements over original construction panel:
-
-* can be scaled
-* order of units in selection is deterministic and is sorted in this order: engineers -> Land units -> Air units -> Naval units -> Structures and everything else
-* queue drag is more stable and also works for mobile factories
-
-![Build options](./Media/reui_construction_build_options.jpg)
-![Selection](./Media/reui_construction_selection.jpg)
-![Enhancements](./Media/reui_construction_enhancements.jpg)
-![Upgrade chain](./Media/reui_construction_upgrade_chains.jpg)
-
-### ReUI.Hotbuild
-
-Previously "HotBuild Overhaul". Currently it is slightly improved HotBuild Overhaul mod. But in addition it allows you to use templates in building sets.
-
-Template items are highlighted with yellow color. **Fill** button will convert template for all factions.
-
-![reuihotbuild](./Media/reuihotbuild.png)
-
-ReUI.Hotbuild changes default mechanism of hotbuild and fixes previously addressed [issue](#69) with it. Since now on factory sets are picking only ***one*** item, you can't have multiple items for a factory as it was before.
-
-### ReUI.Minimap
-
-Adds option to lock zoom and automatically adjusts minimap size to map size.
-
-### ReUI.ActionsPanel
-
-Previously "Actions Grid Panel".
+![templates](/Media/templates.png)
 
 ## Libraries
 
