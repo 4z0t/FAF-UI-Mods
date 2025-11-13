@@ -22,7 +22,7 @@ function Main(isReplay)
         return
     end
 
-    local Score = ReUI.Exists "ReUI.Score >= 1.2.0" --[[@as ReUI.Score?]]
+    local Score = ReUI.Exists "ReUI.Score <= 1.2.1" --[[@as ReUI.Score?]]
     if Score then
         local rankNames = {
             [0] = { "Private", "Corporal", "Sergeant", "Captain", "Major", "Colonel", "General", "Supreme Commander" },
