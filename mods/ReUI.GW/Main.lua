@@ -22,6 +22,8 @@ function Main(isReplay)
         return
     end
 
+    local options = ReUI.Options.Mods["ReUI.GW"]
+
     local Score = ReUI.Exists "ReUI.Score <= 1.2.1" --[[@as ReUI.Score?]]
     if Score then
         local rankNames = {
@@ -35,12 +37,13 @@ function Main(isReplay)
         local sessionInfo = SessionGetScenarioInfo()
         local ranks = sessionInfo.Options.Ranks
 
+
         for _, army in ipairs(data) do
             local nickname = army.nickname
             local rank = ranks[nickname] or 1
             army.rating = rank
             local rankName = rankNames[army.faction][rank]
-            if rankName then
+            if rankName and options.displayRankNames() then
                 army.name = ("[%s] %s"):format(rankName, nickname)
             end
         end
