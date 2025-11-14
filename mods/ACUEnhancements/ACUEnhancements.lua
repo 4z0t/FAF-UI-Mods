@@ -24,6 +24,13 @@ function Main(isReplay)
     local Enhancements = ReUI.Units.Enhancements
     local Button = import('/lua/maui/button.lua').Button
 
+    ---@type fun(unit: UserUnit?): UnitBlueprint?
+    local GetSingleBlueprintFromSelection = IPairsEnumerator
+        ---@param unit UserUnit
+        :Select(function(unit) return unit:GetBlueprint() end)
+        :Distinct()
+        :Single()
+
     ---@class EnhancementIconInfo
     ---@field bpID string
     ---@field name string
@@ -114,17 +121,14 @@ function Main(isReplay)
         ---@param self ACUEnhancementsHandler
         ---@param selection UserUnit[]
         ---@return EnhancementIconInfo[]?
+        ---@return UserUnit[]?
         Update = function(self, selection)
             if table.empty(selection) then
                 return
             end
 
             ---@type UnitBlueprint?
-            local bp = Enumerate(selection)
-                ---@param unit UserUnit
-                :Select(function(unit) return unit:GetBlueprint() end)
-                :Distinct()
-                :Single()
+            local bp = GetSingleBlueprintFromSelection(selection)
 
             if not bp then
                 return
@@ -139,9 +143,9 @@ function Main(isReplay)
                 local unit = selection[1]
                 local upgrades = self:GetAvailableUpgrades(unit)
 
-                return upgrades
+                return upgrades, selection
             else
-                return self:GetAvailableUpgradesForBP(bp)
+                return self:GetAvailableUpgradesForBP(bp), selection
             end
         end,
 
@@ -149,6 +153,7 @@ function Main(isReplay)
         ---@field btn Button
         ---@field bpID string
         ---@field name string
+        ---@field selection UserUnit[]?
         ComponentClass = Class(AItemComponent)
         {
             ---Called when component is bond to an item
@@ -191,11 +196,13 @@ function Main(isReplay)
 
                 self.btn.OnRolloverEvent = function(btn, state)
                     if state == 'enter' or state == "down" then
-                        local selection = GetSelectedUnits()
-                        local enh       = __blueprints[self.bpID].Enhancements[self.name]
-                        UnitViewDetail.ShowEnhancement(enh, self.bpID, enh.Icon,
-                            GetEnhancementPrefix(self.bpID, enh.Icon),
-                            selection[1])
+                        local selection = self.selection
+                        if selection then
+                            local enh = __blueprints[self.bpID].Enhancements[self.name]
+                            UnitViewDetail.ShowEnhancement(enh, self.bpID, enh.Icon,
+                                GetEnhancementPrefix(self.bpID, enh.Icon),
+                                selection[1])
+                        end
                     else
                         UnitViewDetail.Hide()
                     end
@@ -213,11 +220,13 @@ function Main(isReplay)
             ---@param self EnhComponent
             ---@param item ActionsGridItem
             ---@param action EnhancementIconInfo
-            Enable = function(self, item, action)
+            ---@param selection UserUnit[]
+            Enable = function(self, item, action, selection)
                 self.btn:Enable()
                 self.btn:Show()
                 self.bpID = action.bpID
                 self.name = action.name
+                self.selection = selection
 
                 self.btn:SetNewTextures(GetEnhancementTextures(self.bpID,
                     __blueprints[self.bpID].Enhancements[self.name].Icon))
@@ -240,6 +249,9 @@ function Main(isReplay)
             Destroy = function(self)
                 self.btn:Destroy()
                 self.btn = nil
+                self.bpID = nil
+                self.name = nil
+                self.selection = nil
             end,
         },
     }
