@@ -533,7 +533,9 @@ Loader = Class()
             end
         end
 
-        self:AddError(("Module '%s' is not enabled."):format(module.Name))
+        local msg = ("Module '%s' is not enabled."):format(module.Name)
+        self:AddError(msg)
+        _error(msg)
     end,
 
     ---@param self ReUI.Loader
@@ -546,6 +548,15 @@ Loader = Class()
 
         if deps.enabled then
             self:CheckModEnabled(topModule)
+        end
+
+        if deps.version then
+            local version = tonumber(import("/lua/version.lua").GetVersion()) or 0
+            if deps.version > version then
+                local msg = ("Module '%s' requires game version %s or higher."):format(topModule.Name, deps.version)
+                self:AddError(msg)
+                _error(msg)
+            end
         end
 
         for _, dep in ipairs(deps) do
