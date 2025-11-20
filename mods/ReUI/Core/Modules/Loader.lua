@@ -524,14 +524,31 @@ Loader = Class()
     end,
 
     ---@param self ReUI.Loader
-    ---@param deps string[]
+    ---@param module ReUI.Module
+    CheckModEnabled = function(self, module)
+        local uid = import(module.Path .. "mod_info.lua").uid
+        for _, mod in __active_mods do
+            if mod.uid == uid then
+                return
+            end
+        end
+
+        self:AddError(("Module '%s' is not enabled."):format(module.Name))
+    end,
+
+    ---@param self ReUI.Loader
+    ---@param deps string[]|DependencyInfo
     Require = function(self, deps)
         self:CheckPreLoadStage()
 
         local topModule = self._preloadStack[table.getn(self._preloadStack)]
         assert(topModule, "ReUI.Loader: there is no module in preload stack")
 
-        for _, dep in deps do
+        if deps.enabled then
+            self:CheckModEnabled(topModule)
+        end
+
+        for _, dep in ipairs(deps) do
             local name, op, version = MatchDependencyString(dep)
             if not name then
                 _error(("Invalid dependency string '%s'!"):format(dep))

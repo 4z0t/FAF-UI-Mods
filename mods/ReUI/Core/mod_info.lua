@@ -1,5 +1,5 @@
 name = "ReUI.Core"
-uid = "reui-core-1.4.0"
+uid = "reui-core-1.6.0"
 version = 1
 copyright = ""
 description = [[]]
@@ -16,4 +16,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Core=1.5.0'
+ReUI = 'ReUI.Core=1.6.0'
