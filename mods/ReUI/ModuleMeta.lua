@@ -13,6 +13,10 @@
 ---@class ReUI
 ReUI = {}
 
+---@class DependencyInfo
+---@field enabled boolean @Ensures that mod is enabled
+---@field version number? @Required version of the game, checked as '>='.
+
 --- Tells ReUI what modules to load and which versions are required
 --- for this mod to function.
 --- Example:
@@ -28,7 +32,7 @@ ReUI = {}
 ---If mod tries to perform Require call outside of UI creation then it will fail.
 ---
 --- Invalid string will also cause error.
----@param deps string[]
+---@param deps string[]|DependencyInfo
 function ReUI.Require(deps)
 end
 
