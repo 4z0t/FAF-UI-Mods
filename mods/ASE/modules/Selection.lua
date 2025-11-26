@@ -146,10 +146,7 @@ function FilterAssisters(selection)
     local changed = false
     local newSelection = EntityCategoryFilterOut(assistCategory, selection)
     for _, unit in possibleAssisters do
-        local unitTarget = unit:GetGuardedEntity()
-        if not unitTarget then
-            unitTarget = getShieldAssistTarget(unit)
-        end
+        local unitTarget = unit:GetGuardedEntity() or getShieldAssistTarget(unit)
         if not isDoubleClick then
             clickedAssisterTarget = unitTarget
         end
