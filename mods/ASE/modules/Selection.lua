@@ -124,7 +124,7 @@ end
 --- Returns the unit's focus if it is performing an instant shield assist.
 ---@param unit UserUnit
 ---@return UserUnit?
-local function getShieldAssistTarget(unit)
+local function GetShieldAssistTarget(unit)
     local unitQueue = unit:GetCommandQueue()
     if unitQueue[1].type == "Repair" and unitQueue[2].type == "Guard" then
         local pos1 = unitQueue[1].position
@@ -146,7 +146,7 @@ function FilterAssisters(selection)
     local changed = false
     local newSelection = EntityCategoryFilterOut(assistCategory, selection)
     for _, unit in possibleAssisters do
-        local unitTarget = unit:GetGuardedEntity() or getShieldAssistTarget(unit)
+        local unitTarget = unit:GetGuardedEntity() or GetShieldAssistTarget(unit)
         if not isDoubleClick then
             clickedAssisterTarget = unitTarget
         end
@@ -367,7 +367,7 @@ local function InitOptionsExoticCategories()
     UpdateExotics()
 end
 
-local function checkForDoubleClick(mouseEvent)
+local function CheckForDoubleClick(mouseEvent)
     if mouseEvent.Type == "ButtonDClick" then
         isDoubleClick = true
     else
@@ -393,11 +393,11 @@ function Main(_isReplay)
 
     InitOptionsExoticCategories()
 
-    import("/lua/ui/uimain.lua").AddOnMouseClickedFunc(checkForDoubleClick)
+    import("/lua/ui/uimain.lua").AddOnMouseClickedFunc(CheckForDoubleClick)
 
     -- UpdateDomainsCursor()
 end
 
 __moduleinfo.OnDirty = function()
-    import("/lua/ui/uimain.lua").RemoveOnMouseClickedFunc(checkForDoubleClick)
+    import("/lua/ui/uimain.lua").RemoveOnMouseClickedFunc(CheckForDoubleClick)
 end
