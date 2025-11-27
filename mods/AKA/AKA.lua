@@ -26,13 +26,6 @@ function Main()
 
         local Contains = IPairsEnumerator:Contains()
 
-        local AllFactories = IPairsEnumerator
-            ---@param unit UserUnit
-            :All(function(unit)
-                return unit:IsInCategory 'FACTORY'
-                    or unit:IsInCategory 'EXTERNALFACTORY'
-            end)
-
         local AllRepeatQueue = IPairsEnumerator
             ---@param unit UserUnit
             :All(function(unit)
@@ -40,95 +33,99 @@ function Main()
             end)
 
         CategoryMatcher "Transportation / Overcharge / Repeat queue"
-        {
-            CategoryAction(), -- do nothing if no selection
-            CategoryAction(categories.TRANSPORTATION)
-                :Action "StartCommandMode order RULEUCC_Transport",
-            CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
-                :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
-            CategoryAction()
-                :Match(AllFactories)
-                :Action(function(selection)
-                    local isRepeatBuild = AllRepeatQueue(selection)
-                        and 'false'
-                        or 'true'
-                    ---@param unit UserUnit
-                    for _, unit in selection do
-                        unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                        if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
-                            unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+            :Modifiers { shift = true }
+            {
+                CategoryAction(), -- do nothing if no selection
+                CategoryAction(categories.TRANSPORTATION)
+                    :Action "StartCommandMode order RULEUCC_Transport",
+                CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
+                    :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
+                CategoryAction(categories.FACTORY + categories.EXTERNALFACTORY)
+                    :Action(function(selection)
+                        local isRepeatBuild = AllRepeatQueue(selection)
+                            and 'false'
+                            or 'true'
+                        ---@param unit UserUnit
+                        for _, unit in selection do
+                            unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                            if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
+                                unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                            end
                         end
-                    end
-                end)
-        }:AddShiftVersion()
+                    end)
+            }
 
         CategoryMatcher "Launch missile / attack-reclaim / attack order"
-        {
-            CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
-                :Action 'StartCommandMode order RULEUCC_Nuke',
-            CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH2)
-                :Action 'StartCommandMode order RULEUCC_Tactical',
-            CategoryAction(categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3)
-                + categories.FACTORY * categories.STRUCTURE - categories.SUBCOMMANDER)
-                :Action(function(selection)
-                    CM.StartCommandMode("order", attackMoveModeData)
-                end),
-            CategoryAction()
-                :Match(function(selection, category)
-                    return true
-                end)
-                :Action 'StartCommandMode order RULEUCC_Attack',
-        }:AddShiftVersion()
+            :Modifiers { shift = true }
+            {
+                CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
+                    :Action 'StartCommandMode order RULEUCC_Nuke',
+                CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH2)
+                    :Action 'StartCommandMode order RULEUCC_Tactical',
+                CategoryAction(categories.ENGINEER * (categories.TECH1 + categories.TECH2 + categories.TECH3)
+                    + categories.FACTORY * categories.STRUCTURE - categories.SUBCOMMANDER)
+                    :Action(function(selection)
+                        CM.StartCommandMode("order", attackMoveModeData)
+                    end),
+                CategoryAction()
+                    :Match(function(selection, category)
+                        return true
+                    end)
+                    :Action 'StartCommandMode order RULEUCC_Attack',
+            }
 
         CategoryMatcher "Select nearest idle t1 engineer / reclaim / toggle shields / toggle stealth"
-        {
-            CategoryAction()
-                :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
-            CategoryAction(categories.ENGINEER)
-                :Action "StartCommandMode order RULEUCC_Reclaim",
-            CategoryAction()
-                :Match(function(selection)
-                    local orders, toggles, _ = GetUnitCommandData(selection)
-                    return Contains(toggles, "RULEUTC_ShieldToggle")
-                end)
-                :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Shield\")",
-            CategoryAction()
-                :Match(function(selection)
-                    local orders, toggles, _ = GetUnitCommandData(selection)
-                    return Contains(toggles, "RULEUTC_StealthToggle")
-                end)
-                :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Stealth\")",
-        }:AddShiftVersion()
+            :Modifiers { shift = true }
+            {
+                CategoryAction()
+                    :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
+                CategoryAction(categories.ENGINEER)
+                    :Action "StartCommandMode order RULEUCC_Reclaim",
+                CategoryAction()
+                    :Match(function(selection)
+                        local orders, toggles, _ = GetUnitCommandData(selection)
+                        return Contains(toggles, "RULEUTC_ShieldToggle")
+                    end)
+                    :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Shield\")",
+                CategoryAction()
+                    :Match(function(selection)
+                        local orders, toggles, _ = GetUnitCommandData(selection)
+                        return Contains(toggles, "RULEUTC_StealthToggle")
+                    end)
+                    :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Stealth\")",
+            }
 
         CategoryMatcher "Move / Select nearest transport"
-        {
-            CategoryAction()
-                :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
-            CategoryAction()
-                :Match(function(selection, category)
-                    return true
-                end)
-                :Action "StartCommandMode order RULEUCC_Move",
-        }:AddShiftVersion()
+            :Modifiers { shift = true }
+            {
+                CategoryAction()
+                    :Action "UI_SelectByCategory +nearest +idle AIR TRANSPORTATION",
+                CategoryAction()
+                    :Match(function(selection, category)
+                        return true
+                    end)
+                    :Action "StartCommandMode order RULEUCC_Move",
+            }
 
         CategoryMatcher "Select nearest air scout / build sensors"
-        {
-            CategoryAction()
-                :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
-            CategoryAction(categories.AIR * categories.INTELLIGENCE)
-                :Action "UI_SelectByCategory AIR INTELLIGENCE",
-            CategoryAction()
-                :Match(function(selection, category)
-                    return true
-                end)
-                :Action(function(selection)
-                    if Hotbuild then
-                        Hotbuild.ProcessHotbuild "Sensors"
-                    else
-                        import("/lua/keymap/hotbuild.lua").buildAction "Sensors"
-                    end
-                end),
-        }:AddShiftVersion()
+            :Modifiers { shift = true }
+            {
+                CategoryAction()
+                    :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
+                CategoryAction(categories.AIR * categories.INTELLIGENCE)
+                    :Action "UI_SelectByCategory AIR INTELLIGENCE",
+                CategoryAction()
+                    :Match(function(selection, category)
+                        return true
+                    end)
+                    :Action(function(selection)
+                        if Hotbuild then
+                            Hotbuild.ProcessHotbuild "Sensors"
+                        else
+                            import("/lua/keymap/hotbuild.lua").buildAction "Sensors"
+                        end
+                    end),
+            }
 
 
         local selectionChanged = true
