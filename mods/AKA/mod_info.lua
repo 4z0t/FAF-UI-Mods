@@ -1,5 +1,5 @@
 name = "Advanced Key Actions"
-version = 1
+version = 2
 copyright = "MIT License"
 description = [[
 Adds these keybinds that combine multiple actions into one based on current selection:
@@ -13,9 +13,9 @@ Can be found at ReUI.Actions section.
 ]]
 author = "4z0t"
 url = "https://github.com/4z0t/FAF-UI-Mods"
-uid = "advanced-key-actions-v01"
+uid = "advanced-key-actions-1.0.1"
 exclusive = false
 ui_only = true
 conflicts = {}
 
-ReUI = "AKA=1.0.0"
+ReUI = "AKA=1.0.1"
