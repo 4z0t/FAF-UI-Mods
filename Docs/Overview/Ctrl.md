@@ -8,4 +8,5 @@ Mod extends applications of `Ctrl` button for certain situations.
   ![ctrlcopy](/Media/ctrlcopy.gif)
 
 You can disable unwanted feature anytime in options
-![options](/Media/ctrl_options.png)
+![options](/Media/ctrl_options.png)\
+*But why would you?*
