@@ -1,9 +1,8 @@
 ReUI.Require
 {
-    "ReUI.Core >= 1.0.0",
+    "ReUI.Core >= 1.5.0",
     "ReUI.Actions >= 1.0.0",
     "ReUI.LINQ >= 1.1.0",
-    "ReUI.Hotbuild >= 1.0.0",
 }
 
 function Main()
@@ -13,6 +12,8 @@ function Main()
         local CategoryMatcher = ReUI.Actions.CategoryMatcher
         local CategoryAction = ReUI.Actions.CategoryAction
         local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+        local Hotbuild = ReUI.Exists "ReUI.Hotbuild >= 1.0.0" --[[@as ReUI.Hotbuild?]]
+
 
         local CM = import("/lua/ui/game/commandmode.lua")
 
@@ -121,7 +122,11 @@ function Main()
                     return true
                 end)
                 :Action(function(selection)
-                    ReUI.Hotbuild.ProcessHotbuild "Sensors"
+                    if Hotbuild then
+                        Hotbuild.ProcessHotbuild "Sensors"
+                    else
+                        import("/lua/keymap/hotbuild.lua").buildAction "Sensors"
+                    end
                 end),
         }:AddShiftVersion()
 
@@ -159,6 +164,5 @@ function Main()
                 end)
                 :Action(import("/lua/ui/game/orders.lua").Stop),
         }
-
     end)
 end
