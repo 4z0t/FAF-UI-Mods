@@ -21,5 +21,6 @@ function Main(isReplay)
         },
         BaseGridItem = BaseGridItem,
         BaseGridPanel = BaseGridPanel,
+        Grid = import("Modules/Grid.lua").Grid
     }
 end

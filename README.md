@@ -1,35 +1,38 @@
 # ReUI
 
-ReUI is a project that combines all UI mods into one - an overhaul of whole UI of Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.
+ReUI project is a collection of UI mods that improve game experience, performance and usability of UI in Supreme Commander: Forged Alliance. Here is current list of mods and libraries that are part of ReUI project.\
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/EZb6h6gbWz)
 
 ## Mods
 
-### ReUI.Score
+Click on link to see full info about a mod.
 
 Previously "4z0t's scoreboard". As originally it is completely revamped scoreboard panel with various new features and fixes.
 
-![Scoreboard](./Media/s1.png)
-![Scoreboard](./Media/s2.png)
+![functionsreplay.gif](/Media/functionsreplay.gif)
 
-[More about scoreboard](./Deprecated/4SB/README.md).
+### [ReUI.Economy](/Docs/Overview/ReUI.Economy.md)
 
-### ReUI.Economy
+![Economy](/Media/economy.png)
 
-It is simply updated panel of economy with scale and custom layout capabilities.
+### [ReUI.Reclaim](/Docs/Overview/ReUI.Reclaim.md)
 
-![Economy](./Media/economy.png)
+![reclaim](/Media/reclaim.png)
 
-#### Middle layout
+### [ReUI.Construction](/Docs/Overview/ReUI.Construction.md)
 
-Mod "EconomyMiddle" allows you to select middle layout for economy panel.
+![Build options](/Media/reui_construction_build_options.jpg)
+![Selection](/Media/reui_construction_selection.jpg)
+![Enhancements](/Media/reui_construction_enhancements.jpg)
+![Upgrade chain](/Media/reui_construction_upgrade_chains.jpg)
 
-![EconomyMiddle](./Media/economy_middle.png)
+### [ReUI.Hotbuild](/Docs/Overview/ReUI.Hotbuild.md)
 
-### ReUI.Reclaim
+![reuihotbuild](/Media/reuihotbuild.png)
 
-Previously "EzReclaim" and "Optimized reclaim view". It provides with better looking reclaim labels and also shows them in reclaim command mode.
+### [ReUI.Minimap](/Docs/Overview/ReUI.Minimap.md)
 
-![reclaim](./Media/reclaim.png)
+### [ReUI.ActionsPanel](/Docs/Overview/ReUI.ActionsPanel.md)
 
 There are several options that can be adjusted for your needs and hardware
 
@@ -38,41 +41,23 @@ There are several options that can be adjusted for your needs and hardware
 * **grouping distance**: radius at which reclaim labels will be grouped together
 * **update rate**: delay in ms between updates of reclaim labels
 
-![reclaim options](./Media/reclaim_options.png)
+![templates](/Media/templates.png)
 
-### ReUI.Construction
+### [Ctrl](/Docs/Overview/Ctrl.md)
 
-ReUI.Construction is complete overhaul of original construction panel. Optimized, extendable and improved with new features over original one.
-Currently it is missing some of the features of original panel, such as templates, but it will be added in future.
+### [Engineer Alt Selection](/Docs/Overview/EngineerAltSelection.md)
 
-Improvements over original construction panel:
+![eas](/Media/eas.gif)
 
-* can be scaled
-* order of units in selection is deterministic and is sorted in this order: engineers -> Land units -> Air units -> Naval units -> Structures and everything else
-* queue drag is more stable and also works for mobile factories
+### [Rings For All](/Docs/Overview/RingsForAll.md)
 
-![Build options](./Media/reui_construction_build_options.jpg)
-![Selection](./Media/reui_construction_selection.jpg)
-![Enhancements](./Media/reui_construction_enhancements.jpg)
-![Upgrade chain](./Media/reui_construction_upgrade_chains.jpg)
+![rfa1](/Media/rfa1.png)
 
-### ReUI.Hotbuild
+### [Instant Assist](/Docs/Overview/InstantAssist.md)
 
-Previously "HotBuild Overhaul". Currently it is slightly improved HotBuild Overhaul mod. But in addition it allows you to use templates in building sets.
+![IA1](/Media/IA1.gif)
 
-Template items are highlighted with yellow color. **Fill** button will convert template for all factions.
-
-![reuihotbuild](./Media/reuihotbuild.png)
-
-ReUI.Hotbuild changes default mechanism of hotbuild and fixes previously addressed [issue](#69) with it. Since now on factory sets are picking only ***one*** item, you can't have multiple items for a factory as it was before.
-
-### ReUI.Minimap
-
-Adds option to lock zoom and automatically adjusts minimap size to map size.
-
-### ReUI.ActionsPanel
-
-Previously "Actions Grid Panel".
+### [Advanced Key Actions](/Docs/Overview/AdvancedKeyActions.md)
 
 ## Libraries
 
@@ -94,7 +79,7 @@ Layoutable is a class that stores Layouter and Layout references and applies the
 
 #### ReUI.UI.Controls
 
-Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox (no idea why this one is here :D).
+Provides with primitive classes that inherit Layoutable class. These are Group, Text, Bitmap and CheckBox.
 
 #### ReUI.UI.Views
 

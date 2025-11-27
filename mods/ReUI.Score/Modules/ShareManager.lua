@@ -16,7 +16,7 @@ end
 
 local function GiveResourcesToPlayer(resourceType, id, ratio)
     if GetFocusArmy() == id then return end
-    
+
     ratio = ratio or 0.5
     local scoresCache = import("/lua/ui/game/score.lua").GetScoreCache()
     local armyScore = scoresCache[id]
@@ -78,9 +78,9 @@ end
 
 local function RequestResourceFromPlayer(resourceType, id)
     if GetFocusArmy() == id then
-        SendMessage(string.format("Give me %s", resourceType))
+        SendMessage(string.format("Please give me %s", resourceType))
     else
-        SendMessage(string.format("%s, give me %s", armiesTable[id].nickname, resourceType))
+        SendMessage(string.format("%s, please give me %s", armiesTable[id].nickname, resourceType))
     end
 end
 
@@ -94,9 +94,9 @@ end
 
 function RequestUnitFromPlayer(id)
     if GetFocusArmy() == id then
-        SendMessage("Give me T3 engineer")
+        SendMessage("Please give me T3 engineer")
     else
-        SendMessage(string.format("%s, give me an engineer", armiesTable[id].nickname))
+        SendMessage(string.format("%s, please give me an engineer", armiesTable[id].nickname))
     end
 end
 

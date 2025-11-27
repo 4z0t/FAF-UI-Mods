@@ -1,6 +1,6 @@
 ReUI.Require
 {
-    "ReUI.Core >= 1.0.0",
+    "ReUI.Core >= 1.5.0",
     "ReUI.LINQ >= 1.0.0",
     "ReUI.UI.Views >= 1.0.0"
 }
@@ -58,10 +58,17 @@ function Main(isReplay)
     local function LoadOptionsFile(modsOptions, modName)
         LOG(("ReUI.Options: Loading options of mod '%s'"):format(modName))
 
-        local optionsFilePath = "/mods/" .. modName .. "/Options.lua" --[[@as FileName]]
+        ---@type FileName
+        local path
+        local module = ReUI.Get(modName)
+        if module then
+            path = module.Path .. "Options.lua"
+        else
+            path = string.format("/mods/%s/Options.lua", modName) --[[@as FileName]]
+        end
 
         ---@type fun()
-        local mainF = import(optionsFilePath).Main
+        local mainF = import(path).Main
         optionsMainFuncs[modName] = mainF
 
         local options = _rawget(modsOptions, modName)

@@ -7,7 +7,7 @@ Extends application of Ctrl button:
     - Ctrl-Copy hold Ctrl and right click any building to copy it for building
 
 You can enable/disable features any time in UI mods options menu.
-Requires UI Mod Tools!
+ReUI is required for this mod.
 ]]
 author = "4z0t"
 url = ""
@@ -22,4 +22,5 @@ requiresNames = {}
 conflicts = { "move-only-v02", "move-only-v01" }
 before = {}
 after = {}
-__umt = true
+
+ReUI = 'Ctrl=1.0.0'

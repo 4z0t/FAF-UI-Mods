@@ -22,9 +22,10 @@ function Main()
     ---@type Hook[]
     local hooks = {}
 
-    ---@diagnostic disable-next-line:different-requires
-    local ReUIOnCreateUI = import("Modules/OnCreateUI.lua")
-    ReUIOnCreateUI.AddPreCreateCallback(function(isReplay)
+    local loader = ReUI.__loader --[[@as ReUI.Loader]]
+
+
+    loader:AddPreCreateCallback(function(isReplay)
         local pcall = pcall
         for _, hook in hooks do
             local ok, result = pcall(MakeHook, hook)
@@ -35,7 +36,7 @@ function Main()
         end
     end)
 
-    ReUIOnCreateUI.AddPostCreateCallback(function(isReplay)
+    loader:AddPostCreateCallback(function(isReplay)
         ---@diagnostic disable-next-line:cast-local-type
         hooks = nil
 
@@ -86,8 +87,15 @@ function Main()
             -- end
         end,
 
-        OnPreCreateUI = ReUIOnCreateUI.AddPreCreateCallback,
-        OnPostCreateUI = ReUIOnCreateUI.AddPostCreateCallback,
+        ---@param callback OnCreateUICallback
+        OnPreCreateUI = function(callback)
+            return loader:AddPreCreateCallback(callback)
+        end,
+
+        ---@param callback OnCreateUICallback
+        OnPostCreateUI = function(callback)
+            return loader:AddPostCreateCallback(callback)
+        end,
 
         Weak = {
             ---Makes table weak by key
