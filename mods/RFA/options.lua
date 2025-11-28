@@ -13,8 +13,10 @@ ReUI.Options.Mods["RFA"] = {
     showRadar = Opt(true),
     showSonar = Opt(true),
     showCounterIntel = Opt(true),
+    showShield = Opt(true),
     showInMinimap = Opt(false),
     displayActualBuildRange = Opt(false),
+    displayBuildRingAtMouseHeight = Opt(false),
 }
 
 function Main()
@@ -43,7 +45,9 @@ function Main()
             Options.Filter("Show Radar range", options.showRadar, 4),
             Options.Filter("Show Sonar range", options.showSonar, 4),
             Options.Filter("Show Counter-intel range", options.showCounterIntel, 4),
+            Options.Filter("Show Shield range", options.showShield, 4),
             Options.Filter("Display actual build range (including skirt size)", options.displayActualBuildRange, 4),
+            Options.Filter("Display build range ring at mouse height", options.displayBuildRingAtMouseHeight, 4),
             Options.Strings("Build Preview key",
                 {
                     "SHIFT",
