@@ -12,7 +12,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 
 ---@class EnhancementData
 ---@field type "arrow"|"split"|"item"
----@field state "installed"|"uninstalled"|"disabled"
+---@field state "installed"|"uninstalled"|"disabled"|"queued"
 ---@field name string
 
 
@@ -71,47 +71,84 @@ EnhancementsHandler = ReUI.Core.Class(ASelectionHandler)
         self._context.bpID = bp.BlueprintId
         local slot = context.slot
 
-        local enhancements = Enumerate(enhancementsForBP)
+        ---@type UpgradeChain[]
+        local enhancementsForSlot = Enumerate(enhancementsForBP)
             :Where(function(chain)
                 return Enumerate(chain)
                     :All(function(enhancement)
                         return bpEnhancements[enhancement].Slot == slot
                     end)
             end)
-            ---@param chain string[]
-            :SelectMany(function(chain)
-                local data = {}
-                for i, enhancement in chain do
-                    data[i] = { type = "arrow", name = enhancement, state = "uninstalled" }
-                end
-                data[table.getn(data)].type = "split"
-                return data
-            end)
-            -- :SelectMany()
-            -- :Where(function(enhancement)
-            --     return bpEnhancements[enhancement].Slot == slot
-            -- end)
             :ToArray()
 
-        if table.getn(selection) == 1 then
-            local unit = selection[1]
-            local installedEnhancements = EnhanceCommon.GetEnhancements(unit:GetEntityId())
-            local hasAnyQueued = Enumerate(enhancements)
-                :Any(function(enhancement)
-                    return Enhancements.IsQueued(unit, enhancement.name)
+        if table.getn(selection) ~= 1 then
+            ---@type EnhancementData[]
+            local enhancements = Enumerate(enhancementsForSlot)
+                ---@param chain string[]
+                :SelectMany(function(chain)
+                    local data = {}
+                    for i, enhancement in chain do
+                        local allInstalled = Enumerate(selection)
+                            :All(function(unit)
+                                return Enhancements.IsInstalled(unit, enhancement)
+                            end)
+                        data[i] = {
+                            type = "arrow",
+                            name = enhancement,
+                            state = allInstalled and "installed" or "uninstalled"
+                        }
+                    end
+                    data[table.getn(data)].type = "split"
+                    return data
                 end)
+                :ToArray()
 
-            ---@param enhancement EnhancementData
-            for i, enhancement in enhancements do
-                if hasAnyQueued and not installedEnhancements[slot] then
-                    enhancement.state = "disabled"
-                elseif installedEnhancements[slot] == enhancement.name then
-                    enhancement.state = "installed"
-                end
-            end
+            return enhancements, self._context
         end
 
-        return enhancements, self._context
+        local unit = selection[1]
+
+        ---@type table<string, boolean>
+        local queuedEnhancements = Enumerate(enhancementsForSlot)
+            :SelectMany()
+            :Where(function(enhancement)
+                return Enhancements.IsQueued(unit, enhancement)
+            end)
+            :ToSet()
+
+
+        local result = {}
+        ---@param chain UpgradeChain
+        for i, chain in ipairs(enhancementsForSlot) do
+
+            local anyQueuedInChain = Enumerate(chain)
+                :Any(function(enhancement)
+                    return queuedEnhancements[enhancement]
+                end)
+
+            if anyQueuedInChain or table.empty(queuedEnhancements) then
+                for _, enh in chain do
+                    table.insert(result,
+                        {
+                            type = "arrow",
+                            name = enh,
+                            state = queuedEnhancements[enh]
+                                and "queued"
+                                or Enhancements.IsInstalled(unit, enh)
+                                and "installed"
+                                or "uninstalled"
+                        })
+                end
+            else
+                -- Fill with disabled enhancements cuz these can't be ordered since other chain is queued
+                for _, enh in chain do
+                    table.insert(result, { type = "arrow", name = enh, state = "disabled" })
+                end
+            end
+            result[table.getn(result)].type = "split"
+        end
+
+        return result, self._context
     end,
 
     ---@param self EnhancementsHandler
@@ -147,7 +184,7 @@ EnhancementsHandler = ReUI.Core.Class(ASelectionHandler)
             local name = self.data.name
             local modifiers = event.Modifiers
             local selection = GetSelectedUnits()
-            if event.Type == "ButtonPress" or event.Type == "ButtonDClick" and self.data.state == 'uninstalled' then
+            if (event.Type == "ButtonPress" or event.Type == "ButtonDClick") and self.data.state == 'uninstalled' then
                 if table.getn(selection) == 1 then
                     local occupiedEnhName = Enhancements.IsOccupiedSlotFor(selection[1], name)
                     if occupiedEnhName then
@@ -166,6 +203,7 @@ EnhancementsHandler = ReUI.Core.Class(ASelectionHandler)
                         return
                     end
                 end
+                PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
                 Enhancements.OrderEnhancement(name, modifiers.Shift)
                 item:UpdatePanel()
             elseif event.Type == "MouseEnter" then
@@ -176,7 +214,11 @@ EnhancementsHandler = ReUI.Core.Class(ASelectionHandler)
             elseif event.Type == "MouseExit" then
                 UnitViewDetail.Hide()
                 local up, down, over, _, sel = GetEnhancementTextures(id, __blueprints[id].Enhancements[name].Icon)
-                item.BackGround = up
+                if self.data.state == "installed" or self.data.state == "queued" then
+                    item.BackGround = sel
+                else
+                    item.BackGround = up
+                end
             end
         end,
 
@@ -199,6 +241,9 @@ EnhancementsHandler = ReUI.Core.Class(ASelectionHandler)
                 item.Icon = nil
             elseif action.state == "disabled" then
                 item.BackGround = up
+                item.IconColor = "aa000000"
+            elseif action.state == "queued" then
+                item.BackGround = sel
                 item.IconColor = "aa000000"
             end
 

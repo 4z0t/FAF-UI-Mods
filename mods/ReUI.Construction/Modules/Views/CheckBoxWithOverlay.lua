@@ -39,6 +39,7 @@ CheckBoxWithOverlay = ReUI.Core.Class(CheckBox)
         self._overlay:SetFrame(1)
     end,
 
+    ---@param self CheckBoxWithOverlay
     OnDestroy = function(self)
         self._overlay = nil
         CheckBox.OnDestroy(self)

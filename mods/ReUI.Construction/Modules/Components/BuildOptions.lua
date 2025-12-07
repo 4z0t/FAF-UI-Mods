@@ -12,9 +12,6 @@ local IsRestricted = import("/lua/game.lua").IsRestricted
 
 local Enumerate = ReUI.LINQ.Enumerate
 
----@class BuildOptionData
----@field id string
-
 local sortCategoriesOrder = {
     categories.SORTCONSTRUCTION,
     categories.SORTECONOMY,
@@ -136,13 +133,106 @@ local function CheckACUBuildOptions(acus)
     return buildableCategories
 end
 
----@class BuildOptionsHandler : ASelectionHandler
-BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
+---@class HotKeyData
+---@field textsize number
+---@field colour string
+---@field key string
+
+---@class BuildOptionData
+---@field id string
+---@field hotkey HotKeyData?
+
+
+---@class BaseBuildOptionsHandler : ASelectionHandler
+---@field hotkeys table<string, HotKeyData>
+local BaseBuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
+{
+    OnInit = function(self)
+        self.hotkeys = {}
+    end,
+
+    ---@param self BuildOptionsHandler
+    SetHotKeys = function(self, hotkeys)
+        self.hotkeys = hotkeys
+    end,
+}
+
+---@class BaseBuildItem : AItemComponent
+---@field data BuildOptionData
+---@field context ConstructionContext
+---@field textBG ReUI.UI.Controls.Bitmap
+---@field text ReUI.UI.Controls.Text
+local BaseBuildItem = ReUI.Core.Class(AItemComponent)
+{
+    ---Called when component is bond to an item
+    ---@param self BaseBuildItem
+    ---@param item ReUI.Construction.Grid.Item
+    Create = function(self, item)
+        self.textBG = ReUI.UI.Controls.Bitmap(item)
+        item.Layouter(self.textBG)
+            :Color("ff272822")
+            :AtRightBottomIn(item)
+            :Width(20)
+            :Height(20)
+            :Over(item, 6)
+            :DisableHitTest()
+            :Hide()
+
+        self.text = ReUI.UI.Controls.Text(item)
+        self.text:SetFont("Arial", 14)
+        item.Layouter(self.text)
+            :AtCenterIn(self.textBG)
+            :DisableHitTest()
+            :Over(item, 7)
+            :Hide()
+    end,
+
+    ---Called when item is activated with this component event handling
+    ---@param self BaseBuildItem
+    ---@param item ReUI.Construction.Grid.Item
+    ---@param action BuildOptionData
+    ---@param context ConstructionContext
+    Enable = function(self, item, action, context)
+        self.data = action
+        self.context = context
+        local id = self.data.id
+
+        if action.hotkey then
+            self.textBG:Show()
+            self.text:SetText(action.hotkey.key)
+            self.text:SetFont("Arial", action.hotkey.textsize)
+            self.text:SetColor(action.hotkey.colour)
+            self.text:Show()
+        end
+        item:DisplayBPID(id)
+        item.Text = nil
+    end,
+
+    ---Called when item is changing event handler
+    ---@param self BaseBuildItem
+    ---@param item ReUI.Construction.Grid.Item
+    Disable = function(self, item)
+        self.text:Hide()
+        self.textBG:Hide()
+        item:ClearDisplay()
+    end,
+
+    ---Called when component is being destroyed
+    ---@param self BaseBuildItem
+    Destroy = function(self)
+        self.context = nil
+        self.data = nil
+
+        self.text = nil
+        self.textBG = nil
+    end,
+}
+
+
+---@class BuildOptionsHandler : BaseBuildOptionsHandler
+BuildOptionsHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
 {
     Name = "BuildOptions",
-
-    OnInit = function(self)
-    end,
 
     ---@param self BuildOptionsHandler
     ---@param context ConstructionContext
@@ -154,7 +244,9 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
         end
         ---@cast selection -nil
 
-        local isAllEngineers = table.empty(EntityCategoryFilterOut(categories.ENGINEER, selection))
+        local isAllEngineers = table.empty(EntityCategoryFilterOut(categories.ENGINEER +
+            categories.xrl0403, -- Megalith
+            selection))
         if not isAllEngineers then
             return
         end
@@ -208,6 +300,8 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
             return
         end
 
+        local hotkeys = self.hotkeys
+
         return Enumerate(buildableUnits)
             :OrderBy(function(value) return value end,
                 function(bp1, bp2)
@@ -227,7 +321,10 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
                     return bp1 < bp2
                 end)
             :Select(function(bpID)
-                return { id = bpID }
+                return {
+                    id = bpID,
+                    hotkey = hotkeys[bpID]
+                }
             end)
             :ToArray()
     end,
@@ -236,23 +333,16 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
     OnDestroy = function(self)
     end,
 
-    ---@class BuildOptionsItem : AItemComponent
-    ---@field data BuildOptionData
-    ---@field context ConstructionContext
-    ComponentClass = ReUI.Core.Class(AItemComponent)
+    ---@class BuildOptionsItem : BaseBuildItem
+    ComponentClass = ReUI.Core.Class(BaseBuildItem)
     {
-        ---Called when component is bond to an item
-        ---@param self BuildOptionsItem
-        ---@param item ReUI.Construction.Grid.Item
-        Create = function(self, item)
-        end,
-
         ---Called when grid item receives an event
         ---@param self BuildOptionsItem
         ---@param item ReUI.Construction.Grid.Item
         ---@param event KeyEvent
         HandleEvent = function(self, item, event)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
+                ClearBuildTemplates()
                 import("/lua/ui/game/commandmode.lua").StartCommandMode("build", { name = self.data.id })
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
             elseif event.Type == "MouseEnter" then
@@ -261,34 +351,6 @@ BuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
             elseif event.Type == "MouseExit" then
                 UnitViewDetail.Hide()
             end
-        end,
-
-        ---Called when item is activated with this component event handling
-        ---@param self BuildOptionsItem
-        ---@param item ReUI.Construction.Grid.Item
-        ---@param action BuildOptionData
-        ---@param context ConstructionContext
-        Enable = function(self, item, action, context)
-            self.data = action
-            self.context = context
-            local id = self.data.id
-            item:DisplayBPID(id)
-            item.Text = nil
-        end,
-
-        ---Called when item is changing event handler
-        ---@param self BuildOptionsFactoryItem
-        ---@param item ReUI.Construction.Grid.Item
-        Disable = function(self, item)
-            item.StrategicIcon = nil
-            item.BackGround = nil
-            item.Icon = nil
-        end,
-
-        ---Called when component is being destroyed
-        ---@param self BuildOptionsItem
-        Destroy = function(self)
-            self.context = nil
         end,
     },
 }
@@ -332,13 +394,10 @@ local techBuildables = {
     ["EXPERIMENTAL"] = (categories.EXPERIMENTAL - CONSTRUCTIONSORTDOWN),
 }
 
----@class BuildOptionsFactoryHandler : ASelectionHandler
-BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
+---@class BuildOptionsFactoryHandler : BaseBuildOptionsHandler
+BuildOptionsFactoryHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
 {
     Name = "BuildOptionsFactory",
-
-    OnInit = function(self)
-    end,
 
     ---@param self BuildOptionsFactoryHandler
     ---@param context ConstructionContext
@@ -395,6 +454,8 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
 
         local focusArmy = GetFocusArmy()
 
+        local hotkeys = self.hotkeys
+
         return Enumerate(buildableUnits)
             :Where(function(bpID)
                 return not IsRestricted(bpID, focusArmy)
@@ -418,7 +479,10 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
                 return bp1 < bp2
             end)
             :Select(function(bpID)
-                return { id = bpID }
+                return {
+                    id = bpID,
+                    hotkey = hotkeys[bpID]
+                }
             end)
             :ToArray()
     end,
@@ -427,17 +491,9 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
     OnDestroy = function(self)
     end,
 
-    ---@class BuildOptionsFactoryItem : AItemComponent
-    ---@field data BuildOptionData
-    ---@field context ConstructionContext
-    ComponentClass = ReUI.Core.Class(AItemComponent)
+    ---@class BuildOptionsFactoryItem : BaseBuildItem
+    ComponentClass = ReUI.Core.Class(BaseBuildItem)
     {
-        ---Called when component is bond to an item
-        ---@param self BuildOptionsFactoryItem
-        ---@param item ReUI.Construction.Grid.Item
-        Create = function(self, item)
-        end,
-
 
         ---@param self BuildOptionsFactoryItem
         ---@param selection UserUnit[]
@@ -453,15 +509,14 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
                         return true
                     elseif bpGeneral.UpgradesFrom == unitBp.General.UpgradesTo then
                         return true
-                    elseif bpGeneral.UpgradesFromBase ~= "none" then
+                    elseif bpGeneral.UpgradesFromBase == "none" then
+                        return false
                         -- Try testing against the base
-                        if bpGeneral.UpgradesFromBase == unitBp.BlueprintId then
-                            return true
-                        elseif bpGeneral.UpgradesFromBase == unitBp.General.UpgradesFromBase then
-                            return true
-                        end
+                    elseif bpGeneral.UpgradesFromBase == unitBp.BlueprintId then
+                        return true
+                    elseif bpGeneral.UpgradesFromBase == unitBp.General.UpgradesFromBase then
+                        return true
                     end
-                    return false
                 end)
             if performUpgrade then
                 IssueUpgradeOrders(selection, id)
@@ -485,12 +540,25 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
         end,
 
         ---@param self BuildOptionsFactoryItem
+        ---@param unit UserUnit
+        ---@return UIBuildQueue
+        GetFactoryQueue = function(self, unit)
+            local currentCommandQueue
+            if EntityCategoryContains(categories.EXTERNALFACTORY, unit) then
+                currentCommandQueue = SetCurrentFactoryForQueueDisplay(unit:GetCreator())
+            else
+                currentCommandQueue = SetCurrentFactoryForQueueDisplay(unit)
+            end
+            return currentCommandQueue
+        end,
+
+        ---@param self BuildOptionsFactoryItem
         ---@param selection UserUnit[]
         ---@param id string
         ---@param count number
         InsertFrontQueue = function(self, selection, id, count)
             local factory = selection[1]
-            local queue = SetCurrentFactoryForQueueDisplay(factory)
+            local queue = self:GetFactoryQueue(factory)
             if table.empty(queue) then
                 self:OrderConstruction(selection, id, count)
                 return
@@ -524,6 +592,20 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             end
         end,
 
+        ---@param self BuildOptionsFactoryItem
+        ---@param factory UserUnit
+        ---@param id string
+        ---@param count number
+        RemoveFromQueue = function(self, factory, id, count)
+            local queue = self:GetFactoryQueue(factory)
+            for index = table.getn(queue), 1, -1 do
+                if queue[index].id == id then
+                    DecreaseBuildCountInQueue(index, count)
+                    break
+                end
+            end
+        end,
+
         ---Called when grid item receives an event
         ---@param self BuildOptionsFactoryItem
         ---@param item ReUI.Construction.Grid.Item
@@ -531,18 +613,25 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
         HandleEvent = function(self, item, event)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
                 local modifiers = event.Modifiers
+
                 local count = 1
                 if modifiers.Shift or modifiers.Ctrl then
                     count = 5
                 end
 
-                if modifiers.Alt and table.getn(self.context.selection) == 1 then
-                    self:InsertFrontQueue(self.context.selection, self.data.id, count)
-                else
-                    self:OrderConstruction(self.context.selection, self.data.id, count)
+                if modifiers.Left then
+                    if modifiers.Alt and table.getn(self.context.selection) == 1 then
+                        self:InsertFrontQueue(self.context.selection, self.data.id, count)
+                    else
+                        self:OrderConstruction(self.context.selection, self.data.id, count)
+                    end
+                elseif modifiers.Right then
+                    if table.getn(self.context.selection) == 1 then
+                        self:RemoveFromQueue(self.context.selection[1], self.data.id, count)
+                    end
                 end
-                item:UpdatePanel()
 
+                item:UpdatePanel()
                 PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
             elseif event.Type == "MouseEnter" then
                 local id = self.data.id
@@ -550,34 +639,6 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(ASelectionHandler)
             elseif event.Type == "MouseExit" then
                 UnitViewDetail.Hide()
             end
-        end,
-
-        ---Called when item is activated with this component event handling
-        ---@param self BuildOptionsFactoryItem
-        ---@param item ReUI.Construction.Grid.Item
-        ---@param action BuildOptionData
-        ---@param context ConstructionContext
-        Enable = function(self, item, action, context)
-            self.data = action
-            self.context = context
-            local id = self.data.id
-            item:DisplayBPID(id)
-            item.Text = nil
-        end,
-
-        ---Called when item is changing event handler
-        ---@param self BuildOptionsFactoryItem
-        ---@param item ReUI.Construction.Grid.Item
-        Disable = function(self, item)
-            item.StrategicIcon = nil
-            item.BackGround = nil
-            item.Icon = nil
-        end,
-
-        ---Called when component is being destroyed
-        ---@param self BuildOptionsFactoryItem
-        Destroy = function(self)
-            self.context = nil
         end,
     },
 }

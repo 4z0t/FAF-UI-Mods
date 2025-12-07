@@ -10,9 +10,15 @@ ReUI.Options.Mods["ReUI.Construction"] = {
     width = Opt(400),
     canScroll = Opt(false),
     color = Opt("ffffffff"),
+
+    selection = {
+        showGroups = Opt(false),
+    },
 }
 
 function Main()
+    local UIUtil = import('/lua/ui/uiutil.lua')
+
     local options = ReUI.Options.Mods["ReUI.Construction"]
     Options.AddOptions("ReUI.Construction", "ReUI.Construction", {
         -- Options.Slider("Rows", 1, 10, 1, options.rows, 4),
@@ -22,6 +28,8 @@ function Main()
         Options.Slider("Scale", 50, 300, 25, options.scale, 4),
         Options.Filter("Scroll through items", options.canScroll),
         Options.ColorSlider("Text color", options.color, 4),
+        -- Options.Title("Selection", nil, nil, UIUtil.factionTextColor),
+        -- Options.Filter("show groups", options.selection.showGroups, 4),
     })
 
 end

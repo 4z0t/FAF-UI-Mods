@@ -1,6 +1,6 @@
 ReUI.Require
 {
-    "ReUI.Core >= 1.0.0",
+    "ReUI.Core >= 1.5.0",
     "ReUI.LINQ >= 1.4.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.UI.Color >= 1.0.0",
@@ -15,22 +15,6 @@ ReUI.Require
 
 
 function Main(isReplay)
-    local techLevels =
-    {
-        "TECH1",
-        "TECH2",
-        "TECH3",
-        "EXPERIMENTAL"
-    }
-
-    local techFiles =
-    {
-        ["TECH1"] = '/game/construct-tech_btn/t1_btn_',
-        ["TECH2"] = '/game/construct-tech_btn/t2_btn_',
-        ["TECH3"] = '/game/construct-tech_btn/t3_btn_',
-        ["EXPERIMENTAL"] = '/game/construct-tech_btn/t4_btn_',
-    }
-
     ---@type EnhancementSlot[]
     local slotNames =
     {
@@ -46,11 +30,10 @@ function Main(isReplay)
         Back = '/game/construct-tech_btn/m_upgrade_btn_',
     }
 
-    local Bitmap       = ReUI.UI.Controls.Bitmap
-    local Text         = ReUI.UI.Controls.Text
-    local CheckBox     = ReUI.UI.Controls.CheckBox
-    local Group        = ReUI.UI.Controls.Group
-    local BaseGridItem = ReUI.UI.Views.Grid.BaseGridItem
+    local Bitmap   = ReUI.UI.Controls.Bitmap
+    local Text     = ReUI.UI.Controls.Text
+    local CheckBox = ReUI.UI.Controls.CheckBox
+    local Group    = ReUI.UI.Controls.Group
 
     local Enumerate = ReUI.LINQ.Enumerate
     local Contains = ReUI.LINQ.IPairsEnumerator:Contains()
@@ -58,277 +41,23 @@ function Main(isReplay)
     local LF = ReUI.UI.LayoutFunctions
 
     local UIUtil = import("/lua/ui/uiutil.lua")
-    local StrategicIconsFile = import("/lua/ui/game/straticons.lua")
     local Tooltip = import("/lua/ui/game/tooltip.lua")
-    local LazyVar = import('/lua/lazyvar.lua').Create
 
     local HorizontalGridScroller = import("Modules/GridScroller.lua").HorizontalGridScroller
     local LazyGrid               = import("Modules/Views/LazyGrid.lua").LazyGrid
     local ButtonWithOverlay      = import("Modules/Views/ButtonWithOverlay.lua").ButtonWithOverlay
-    local CheckBoxWithOverlay    = import("Modules/Views/CheckBoxWithOverlay.lua").CheckBoxWithOverlay
+    local ConstructionBorder     = import("Modules/Views/Border.lua").Border
+    local Event                  = import("Modules/Event.lua").Event
+    local Item                   = import("Modules/Views/Item.lua").Item
 
 
-    local validIcons = { land = true, air = true, sea = true, amph = true }
-    ---@param unitID string
-    ---@return FileName
-    ---@return FileName
-    ---@return FileName
-    ---@return FileName
-    local function GetBackgroundTextures(unitID)
-        local bp = __blueprints[unitID]
-        local icon = "land"
-        if unitID and unitID ~= 'default' then
-            local bpIcon = bp.General.Icon
-            if not validIcons[bpIcon] then
-                if bpIcon then
-                    WARN(debug.traceback(nil, "Invalid icon" .. bpIcon .. " for unit " .. tostring(unitID)))
-                end
-                bp.General.Icon = "land"
-            else
-                icon = bpIcon
-            end
-        end
-
-        return UIUtil.UIFile('/icons/units/' .. icon .. '_up.dds'--[[@as FileName]] ),
-            UIUtil.UIFile('/icons/units/' .. icon .. '_down.dds'--[[@as FileName]] ),
-            UIUtil.UIFile('/icons/units/' .. icon .. '_over.dds'--[[@as FileName]] ),
-            UIUtil.UIFile('/icons/units/' .. icon .. '_up.dds'--[[@as FileName]] )
-    end
-
-    ---@class ReUI.Construction.Grid.Item : BaseGridItem
-    ---@field _grid  ReUI.Construction.Grid
-    ---@field _bg  ReUI.UI.Controls.Bitmap
-    ---@field _icon  ReUI.UI.Controls.Bitmap
-    ---@field _strategicIcon  ReUI.UI.Controls.Bitmap
-    ---@field _text  ReUI.UI.Controls.Text
-    local ConstructionPanelItem = ReUI.Core.Class(BaseGridItem)
-    {
-        ---@type Lazy<Color>
-        TextColor = LazyVar("ffffffff"),
-
-        ---@param self ReUI.Construction.Grid.Item
-        ---@param parent ReUI.Construction.Grid
-        __init = function(self, parent)
-            BaseGridItem.__init(self, parent)
-            self._grid = parent
-
-            self._bg = Bitmap(self)
-            self._icon = Bitmap(self)
-            self._strategicIcon = Bitmap(self)
-            self._text = Text(self)
-        end,
-
-        ---@param self ReUI.Construction.Grid.Item
-        ---@param layouter ReUI.UI.Layouter
-        InitLayout = function(self, layouter)
-            BaseGridItem.InitLayout(self, layouter)
-            layouter(self._bg)
-                :Fill(self)
-                :DisableHitTest()
-                :Over(self, 1)
-
-            layouter(self._icon)
-                :Fill(self)
-                :DisableHitTest()
-                :Over(self, 2)
-
-            layouter(self._strategicIcon)
-                :AtLeftTopIn(self, 4, 4)
-                :DisableHitTest()
-                :Over(self, 3)
-
-            layouter(self._text)
-                :AtRightBottomIn(self)
-                :Color(self.TextColor)
-                :DropShadow(true)
-                :DisableHitTest()
-                :Over(self, 10)
-
-            layouter(self)
-                :Color "00000000"
-
-            self._text:SetFont("Arial", 20)
-        end,
-
-        ---@type string
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        Icon = ReUI.Core.Property
-        {
-            ---@param self ReUI.Construction.Grid.Item
-            set = function(self, value)
-                if value == nil then
-                    self._icon:Hide()
-                    return
-                end
-
-                if DiskGetFileInfo(UIUtil.UIFile('/icons/units/' .. value .. '_icon.dds'--[[@as FileName]] , true)) then
-                    self._icon:SetTexture(UIUtil.UIFile('/icons/units/' .. value .. '_icon.dds'--[[@as FileName]] , true))
-                else
-                    self._icon:SetTexture(UIUtil.UIFile('/icons/units/default_icon.dds'))
-                end
-                self._icon:Show()
-            end
-        },
-
-        ---@type string
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        IconColor = ReUI.Core.Property
-        {
-            ---@param self ReUI.Construction.Grid.Item
-            set = function(self, value)
-                if value == nil then
-                    self._icon:Hide()
-                    return
-                end
-                self._icon:SetSolidColor(value)
-                self._icon:Show()
-            end
-        },
-
-        ---@type string
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        StrategicIcon = ReUI.Core.Property
-        {
-            ---@param self ReUI.Construction.Grid.Item
-            set = function(self, value)
-                if value == nil then
-                    self._strategicIcon:Hide()
-                    return
-                end
-
-                local iconName = __blueprints[value].StrategicIconName
-                if not iconName then
-                    self._strategicIcon:Hide()
-                    return
-                end
-
-                local path = '/textures/ui/common/game/strategicicons/' .. iconName .. '_rest.dds' --[[@as FileName]]
-                if DiskGetFileInfo(path) then
-                    self._strategicIcon:SetTexture(path)
-                    self._strategicIcon:Show()
-                    return
-                end
-
-                local icon = StrategicIconsFile.aSpecificStratIcons[value] or
-                    StrategicIconsFile.aStratIconTranslation[iconName]
-
-                if not icon then
-                    self._strategicIcon:Hide()
-                    return
-                end
-
-                local path = '/textures/ui/icons_strategic/' .. icon .. '.dds' --[[@as FileName]]
-                if not DiskGetFileInfo(path) then
-                    self._strategicIcon:Hide()
-                    return
-                end
-
-                self._strategicIcon:SetTexture(path)
-                self._strategicIcon:Show()
-            end
-        },
-
-        ---@type string
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        BackGround = ReUI.Core.Property
-        {
-            ---@param self ReUI.Construction.Grid.Item
-            set = function(self, value)
-                if value == nil then
-                    self._bg:Hide()
-                    return
-                end
-
-                self._bg:SetTexture(value)
-                self._bg:Show()
-            end
-        },
-
-        ---@type string|number
-        ---@diagnostic disable-next-line:assign-type-mismatch
-        Text = ReUI.Core.Property
-        {
-            ---@param self ReUI.Construction.Grid.Item
-            set = function(self, value)
-                if value == nil then
-                    self._text:Hide()
-                    return
-                end
-
-                self._text:SetText(value)
-                self._text:Show()
-            end
-        },
-
-        ---@param self ReUI.Construction.Grid.Item
-        ---@param id string
-        ---@param mode? "up"|"down"|"rest"|"disabled"
-        DisplayBPID = function(self, id, mode)
-            mode = mode or "rest"
-            self.StrategicIcon = id
-            self:SetBackGroundFromId(id, mode)
-            self.Icon = id
-        end,
-
-        ---@param self ReUI.Construction.Grid.Item
-        ClearDisplay = function(self)
-            self.StrategicIcon = nil
-            self.BackGround = nil
-            self.Icon = nil
-            self.Text = nil
-            self._text:SetColor(self.TextColor)
-        end,
-
-        ---@param self ReUI.Construction.Grid.Item
-        ---@param id string
-        ---@param mode? "up"|"down"|"rest"|"disabled"
-        SetBackGroundFromId = function(self, id, mode)
-            if id == nil then
-                self._bg:Hide()
-                return
-            end
-
-            local up, down, rest, dis = GetBackgroundTextures(id)
-            local texture = rest
-            if mode == "up" then
-                texture = up
-            elseif mode == "rest" then
-                texture = rest
-            elseif mode == "down" then
-                texture = down
-            elseif mode == "disabled" then
-                texture = dis
-            end
-            self._bg:SetTexture(texture)
-            self._bg:Show()
-        end,
-
-        ---@param self ReUI.Construction.Grid.Item
-        ---@param immediately? boolean
-        UpdatePanel = function(self, immediately)
-            local panel = self._grid.panel
-            if immediately then
-                panel:Refresh()
-            else
-                ForkThread(panel.Refresh, panel)
-            end
-        end,
-
-        ---@param self ReUI.Construction.Grid.Item
-        OnDestroy = function(self)
-            self._grid = nil
-            self._bg = nil
-            self._icon = nil
-            self._strategicIcon = nil
-            self._text = nil
-            BaseGridItem.OnDestroy(self)
-        end,
-    }
 
     ---@alias UpdateReason
     ---| "selection"
     ---| "queue"
     ---| "refresh"
+    ---| "tab"
+    ---| "tech"
 
     ---@alias TechLevel
     ---| "NONE"
@@ -338,9 +67,10 @@ function Main(isReplay)
     ---| "EXPERIMENTAL"
 
     ---@class ConstructionHandlerData
-    ---@field tab Tabs
+    ---@field tab TabNames
     ---@field name string
     ---@field displayMode "grid"|"list"
+    ---@field actions string[]
     ---@field handler ASelectionHandler
 
     ---@class ConstructionContext
@@ -349,7 +79,7 @@ function Main(isReplay)
     ---@field slot EnhancementSlot
     ---@field reason UpdateReason
     ---@field panel ReUI.Construction.Panel
-    ---@field tab Tabs|"all"
+    ---@field tab TabNames|"all"
 
     ---@class ReUI.Construction.Grid : LazyGrid
     ---@field panel ReUI.Construction.Panel
@@ -363,7 +93,8 @@ function Main(isReplay)
     ---@field _canScroll boolean
     local ConstructionGrid = ReUI.Core.Class(LazyGrid)
     {
-        ItemClass = ConstructionPanelItem,
+        ItemClass = Item,
+        AutoLayout = false,
 
         ---@param self ReUI.Construction.Grid
         ---@param parent ReUI.Construction.Panel
@@ -401,8 +132,6 @@ function Main(isReplay)
                     self:Refresh()
                 end
             end
-
-            self.AutoLayout = false
         end,
 
         ---@param self ReUI.Construction.Grid
@@ -501,14 +230,6 @@ function Main(isReplay)
         end,
 
         ---@param self ReUI.Construction.Grid
-        OnResized = function(self)
-            if self:IsHidden() then
-                return
-            end
-            self:Refresh()
-        end,
-
-        ---@param self ReUI.Construction.Grid
         Disable = function(self)
             self._btnEnd:Disable()
             self._btnNext:Disable()
@@ -529,9 +250,6 @@ function Main(isReplay)
                 self:Disable()
                 return
             end
-            ---@cast actions -nil
-            ---@cast context -nil
-            ---@cast handlerData -nil
 
             self:Show()
 
@@ -594,56 +312,16 @@ function Main(isReplay)
         OnDestroy = function(self)
             self._scroller:Destroy()
             self._scroller = nil
-            self._border = nil
             self._btnNext = nil
             self._btnPrev = nil
             self._btnStart = nil
             self._btnEnd = nil
-            self._overlayNext = nil
-            self._overlayPrev = nil
-            self._overlayStart = nil
-            self._overlayEnd = nil
+            self._componentClasses = nil
+            self.panel = nil
             LazyGrid.OnDestroy(self)
         end,
     }
 
-    ---@class ConstructionBorder : ReUI.UI.Controls.Group
-    ---@field l  ReUI.UI.Controls.Bitmap
-    ---@field r  ReUI.UI.Controls.Bitmap
-    ---@field m  ReUI.UI.Controls.Bitmap
-    local ConstructionBorder = ReUI.Core.Class(Group)
-    {
-        ---@param self ConstructionBorder
-        ---@param parent Control
-        __init = function(self, parent)
-            Group.__init(self, parent)
-
-            self.l = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_s_bmp_l.dds')
-            self.m = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_m3.dds')
-            self.r = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_r.dds')
-        end,
-
-        ---@param self ConstructionBorder
-        ---@param layouter ReUI.UI.Layouter
-        InitLayout = function(self, layouter)
-
-            layouter(self.l)
-                :Left(self.Left)
-                :Top(self.Top)
-                :Bottom(self.Bottom)
-
-            layouter(self.r)
-                :Right(self.Right)
-                :Top(self.Top)
-                :Bottom(self.Bottom)
-
-            layouter(self.m)
-                :Right(self.r.Left)
-                :Left(self.l.Right)
-                :Top(self.Top)
-                :Bottom(self.Bottom)
-        end,
-    }
 
     ---@class Tab : ReUI.UI.Controls.CheckBox
     local Tab = ReUI.Core.Class(CheckBox)
@@ -659,7 +337,7 @@ function Main(isReplay)
         end
     }
 
-    ---@alias Tabs
+    ---@alias TabNames
     ---| "selection"
     ---| "construction"
     ---| "enhancements"
@@ -694,55 +372,496 @@ function Main(isReplay)
         return true
     end
 
+    ---@class ConstructionTabs
+    ---@field _currentTab TabNames
+    ---@field _constructionPanel ReUI.Construction.Panel
+    ---@field _constructionTab Tab
+    ---@field _selectionTab Tab
+    ---@field _enhancementsTab Tab
+    ---@field _tabs table<TabNames, Tab>
+    local ConstructionTabs = ReUI.Core.Class()
+    {
+        ---@param self ConstructionTabs
+        ---@param parent ReUI.Construction.Panel
+        __init = function(self, parent)
+            self._constructionPanel = parent
+            self._currentTab = "selection"
+
+            ---@param checkBox Tab
+            ---@param tab TabNames
+            local function OnTabCheck(checkBox, tab)
+                if not self:SetCurrentTab(tab) then
+                    return
+                end
+                self._constructionPanel:OnTabChanged(tab)
+            end
+
+            self._constructionTab = Tab(self._constructionPanel)
+            Tooltip.AddControlTooltip(self._constructionTab, 'construction_tab_construction')
+            ---@param tab Tab
+            ---@param checked boolean
+            self._constructionTab.OnCheck = function(tab, checked)
+                OnTabCheck(tab, "construction")
+            end
+
+            self._selectionTab = Tab(self._constructionPanel)
+            Tooltip.AddControlTooltip(self._selectionTab, 'construction_tab_attached')
+            ---@param tab Tab
+            ---@param checked boolean
+            self._selectionTab.OnCheck = function(tab, checked)
+                OnTabCheck(tab, "selection")
+            end
+
+            self._enhancementsTab = Tab(self._constructionPanel)
+            Tooltip.AddControlTooltip(self._enhancementsTab, 'construction_tab_enhancement')
+            ---@param tab Tab
+            ---@param checked boolean
+            self._enhancementsTab.OnCheck = function(tab, checked)
+                OnTabCheck(tab, "enhancements")
+            end
+
+            self._tabs = {
+                construction = self._constructionTab,
+                selection = self._selectionTab,
+                enhancements = self._enhancementsTab,
+            }
+        end,
+
+        ---@param self ConstructionTabs
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+            local constructionPanel = self._constructionPanel
+
+            local tabFiles = {
+                construction = '/game/construct-tab_btn/top_tab_btn_',
+                selection = '/game/construct-tab_btn/mid_tab_btn_',
+                enhancement = '/game/construct-tab_btn/bot_tab_btn_',
+            }
+
+            ---@param name FileName
+            ---@return FileName
+            ---@return FileName
+            ---@return FileName
+            ---@return FileName
+            ---@return FileName
+            ---@return FileName
+            local function GetTabTextures(name)
+                return UIUtil.UIFile(name .. 'up_bmp.dds'),
+                    UIUtil.UIFile(name .. 'sel_bmp.dds'),
+                    UIUtil.UIFile(name .. 'over_bmp.dds'),
+                    UIUtil.UIFile(name .. 'down_bmp.dds'),
+                    UIUtil.UIFile(name .. 'dis_bmp.dds'),
+                    UIUtil.UIFile(name .. 'dis_bmp.dds')
+            end
+
+            layouter(self._enhancementsTab)
+                :AtLeftIn(constructionPanel, -10)
+                :AtBottomIn(constructionPanel, -11)
+
+            self._enhancementsTab:SetNewTextures(GetTabTextures(tabFiles.enhancement))
+            self._enhancementsTab:UseAlphaHitTest(true)
+
+            layouter(self._selectionTab)
+                :Above(self._enhancementsTab, -16)
+
+            self._selectionTab:SetNewTextures(GetTabTextures(tabFiles.selection))
+            self._selectionTab:UseAlphaHitTest(true)
+
+            layouter(self._constructionTab)
+                :Above(self._selectionTab, -16)
+
+            self._constructionTab:SetNewTextures(GetTabTextures(tabFiles.construction))
+            self._constructionTab:UseAlphaHitTest(true)
+        end,
+
+        ---@param self ConstructionTabs
+        ---@param tabName TabNames
+        ---@return boolean
+        SetCurrentTab = function(self, tabName)
+            if self._currentTab == tabName then
+                return false
+            end
+
+            self._currentTab = tabName
+            ---@param tab Tab
+            for name, tab in self._tabs do
+                tab:SetCheck(tabName == name, true)
+            end
+            return true
+        end,
+
+        ---@param self ConstructionTabs
+        ---@param tabName TabNames
+        ---@param enabled boolean
+        SetTabEnabled = function(self, tabName, enabled)
+            local tab = self._tabs[tabName]
+            if tab then
+                if enabled then
+                    tab:Enable()
+                else
+                    tab:Disable()
+                end
+            end
+        end
+    }
+
+    local ActionCheckBox = import("Modules/Views/ActionCheckBox.lua").ActionCheckBox
+
+    local ActionCheckBoxBehavior = import("Modules/Views/ActionCheckBox.lua").ActionCheckBoxBehavior
+
+    ---@class PauseBehavior : ReUI.Construction.ActionCheckBoxBehavior
+    local PauseBehavior = ReUI.Core.Class(ActionCheckBoxBehavior)
+    {
+        ---@param self PauseBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        OnAttach = function(self, checkBox)
+            checkBox:SetNewTextures(
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_up.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_selected.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_dis.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_dis.dds')
+            )
+
+            checkBox:SetOverlayTextures(
+                UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
+            )
+        end,
+
+        ---@param self PauseBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        ---@param paused boolean
+        OnChecked = function(self, checkBox, paused)
+            local selection = checkBox.Context.selection
+            if table.empty(selection) then
+                return
+            end
+            ---@cast selection -nil
+
+            SetPaused(selection, paused)
+            local checkedS = paused and "true" or "false"
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT,
+                selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', checkedS)
+            end
+        end,
+
+        ---@param self PauseBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        OnUpdate = function(self, checkBox)
+            local selection = checkBox.Context.selection
+            if table.empty(selection) then
+                checkBox:Disable()
+                return
+            end
+            ---@cast selection -nil
+
+            local orders = GetUnitCommandData(selection)
+            local isPauseAvailable = Contains(orders, "RULEUCC_Pause")
+
+            if isPauseAvailable then
+                checkBox:SetCheck(GetIsPaused(selection), true)
+                checkBox:Enable()
+            else
+                checkBox:Disable()
+            end
+        end,
+    }
+
+    ---@class RepeatBehavior : ReUI.Construction.ActionCheckBoxBehavior
+    local RepeatBehavior = ReUI.Core.Class(ActionCheckBoxBehavior)
+    {
+        ---@param self RepeatBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        OnAttach = function(self, checkBox)
+            checkBox:SetNewTextures(
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_up.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_selected.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_dis.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/mid_btn_dis.dds')
+            )
+
+            checkBox:SetOverlayTextures(
+                UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds'),
+                UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
+            )
+        end,
+
+        ---@param self RepeatBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        ---@param isChecked boolean
+        OnChecked = function(self, checkBox, isChecked)
+            local selection = checkBox.Context.selection
+            if table.empty(selection) then
+                return
+            end
+            ---@cast selection -nil
+
+            local isRepeatBuild = isChecked and 'true' or 'false'
+            ---@param unit UserUnit
+            for _, unit in selection do
+                unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
+                    unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                end
+            end
+        end,
+
+        ---@param self RepeatBehavior
+        ---@param checkBox ReUI.Construction.ActionCheckBox
+        OnUpdate = function(self, checkBox)
+            local selection = checkBox.Context.selection
+            if table.empty(selection) then
+                checkBox:Disable()
+                return
+            end
+
+            ---@cast selection -nil
+
+            local allFactories = Enumerate(selection)
+                ---@param unit UserUnit
+                :All(function(unit)
+                    return EntityCategoryContains(categories.FACTORY + categories.EXTERNALFACTORY, unit)
+                end)
+
+            if allFactories then
+                local allRepeatQueue = Enumerate(selection)
+                    ---@param unit UserUnit
+                    :All(function(unit)
+                        return unit:IsRepeatQueue()
+                    end)
+
+                checkBox:SetCheck(allRepeatQueue, true)
+                checkBox:Enable()
+            else
+                checkBox:Disable()
+            end
+        end,
+    }
+
+    ---@class TabsRowProto
+    ---@field name string
+    ---@field file FileName
+
+    ---@class TechTab : ReUI.UI.Controls.CheckBox
+    ---@field name string
+    ---@field file FileName
+    local TechTab = ReUI.Core.Class(CheckBox)
+    {
+        AutoLayout = false,
+
+        ---@param self TechTab
+        ---@param parent Control
+        ---@param name string
+        ---@param file FileName
+        __init = function(self, parent, name, file)
+            CheckBox.__init(self, parent)
+
+            self.mClickCue = 'UI_Tab_Click_02'
+            self.mRolloverCue = 'UI_Tab_Rollover_02'
+
+            self.name = name
+            self.file = file
+        end,
+
+        ---@param self TechTab
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+            local file = self.file
+            self:SetNewTextures(
+                UIUtil.UIFile(file .. 'up.dds'),
+                UIUtil.UIFile(file .. 'selected.dds'),
+                UIUtil.UIFile(file .. 'over.dds'),
+                UIUtil.UIFile(file .. 'down.dds'),
+                UIUtil.UIFile(file .. 'dis.dds'),
+                UIUtil.UIFile(file .. 'dis.dds')
+            )
+        end,
+    }
+
+
+    ---@class TechTabs : ReUI.UI.Controls.Group
+    ---@field _constructionPanel ReUI.Construction.Panel
+    ---@field _tabs ReUI.UI.Controls.CheckBox[]
+    local TechTabs = ReUI.Core.Class(Group)
+    {
+        AutoLayout = false,
+
+        ---@param self TechTabs
+        ---@param parent ReUI.Construction.Panel
+        ---@param tabs TabsRowProto[]
+        __init = function(self, parent, tabs)
+            Group.__init(self, parent)
+
+            self._constructionPanel = parent
+
+            ---@param tab TechTab
+            ---@param checked boolean
+            local function OnTabCheck(tab, checked)
+                self:OnTabCheck(tab.name)
+            end
+
+            self._tabs = {}
+            for _, proto in ipairs(tabs) do
+                local tab = TechTab(self, proto.name, proto.file)
+                tab.OnCheck = OnTabCheck
+                table.insert(self._tabs, tab)
+            end
+        end,
+
+        ---@param self TechTabs
+        ---@param tech TechLevel
+        SetActiveTechTab = function(self, tech)
+            ---@param tab TechTab
+            for i, tab in self._tabs do
+                tab:SetCheck(tab.name == tech, true)
+            end
+        end,
+
+        ---@param self TechTabs
+        ---@param techs table<TechLevel, boolean>
+        SetAvailableTech = function(self, techs)
+            for tech, enabled in techs do
+                self:SetEnabledTab(tech, enabled)
+            end
+        end,
+
+        ---@param self TechTabs
+        ---@param name string
+        ---@param enabled boolean
+        SetEnabledTab = function(self, name, enabled)
+            for i, tab in self._tabs do
+                if tab.name == name then
+                    if enabled then
+                        tab:Enable()
+                    else
+                        tab:Disable()
+                    end
+                    break
+                end
+            end
+        end,
+
+        ---@param self TechTabs
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+
+            local prev
+            ---@param tab TechTab
+            for i, tab in self._tabs do
+                if prev then
+                    layouter(tab)
+                        :RightOf(prev)
+                else
+                    layouter(tab)
+                        :AtRightBottomIn(self)
+                end
+
+                layouter(tab)
+                    :PerformLayout()
+
+                prev = tab
+            end
+
+            layouter(self)
+                :Width(0)
+                :Height(0)
+                :DisableHitTest()
+        end,
+
+        ---@param self TechTabs
+        ---@param name string
+        OnTabCheck = function(self, name)
+            ---@param tab TechTab
+            for _, tab in self._tabs do
+                if tab.name ~= name then
+                    tab:SetCheck(false, true)
+                end
+            end
+
+            self._constructionPanel:OnTechChanged(name)
+        end,
+
+        ---@param self TechTabs
+        OnDestroy = function(self)
+            self._tabs = nil
+            self._constructionPanel = nil
+            Group.OnDestroy(self)
+        end
+    }
+
     ---@class ReUI.Construction.Panel : ReUI.UI.Controls.Group
     ---@field _context ConstructionContext
     ---@field _componentClasses table<string, fun(instance: BaseGridItem):AItemComponent>
     ---@field _selectionHandlers table<string, ASelectionHandler>
-    ---@field _tabs table<string, ReUI.UI.Controls.CheckBox>
+    ---@field _actionsBehavior table<string, ReUI.Construction.ActionCheckBoxBehavior>
     ---@field _slots table<string, ReUI.UI.Controls.CheckBox>
-    ---@field _currentTab Tabs
+    ---@field _constructionTabs ConstructionTabs
+    ---@field _techTabs TechTabs
     ---@field _canScroll boolean
     ---@field _primary ReUI.Construction.Grid
     ---@field _enhancements ReUI.Construction.Grid
     ---@field _secondary ReUI.Construction.Grid
     ---@field _border ConstructionBorder
-    ---@field _pause CheckBoxWithOverlay
-    ---@field _repeat CheckBoxWithOverlay
-    ---@field _constructionTab Tab
-    ---@field _selectionTab Tab
-    ---@field _enhancementsTab Tab
+    ---@field _actionCheckBoxes ReUI.Construction.ActionCheckBox[]
+    ---@field UpdateEvent Event
     local ConstructionPanel = ReUI.Core.Class(Group)
     {
+
+        ---@type table<string, ReUI.Construction.ActionCheckBoxBehavior>
+        Actions = {
+            ["pause"]       = PauseBehavior,
+            ["repeatBuild"] = RepeatBehavior,
+        },
+
+        ---@type TabsRowProto[]
+        TechTabs = {
+            { name = "TECH1", file = '/game/construct-tech_btn/t1_btn_', },
+            { name = "TECH2", file = '/game/construct-tech_btn/t2_btn_', },
+            { name = "TECH3", file = '/game/construct-tech_btn/t3_btn_', },
+            { name = "EXPERIMENTAL", file = '/game/construct-tech_btn/t4_btn_', },
+        },
+
         ---@type ConstructionHandlerData[]
         PrimaryHandlers = {
             {
-                tab = "construction",
                 name = "BuildOptions",
+                tab = "construction",
                 displayMode = "grid",
-                handler = import("Modules/Components/BuildOptions.lua").BuildOptionsHandler
+                actions = { "repeatBuild", "pause" },
+                handler = import("Modules/Components/BuildOptions.lua").BuildOptionsHandler,
             },
             {
-                tab = "construction",
                 name = "BuildOptionsFactory",
+                tab = "construction",
                 displayMode = "grid",
+                actions = { "repeatBuild", "pause" },
                 handler = import("Modules/Components/BuildOptions.lua").BuildOptionsFactoryHandler
             },
             {
-                tab = "selection",
                 name = "UpgradeChain",
+                tab = "selection",
                 displayMode = "list",
+                actions = { "repeatBuild", "pause" },
                 handler = import("Modules/Components/UpgradeChain.lua").UpgradeChainHandler,
             },
             {
-                tab = "selection",
                 name = "Selection",
+                tab = "selection",
                 displayMode = "grid",
+                actions = { "repeatBuild", "pause" },
                 handler = import("Modules/Components/SelectedUnits.lua").SelectedUnitsListHandler
             },
             {
-                tab = "enhancements",
                 name = "Enhancements",
+                tab = "enhancements",
                 displayMode = "list",
+                actions = { "repeatBuild", "pause" },
                 handler = import("Modules/Components/Enhancements.lua").EnhancementsHandler,
             },
         },
@@ -750,28 +869,28 @@ function Main(isReplay)
         ---@type ConstructionHandlerData[]
         SecondaryHandlers = {
             {
-                tab = "construction",
                 name = "FactoryQueue",
+                tab = "construction",
                 handler = import("Modules/Components/QueueList.lua").QueueListHandler
             },
             {
-                tab = "construction",
                 name = "BuildQueue",
+                tab = "construction",
                 handler = import("Modules/Components/BuildQueue.lua").BuildQueueHandler
             },
             {
-                tab = "selection",
                 name = "TransportCargo",
+                tab = "selection",
                 handler = import("Modules/Components/TransportCargo.lua").TransportCargoHandler
             },
             {
-                tab = "selection",
                 name = "CarrierCargo",
+                tab = "selection",
                 handler = import("Modules/Components/CarrierCargo.lua").CarrierCargoHandler
             },
             {
-                tab = "selection",
                 name = "Selection",
+                tab = "selection",
                 handler = import("Modules/Components/SelectedUnits.lua").SelectedUnitsListHandler
             },
         },
@@ -784,7 +903,9 @@ function Main(isReplay)
 
             self.Layouter = ReUI.UI.RoundLayouter(LF.Div(options.scale:Raw(), 100))
             self.AutoLayout = false
-            self._currentTab = "selection"
+
+            self.UpdateEvent = Event()
+
             self._canScroll = false
             self._context = {
                 tech = "NONE",
@@ -795,6 +916,11 @@ function Main(isReplay)
                 panel = self,
                 displayMode = "grid",
             }
+
+            self._actionsBehavior = {}
+            for name, behavior in self.Actions do
+                self._actionsBehavior[name] = behavior()
+            end
 
             self._selectionHandlers = {}
             self._componentClasses = {}
@@ -822,42 +948,17 @@ function Main(isReplay)
                 self._selectionHandlers[name] = handlerData.handler(self)
             end
 
+            self._constructionTabs = ConstructionTabs(self)
             self._primary = ReUI.Construction.Grid(self, self._componentClasses)
             self._secondary = ReUI.Construction.Grid(self, self._componentClasses)
             self._enhancements = ReUI.Construction.Grid(self, self._componentClasses)
             self._border = ConstructionBorder(self)
+            self._techTabs = TechTabs(self, self.TechTabs)
 
-            self._pause = CheckBoxWithOverlay(self)
-            self._pause.OnCheck = function(pause, checked)
-                self:OnPause(checked)
-            end
-
-            self._repeat = CheckBoxWithOverlay(self)
-            self._repeat.OnCheck = function(repeat_, checked)
-                self:OnRepeat(checked)
-            end
-
-            self._tabs = {}
-
-            local function OnCheck(_tab, checked)
-                ---@param tab ReUI.UI.Controls.CheckBox
-                for _, tab in self._tabs do
-                    if tab ~= _tab then
-                        tab:SetCheck(false, true)
-                    end
-                end
-
-                self._context.tech = _tab.tech
-                self:Refresh()
-            end
-
-            for i, t in techLevels do
-                self._tabs[i] = CheckBox(self)
-                self._tabs[i].tech = t
-                self._tabs[i].OnCheck = OnCheck
-                self._tabs[i].mClickCue = 'UI_Tab_Click_02'
-                self._tabs[i].mRolloverCue = 'UI_Tab_Rollover_02'
-            end
+            self._actionCheckBoxes = {
+                ActionCheckBox(self, self._context),
+                ActionCheckBox(self, self._context),
+            }
 
             self._slots = {}
 
@@ -879,30 +980,6 @@ function Main(isReplay)
                 self._slots[i].OnCheck = OnCheckSlot
                 self._slots[i].mClickCue = 'UI_Tab_Click_02'
                 self._slots[i].mRolloverCue = 'UI_Tab_Rollover_02'
-            end
-
-            self._constructionTab = Tab(self)
-            Tooltip.AddControlTooltip(self._constructionTab, 'construction_tab_construction')
-            ---@param tab Tab
-            ---@param checked boolean
-            self._constructionTab.OnCheck = function(tab, checked)
-                self:OnCheckedConstructionTab()
-            end
-
-            self._selectionTab = Tab(self)
-            Tooltip.AddControlTooltip(self._selectionTab, 'construction_tab_attached')
-            ---@param tab Tab
-            ---@param checked boolean
-            self._selectionTab.OnCheck = function(tab, checked)
-                self:OnCheckedSelectionTab()
-            end
-
-            self._enhancementsTab = Tab(self)
-            Tooltip.AddControlTooltip(self._enhancementsTab, 'construction_tab_enhancement')
-            ---@param tab Tab
-            ---@param checked boolean
-            self._enhancementsTab.OnCheck = function(tab, checked)
-                self:OnCheckedEnhancementsTab()
             end
 
             local itemSize = 48
@@ -930,44 +1007,6 @@ function Main(isReplay)
         ---@param self ReUI.Construction.Panel
         ---@param layouter ReUI.UI.Layouter
         InitLayout = function(self, layouter)
-            local textures = {
-                midBtn = {
-                    up = UIUtil.UIFile('/game/construct-sm_btn/mid_btn_up.dds'),
-                    selected = UIUtil.UIFile('/game/construct-sm_btn/mid_btn_selected.dds'),
-                    down = UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
-                    over = UIUtil.UIFile('/game/construct-sm_btn/mid_btn_over.dds'),
-                    dis = UIUtil.UIFile('/game/construct-sm_btn/mid_btn_dis.dds')
-                },
-                minBtn = {
-                    up = UIUtil.UIFile('/game/construct-sm_btn/left_btn_up.dds'),
-                    down = UIUtil.UIFile('/game/construct-sm_btn/left_btn_over.dds'),
-                    over = UIUtil.UIFile('/game/construct-sm_btn/left_btn_over.dds'),
-                    dis = UIUtil.UIFile('/game/construct-sm_btn/left_btn_dis.dds')
-                },
-                maxBtn = {
-                    up = UIUtil.UIFile('/game/construct-sm_btn/right_btn_up.dds'),
-                    down = UIUtil.UIFile('/game/construct-sm_btn/right_btn_over.dds'),
-                    over = UIUtil.UIFile('/game/construct-sm_btn/right_btn_over.dds'),
-                    dis = UIUtil.UIFile('/game/construct-sm_btn/right_btn_dis.dds')
-                },
-                minIcon = {
-                    on = UIUtil.UIFile('/game/construct-sm_btn/back_on.dds'),
-                    off = UIUtil.UIFile('/game/construct-sm_btn/back_off.dds')
-                },
-                maxIcon = {
-                    on = UIUtil.UIFile('/game/construct-sm_btn/forward_on.dds'),
-                    off = UIUtil.UIFile('/game/construct-sm_btn/forward_off.dds')
-                },
-                pageMinIcon = {
-                    on = UIUtil.UIFile('/game/construct-sm_btn/rewind_on.dds'),
-                    off = UIUtil.UIFile('/game/construct-sm_btn/rewind_off.dds')
-                },
-                pageMaxIcon = {
-                    on = UIUtil.UIFile('/game/construct-sm_btn/fforward_on.dds'),
-                    off = UIUtil.UIFile('/game/construct-sm_btn/fforward_off.dds')
-                }
-            }
-
             self._primary.AutoWidth = false
             self._secondary.AutoWidth = false
             self._enhancements.AutoWidth = false
@@ -994,40 +1033,14 @@ function Main(isReplay)
                 :ResetWidth()
                 :Hide()
 
-            layouter(self._repeat)
+
+            layouter(self._actionCheckBoxes[1])
                 :FillVertically(self._enhancements)
                 :AtLeftIn(self, 65)
 
-            self._repeat:SetNewTextures(
-                textures.midBtn.up,
-                textures.midBtn.selected,
-                textures.midBtn.over,
-                textures.midBtn.over,
-                textures.midBtn.dis,
-                textures.midBtn.dis
-            )
-
-            self._repeat:SetOverlayTextures(
-                UIUtil.UIFile('/game/construct-sm_btn/infinite_off.dds'),
-                UIUtil.UIFile('/game/construct-sm_btn/infinite_on.dds')
-            )
-
-            layouter(self._pause)
+            layouter(self._actionCheckBoxes[2])
                 :FillVertically(self._secondary)
                 :AtLeftIn(self, 65)
-
-            self._pause:SetNewTextures(
-                textures.midBtn.up,
-                textures.midBtn.selected,
-                textures.midBtn.over,
-                textures.midBtn.over,
-                textures.midBtn.dis,
-                textures.midBtn.dis
-            )
-            self._pause:SetOverlayTextures(
-                UIUtil.UIFile('/game/construct-sm_btn/pause_off.dds'),
-                UIUtil.UIFile('/game/construct-sm_btn/pause_on.dds')
-            )
 
             layouter(self._border)
                 :Top(self.Top)
@@ -1041,31 +1054,16 @@ function Main(isReplay)
                 :AtTopIn(self._primary, -5)
                 :EnableHitTest()
 
-            local prev
-            ---@param tab ReUI.UI.Controls.CheckBox
-            for i, tab in self._tabs do
-                if prev then
-                    layouter(tab)
-                        :RightOf(prev)
-                else
-                    layouter(tab)
-                        :Above(self._primary, 3)
-                end
 
-                local pre = techFiles[tab.tech] --[[@as FileName]]
-                tab:SetNewTextures(
-                    UIUtil.UIFile(pre .. 'up.dds'),
-                    UIUtil.UIFile(pre .. 'selected.dds'),
-                    UIUtil.UIFile(pre .. 'over.dds'),
-                    UIUtil.UIFile(pre .. 'down.dds'),
-                    UIUtil.UIFile(pre .. 'dis.dds'),
-                    UIUtil.UIFile(pre .. 'dis.dds')
-                )
+            layouter(self._techTabs)
+                :Above(self._primary, 3)
+                :PerformLayout()
 
-                prev = tab
+            for i, checkbox in self._actionCheckBoxes do
+                checkbox.Behavior = nil
             end
-            prev = nil
 
+            local prev
             ---@param slot ReUI.UI.Controls.CheckBox
             for i, slot in self._slots do
                 if prev then
@@ -1089,48 +1087,11 @@ function Main(isReplay)
                 prev = slot
             end
 
-            local tabFiles = {
-                construction = '/game/construct-tab_btn/top_tab_btn_',
-                selection = '/game/construct-tab_btn/mid_tab_btn_',
-                enhancement = '/game/construct-tab_btn/bot_tab_btn_',
-            }
-
-            ---@param name FileName
-            ---@return FileName
-            ---@return FileName
-            ---@return FileName
-            ---@return FileName
-            ---@return FileName
-            ---@return FileName
-            local function GetTabTextures(name)
-                return UIUtil.UIFile(name .. 'up_bmp.dds'),
-                    UIUtil.UIFile(name .. 'sel_bmp.dds'),
-                    UIUtil.UIFile(name .. 'over_bmp.dds'),
-                    UIUtil.UIFile(name .. 'down_bmp.dds'),
-                    UIUtil.UIFile(name .. 'dis_bmp.dds'),
-                    UIUtil.UIFile(name .. 'dis_bmp.dds')
-            end
-
-            layouter(self._enhancementsTab)
-                :AtLeftIn(self, -10)
-                :AtBottomIn(self, -11)
-
-            self._enhancementsTab:SetNewTextures(GetTabTextures(tabFiles.enhancement))
-            self._enhancementsTab:UseAlphaHitTest(true)
-
-            layouter(self._selectionTab)
-                :Above(self._enhancementsTab, -16)
-
-            self._selectionTab:SetNewTextures(GetTabTextures(tabFiles.selection))
-            self._selectionTab:UseAlphaHitTest(true)
-
-            layouter(self._constructionTab)
-                :Above(self._selectionTab, -16)
-
-            self._constructionTab:SetNewTextures(GetTabTextures(tabFiles.construction))
-            self._constructionTab:UseAlphaHitTest(true)
+            self._constructionTabs:InitLayout(layouter)
         end,
 
+        ---@param self ReUI.Construction.Panel
+        ---@param event KeyEvent
         HandleEvent = function(self, event)
             if event.Type == "WheelRotation" then
                 return self._canScroll
@@ -1139,165 +1100,15 @@ function Main(isReplay)
         end,
 
         ---@param self ReUI.Construction.Panel
-        OnCheckedConstructionTab = function(self)
-            if self._currentTab == "construction" then
-                return
-            end
-
-            self:ApplyToTabs(self.ShowCheckBox)
-            self:ApplyToSlots(self.HideCheckBox)
-
-            self._context.tab = "construction"
-            self:SetCurrentTab("construction")
-            self:Refresh()
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        OnCheckedSelectionTab = function(self)
-            if self._currentTab == "selection" then
-                return
-            end
-
-            self:ApplyToTabs(self.HideCheckBox)
-            self:ApplyToSlots(self.HideCheckBox)
-
-            self._context.tab = "selection"
-            self:SetCurrentTab("selection")
-            self:Refresh()
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        OnCheckedEnhancementsTab = function(self)
-            if self._currentTab == "enhancements" then
-                return
-            end
-            self:ApplyToTabs(self.HideCheckBox)
-            for _, slot in self._slots do
-                slot:Show()
-                slot:SetCheck(slot.slot == self._context.slot, true)
-            end
-            self._context.tab = "enhancements"
-            self:SetCurrentTab("enhancements")
-            self:Refresh()
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        ---@param tab Tabs
-        SetCurrentTab = function(self, tab)
-            self._currentTab = tab
-            self._constructionTab:SetCheck(tab == "construction", true)
-            self._selectionTab:SetCheck(tab == "selection", true)
-            self._enhancementsTab:SetCheck(tab == "enhancements", true)
-        end,
-
-        ---@param self ReUI.Construction.Panel
         ---@param techs table<TechLevel, boolean>
         SetAvailableTech = function(self, techs)
-            ---@param tab ReUI.UI.Controls.CheckBox
-            for i, tab in self._tabs do
-                local enabled = techs[tab.tech]
-                if enabled then
-                    tab:Enable()
-                else
-                    tab:Disable()
-                end
-            end
+            self._techTabs:SetAvailableTech(techs)
         end,
 
         ---@param self ReUI.Construction.Panel
         ---@param tech TechLevel
         SetActiveTech = function(self, tech)
-            ---@param tab ReUI.UI.Controls.CheckBox
-            for i, tab in self._tabs do
-                tab:SetCheck(tab.tech == tech, true)
-            end
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        ---@param paused boolean
-        OnPause = function(self, paused)
-            local selection = self._context.selection
-            if table.empty(selection) then
-                return
-            end
-            ---@cast selection -nil
-
-            SetPaused(selection, paused)
-            local checkedS = paused and "true" or "false"
-            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
-            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT,
-                selection) do
-                exFac:GetCreator():ProcessInfo('SetPaused', checkedS)
-            end
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        OnRepeat = function(self, repeat_)
-            local selection = self._context.selection
-            if table.empty(selection) then
-                return
-            end
-            ---@cast selection -nil
-
-            local isRepeatBuild = repeat_ and 'true' or 'false'
-            ---@param unit UserUnit
-            for _, unit in selection do
-                unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
-                    unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                end
-            end
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        UpdatePause = function(self)
-            local selection = self._context.selection
-            if table.empty(selection) then
-                self._pause:Disable()
-                return
-            end
-            ---@cast selection -nil
-
-            local orders = GetUnitCommandData(selection)
-            local isPauseAvailable = Contains(orders, "RULEUCC_Pause")
-
-            if isPauseAvailable then
-                self._pause:SetCheck(GetIsPaused(selection), true)
-                self._pause:Enable()
-            else
-                self._pause:Disable()
-            end
-
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        UpdateRepeat = function(self)
-            local selection = self._context.selection
-            if table.empty(selection) then
-                self._repeat:Disable()
-                return
-            end
-
-            ---@cast selection -nil
-
-            local allFactories = Enumerate(selection)
-                ---@param unit UserUnit
-                :All(function(unit)
-                    return EntityCategoryContains(categories.FACTORY + categories.EXTERNALFACTORY, unit)
-                end)
-
-            if allFactories then
-                local allRepeatQueue = Enumerate(selection)
-                    ---@param unit UserUnit
-                    :All(function(unit)
-                        return unit:IsRepeatQueue()
-                    end)
-
-                self._repeat:SetCheck(allRepeatQueue, true)
-                self._repeat:Enable()
-            else
-                self._repeat:Disable()
-            end
+            self._techTabs:SetActiveTechTab(tech)
         end,
 
         ---@param self ReUI.Construction.Panel
@@ -1305,14 +1116,6 @@ function Main(isReplay)
         ApplyToSlots = function(self, func)
             for _, slot in self._slots do
                 func(self, slot)
-            end
-        end,
-
-        ---@param self ReUI.Construction.Panel
-        ---@param func fun(self: ReUI.Construction.Panel, slot:ReUI.UI.Controls.CheckBox)
-        ApplyToTabs = function(self, func)
-            for _, tab in self._tabs do
-                func(self, tab)
             end
         end,
 
@@ -1326,6 +1129,13 @@ function Main(isReplay)
         ---@param cb ReUI.UI.Controls.CheckBox
         ShowCheckBox = function(self, cb)
             cb:Show()
+        end,
+
+        ---@param self ReUI.Construction.Panel
+        ---@param name string
+        ---@return ASelectionHandler?
+        GetHandler = function(self, name)
+            return self._selectionHandlers[name]
         end,
 
         ---@param self ReUI.Construction.Panel
@@ -1346,7 +1156,7 @@ function Main(isReplay)
                     continue
                 end
                 local name = handlerData.name
-                local handler = self._selectionHandlers[name]
+                local handler = self:GetHandler(name) --[[@as ASelectionHandler]]
 
                 local actions, context = handler:Update(selfContext)
                 if actions then
@@ -1366,8 +1176,8 @@ function Main(isReplay)
                 self._context.tab == "enhancements")
 
             if not primaryHandlerData and not secondaryHandlerData then
+                self._constructionTabs:SetCurrentTab("none")
                 self:Hide()
-                self._currentTab = "none"
                 return
             end
             --- This is never nil afterwards
@@ -1397,38 +1207,62 @@ function Main(isReplay)
             end
 
             local tab = primaryHandlerData.tab
-            self:SetCurrentTab(tab)
+            self._constructionTabs:SetCurrentTab(tab)
 
             if reason == "selection" then
                 if tab == "construction" then
-                    self:ApplyToTabs(self.ShowCheckBox)
+                    self._techTabs:Show()
                     self:ApplyToSlots(self.HideCheckBox)
-                    self._constructionTab:Enable()
-                    self._selectionTab:Enable()
+                    self._constructionTabs:SetTabEnabled("construction", true)
+                    self._constructionTabs:SetTabEnabled("selection", true)
                 elseif tab == "selection" then
-                    self:ApplyToTabs(self.HideCheckBox)
+                    self._techTabs:Hide()
                     self:ApplyToSlots(self.HideCheckBox)
-                    self._constructionTab:Disable()
-                    self._selectionTab:Enable()
+                    self._constructionTabs:SetTabEnabled("construction", false)
+                    self._constructionTabs:SetTabEnabled("selection", true)
                 elseif tab == "enhancements" then
-                    self:ApplyToTabs(self.HideCheckBox)
+                    self._techTabs:Hide()
                     self:ApplyToSlots(self.ShowCheckBox)
                 end
 
-                if HasEnhancementsForSelection(self._context.selection) then
-                    self._enhancementsTab:Enable()
-                else
-                    self._enhancementsTab:Disable()
-                end
+                self._constructionTabs:SetTabEnabled("enhancements",
+                    HasEnhancementsForSelection(self._context.selection))
             end
 
-            self:UpdatePause()
-            self:UpdateRepeat()
+            local actions = primaryHandlerData.actions
+            for i, checkbox in self._actionCheckBoxes do
+                checkbox.Behavior = self._actionsBehavior[ actions[i] ]
+                checkbox:Update()
+            end
+
+            self.UpdateEvent:Invoke(self, self._context)
         end,
 
         ---@param self ReUI.Construction.Panel
         Refresh = function(self)
             self:Update("refresh")
+        end,
+
+        ---@param self ReUI.Construction.Panel
+        ---@param tab TabNames
+        OnTabChanged = function(self, tab)
+            self._context.tab = tab
+
+            if tab == "construction" then
+                self._techTabs:Show()
+                self:ApplyToSlots(self.HideCheckBox)
+            elseif tab == "selection" then
+                self._techTabs:Hide()
+                self:ApplyToSlots(self.HideCheckBox)
+            elseif tab == "enhancements" then
+                self._techTabs:Hide()
+                for _, slot in self._slots do
+                    slot:Show()
+                    slot:SetCheck(slot.slot == self._context.slot, true)
+                end
+            end
+
+            self:Update("tab")
         end,
 
         ---@param self ReUI.Construction.Panel
@@ -1446,6 +1280,13 @@ function Main(isReplay)
             end
 
             self:Update("selection")
+        end,
+
+        ---@param self ReUI.Construction.Panel
+        ---@param tech TechLevel
+        OnTechChanged = function(self, tech)
+            self._context.tech = tech
+            self:Update("tech")
         end,
 
         ---@param self ReUI.Construction.Panel
@@ -1472,6 +1313,10 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         OnDestroy = function(self)
+            self._actionsBehavior = nil
+            self._techTabs = nil
+            self._border = nil
+            self._actionCheckBoxes = nil
             self._primary = nil
             self._secondary = nil
             self._enhancements = nil
@@ -1600,13 +1445,40 @@ function Main(isReplay)
     --- This must be removed as well as corresponding keybind
     ConstructionHook("ToggleUnitPause", function(field, module)
         return function()
+            local selection = GetSelectedUnits()
+            if table.empty(selection) then
+                return
+            end
+            ---@cast selection -nil
+
+            local paused = not GetIsPaused(selection)
+            SetPaused(selection, paused)
+            local checkedS = paused and "true" or "false"
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT,
+                selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', checkedS)
+            end
+        end
+    end)
+
+    ConstructionHook("setIdRelations", function(field, module)
+        return function(idRelations, upgradeKey)
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
             if IsDestroyed(panel) then
                 return
             end
 
-            panel._pause:ToggleCheck()
+            local handler = panel:GetHandler "BuildOptions" --[[@as BuildOptionsHandler?]]
+            if handler then
+                handler:SetHotKeys(idRelations)
+            end
+            local handler = panel:GetHandler "BuildOptionsFactory" --[[@as BuildOptionsHandler?]]
+            if handler then
+                handler:SetHotKeys(idRelations)
+            end
+
         end
     end)
 
@@ -1618,7 +1490,7 @@ function Main(isReplay)
     --[ ] Expose toggles for shitty keybinds
     --[x] Progress bar for construction
     --[x] don't display count for upgrades of factories
-    --[ ] display keybinds in construction menu
+    --[x] display keybinds in construction menu
     --[x] old selection check is incorrect and must be done elsewhere
     --[x] fix progress bar with enhancements and regular construction
     --[ ] fix order of items with queue and enhancements (including cases with deleting items and when upgrades are reset)
@@ -1628,7 +1500,10 @@ function Main(isReplay)
     --[x] bottom panel doesn't display other things in enhancements mode
     --[x] add reui error messages into game chat
     --[x] fix tech switch when queue is changed
-    --[ ] fix queue and chain upgrades for t2 shields of UEF and Seraphim (use command queue instead of factory queue)
+    --[x] fix queue and chain upgrades for t2 shields of UEF and Seraphim (use command queue instead of factory queue) (it has to be fixed on sim side.)
+    --[ ] display upgrade keybinds in construction menu
+    --[x] add logic for removing items from queue in build options of factories
+    --[ ] fix construction tab disabling when current tab is selection
     -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
 
     return {

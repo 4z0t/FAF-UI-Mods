@@ -201,12 +201,35 @@ BuildQueueHandler = ReUI.Core.Class(ASelectionHandler)
 
         local unit = selection[1]
 
-        if not EntityCategoryContains(categories.SHOWQUEUE, unit) then
+        if not
+            EntityCategoryContains(categories.SHOWQUEUE +
+                categories.SHIELD * categories.STRUCTURE * categories.TECH2, -- workaround for t2 shields
+                unit) then
             queueContext:Clear()
             return
         end
 
         self._context.unit = unit
+
+        if EntityCategoryContains(categories.SHIELD * categories.STRUCTURE * categories.TECH2 - categories.SHOWQUEUE,
+            unit) then
+            local queue = unit:GetCommandQueue()
+            if table.empty(queue) then
+                return {}, queueContext
+            end
+
+            return {
+                { 1,
+                    {
+                        count = 1,
+                        id = unit:GetBlueprint().General.UpgradesTo
+                    },
+                    type = "unit",
+                    showProgress = true
+                }
+            }, queueContext
+        end
+
 
         local bp           = unit:GetBlueprint()
         local enhancements = bp.Enhancements
@@ -219,13 +242,16 @@ BuildQueueHandler = ReUI.Core.Class(ASelectionHandler)
 
         ---@type UIBuildQueueItem[]
         local currentCommandQueue = SetCurrentFactoryForQueueDisplay(unit)
-
         if table.empty(currentCommandQueue) then
             -- ClearCurrentFactoryForQueueDisplay()
             return {}, queueContext
         end
 
         local queue = BuildQueueToQueueData(currentCommandQueue)
+        if table.empty(queue) then
+            return {}, queueContext
+        end
+
         queue[1].showProgress = true
         return queue, queueContext
     end,
