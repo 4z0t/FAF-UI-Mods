@@ -143,7 +143,28 @@ CarrierCargoHandler = ReUI.Core.Class(ASelectionHandler)
         end
         ---@cast selection -nil
 
+        local focusUnits = Enumerate(selection)
+            :Select(function(unit)
+                return EntityCategoryContains(categories.EXTERNALFACTORY, unit)
+                    and unit:GetCreator()
+                    or unit
+            end)
+            ---@param unit UserUnit
+            :Select(function(unit)
+                return unit:GetFocus()
+            end)
+            :Where(function(unit)
+                return unit
+            end)
+            :ToSet()
+
         local attachedUnits = EntityCategoryFilterDown(categories.MOBILE, GetAttachedUnitsList(selection))
+
+        attachedUnits = Enumerate(attachedUnits)
+            :Where(function(unit)
+                return not focusUnits[unit]
+            end)
+            :ToArray()
 
         if table.empty(attachedUnits) then
             self._context:Clear()
@@ -176,6 +197,7 @@ CarrierCargoHandler = ReUI.Core.Class(ASelectionHandler)
     end,
 
     ---@class CarrierCargoItem : AItemComponent
+    ---@field icon ReUI.UI.Controls.Bitmap
     ---@field data CarrierCargoData
     ---@field context CarrierCargoContext
     ComponentClass = ReUI.Core.Class(AItemComponent)
@@ -184,6 +206,13 @@ CarrierCargoHandler = ReUI.Core.Class(ASelectionHandler)
         ---@param self CarrierCargoItem
         ---@param item ReUI.Construction.Grid.Item
         Create = function(self, item)
+            self.icon = ReUI.UI.Controls.Bitmap(item)
+            item.Layouter(self.icon)
+                :Texture(UIUtil.UIFile('/game/unit_view_icons/attached.dds'))
+                :AtLeftBottomIn(item, 2, 2)
+                :Over(item, 5)
+                :DisableHitTest()
+                :Hide()
         end,
 
         ---Called when grid item receives an event
@@ -223,6 +252,7 @@ CarrierCargoHandler = ReUI.Core.Class(ASelectionHandler)
                 mode = "down"
             end
 
+            self.icon:Show()
             item:DisplayBPID(id, mode)
             item.Text = table.getn(self.data[2])
         end,
@@ -231,13 +261,15 @@ CarrierCargoHandler = ReUI.Core.Class(ASelectionHandler)
         ---@param self CarrierCargoItem
         ---@param item ReUI.Construction.Grid.Item
         Disable = function(self, item)
+            self.icon:Hide()
             item:ClearDisplay()
         end,
 
         ---Called when component is being destroyed
         ---@param self CarrierCargoItem
         Destroy = function(self)
-
+            self.icon = nil
+            self.data = nil
         end,
     },
 }

@@ -14,4 +14,4 @@ enabled = true
 exclusive = false
 ui_only = true
 
-ReUI = 'ReUI.Construction=1.1.0'
+ReUI = 'ReUI.Construction=1.0.0'

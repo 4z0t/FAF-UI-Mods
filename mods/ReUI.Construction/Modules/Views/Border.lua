@@ -1,0 +1,42 @@
+local Bitmap       = ReUI.UI.Controls.Bitmap
+local Group        = ReUI.UI.Controls.Group
+
+local UIUtil = import("/lua/ui/uiutil.lua")
+
+---@class ConstructionBorder : ReUI.UI.Controls.Group
+---@field l  ReUI.UI.Controls.Bitmap
+---@field r  ReUI.UI.Controls.Bitmap
+---@field m  ReUI.UI.Controls.Bitmap
+Border = ReUI.Core.Class(Group)
+{
+    ---@param self ConstructionBorder
+    ---@param parent Control
+    __init = function(self, parent)
+        Group.__init(self, parent)
+
+        self.l = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_s_bmp_l.dds')
+        self.m = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_m3.dds')
+        self.r = Bitmap(self, UIUtil.SkinnableFile '/game/construct-panel/construct-panel_bmp_r.dds')
+    end,
+
+    ---@param self ConstructionBorder
+    ---@param layouter ReUI.UI.Layouter
+    InitLayout = function(self, layouter)
+
+        layouter(self.l)
+            :Left(self.Left)
+            :Top(self.Top)
+            :Bottom(self.Bottom)
+
+        layouter(self.r)
+            :Right(self.Right)
+            :Top(self.Top)
+            :Bottom(self.Bottom)
+
+        layouter(self.m)
+            :Right(self.r.Left)
+            :Left(self.l.Right)
+            :Top(self.Top)
+            :Bottom(self.Bottom)
+    end,
+}

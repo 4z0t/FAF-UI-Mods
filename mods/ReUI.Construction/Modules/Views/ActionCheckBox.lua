@@ -1,0 +1,106 @@
+local CheckBoxWithOverlay = import("CheckBoxWithOverlay.lua").CheckBoxWithOverlay
+
+---@class ReUI.Construction.ActionCheckBox : CheckBoxWithOverlay
+---@field _behavior ReUI.Construction.ActionCheckBoxBehavior?
+---@field _context ConstructionContext
+ActionCheckBox = ReUI.Core.Class(CheckBoxWithOverlay)
+{
+
+    ---@param self ReUI.Construction.ActionCheckBox
+    ---@param parent Control
+    ---@param context ConstructionContext
+    __init = function(self, parent, context)
+        CheckBoxWithOverlay.__init(self, parent)
+
+        self._context = context
+    end,
+
+    ---@param self ReUI.Construction.ActionCheckBox
+    ---@param checked boolean
+    OnCheck = function(self, checked)
+        local behavior = self._behavior
+        if behavior then
+            behavior:OnChecked(self, checked)
+        end
+    end,
+
+    ---@param self ReUI.Construction.ActionCheckBox
+    Update = function(self)
+        local behavior = self._behavior
+        if behavior then
+            behavior:OnUpdate(self)
+        end
+    end,
+
+    ---@type ReUI.Construction.ActionCheckBoxBehavior
+    Behavior = ReUI.Core.Property
+    {
+        ---@param self ReUI.Construction.ActionCheckBox
+        ---@return ReUI.Construction.ActionCheckBoxBehavior
+        get = function(self)
+            return self._behavior
+        end,
+
+        ---@param self ReUI.Construction.ActionCheckBox
+        ---@param value ReUI.Construction.ActionCheckBoxBehavior?
+        set = function(self, value)
+            local prevBehavior = self._behavior
+            if prevBehavior == value then
+                return
+            end
+
+            if prevBehavior then
+                prevBehavior:OnDetach(self)
+            end
+
+            self._behavior = value
+
+            if value then
+                value:OnAttach(self)
+            end
+        end
+    },
+
+    ---@type ConstructionContext
+    Context = ReUI.Core.Property
+    {
+        ---@param self ReUI.Construction.ActionCheckBox
+        ---@return ConstructionContext
+        get = function(self)
+            return self._context
+        end,
+    },
+
+    ---@param self CheckBoxWithOverlay
+    OnDestroy = function(self)
+        self._context = nil
+        self._behavior = nil
+        CheckBoxWithOverlay.OnDestroy(self)
+    end,
+}
+
+
+---@class ReUI.Construction.ActionCheckBoxBehavior
+ActionCheckBoxBehavior = ReUI.Core.Class()
+{
+    ---@param self ReUI.Construction.ActionCheckBoxBehavior
+    ---@param checkBox ReUI.Construction.ActionCheckBox
+    OnAttach = function(self, checkBox)
+    end,
+
+    ---@param self ReUI.Construction.ActionCheckBoxBehavior
+    ---@param checkBox ReUI.Construction.ActionCheckBox
+    OnDetach = function(self, checkBox)
+    end,
+
+    ---@param self ReUI.Construction.ActionCheckBoxBehavior
+    ---@param checkBox ReUI.Construction.ActionCheckBox
+    ---@param isChecked boolean
+    OnChecked = function(self, checkBox, isChecked)
+    end,
+
+    ---@param self ReUI.Construction.ActionCheckBoxBehavior
+    ---@param checkBox ReUI.Construction.ActionCheckBox
+    OnUpdate = function(self, checkBox)
+    end,
+}
