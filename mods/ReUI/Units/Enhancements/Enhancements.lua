@@ -192,7 +192,7 @@ function Main(isReplay)
 
         if not bpEnhancements[enhancement] then return end
 
-        if IsInstalled(unit, enhancement) then return end
+        if IsInstalled(unit, enhancement) or IsQueued(unit, enhancement) then return end
 
         local id = unit:GetEntityId()
 

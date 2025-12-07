@@ -14,6 +14,11 @@ local EscapeCover = ReUI.UI.Views.EscapeCover
 ---@field optionVar OptionVar
 ---@field indent number
 
+---@class OptionsInfo
+---@field name string
+---@field title string
+---@field builder (fun(frame:Frame):Control)|ControlConfig[]
+
 ---#region Options build items
 
 local splitterTable = {
@@ -132,12 +137,18 @@ end
 
 ---#endregion
 
+---@type OptionsInfo[]
 local globalOptions = {}
 local optionsSelector = nil
 local optionsWindows = ReUI.Core.Weak.Value {}
 
+---@class OptionLine : Group
+---@field data OptionsInfo
+---@field id integer
 local OptionLine = Class(Group)
 {
+    ---@param self OptionLine
+    ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
 
@@ -155,14 +166,14 @@ local OptionLine = Class(Group)
         self._bg.OnCheck = function(bg, checked)
             if not IsDestroyed(optionsWindows[self.id]) then return end
 
-            if iscallable(self.data[2]) then
-                optionsWindows[self.id] = self.data[2](parent:GetRootFrame())
+            if iscallable(self.data.builder) then
+                optionsWindows[self.id] = self.data.builder(parent:GetRootFrame())
             else
                 optionsWindows[self.id] = OptionsWindow(
                     parent:GetRootFrame(),
-                    self.data[1],
+                    self.data.title,
                     self.id,
-                    self.data[2]
+                    self.data.builder
                 )
             end
 
@@ -190,11 +201,14 @@ local OptionLine = Class(Group)
             :Over(parent)
     end,
 
+    ---@param self OptionLine
+    ---@param data OptionsInfo?
+    ---@param id integer
     Render = function(self, data, id)
         if data then
             self.id = id
             self.data = data
-            self._name:SetText(data[1])
+            self._name:SetText(data.title)
             self._bg:Enable()
             self._bg:SetCheck(false, true)
         else
@@ -227,6 +241,10 @@ local OptionSelector = Class(DynamicScrollable)
         self._cover.OnClose = function(cover)
             self:Destroy()
         end
+
+        table.sort(globalOptions, function(a, b)
+            return a.name < b.name
+        end)
     end,
 
     __post_init = function(self, parent)
@@ -237,6 +255,10 @@ local OptionSelector = Class(DynamicScrollable)
 
     GetData = function(self)
         return globalOptions
+    end,
+
+    DataIter = function(self, key, data)
+        return next(data, key)
     end,
 
     _InitLines = function(self)
@@ -299,10 +321,6 @@ local OptionSelector = Class(DynamicScrollable)
         self._lineGroup.lines[lineIndex]:Render(value, key)
     end,
 
-    DataIter = function(self, key, data)
-        return next(data, key)
-    end,
-
     OnDestroy = function(self)
         optionsSelector = nil
     end
@@ -316,7 +334,11 @@ local OptionSelector = Class(DynamicScrollable)
 ---@param buildTable table|fun(frame:Frame):Control
 function AddOptions(option, title, buildTable)
     option = (option:gsub("[^A-Za-z0-9]+", "_"))
-    globalOptions[option] = { title, buildTable }
+    table.insert(globalOptions, {
+        name = option,
+        title = title,
+        builder = buildTable
+    })
 end
 
 local function CreateUI(parent)

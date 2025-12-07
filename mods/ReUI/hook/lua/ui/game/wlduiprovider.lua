@@ -13,7 +13,7 @@ do
         return loader:Exists(tag)
     end
 
-    ---@param deps string[]
+    ---@param deps string[]|DependencyInfo
     function __ReUI.Require(deps)
         return loader:Require(deps)
     end
