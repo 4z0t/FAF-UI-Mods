@@ -5,6 +5,7 @@ Currently it is missing some of the features of original panel, such as template
 
 Improvements over original construction panel:
 
+* optimized
 * can be scaled
 * order of units in selection is deterministic
 * queue drag is more stable and also works for mobile factories
