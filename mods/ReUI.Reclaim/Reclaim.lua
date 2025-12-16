@@ -37,11 +37,6 @@ local function RefreshReclaim()
     end
 end
 
-local Reclaim = import('/lua/ui/game/reclaim.lua')
-
-Reclaim.OnCommandGraphShow = function(bool)
-end
-
 ---@type table<EntityId, UIReclaimDataPoint>
 local insidePlayableAreaReclaim = {}
 ---@type table<EntityId, UIReclaimDataPoint>
@@ -80,7 +75,7 @@ local function InPlayableArea(pos)
     return true
 end
 
-Reclaim.SetPlayableArea = function(rect)
+AddOnSyncHashedCallback(function(rect)
     playableArea = rect
 
     local inside = {}
@@ -98,7 +93,7 @@ Reclaim.SetPlayableArea = function(rect)
     outsidePlayableAreaReclaim = outside
 
     RefreshReclaim()
-end
+end, "NewPlayableArea", "ReUI.Reclaim")
 
 AddOnSyncHashedCallback(function(reclaimPoints)
     if table.empty(reclaimPoints) then
@@ -136,6 +131,11 @@ function Main(isReplay)
     local Text = import('/lua/maui/text.lua').Text
 
     local LayoutFor = ReUI.UI.FloorLayoutFor
+
+    local ReclaimHook = ReUI.Core.HookModule '/lua/ui/game/reclaim.lua'
+    ReclaimHook("OnCommandGraphShow", function(field, module)
+        return function(bool) end
+    end)
 
 
     ---@param totalMass number
