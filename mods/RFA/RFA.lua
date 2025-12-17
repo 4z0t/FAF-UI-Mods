@@ -52,6 +52,11 @@ function Main(isReplay)
     local showRadar = false
     local showSonar = false
     local showCounterIntel = false
+    local ringOpacity = 255
+
+    options.ringOpacity:Bind(function(opt)
+        ringOpacity = opt()
+    end)
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -471,7 +476,7 @@ function Main(isReplay)
     ---@return number
     local function GetColorAndThickness(type)
         local params = overlayParams[type]
-        return ("ff%s"):format((params.NormalColor):sub(3)), params.Outer[1] / params.Type
+        return ("%02x%s"):format(ringOpacity, (params.NormalColor):sub(3)), params.Outer[1] / params.Type
     end
 
     local function TableClear(t)
