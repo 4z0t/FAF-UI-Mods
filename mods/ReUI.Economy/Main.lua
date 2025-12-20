@@ -13,7 +13,7 @@ function Main(isReplay)
 
     local EconomyHook = ReUI.Core.HookModule "/lua/ui/game/economy.lua"
 
-    function EconomyHook.CreateEconomyBar(field, module)
+    EconomyHook("CreateEconomyBar", function(field, module)
         return function(parent)
             local options = ReUI.Options.Mods["ReUI.Economy"]
             local scale = options.scale:Raw()
@@ -36,7 +36,7 @@ function Main(isReplay)
 
             return panel
         end
-    end
+    end)
 
     EconomyHook("ToggleEconPanel", function(field, module)
         return function(state)
