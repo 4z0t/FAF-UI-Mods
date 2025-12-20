@@ -26,7 +26,7 @@ end
 function SaveActive(name)
     Model.DelHotBuild(activeName)
     if name and name ~= "" then
-        Model.SaveHotBuild(name, active)
+        Model.SaveHotBuild(name, active, true)
         activeName = name
     end
 end

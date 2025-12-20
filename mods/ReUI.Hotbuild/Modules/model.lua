@@ -81,8 +81,8 @@ function Compile(data)
     return res
 end
 
-local function ResetIdRelations()
-
+local function ResetIdRelations(hotBuilds)
+    import('/lua/keymap/hotkeylabels.lua').init()
 end
 
 local strLen = string.len
@@ -92,16 +92,6 @@ local strLen = string.len
 local hotBuilds
 ---@type table<string,table<SkinName, BPHotbuildData>>
 globalBPs = {}
-
-function ClearHotBuildActions()
-    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
-    for name, action in actions do
-        if action.category == 'ReUI.Hotbuild' then
-            actions[name] = nil
-        end
-    end
-    Prefs.SetToCurrentProfile("UserKeyActions", actions)
-end
 
 function FilterBlueprints()
     local bps = Enumerate(__blueprints, next)
@@ -113,13 +103,15 @@ function FilterBlueprints()
                 return true
             end
             if strLen(id) == 7 then
-                return Enumerate(bp.Categories):Any(function(cat) return legalCategories[cat] end)
+                return Enumerate(bp.Categories)
+                    :Any(function(cat) return legalCategories[cat] end)
             end
             return false
         end)
         :ToTable()
 
-    local templates = Templates.GetTemplates()
+    local templates = Templates.GetTemplates() or {}
+
     for i, div in divisions do
         globalBPs[div.name] = {}
         for j, skin in skins do
@@ -158,31 +150,41 @@ function FilterBlueprints()
                     table.insert(globalBPs[div.name][skin], template)
                 end
             end
-
         end
     end
 end
 
 function AddToUnitkeygroups(name, compiled)
-    local formattedName = ReUI.Actions.FormatActionName(name)
+    local formattedName = ReUI.Actions.FormatActionName(name:lower())
     ReUI.Hotbuild.AddHotbuild(formattedName, compiled)
+    local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
+    unitkeygroups[formattedName] = Enumerate(compiled)
+        :Select(function(value)
+            if type(value) == 'string' then
+                return value
+            end
+            return value.templateData[3][1] or false
+        end)
+        :Where(function(value) return value end)
+        :ToArray()
+
     ReUI.Actions.AddSimpleAction
     {
         formattedName = formattedName,
         description = name,
         action = string.format('UI_Lua ReUI.Hotbuild.ProcessHotbuild("%s")', formattedName),
         category = 'ReUI.Hotbuild',
+        modifiers = { shift = true, alt = true }
     }
 end
 
 function LoadHotBuilds()
-    ClearHotBuildActions()
     hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
         AddToUnitkeygroups(name, compiled)
     end
-    ResetIdRelations()
+    ResetIdRelations(hotBuilds)
 end
 
 function FetchHotBuildsKeys()
@@ -199,12 +201,15 @@ function FilterEmptyTables(data)
     return data
 end
 
-function SaveHotBuild(name, data)
+function SaveHotBuild(name, data, save)
     hotBuilds[name] = FilterEmptyTables(data)
     local compiled = Compile(data)
     AddToUnitkeygroups(name, compiled)
-    ResetIdRelations()
+    ResetIdRelations(hotBuilds)
     Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+    if save then
+        SavePreferences()
+    end
 end
 
 function DelHotBuild(name)
