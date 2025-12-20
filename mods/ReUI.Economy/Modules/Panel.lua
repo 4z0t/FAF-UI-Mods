@@ -61,17 +61,18 @@ local slideAnimation = ReUI.UI.Animation.Factory.Base
 
 
 local bgBlinkAnimation = ReUI.UI.Animation.Factory.Base
-    :OnStart(function(control, state, flashMod)
+    :OnStart(function(control, state, flashMod, maxAlpha)
         return {
             cycles = 0,
             ascending = 1,
             flashMod = flashMod,
+            maxAlpha = maxAlpha or 0.5,
         }
     end)
     :OnFrame(function(control, delta, state)
         local newAlpha = control:GetAlpha() + delta * state.flashMod * state.ascending
-        if newAlpha > .5 then
-            newAlpha = .5
+        if newAlpha > state.maxAlpha then
+            newAlpha = state.maxAlpha
             state.cycles = state.cycles + 1
             state.ascending = -1
         elseif newAlpha < 0 then
@@ -93,10 +94,6 @@ local fadeAnimation = ReUI.UI.Animation.Factory.Alpha
 local animationSpeed = 500
 
 
-local function FormatNumber(n)
-    return math.round(math.clamp(n, 0, 99999999))
-end
-
 local MathAbs = math.abs
 ---Formats number as large one
 ---@param n number | nil
@@ -116,7 +113,10 @@ local function FormatNumber(n)
     end
 end
 
+---@alias ResourceBlockState "yellow"|"hide"|"red"|"none"
+
 ---@class ResourceBlock : ReUI.UI.Controls.Group
+---@field _state ResourceBlockState
 ---@field _type ResourceType
 ---@field _lastReclaimTotal number
 ---@field _bg ReUI.UI.Controls.Bitmap
@@ -148,6 +148,13 @@ ResourceBlock = ReUI.Core.Class(Group)
     ---@field reclaimTotalColor Color
     Style = {},
 
+    ---@type ReUI.UI.Animation.Animation
+    BlinkAnimation = bgBlinkAnimation,
+
+    ---@type ReUI.UI.Animation.Animation
+    FadeAnimation = fadeAnimation,
+
+
     ---@param self ResourceBlock
     ---@param parent Control
     ---@param resourceType ResourceType
@@ -156,6 +163,7 @@ ResourceBlock = ReUI.Core.Class(Group)
         self._type = resourceType
         self._lastReclaimTotal = 0
         self._lastReclaimRate = 0
+        self._state = 'none'
 
         self._bg = Bitmap(self)
         self._icon = Bitmap(self)
@@ -173,7 +181,6 @@ ResourceBlock = ReUI.Core.Class(Group)
         self._reclaimDelta = Text.Create(self, UIUtil.bodyFont, 10)
         self._reclaimTotal = Text.Create(self, UIUtil.bodyFont, 10)
 
-        self._bg._state = ''
     end,
 
     ---@param self ResourceBlock
@@ -189,22 +196,31 @@ ResourceBlock = ReUI.Core.Class(Group)
     end,
 
     ---@param self ResourceBlock
-    ---@param state "yellow"|"hide"|"red"
+    StartBlink = function(self)
+        self.BlinkAnimation:Apply(self._bg, 1.25, 0.5)
+    end,
+
+    ---@param self ResourceBlock
+    StartFade = function(self)
+        self.FadeAnimation:Apply(self._bg)
+    end,
+
+    ---@param self ResourceBlock
+    ---@param state ResourceBlockState
     SetBGState = function(self, state)
-        local bg = self._bg
-        if bg._state == state then
+        if self._state == state then
             return
         end
-        bg._state = state
+        self._state = state
 
         if state == 'red' then
             self:SetBGMode "red"
-            bgBlinkAnimation:Apply(bg, 1.6)
+            self:StartBlink()
         elseif state == 'yellow' then
             self:SetBGMode "yellow"
-            bgBlinkAnimation:Apply(bg, 1.25)
+            self:StartBlink()
         elseif state == "hide" then
-            fadeAnimation:Apply(bg)
+            self:StartFade()
         end
     end,
 
@@ -283,6 +299,11 @@ ResourceBlock = ReUI.Core.Class(Group)
     end,
 
     ---@param self ResourceBlock
+    ResetState = function(self)
+        self._state = "none"
+    end,
+
+    ---@param self ResourceBlock
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
         self._bg:SetTexture({
@@ -355,6 +376,8 @@ ResourceBlock = ReUI.Core.Class(Group)
             :Width(296)
             :Height(25)
             :DisableHitTest(true)
+
+        self:ResetState()
     end,
 }
 

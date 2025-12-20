@@ -75,9 +75,6 @@ function Main(isReplay)
         return function()
             field()
             local controls = import("/lua/ui/game/multifunction.lua").controls
-            ReUI.UI.FloorLayoutFor(controls.bg)
-                :AtTopIn(GetFrame(0), 75)
-
             ReUI.UI.FloorLayoutFor(controls.collapseArrow)
                 :AtVerticalCenterIn(controls.bg)
         end
@@ -102,6 +99,11 @@ function Main(isReplay)
                 elseif mode == 'yellow' then
                     bg:SetSolidColor "yellow"
                 end
+            end
+
+            ---@param control ResourceBlock
+            control.StartBlink = function(control)
+                control.BlinkAnimation:Apply(control._bg, 1.25, 0.5 * 117 / 255)
             end
 
             layouter(control._bg)
@@ -173,12 +175,17 @@ function Main(isReplay)
                 :Width(296)
                 :Height(25)
                 :DisableHitTest(true)
+
+            control:ResetState()
         end,
 
         ---@param self BlockLayout
         ---@param control ResourceBlock
         Restore = function(self, control)
             control.SetBGMode = nil
+            control.StartBlink = nil
+            control._bg:ResetLayout()
+            control:ResetState()
         end
     }
 
@@ -247,7 +254,10 @@ function Main(isReplay)
                 :DisableHitTest()
 
             layouter(self._border)
-                :FillFixedBorder(self, -10)
+                :AtRightIn(self, -7)
+                :AtLeftIn(self, -6)
+                :AtTopIn(self, -9)
+                :AtBottomIn(self, -8)
                 :Under(self)
                 :DisableHitTest(true)
 
@@ -311,6 +321,8 @@ function Main(isReplay)
 
             self._mass.Layout = nil
             self._energy.Layout = nil
+
+            self._bg:ResetLayout()
         end,
 
         ---@param self MiddleLayout
