@@ -97,6 +97,10 @@ function Main(isReplay)
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
         local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
 
+        if table.empty(buildable) then
+            return false
+        end
+
         local items = {}
         local icons = {}
         for _, entry in ipairs(data) do
@@ -165,6 +169,10 @@ function Main(isReplay)
         GetCycleMap():HideCycle()
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
         local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
+
+        if table.empty(buildable) then
+            return false
+        end
 
         local items = {}
         local icons = {}
