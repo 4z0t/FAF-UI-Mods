@@ -35,6 +35,9 @@ function Main(isReplay)
         local LayoutFor = ReUI.UI.FloorLayoutFor
         local constructionPanelControls = import("/lua/ui/game/construction.lua").controls
 
+        LayoutFor(panel)
+            :Over(constructionPanelControls.constructionGroup)
+
         LayoutFor(constructionPanelControls.constructionGroup)
             :AnchorToLeft(panel, 25)
     end
