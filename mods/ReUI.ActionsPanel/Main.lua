@@ -35,25 +35,16 @@ function Main(isReplay)
         local LayoutFor = ReUI.UI.FloorLayoutFor
         local constructionPanelControls = import("/lua/ui/game/construction.lua").controls
 
+        LayoutFor(panel)
+            :Over(constructionPanelControls.constructionGroup)
+
         LayoutFor(constructionPanelControls.constructionGroup)
             :AnchorToLeft(panel, 25)
     end
 
-    ReUI.Core.Hook("/lua/ui/game/layouts/orders_left.lua", "SetLayout", function(field, module)
-        return function()
-            field()
-            SetLayout()
-        end
-    end)
-    ReUI.Core.Hook("/lua/ui/game/layouts/orders_mini.lua", "SetLayout", function(field, module)
-        return function()
-            field()
-            SetLayout()
-        end
-    end)
-    ReUI.Core.Hook("/lua/ui/game/layouts/orders_right.lua", "SetLayout", function(field, module)
-        return function()
-            field()
+    ReUI.Core.Hook("/lua/ui/game/gamemain.lua", "SetLayout", function(field, module)
+        return function(layout)
+            field(layout)
             SetLayout()
         end
     end)
@@ -75,7 +66,7 @@ function Main(isReplay)
         local LayoutFor = ReUI.UI.FloorLayoutFor
         local ActionsGrid = ReUI.ActionsPanel.ActionsGrid
 
-        local parent = import("/lua/ui/game/construction.lua").controlClusterGroup
+        local parent = GetFrame(0) --[[@as Frame]]
 
         local options = ReUI.Options.Mods["ReUI.ActionsPanel"]
 
@@ -90,7 +81,7 @@ function Main(isReplay)
         panel.HorizontalSpacing = options.space:Raw()
 
         LayoutFor(panel)
-            :AtRightBottomIn(GetFrame(0)--[[@as Frame]] , 14, 14)
+            :AtRightBottomIn(parent, 14, 14)
             :Hide()
 
         local function OnSelectionChanged(info)
