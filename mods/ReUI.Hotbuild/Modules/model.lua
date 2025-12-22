@@ -7,7 +7,6 @@ local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 local Enumerate = ReUI.LINQ.Enumerate
 local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 local PairsEnumerator = ReUI.LINQ.PairsEnumerator
-local ToSet = IPairsEnumerator:ToSet()
 
 ---@alias SkinName 'cybran'|'seraphim'|'aeon'|'uef'
 ---@type SkinName[]
@@ -80,6 +79,18 @@ local hotBuilds
 ---@type table<string,table<SkinName, BPHotbuildData>>
 globalBPs = {}
 
+local function CanBuildTemplate(template, bpIds)
+    local templateData = template.templateData
+    for i = 3, table.getn(templateData) do
+        local entry = templateData[i]
+        local id = entry[1]
+        if not id or not bpIds[id] then
+            return false
+        end
+    end
+    return true
+end
+
 function FilterBlueprints()
     LOG(validCategory)
     local bps = PairsEnumerator
@@ -101,7 +112,8 @@ function FilterBlueprints()
             local upperSkin = string.upper(skin)
             local category = div.category * categories[upperSkin]
 
-            local bpIds = Enumerate(bps, next)
+            local bpIds = PairsEnumerator
+                :Enumerate(bps)
                 ---@param bp UnitBlueprint
                 :Where(function(bp)
                     return EntityCategoryContains(category, bp.BlueprintId)
@@ -109,22 +121,11 @@ function FilterBlueprints()
                 :Keys()
                 :ToSet()
 
-            globalBPs[div.name][skin] = Enumerate(bpIds, next)
+            globalBPs[div.name][skin] = PairsEnumerator
+                :Enumerate(bpIds)
                 :Keys()
                 :OrderBy(function(value) return string.sub(value, 4) end)
                 :ToArray()
-
-            local function CanBuildTemplate(template, bpIds)
-                local templateData = template.templateData
-                for i = 3, table.getn(templateData) do
-                    local entry = templateData[i]
-                    local id = entry[1]
-                    if not id or not bpIds[id] then
-                        return false
-                    end
-                end
-                return true
-            end
 
             for _, template in templates do
                 if CanBuildTemplate(template, bpIds) then
@@ -169,7 +170,8 @@ function LoadHotBuilds()
 end
 
 function FetchHotBuildsKeys()
-    return Enumerate(hotBuilds, next)
+    return PairsEnumerator
+        :Enumerate(hotBuilds)
         :Keys()
         :ToArray()
 end
