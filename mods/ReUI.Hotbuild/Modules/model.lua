@@ -76,7 +76,7 @@ end
 ---@alias BPHotbuildData string|table
 
 local hotBuilds
----@type table<string,table<SkinName, BPHotbuildData>>
+---@type table<string,table<SkinName, BPHotbuildData[]>>
 globalBPs = {}
 
 local function CanBuildTemplate(template, bpIds)
