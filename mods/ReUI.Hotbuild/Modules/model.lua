@@ -4,9 +4,10 @@ local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 
 
-local LINQ = ReUI.LINQ
-local Enumerate = LINQ.Enumerate
-local ToSet = LINQ.IPairsEnumerator:ToSet()
+local Enumerate = ReUI.LINQ.Enumerate
+local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+local PairsEnumerator = ReUI.LINQ.PairsEnumerator
+local ToSet = IPairsEnumerator:ToSet()
 
 ---@alias SkinName 'cybran'|'seraphim'|'aeon'|'uef'
 ---@type SkinName[]
@@ -14,54 +15,42 @@ local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
 ---@class DivisionData
 ---@field name string
----@field all string[]
----@field any string[]
+---@field category EntityCategory
 
 ---@type DivisionData[]
 local divisions = {
     {
         name = 'Construction',
-        all = {},
-        any = { 'BUILTBYTIER3ENGINEER' }
+        category = categories.BUILTBYTIER3ENGINEER,
     },
     {
         name = 'Land',
-        all = { 'LAND' },
-        any = { 'BUILTBYTIER3FACTORY', 'BUILTBYLANDTIER3FACTORY' }
+        category = categories.LAND * (categories.BUILTBYTIER3FACTORY + categories.BUILTBYLANDTIER3FACTORY),
     },
     {
         name = 'Air',
-        all = { 'AIR' },
-        any = { 'BUILTBYTIER3FACTORY', 'TRANSPORTBUILTBYTIER3FACTORY' }
+        category = categories.AIR * (categories.BUILTBYTIER3FACTORY + categories.TRANSPORTBUILTBYTIER3FACTORY),
     },
     {
         name = 'Naval',
-        all = { 'NAVAL' },
-        any = { 'BUILTBYTIER3FACTORY' }
+        category = categories.NAVAL * categories.BUILTBYTIER3FACTORY,
     },
     {
         name = 'Gate',
-        all = {},
-        any = { 'BUILTBYQUANTUMGATE' }
+        category = categories.BUILTBYQUANTUMGATE,
     }
 }
 
-local legalCategories = ToSet
-{
-    'BUILTBYTIER1FACTORY', 'BUILTBYTIER2FACTORY',
-    'BUILTBYTIER3FACTORY',
-    'BUILTBYTIER1ENGINEER', 'BUILTBYTIER2ENGINEER', 'BUILTBYTIER3ENGINEER',
-    'BUILTBYCOMMANDER', 'BUILTBYQUANTUMGATE', 'BUILTBYLANDTIER3FACTORY', -- special for sparky
-    'TRANSPORTBUILTBYTIER3FACTORY' -- all transports and mercy
-}
-
-local sacu = ToSet
-{
-    "url0301",
-    "xsl0301",
-    "ual0301",
-    "uel0301",
-}
+local validCategory = categories.BUILTBYTIER1FACTORY +
+    categories.BUILTBYTIER2FACTORY +
+    categories.BUILTBYTIER3FACTORY +
+    categories.BUILTBYTIER1ENGINEER +
+    categories.BUILTBYTIER2ENGINEER +
+    categories.BUILTBYTIER3ENGINEER +
+    categories.BUILTBYCOMMANDER +
+    categories.BUILTBYQUANTUMGATE +
+    categories.BUILTBYLANDTIER3FACTORY +
+    categories.TRANSPORTBUILTBYTIER3FACTORY
 
 function Compile(data)
     local res = {}
@@ -85,8 +74,6 @@ local function ResetIdRelations(hotBuilds)
     import('/lua/keymap/hotkeylabels.lua').init()
 end
 
-local strLen = string.len
-
 ---@alias BPHotbuildData string|table
 
 local hotBuilds
@@ -94,36 +81,30 @@ local hotBuilds
 globalBPs = {}
 
 function FilterBlueprints()
-    local bps = Enumerate(__blueprints, next)
+    LOG(validCategory)
+    local bps = PairsEnumerator
+        :Enumerate(__blueprints)
         ---@param bp EntityBlueprint
         ---@param id string
         :Where(function(bp, id)
-            -- add SACU filter
-            if sacu[string.sub(id, 1, 7)] then
-                return true
-            end
-            if strLen(id) == 7 then
-                return Enumerate(bp.Categories)
-                    :Any(function(cat) return legalCategories[cat] end)
-            end
-            return false
+            return type(id) == "string" and
+                EntityCategoryContains(validCategory, id)
         end)
         :ToTable()
 
     local templates = Templates.GetTemplates() or {}
 
-    for i, div in divisions do
+    ---@param div DivisionData
+    for _, div in divisions do
         globalBPs[div.name] = {}
-        for j, skin in skins do
+        for _, skin in skins do
             local upperSkin = string.upper(skin)
+            local category = div.category * categories[upperSkin]
 
             local bpIds = Enumerate(bps, next)
                 ---@param bp UnitBlueprint
                 :Where(function(bp)
-                    local categories = bp.CategoriesHash
-                    return categories[upperSkin] and
-                        Enumerate(div.all):All(function(cat) return categories[cat] end) and
-                        Enumerate(div.any):Any(function(cat) return categories[cat] end)
+                    return EntityCategoryContains(category, bp.BlueprintId)
                 end)
                 :Keys()
                 :ToSet()
