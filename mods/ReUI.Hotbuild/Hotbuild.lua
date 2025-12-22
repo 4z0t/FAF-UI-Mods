@@ -12,14 +12,17 @@ ReUI.Require
 }
 
 function Main(isReplay)
-
-    local CycleMap = import('Modules/CycleMap.lua').CycleMap
+    local type = type
     local TableEmpty = table.empty
+
     local ToSet = ReUI.LINQ.IPairsEnumerator:ToSet()
     local Layouter = ReUI.UI.FloorLayoutFor
-    local Construction = import("/lua/ui/game/construction.lua")
 
+    local Construction = import("/lua/ui/game/construction.lua")
     local CommandMode = import("/lua/ui/game/commandmode.lua")
+
+    local CycleMap = import('Modules/CycleMap.lua').CycleMap
+
     local cycleMap
     ---@return CycleMap
     local function GetCycleMap()
@@ -63,6 +66,10 @@ function Main(isReplay)
     ---@return boolean
     local function CanBuildTemplate(template, buildableUnits)
         local templateData = template.templateData
+        if type(templateData[1]) ~= "number" or
+            type(templateData[2]) ~= "number" then
+            return false
+        end
         for i = 3, table.getn(templateData) do
             local entry = templateData[i]
             local id = entry[1]
@@ -77,7 +84,11 @@ function Main(isReplay)
     ---@param buildableUnits any
     ---@return boolean
     local function CanBuildFactoryTemplate(template, buildableUnits)
-        for _, entry in ipairs(template.templateData) do
+        local templateData = template.templateData
+        if type(templateData[1]) ~= "table" then
+            return false
+        end
+        for _, entry in ipairs(templateData) do
             local id = entry.id
             if not id or not buildableUnits[id] then
                 return false
