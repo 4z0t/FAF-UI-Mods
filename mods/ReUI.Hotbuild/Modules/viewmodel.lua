@@ -12,9 +12,9 @@ local active
 local activeName
 
 local prefixes = {
-    ["aeon"] = { "ua", "xa", "da", "za" },
-    ["uef"] = { "ue", "xe", "de", "ze" },
-    ["cybran"] = { "ur", "xr", "dr", "zr" },
+    ["aeon"]     = { "ua", "xa", "da", "za" },
+    ["uef"]      = { "ue", "xe", "de", "ze" },
+    ["cybran"]   = { "ur", "xr", "dr", "zr" },
     ["seraphim"] = { "xs", "us", "ds", "zs" }
 }
 local globalBPs
@@ -122,7 +122,13 @@ local similars = {
         ["aeon"] = "xaa0305",
         ["uef"] = "uea0305",
         ["cybran"] = "xra0305"
-    } -- T3 gunships
+    }, -- T3 gunships
+    {
+        ["aeon"] = "ual0201",
+        ["uef"] = "uel0201",
+        ["cybran"] = "url0107",
+        ["seraphim"] = "xsl0201"
+    }, -- T1 land tanks + mantis
 }
 
 local function FindSimilarBlueprints(faction, bp, category)
@@ -135,7 +141,7 @@ local function FindSimilarBlueprints(faction, bp, category)
             break
         end
     end
-    local bps = LINQ.Enumerate(similars):First(function(k, v)
+    local bps = LINQ.Enumerate(similars):First(function(v)
         return v[faction] == bp
     end)
     if not bps then
@@ -151,8 +157,13 @@ end
 
 local function ConvertTemplate(faction, template, category)
     local templates = {}
-    for prefixSkin, prefix in prefixes do
-        templates[prefixSkin] = table.deepcopy(template)
+    local function GetFactionTemplate(faction)
+        local t = templates[faction]
+        if not t then
+            t = table.deepcopy(template)
+            templates[faction] = t
+        end
+        return t
     end
 
     local templateData = template.templateData
@@ -160,7 +171,29 @@ local function ConvertTemplate(faction, template, category)
         local id = templateData[i][1]
         local bps = FindSimilarBlueprints(faction, id, category)
         for skin, bp in bps do
-            templates[skin].templateData[i][1] = bp
+            GetFactionTemplate(skin).templateData[i][1] = bp
+        end
+    end
+
+    local bps = FindSimilarBlueprints(faction, template.icon, category)
+    for skin, bp in bps do
+        GetFactionTemplate(skin).icon = bp
+    end
+    return templates
+end
+
+local function ConvertFactoryTemplate(faction, template, category)
+    local templates = {}
+    for prefixSkin, prefix in prefixes do
+        templates[prefixSkin] = table.deepcopy(template)
+    end
+
+    local templateData = template.templateData
+    for i, entry in ipairs(templateData) do
+        local id = entry.id
+        local bps = FindSimilarBlueprints(faction, id, category)
+        for skin, bp in bps do
+            templates[skin].templateData[i].id = bp
         end
     end
 
@@ -177,9 +210,16 @@ function FillBlueprints(category)
     active[category] = active[category] or {}
     activeFaction, activeBP = SingleBlueprint(active[category])
     if activeBP then
-        local bps = FindSimilarBlueprints(activeFaction, activeBP, category)
-        for faction, bp in bps do
-            SetBlueprint(category, faction, bp)
+        if type(activeBP) == "string" then
+            local bps = FindSimilarBlueprints(activeFaction, activeBP, category)
+            for faction, bp in bps do
+                SetBlueprint(category, faction, bp)
+            end
+        elseif type(activeBP) == "table" then
+            local bps = ConvertFactoryTemplate(activeFaction, activeBP, category)
+            for faction, bp in bps do
+                SetBlueprint(category, faction, bp)
+            end
         end
     end
 end

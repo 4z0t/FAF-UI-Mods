@@ -91,6 +91,16 @@ local function CanBuildTemplate(template, bpIds)
     return true
 end
 
+local function CanBuildFactoryTemplate(template, bpIds)
+    local templateData = template.templateData
+    for _, entry in ipairs(templateData) do
+        if not bpIds[entry.id] then
+            return false
+        end
+    end
+    return true
+end
+
 function FilterBlueprints()
     LOG(validCategory)
     local bps = PairsEnumerator
@@ -104,6 +114,7 @@ function FilterBlueprints()
         :ToTable()
 
     local templates = Templates.GetTemplates() or {}
+    local factoryTemplates = FactoryTemplates.GetTemplates() or {}
 
     ---@param div DivisionData
     for _, div in divisions do
@@ -129,6 +140,12 @@ function FilterBlueprints()
 
             for _, template in templates do
                 if CanBuildTemplate(template, bpIds) then
+                    table.insert(globalBPs[div.name][skin], template)
+                end
+            end
+
+            for _, template in factoryTemplates do
+                if CanBuildFactoryTemplate(template, bpIds) then
                     table.insert(globalBPs[div.name][skin], template)
                 end
             end
