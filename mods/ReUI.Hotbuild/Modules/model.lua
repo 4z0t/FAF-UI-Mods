@@ -102,7 +102,6 @@ local function CanBuildFactoryTemplate(template, bpIds)
 end
 
 function FilterBlueprints()
-    LOG(validCategory)
     local bps = PairsEnumerator
         :Enumerate(__blueprints)
         ---@param bp EntityBlueprint
@@ -157,7 +156,8 @@ function AddToUnitkeygroups(name, compiled)
     local formattedName = ReUI.Actions.FormatActionName(name:lower())
     ReUI.Hotbuild.AddHotbuild(formattedName, compiled)
     local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
-    unitkeygroups[formattedName] = Enumerate(compiled)
+    unitkeygroups[formattedName] = IPairsEnumerator
+        :Enumerate(compiled)
         :Select(function(value)
             if type(value) == 'string' then
                 return value
@@ -195,7 +195,8 @@ end
 
 function FilterEmptyTables(data)
     data = table.deepcopy(data)
-    data.Construction = Enumerate(data.Construction)
+    data.Construction = IPairsEnumerator
+        :Enumerate(data.Construction)
         :Where(function(bps) return not table.empty(bps) end)
         :ToArray()
     return data
