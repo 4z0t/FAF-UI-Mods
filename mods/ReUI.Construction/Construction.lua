@@ -15,6 +15,8 @@ ReUI.Require
 
 
 function Main(isReplay)
+    local pcall = pcall
+
     ---@type EnhancementSlot[]
     local slotNames =
     {
@@ -1168,7 +1170,7 @@ function Main(isReplay)
 
         ---@param self ReUI.Construction.Panel
         ---@param reason UpdateReason
-        Update = function(self, reason)
+        InternalUpdate = function(self, reason)
             self._context.reason = reason
 
             local primaryHandlerData, primaryActions, primaryContext = self:GetActionsFor(self.PrimaryHandlers)
@@ -1236,6 +1238,15 @@ function Main(isReplay)
             end
 
             self.UpdateEvent:Invoke(self, self._context)
+        end,
+
+        ---@param self ReUI.Construction.Panel
+        ---@param reason UpdateReason
+        Update = function(self, reason)
+            local ok, err = pcall(self.InternalUpdate, self, reason)
+            if not ok then
+                WARN("[ReUI.Construction] Update failed: " .. err)
+            end
         end,
 
         ---@param self ReUI.Construction.Panel
