@@ -251,11 +251,9 @@ function Main(isReplay)
         local ViewModel = import('Modules/viewmodel.lua')
         local Model = import('Modules/model.lua')
         local View = import("Modules/views/view.lua")
-        local Share = import("Modules/share.lua")
 
         Model.init()
         ViewModel.init()
-        Share.Init(isReplay)
 
         ReUI.Options.Builder.AddOptions("ReUI.Hotbuild", "ReUI.Hotbuild", View.init)
     end)
