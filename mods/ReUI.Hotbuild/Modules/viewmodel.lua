@@ -6,7 +6,6 @@ local Contains = LINQ.IPairsEnumerator:Contains()
 
 local View = import("views/view.lua")
 local Model = import("model.lua")
-local Share = import("share.lua")
 
 local active
 local activeName
@@ -43,12 +42,6 @@ function SaveReceived(name, data)
 
     Model.SaveHotBuild(newName, data)
     View.UpdateItems()
-end
-
-function SendActiveBuildTable()
-    if activeName ~= "" then
-        Share.SendBuildTable(nil, activeName, active)
-    end
 end
 
 function SetActive(name)
