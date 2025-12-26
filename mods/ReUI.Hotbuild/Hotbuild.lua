@@ -35,7 +35,7 @@ function Main(isReplay)
         cycleMap = CycleMap(frame)
 
         Layouter(cycleMap)
-            :Top(function() return frame.Bottom() * .75 end)
+            :Top(ReUI.UI.LayoutFunctions.Mult(frame.Bottom, 0.75))
             :AtHorizontalCenterIn(frame)
 
         local function ResetCycle(commandMode, modeData)
