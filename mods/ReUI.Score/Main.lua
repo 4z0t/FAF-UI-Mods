@@ -1,13 +1,14 @@
 ReUI.Require
 {
-    "ReUI.Core >= 1.0.0",
+    "ReUI.Core >= 1.6.0",
     "ReUI.LINQ >= 1.3.0",
     "ReUI.UI >= 1.1.0",
     "ReUI.UI.Color >= 1.0.0",
     "ReUI.UI.Animation >= 1.1.0",
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.1.0",
-    "ReUI.Options >= 1.0.0"
+    "ReUI.Options >= 1.0.0",
+    enabled = true,
 }
 
 function Main(isReplay)
