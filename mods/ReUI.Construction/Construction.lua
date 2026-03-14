@@ -326,8 +326,40 @@ function Main(isReplay)
 
 
     ---@class Tab : ReUI.UI.Controls.CheckBox
+    ---@field _hitArea ReUI.UI.Controls.Group
     local Tab = ReUI.Core.Class(CheckBox)
     {
+        ---@param self Tab
+        ---@param parent ReUI.Construction.Panel
+        __init = function(self, parent)
+            CheckBox.__init(self, parent)
+            self._hitArea = Group(self)
+        end,
+
+        ---@param self Tab
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+            layouter(self._hitArea)
+                :Over(self)
+                :OffsetIn(self, 8, 7, 8, 9)
+                :EnableHitTest()
+
+            layouter(self)
+                :DisableHitTest()
+        end,
+
+        ---@param self Tab
+        Disable = function(self)
+            self._isDisabled = true
+            self:OnDisable()
+        end,
+
+        ---@param self Tab
+        Enable = function(self)
+            self._isDisabled = false
+            self:OnEnable()
+        end,
+
         ---@param self Tab
         HandleEvent = function(self, event)
             if event.Type == 'MouseEnter' then
@@ -461,19 +493,16 @@ function Main(isReplay)
                 :AtBottomIn(constructionPanel, -11)
 
             self._enhancementsTab:SetNewTextures(GetTabTextures(tabFiles.enhancement))
-            self._enhancementsTab:UseAlphaHitTest(true)
 
             layouter(self._selectionTab)
                 :Above(self._enhancementsTab, -16)
 
             self._selectionTab:SetNewTextures(GetTabTextures(tabFiles.selection))
-            self._selectionTab:UseAlphaHitTest(true)
 
             layouter(self._constructionTab)
                 :Above(self._selectionTab, -16)
 
             self._constructionTab:SetNewTextures(GetTabTextures(tabFiles.construction))
-            self._constructionTab:UseAlphaHitTest(true)
         end,
 
         ---@param self ConstructionTabs

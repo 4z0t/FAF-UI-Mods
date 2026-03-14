@@ -10,8 +10,8 @@ ReUI.Options.Mods["ReUI.Construction"] = {
     width = Opt(400),
     canScroll = Opt(false),
     color = Opt("ffffffff"),
-
     selection = {
+        improvedDeselection = Opt(false),
         showGroups = Opt(false),
     },
 }
@@ -28,8 +28,8 @@ function Main()
         Options.Slider("Scale", 50, 300, 25, options.scale, 4),
         Options.Filter("Scroll through items", options.canScroll),
         Options.ColorSlider("Text color", options.color, 4),
-        -- Options.Title("Selection", nil, nil, UIUtil.factionTextColor),
-        -- Options.Filter("show groups", options.selection.showGroups, 4),
+        Options.Title("Selection", nil, nil, UIUtil.factionTextColor),
+        Options.Filter("Improved deselection", options.selection.improvedDeselection, 4),
     })
 
 end

@@ -17,6 +17,11 @@ options.selection.showGroups:Bind(function(opt)
     showGroups = opt()
 end)
 
+local improvedDeselection
+options.selection.improvedDeselection:Bind(function(opt)
+    improvedDeselection = opt()
+end)
+
 ---@type table<TechCategory, integer>
 local techCatOrder = {
     ["TECH1"] = 1,
@@ -335,6 +340,30 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
                         local selection = GetSelectedUnits()
                         local id = self.data.id
                         local excludedUnits = EntityCategoryFilterDown(categories[id], self.data.group.units)
+
+                        if improvedDeselection then
+                            local take = 0
+                            if event.Modifiers.Shift and event.Modifiers.Ctrl then
+                                take = 10
+                            elseif event.Modifiers.Shift then
+                                take = 1
+                            elseif event.Modifiers.Ctrl then
+                                take = 5
+                            end
+                            if take ~= 0 then
+                                local newExcludedUnits = {}
+                                local counter = 1
+                                for _, unit in excludedUnits do
+                                    table.insert(newExcludedUnits, unit)
+                                    if counter >= take then
+                                        break
+                                    end
+                                    counter = counter + 1
+                                end
+                                excludedUnits = newExcludedUnits
+                            end
+                        end
+
                         local units = {}
                         for _, unit in selection do
                             if not Contains(excludedUnits, unit) then
