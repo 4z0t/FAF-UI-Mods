@@ -4,7 +4,7 @@ version = 3
 copyright = ""
 description = [[Check on Github and official Discord server for mode details.
 https://github.com/4z0t/FAF-UI-Mods
-https://discord.gg/UZeAEXHV
+https://discord.gg/EZb6h6gbWz
 ]]
 author = "4z0t"
 icon = "/mods/ReUI.Construction/icon.png"
