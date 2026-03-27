@@ -8,6 +8,8 @@ ReUI.Require
 
 local MathAbs = math.abs
 local StringFormat = string.format
+local IsDestroyed = IsDestroyed
+
 ---Formats number as large one
 ---@param n number | nil
 ---@return string
@@ -26,16 +28,7 @@ local function FormatNumber(n)
     end
 end
 
-local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
-local function RefreshReclaim()
-    ---@param view ReUI.WorldView.WorldView
-    for _, view in GetWorldViews() do
-        local reclaimComponent = view:GetComponent("Reclaim") --[[@as WVReclaimComponent]]
-        if reclaimComponent then
-            reclaimComponent:Refresh()
-        end
-    end
-end
+local function RefreshReclaim() end
 
 ---@type table<EntityId, UIReclaimDataPoint>
 local insidePlayableAreaReclaim = {}
@@ -137,6 +130,29 @@ function Main(isReplay)
         return function(bool) end
     end)
 
+    local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
+
+    ReclaimHook("ToggleReclaim", function(field, module)
+        return function()
+            ---@param view ReUI.WorldView.WorldView
+            for _, view in GetWorldViews() do
+                local reclaimComponent = view:GetComponent("Reclaim") --[[@as WVReclaimComponent]]
+                if reclaimComponent then
+                    reclaimComponent:ToggleShowReclaim()
+                end
+            end
+        end
+    end)
+
+    RefreshReclaim = function()
+        ---@param view ReUI.WorldView.WorldView
+        for _, view in GetWorldViews() do
+            local reclaimComponent = view:GetComponent("Reclaim") --[[@as WVReclaimComponent]]
+            if reclaimComponent then
+                reclaimComponent:Refresh()
+            end
+        end
+    end
 
     ---@param totalMass number
     ---@param maxMass number
@@ -151,74 +167,6 @@ function Main(isReplay)
         if maxMass < 2000 then return 'ffff7212', 22 end
         return 'fffb0303', 25
     end
-
-    ---@class ReclaimLabel : Group
-    ---@field massValue LazyVar
-    ---@field mass Bitmap
-    ---@field text Text
-    local ReclaimLabel = Class(Group)
-    {
-        ---@param self ReclaimLabel
-        __init = function(self, parent)
-            Group.__init(self, parent)
-            self.massValue = LazyVar(0)
-
-            self.mass = Bitmap(self)
-            self.text = UIUtil.CreateText(self, "", 10, UIUtil.bodyFont, true)
-
-            LayoutFor(self.mass)
-                :Width(10)
-                :Height(10)
-                :AtCenterIn(self)
-                :Texture(UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
-
-            LayoutFor(self.text)
-                :Above(self, 2)
-                :AtHorizontalCenterIn(self)
-
-            LayoutFor(self)
-                :Left(0)
-                :Top(0)
-                :Width(10)
-                :Height(10)
-                :Over(self:GetParent(), self.massValue)
-                :DisableHitTest(true)
-        end,
-
-        ---@param self ReclaimLabel
-        AdjustToValue = function(self, total, max)
-            local color, size = ComputeLabelPropertiesBatched(total, max or total)
-            if color then
-                self.text:SetFont(UIUtil.bodyFont, size) -- r.mass > 2000
-                self.text:SetColor(color)
-                self.text:Show()
-            else
-                self.text:Hide()
-            end
-        end,
-
-        ---@param self ReclaimLabel
-        ---@param pos Vector2
-        PositionOnScreen = function(self, pos)
-            self.Left:SetValue(pos[1] - 0.5 * self.Width())
-            self.Top:SetValue(pos[2] - 0.5 * self.Height() + 1)
-        end,
-
-        ---@param self ReclaimLabel
-        DisplayReclaim = function(self, r)
-            if self:IsHidden() then
-                self:Show()
-            end
-
-            if r.mass ~= self.massValue() then
-                local mass = tostring(math.floor(0.5 + r.mass))
-                self.text:SetText(mass)
-                self.massValue:Set(r.mass)
-            end
-            self:AdjustToValue(r.mass, r.max)
-        end,
-    }
-
 
     local options = ReUI.Options.Mods["ReUI.Reclaim"]
 
@@ -251,6 +199,86 @@ function Main(isReplay)
     options.updateRate:Bind(function(var)
         updateRate = var() / 1000
     end)
+
+    local iconScale
+    options.scale:Bind(function(var)
+        iconScale = var() / 100
+
+        for _, view in GetWorldViews() do
+            local reclaimComponent = view:GetComponent("Reclaim") --[[@as WVReclaimComponent]]
+            if reclaimComponent then
+                reclaimComponent:ClearLabels()
+            end
+        end
+    end)
+
+    ---@class ReclaimLabel : Group
+    ---@field massValue LazyVar
+    ---@field mass Bitmap
+    ---@field text Text
+    local ReclaimLabel = Class(Group)
+    {
+        ---@param self ReclaimLabel
+        __init = function(self, parent)
+            Group.__init(self, parent)
+            self.massValue = LazyVar(0)
+
+            self.mass = Bitmap(self, UIUtil.UIFile('/game/build-ui/icon-mass_bmp.dds'))
+            self.text = UIUtil.CreateText(self, "", 10, UIUtil.bodyFont, true)
+
+            LayoutFor(self.mass)
+                :Width(10 * iconScale)
+                :Height(10 * iconScale)
+                :AtCenterIn(self)
+
+            LayoutFor(self.text)
+                :Above(self, 2 * iconScale)
+                :AtHorizontalCenterIn(self)
+
+            LayoutFor(self)
+                :Left(0)
+                :Top(0)
+                :Width(10)
+                :Height(10)
+                :Over(self:GetParent(), self.massValue)
+                :DisableHitTest(true)
+        end,
+
+        ---@param self ReclaimLabel
+        AdjustToValue = function(self, total, max)
+            local color, size = ComputeLabelPropertiesBatched(total, max or total)
+            if color then
+                self.text:SetFont(UIUtil.bodyFont, size * iconScale) -- r.mass > 2000
+                self.text:SetColor(color)
+                self.text:Show()
+            else
+                self.text:Hide()
+            end
+        end,
+
+        ---@param self ReclaimLabel
+        ---@param pos Vector2
+        PositionOnScreen = function(self, pos)
+            ---@diagnostic disable-next-line:undefined-field
+            self.Left:SetValue(pos[1] - 0.5 * self.Width())
+            ---@diagnostic disable-next-line:undefined-field
+            self.Top:SetValue(pos[2] - 0.5 * self.Height() + 1)
+        end,
+
+        ---@param self ReclaimLabel
+        DisplayReclaim = function(self, r)
+            if self:IsHidden() then
+                self:Show()
+            end
+
+            if r.mass ~= self.massValue() then
+                local mass = tostring(math.floor(0.5 + r.mass))
+                self.text:SetText(mass)
+                self.massValue:Set(r.mass)
+            end
+            self:AdjustToValue(r.mass, r.max)
+        end,
+    }
 
     ---@param a UIReclaimDataPoint
     ---@param b UIReclaimDataPoint
@@ -376,6 +404,7 @@ function Main(isReplay)
     ---@class WVReclaimComponent : ReUI.WorldView.Component
     ---@field _updateTimer number
     ---@field _enabledWithReclaimMode boolean
+    ---@field _forceShow boolean
     ---@field _previewState boolean
     ---@field _showingReclaim boolean
     ---@field _forceRefresh boolean
@@ -386,7 +415,7 @@ function Main(isReplay)
     ---@field _totalReclaimData number
     ---@field _labels ReclaimLabel[]
     ---@field _reclaimGroup Group
-    ---@field _totalReclaimText Text
+    ---@field _totalReclaimText ReUI.UI.Controls.Text
     local WVReclaimComponent = ReUI.Core.Class(ReUI.WorldView.Component)
     {
         ---@param self WVReclaimComponent
@@ -395,6 +424,7 @@ function Main(isReplay)
 
             self._enabledWithReclaimMode = false
             self._showingReclaim = false
+            self._forceShow = false
             self._previewState = false
             self._prevPosition = {}
             self._prevZoom = 0
@@ -416,7 +446,8 @@ function Main(isReplay)
         GetTotalText = function(self)
             local text = self._totalReclaimText
             if not text then
-                text = Text(self._reclaimGroup)
+                ---@type ReUI.UI.Controls.Text
+                text = ReUI.UI.Controls.Text(self._reclaimGroup)
                 LayoutFor(text)
                     :Depth(10000)
                     :Color("ffd7ff05")
@@ -435,7 +466,7 @@ function Main(isReplay)
                         :AtTopIn(self._reclaimGroup, 200)
                 end
 
-                text:SetFont("Arial", 14)
+                text:SetFont("Arial", options.totalMassFontSize:Raw())
                 self._totalReclaimText = text
             end
             return text
@@ -469,8 +500,13 @@ function Main(isReplay)
         end,
 
         ---@param self WVReclaimComponent
+        ToggleShowReclaim = function(self)
+            self._forceShow = not self._forceShow
+        end,
+
+        ---@param self WVReclaimComponent
         CheckPreviewStateChanged = function(self)
-            local curState = IsKeyDown("Control") and IsKeyDown("Shift")
+            local curState = IsKeyDown("Control") and IsKeyDown("Shift") or self._forceShow
             if self._previewState ~= curState then
                 self._previewState = curState
                 return true
@@ -555,10 +591,7 @@ function Main(isReplay)
                     break
                 end
                 local label = labels[labelIndex]
-                if label and IsDestroyed(label) then
-                    label = nil
-                end
-                if not label then
+                if IsDestroyed(label) then
                     label = ReclaimLabel(reclaimGroup)
                     labels[labelIndex] = label
                 end
@@ -575,6 +608,16 @@ function Main(isReplay)
                     end
                 end
             end
+        end,
+
+        ---@param self WVReclaimComponent
+        ClearLabels = function(self)
+            for _, label in self._labels do
+                if not IsDestroyed(label) then
+                    label:Destroy()
+                end
+            end
+            self._labels = {}
         end,
 
         ---@param self WVReclaimComponent

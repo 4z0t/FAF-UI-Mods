@@ -1,13 +1,14 @@
 name = "ReUI.Reclaim"
-uid = "reui-reclaim-1.1.2"
-version = 3
+uid = "reui-reclaim-1.2.0"
+version = 6
 copyright = ""
-description = [[
-Provides with better looking reclaim labels and also shows them in reclaim command mode.
+description = [[Check on Github and official Discord server for mode details.
+https://github.com/4z0t/FAF-UI-Mods
+https://discord.gg/EZb6h6gbWz
 ]]
 author = "4z0t"
 icon = "/mods/ReUI.Reclaim/icon.png"
-url = ""
+url = "https://github.com/4z0t/FAF-UI-Mods"
 selectable = true
 enabled = true
 exclusive = false
@@ -18,4 +19,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Reclaim=1.1.2'
+ReUI = 'ReUI.Reclaim=1.2.0'
