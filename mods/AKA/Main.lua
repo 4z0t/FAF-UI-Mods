@@ -9,18 +9,20 @@ function Main()
     ReUI.Core.OnPostCreateUI(function(isReplay)
         local GetUnitCommandData = GetUnitCommandData
 
-        local CategoryMatcher = ReUI.Actions.CategoryMatcher
-        local CategoryAction = ReUI.Actions.CategoryAction
+        local CategoryMatcher  = ReUI.Actions.CategoryMatcher
+        local CategoryAction   = ReUI.Actions.CategoryAction
         local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
-        local Hotbuild = ReUI.Exists "ReUI.Hotbuild >= 1.1.0" --[[@as ReUI.Hotbuild?]]
+        local Hotbuild         = ReUI.Exists "ReUI.Hotbuild >= 1.1.0" --[[@as ReUI.Hotbuild?]]
 
-        local CM = import("/lua/ui/game/commandmode.lua")
+        local CM     = import("/lua/ui/game/commandmode.lua")
+        local Misc   = import("/lua/keymap/misckeyactions.lua")
+        local Orders = import("/lua/ui/game/orders.lua")
 
         local attackMoveModeData = {
-            name = "RULEUCC_Script",
+            name        = "RULEUCC_Script",
             AbilityName = 'AttackMove',
-            TaskName = 'AttackMove',
-            Cursor = 'ATTACK_MOVE',
+            TaskName    = 'AttackMove',
+            Cursor      = 'ATTACK_MOVE',
         }
 
         local Contains = IPairsEnumerator:Contains()
@@ -31,6 +33,24 @@ function Main()
                 return unit:IsRepeatQueue()
             end)
 
+        ---@param selection UserUnit[]?
+        local function ToggleRepeatQueue(selection)
+            if not selection then
+                return
+            end
+
+            local isRepeatBuild = AllRepeatQueue(selection)
+                and 'false'
+                or 'true'
+            ---@param unit UserUnit
+            for _, unit in selection do
+                unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
+                    unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
+                end
+            end
+        end
+
         CategoryMatcher "Transportation / Overcharge / Repeat queue"
             :Modifiers { shift = true }
             {
@@ -38,26 +58,38 @@ function Main()
                 CategoryAction(categories.TRANSPORTATION)
                     :Action "StartCommandMode order RULEUCC_Transport",
                 CategoryAction(categories.COMMAND + categories.SUBCOMMANDER)
-                    :Action(import('/lua/ui/game/orders.lua').EnterOverchargeMode),
+                    :Action(Orders.EnterOverchargeMode),
+                -- CategoryAction(categories.xrl0302)
+                --     :Action(function() Misc.toggleScript "Production" end),
                 CategoryAction(categories.FACTORY + categories.EXTERNALFACTORY)
-                    :Action(function(selection)
-                        local isRepeatBuild = AllRepeatQueue(selection)
-                            and 'false'
-                            or 'true'
-                        ---@param unit UserUnit
-                        for _, unit in selection do
-                            unit:ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                            if EntityCategoryContains(categories.EXTERNALFACTORY + categories.EXTERNALFACTORYUNIT, unit) then
-                                unit:GetCreator():ProcessInfo('SetRepeatQueue', isRepeatBuild)
-                            end
-                        end
+                    :Action(ToggleRepeatQueue)
+            }
+
+        CategoryMatcher "Transportation / Overcharge / Repeat queue / Explode Fire Beetle"
+            :Modifiers { shift = true }
+            {
+                -- CategoryAction()
+                --     :Action(Misc.AddNearestIdleEngineersSeq),
+                CategoryAction(categories.TRANSPORTATION)
+                    :Action "StartCommandMode order RULEUCC_Transport",
+                CategoryAction()
+                    :Match(function(selection)
+                        local orders, _, _ = GetUnitCommandData(selection)
+                        return Contains(orders, "RULEUCC_Overcharge")
                     end)
+                    :Action(Orders.EnterOverchargeMode),
+                -- CategoryAction(categories.ENGINEER)
+                --     :Action(Misc.AddNearestIdleEngineersSeq),
+                CategoryAction(categories.xrl0302)
+                    :Action(function() Misc.toggleScript "Production" end),
+                CategoryAction(categories.FACTORY + categories.EXTERNALFACTORY)
+                    :Action(ToggleRepeatQueue)
             }
 
         CategoryMatcher "Launch missile / attack-reclaim / attack order"
             :Modifiers { shift = true }
             {
-                CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3)
+                CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3 + categories.xsb2401)
                     :Action 'StartCommandMode order RULEUCC_Nuke',
                 CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH2)
                     :Action 'StartCommandMode order RULEUCC_Tactical',
@@ -78,20 +110,20 @@ function Main()
             {
                 CategoryAction()
                     :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
-                CategoryAction(categories.ENGINEER)
+                CategoryAction(categories.RECLAIM)
                     :Action "StartCommandMode order RULEUCC_Reclaim",
                 CategoryAction()
                     :Match(function(selection)
                         local orders, toggles, _ = GetUnitCommandData(selection)
                         return Contains(toggles, "RULEUTC_ShieldToggle")
                     end)
-                    :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Shield\")",
+                    :Action(function() Misc.toggleScript "Shield" end),
                 CategoryAction()
                     :Match(function(selection)
                         local orders, toggles, _ = GetUnitCommandData(selection)
                         return Contains(toggles, "RULEUTC_StealthToggle")
                     end)
-                    :Action "UI_Lua import(\"/lua/keymap/misckeyactions.lua\").toggleScript(\"Stealth\")",
+                    :Action(function() Misc.toggleScript "Stealth" end),
             }
 
         CategoryMatcher "Move / Select nearest transport"
@@ -352,23 +384,24 @@ function Main()
         end
 
         local function ZoomToggle()
+            local worldCamera = GetCamera('WorldCamera')
             if defaultSettings == nil then
-                lastSettings = GetCamera('WorldCamera'):SaveSettings()
-                GetCamera('WorldCamera'):Reset()
-                defaultSettings = GetCamera('WorldCamera'):SaveSettings()
+                lastSettings = worldCamera:SaveSettings()
+                worldCamera:Reset()
+                defaultSettings = worldCamera:SaveSettings()
                 return
             end
 
-            local current = GetCamera('WorldCamera'):SaveSettings()
+            local current = worldCamera:SaveSettings()
             if not CompareVectors(current.Focus, defaultSettings.Focus)
                 or current.Heading ~= defaultSettings.Heading
                 or current.Pitch ~= defaultSettings.Pitch
                 or current.Zoom ~= defaultSettings.Zoom
                 or lastSettings == nil then
-                GetCamera('WorldCamera'):Reset()
+                worldCamera:Reset()
                 lastSettings = current
             else
-                GetCamera('WorldCamera'):RestoreSettings(lastSettings)
+                worldCamera:RestoreSettings(lastSettings)
                 lastSettings = nil
             end
         end
@@ -383,9 +416,9 @@ function Main()
                 end)
                 :Action(function(selection)
                     if selectionChanged then
-                        import("/lua/ui/game/orders.lua").SoftStop(selection)
+                        Orders.SoftStop(selection)
                     else
-                        import("/lua/ui/game/orders.lua").Stop(selection)
+                        Orders.Stop(selection)
                     end
                     selectionChanged = false
                 end),
@@ -399,7 +432,7 @@ function Main()
                 :Match(function(selection, category)
                     return true
                 end)
-                :Action(import("/lua/ui/game/orders.lua").Stop),
+                :Action(Orders.Stop),
         }
 
     end)
