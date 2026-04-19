@@ -50,10 +50,21 @@ local import = import
 ---| "=="
 ---| "="
 
+---@param s string
+---@return string
+local function RemoveSpaces(s)
+    s = StringGSub(s, "%s+", "") -- remove spaces
+    return s
+end
+
 local VERSION_NUMBER_REGEX = '^(%d+)%.(%d+)%.(%d+)$'
 ---@param vs string
 ---@return ReUI.Version
 local function ParseVersion(vs)
+    local start = StringFind(vs, VERSION_NUMBER_REGEX)
+    if not start then
+        error("invalid ReUI version: " .. vs)
+    end
     local major = StringGSub(vs, VERSION_NUMBER_REGEX, '%1')
     local minor = StringGSub(vs, VERSION_NUMBER_REGEX, '%2')
     local revision = StringGSub(vs, VERSION_NUMBER_REGEX, '%3')
@@ -64,6 +75,11 @@ local MARKER_VERSION = '^(%a[%a%.%d]*)=(%d+%.%d+%.%d+)$'
 ---@param s string
 ---@return string, ReUI.Version
 local function ParseNameAndVersion(s)
+    s = RemoveSpaces(s)
+    local start = StringFind(s, MARKER_VERSION)
+    if not start then
+        error("invalid ReUI tag: " .. s)
+    end
     local name = StringGSub(s, MARKER_VERSION, '%1')
     local version = StringGSub(s, MARKER_VERSION, '%2')
     return name, ParseVersion(version)
@@ -161,7 +177,7 @@ local VERSION_REGEX = '^(%a[%a%.%d]*)([><=]=?)(%d+%.%d+%.%d+)$'
 ---@return CompareOperator?
 ---@return ReUI.Version?
 local function MatchDependencyString(s)
-    s = StringGSub(s, "%s+", "") -- remove spaces
+    s = RemoveSpaces(s)
     local start = StringFind(s, VERSION_REGEX)
     if not start then
         return nil, nil, nil
@@ -270,6 +286,7 @@ Loader = Class()
         for _, mod in __active_mods do
             if mod.ReUI and mod.ui_only then
                 if mod.selectable then
+                    --! definitely must change this. It has to use only mod's name and then find it. But it also must check that found module is the same as mod
                     self:PreLoadModule(mod.ReUI)
                 else
                     self:AddError((
@@ -347,16 +364,16 @@ Loader = Class()
 
     ---@param self ReUI.Loader
     ---@param moduleTag string
+    ---@return ReUI.Module
     TryPreLoad = function(self, moduleTag)
         self:CheckNotDisposed()
 
-        moduleTag = StringGSub(moduleTag, "%s+", "")
-        local name = StringGSub(moduleTag, MARKER_VERSION, '%1')
+        local name, version = ParseNameAndVersion(moduleTag)
         local module = self._modules[name] or self:TryLoadModule(name)
         if module.Status == "failed" then
             _error(("Module '%s' failed to load previously"):format(name))
         end
-        ---@diagnostic disable-next-line:return-type-mismatch
+
         return module
     end,
 
@@ -633,6 +650,37 @@ Loader = Class()
             "ReUI loader is not in preload stage. Are you trying to require modules within Main function?")
     end,
 
+
+    ---@param self ReUI.Loader
+    ---@param moduleName string
+    ---@return FileName
+    FindModuleInfoPath = function(self, moduleName)
+        local splitName = SplitName(moduleName)
+        --[[
+        for example module is 'ReUI.Construction.Selection'
+        it splits into { ReUI, Construction, Selection }
+        then one by one it checks paths
+            /mods/ReUI/Construction/Selection/mod_info.lua
+            /mods/ReUI.Construction/Selection/mod_info.lua
+            /mods/ReUI.Construction.Selection/mod_info.lua
+        ]]
+        local path = "/mods/" .. splitName[1]
+        for i = 2, table.getn(splitName) do
+            local dotPath = path
+            for j = i, table.getn(splitName) do
+                local part = splitName[j]
+                dotPath = dotPath .. "/" .. part
+            end
+            if exists(dotPath .. "/mod_info.lua") then
+                path = dotPath
+                break
+            end
+            path = path .. "." .. splitName[i]
+        end
+
+        return path .. "/"
+    end,
+
     ---@param self ReUI.Loader
     ---@param moduleName string
     ---@return ReUI.Version
@@ -642,27 +690,32 @@ Loader = Class()
         if moduleInfo then
             return moduleInfo.version, moduleInfo.path
         end
-
-        local dotPath = StringFormat("/mods/%s/", moduleName) --[[@as FileName]]
-        local slashPath = StringFormat("/mods/%s/", StringGSub(moduleName, "%.", "/")) --[[@as FileName]]
-
-        if exists(dotPath .. "mod_info.lua") and exists(slashPath .. "mod_info.lua") then
-            local name1, v1 = ParseNameAndVersion(import(dotPath .. "mod_info.lua").ReUI)
-            local name2, v2 = ParseNameAndVersion(import(slashPath .. "mod_info.lua").ReUI)
-
-            if VersionGreater(v1, v2) or VersionEqual(v1, v2) then
-                return v1, dotPath
-            end
-            return v2, slashPath
-        elseif exists(dotPath .. "mod_info.lua") then
-            local name1, v1 = ParseNameAndVersion(import(dotPath .. "mod_info.lua").ReUI)
-            return v1, dotPath
-        elseif exists(slashPath .. "mod_info.lua") then
-            local name2, v2 = ParseNameAndVersion(import(slashPath .. "mod_info.lua").ReUI)
-            return v2, slashPath
+        local modulePath = self:FindModuleInfoPath(moduleName)
+        if not exists(modulePath .. "mod_info.lua") then
+            error("Unable to find module " .. moduleName)
         end
 
-        error("Unable to find module " .. moduleName)
+        local tag = import(modulePath .. "mod_info.lua").ReUI
+        if type(tag) ~= "string" then
+            error("invalid ReUI tag for " .. moduleName)
+        end
+
+        local name, version = ParseNameAndVersion(tag)
+        -- local start = StringFind(tag, VERSION_NUMBER_REGEX)
+        -- if start then
+        --     version = ParseVersion(tag)
+        --     name = moduleName
+        -- else
+        --     name, version = ParseNameAndVersion(tag)
+        --     WARN("ReUI.Loader: Deprecated version tag. Use just version instead.")
+        --     WARN(tag)
+        -- end
+
+        if name ~= moduleName then
+            error("name mismatch for " .. moduleName)
+        end
+
+        return version, modulePath
     end,
 
     ---@param self ReUI.Loader

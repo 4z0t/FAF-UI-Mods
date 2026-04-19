@@ -1,7 +1,6 @@
 ---@declare-global
 --- For mod to be loaded by ReUI loader specify
 --- `ReUI = '<name>=<version>'` in mod_info.lua file.
----
 --- Example:
 ---
 --- `ReUI = 'ReUI.Core=1.0.0'`
