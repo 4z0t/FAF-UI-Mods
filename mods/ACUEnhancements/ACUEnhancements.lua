@@ -240,6 +240,10 @@ function Main(isReplay)
             ---@param self EnhComponent
             ---@param item ActionsGridItem
             Disable = function(self, item)
+                if self.btn.mMouseOver then
+                    UnitViewDetail.Hide()
+                    self.btn.mMouseOver = false
+                end
                 self.btn:Disable()
                 self.btn:Hide()
             end,
