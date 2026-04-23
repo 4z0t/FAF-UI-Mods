@@ -241,8 +241,7 @@ function Main(isReplay)
             ---@param item ActionsGridItem
             Disable = function(self, item)
                 if self.btn.mMouseOver then
-                    UnitViewDetail.Hide()
-                    self.btn.mMouseOver = false
+                    self.btn:OnRolloverEvent("exit")
                 end
                 self.btn:Disable()
                 self.btn:Hide()
