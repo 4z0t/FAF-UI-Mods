@@ -1,5 +1,8 @@
 ReUI.Require
 {
+    "ReUI.Core >= 1.4.0",
+    "ReUI.UI >= 1.4.0",
+    "ReUI.UI.Controls >= 1.0.0",
 }
 
 
@@ -130,6 +133,7 @@ function Main(isReplay)
         HiddenSelect = HiddenSelect,
         ApplyToSelectedUnits = ApplyToSelectedUnits,
         Get = Get,
+        Overlay = import('Modules/Overlay.lua').Overlay,
     }
 
 end
