@@ -68,7 +68,7 @@ function Main()
         CategoryMatcher "Transportation / Overcharge / Repeat queue / Explode Fire Beetle"
             :Modifiers { shift = true }
             {
-                -- CategoryAction()
+                CategoryAction(), -- do nothing if no selection
                 --     :Action(Misc.AddNearestIdleEngineersSeq),
                 CategoryAction(categories.TRANSPORTATION)
                     :Action "StartCommandMode order RULEUCC_Transport",
