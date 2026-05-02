@@ -1512,11 +1512,11 @@ function Main(isReplay)
 
             local handler = panel:GetHandler "BuildOptions" --[[@as BuildOptionsHandler?]]
             if handler then
-                handler:SetHotKeys(idRelations)
+                handler:SetHotKeys(idRelations, upgradeKey)
             end
             local handler = panel:GetHandler "BuildOptionsFactory" --[[@as BuildOptionsHandler?]]
             if handler then
-                handler:SetHotKeys(idRelations)
+                handler:SetHotKeys(idRelations, upgradeKey)
             end
 
         end

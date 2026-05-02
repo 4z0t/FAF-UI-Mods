@@ -1,5 +1,7 @@
 local categories = categories
 local EntityCategoryContains = EntityCategoryContains
+local EntityCategoryFilterOut = EntityCategoryFilterOut
+local EntityCategoryFilterDown = EntityCategoryFilterDown
 
 local AItemComponent = ReUI.UI.Views.Grid.Abstract.AItemComponent
 local ASelectionHandler = ReUI.UI.Views.Grid.Abstract.ASelectionHandler
@@ -11,6 +13,9 @@ local UnitViewDetail = import("/lua/ui/game/unitviewdetail.lua")
 local IsRestricted = import("/lua/game.lua").IsRestricted
 
 local Enumerate = ReUI.LINQ.Enumerate
+local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+local PairsEnumerator = ReUI.LINQ.PairsEnumerator
+
 
 local sortCategoriesOrder = {
     categories.SORTCONSTRUCTION,
@@ -145,15 +150,20 @@ end
 
 ---@class BaseBuildOptionsHandler : ASelectionHandler
 ---@field hotkeys table<string, HotKeyData>
+---@field upgradeKey HotKeyData
 local BaseBuildOptionsHandler = ReUI.Core.Class(ASelectionHandler)
 {
     OnInit = function(self)
         self.hotkeys = {}
+        self.upgradeKey = false
     end,
 
     ---@param self BuildOptionsHandler
-    SetHotKeys = function(self, hotkeys)
+    ---@param hotkeys table<string, HotKeyData>
+    ---@param upgrade HotKeyData
+    SetHotKeys = function(self, hotkeys, upgrade)
         self.hotkeys = hotkeys
+        self.upgradeKey = upgrade
     end,
 }
 
@@ -244,7 +254,7 @@ BuildOptionsHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
         end
         ---@cast selection -nil
 
-        local isAllEngineers = table.empty(EntityCategoryFilterOut(categories.ENGINEER +
+        local isAllEngineers = table.empty(EntityCategoryFilterOut(categories.ENGINEER * categories.MOBILE +
             categories.xrl0403, -- Megalith
             selection))
         if not isAllEngineers then
@@ -394,6 +404,38 @@ local techBuildables = {
     ["EXPERIMENTAL"] = (categories.EXPERIMENTAL - CONSTRUCTIONSORTDOWN),
 }
 
+
+local EnumerateDistinctBlueprints = IPairsEnumerator
+    ---@param unit UserUnit
+    :Select(function(unit) return unit:GetBlueprint() end)
+    :Distinct()
+    :ToFunction()
+
+---@param selection UserUnit[]
+---@param id UnitId
+local function IsFactoryUpgrade(selection, id)
+    local bpGeneral = __blueprints[id].General
+    local upgradesFrom = bpGeneral.UpgradesFrom
+    local upgradesFromBase = bpGeneral.UpgradesFromBase
+
+    if (upgradesFrom == nil or upgradesFrom == 'none') and
+        (upgradesFromBase == nil or upgradesFromBase == 'none') then
+        return false
+    end
+
+    ---@param bp UnitBlueprint
+    for _, bp in EnumerateDistinctBlueprints(selection) do
+        if upgradesFrom == bp.BlueprintId then
+        elseif upgradesFrom == bp.General.UpgradesTo then
+        elseif upgradesFromBase == bp.BlueprintId then
+        elseif upgradesFromBase == bp.General.UpgradesFromBase then
+        else
+            return false
+        end
+    end
+    return true
+end
+
 ---@class BuildOptionsFactoryHandler : BaseBuildOptionsHandler
 BuildOptionsFactoryHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
 {
@@ -479,6 +521,12 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
                 return bp1 < bp2
             end)
             :Select(function(bpID)
+                if IsFactoryUpgrade(selection, bpID) then
+                    return {
+                        id = bpID,
+                        hotkey = self.upgradeKey
+                    }
+                end
                 return {
                     id = bpID,
                     hotkey = hotkeys[bpID]
@@ -502,23 +550,7 @@ BuildOptionsFactoryHandler = ReUI.Core.Class(BaseBuildOptionsHandler)
         OrderConstruction = function(self, selection, id, count)
             local bpGeneral = __blueprints[id].General
 
-            local performUpgrade = bpGeneral.UpgradesFrom ~= 'none' and Enumerate(selection)
-                :All(function(unit)
-                    local unitBp = unit:GetBlueprint()
-                    if bpGeneral.UpgradesFrom == unitBp.BlueprintId then
-                        return true
-                    elseif bpGeneral.UpgradesFrom == unitBp.General.UpgradesTo then
-                        return true
-                    elseif bpGeneral.UpgradesFromBase == "none" then
-                        return false
-                        -- Try testing against the base
-                    elseif bpGeneral.UpgradesFromBase == unitBp.BlueprintId then
-                        return true
-                    elseif bpGeneral.UpgradesFromBase == unitBp.General.UpgradesFromBase then
-                        return true
-                    end
-                end)
-            if performUpgrade then
+            if IsFactoryUpgrade(selection, id) then
                 IssueUpgradeOrders(selection, id)
                 return
             end
