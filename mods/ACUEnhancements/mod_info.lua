@@ -1,13 +1,13 @@
 name = "ACU Enhancements"
-version = 3
+version = 4
 copyright = ""
 description = [[
 ]]
 author = "4z0t"
 url = ""
-uid = "acu-enhancements-v1.0.2"
+uid = "acu-enhancements-v1.0.3"
 exclusive = false
 ui_only = true
 conflicts = {}
 
-ReUI = 'ACUEnhancements=1.0.2'
+ReUI = 'ACUEnhancements=1.0.3'
