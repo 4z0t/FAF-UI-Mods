@@ -3,6 +3,7 @@ ReUI.Require
     "ReUI.Core >= 1.4.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.UI.Controls >= 1.0.0",
+    "ReUI.Selection >= 1.0.0",
 }
 
 
