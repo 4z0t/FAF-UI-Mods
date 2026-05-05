@@ -57,11 +57,15 @@ function Main(isReplay)
         end,
 
         ---@param self ReUI.Selection.Selector
-        ---@param selection UserUnit[]
+        ---@param oldSelection UserUnit[]
+        ---@param newSelection UserUnit[]
+        ---@param added UserUnit[]
+        ---@param removed UserUnit[]
         ---@return UserUnit[]
         ---@return boolean
-        Process = function(self, selection)
+        Process = function(self, oldSelection, newSelection, added, removed)
             local changed, changedSel = false, false
+            local selection = newSelection
 
             ---@param handler ReUI.Selection.Handler
             for _, handler in self:GetHandlers() do
@@ -140,7 +144,7 @@ function Main(isReplay)
 
         local selection, changed = nil, false
         if selector then
-            selection, changed = selector:Process(newSelection)
+            selection, changed = selector:Process(oldSelection, newSelection, added, removed)
         end
 
         if changed then
