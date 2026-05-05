@@ -6,7 +6,7 @@ author = "4z0t"
 url = "https://github.com/4z0t/FAF-UI-Mods"
 uid = "reui-selection-1.0.0"
 exclusive = false
-selectable = true
+selectable = false
 ui_only = true
 conflicts = {
     "selection-fix-v03",

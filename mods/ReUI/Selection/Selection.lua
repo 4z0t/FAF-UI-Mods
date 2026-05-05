@@ -90,6 +90,10 @@ function Main(isReplay)
         ---@param self ReUI.Selection.Selector
         ---@param handler ReUI.Selection.Handler
         Add = function(self, handler)
+            if self:Get(handler.Name) then
+                WARN("ReUI.Selection: Handler with name " + tostring(handler.Name) + " already exists in selector")
+                return
+            end
             table.insert(self._handlers, handler)
             table.sort(self._handlers, function(a, b) return a.Priority > b.Priority end)
         end,
