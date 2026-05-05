@@ -752,3 +752,45 @@ Loader = Class()
         self._postCreateCallbacks = nil
     end,
 }
+
+---@param internalModules InternalModuleInfo[]
+---@return ReUI
+function Create(internalModules)
+    local __ReUI = {}
+    ---@type ReUI.Loader
+    local loader = Loader(__ReUI, internalModules)
+
+    ---@param tag string
+    ---@return ReUI.Module?
+    function __ReUI.Exists(tag)
+        return loader:Exists(tag)
+    end
+
+    ---@param deps string[]|DependencyInfo
+    function __ReUI.Require(deps)
+        return loader:Require(deps)
+    end
+
+    ---@param name string
+    ---@return ReUI.Module?
+    function __ReUI.Get(name)
+        return loader:GetModule(name)
+    end
+
+    ---@type ReUI
+    local ReUI = setmetatable({ __loader = loader, },
+        {
+            __newindex = function(self, k, v)
+                error("Manual assignment into ReUI is forbidden")
+            end,
+
+            __index = function(self, k)
+                local v = __ReUI[k]
+                if not v then
+                    error(("'ReUI.%s' doesn't exist"):format(k))
+                end
+                return v
+            end,
+        })
+    return ReUI
+end
