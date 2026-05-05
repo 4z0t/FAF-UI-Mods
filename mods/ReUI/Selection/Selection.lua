@@ -168,9 +168,13 @@ function Main(isReplay)
     end)
 
     ReUI.Core.OnPostCreateUI(function()
+        if selector == nil then
+            return
+        end
+
         LOG "ReUI.Selection: Handlers:"
         ---@param handler ReUI.Selection.Handler
-        for _, handler in GetSelector():GetHandlers() do
+        for _, handler in selector:GetHandlers() do
             LOG("\t", handler.Name)
         end
     end)
