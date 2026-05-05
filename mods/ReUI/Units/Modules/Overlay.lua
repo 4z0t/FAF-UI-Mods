@@ -10,7 +10,6 @@ local LazyVar = import('/lua/lazyvar.lua').Create
 ---@field PosY LazyVar<number>
 ---@field unit UserUnit
 ---@field id UnitId
----@field string integer
 ---@field offsetX number
 ---@field offsetY number
 Overlay = ReUI.Core.Class(Bitmap)
@@ -38,10 +37,10 @@ Overlay = ReUI.Core.Class(Bitmap)
 
         local worldView = self._worldView
         self.Left:Set(function()
-            return worldView.Left() + self.PosX() - self.Width() / 2 + self.offsetX
+            return worldView.Left() + self.PosX() - self.Width() * 0.5 + self.offsetX
         end)
         self.Top:Set(function()
-            return worldView.Top() + self.PosY() - self.Height() / 2 + self.offsetY
+            return worldView.Top() + self.PosY() - self.Height() * 0.5 + self.offsetY
         end)
 
         self:Hide()
