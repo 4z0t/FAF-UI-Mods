@@ -251,10 +251,6 @@ Loader = Class()
     ---@param func fun(isReplay: boolean)
     ---@return fun(isReplay: boolean)
     Wrap = function(self, func)
-        local ___, version = import("/lua/version.lua").GetVersionData()
-        if StringSub(version, 1, 1) ~= StringSub(version, 3, 3) then
-            return func
-        end
         self:PreLoad()
         return function(isReplay)
             self._isReplay = isReplay
