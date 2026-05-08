@@ -1,6 +1,6 @@
 name = "ReUI.Reclaim"
-uid = "reui-reclaim-1.2.0"
-version = 6
+uid = "reui-reclaim-1.2.1"
+version = 7
 copyright = ""
 description = [[Check on Github and official Discord server for mode details.
 https://github.com/4z0t/FAF-UI-Mods
@@ -19,4 +19,4 @@ conflicts = {}
 before = {}
 after = {}
 
-ReUI = 'ReUI.Reclaim=1.2.0'
+ReUI = 'ReUI.Reclaim=1.2.1'

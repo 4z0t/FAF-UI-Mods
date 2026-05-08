@@ -158,7 +158,7 @@ function Main(isReplay)
     ---@param maxMass number
     ---@return string?
     ---@return integer?
-    local function ComputeLabelPropertiesBatched(totalMass, maxMass)
+    local function GetLabelPropsClear(totalMass, maxMass)
         if totalMass <= 10 then return nil, nil end
         if maxMass < 100 then return 'ffc7ff8f', 10 end
         if maxMass < 300 then return 'ffd7ff05', 12 end
@@ -168,7 +168,31 @@ function Main(isReplay)
         return 'fffb0303', 25
     end
 
+    ---@param totalMass number
+    ---@param maxMass number
+    ---@return string?
+    ---@return integer?
+    local function GetLabelPropsFull(totalMass, maxMass)
+        if maxMass < 100 then return 'ffc7ff8f', 10 end
+        if maxMass < 300 then return 'ffd7ff05', 12 end
+        if maxMass < 600 then return 'ffffeb23', 17 end
+        if maxMass < 1000 then return 'ffff9d23', 20 end
+        if maxMass < 2000 then return 'ffff7212', 22 end
+        return 'fffb0303', 25
+    end
+
     local options = ReUI.Options.Mods["ReUI.Reclaim"]
+
+    ---@type fun(totalMass: number, maxMass: number) : string?, integer?
+    local GetLabelColorAndSize = GetLabelPropsClear
+
+    options.displayMinimumValue:Bind(function(opt)
+        if opt() then
+            GetLabelColorAndSize = GetLabelPropsFull
+        else
+            GetLabelColorAndSize = GetLabelPropsClear
+        end
+    end)
 
     ---@type number
     local heightRatio
@@ -246,7 +270,7 @@ function Main(isReplay)
 
         ---@param self ReclaimLabel
         AdjustToValue = function(self, total, max)
-            local color, size = ComputeLabelPropertiesBatched(total, max or total)
+            local color, size = GetLabelColorAndSize(total, max or total)
             if color then
                 self.text:SetFont(UIUtil.bodyFont, size * iconScale) -- r.mass > 2000
                 self.text:SetColor(color)
