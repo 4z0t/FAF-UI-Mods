@@ -10,6 +10,7 @@ ReUI.Require
     "ReUI.UI.Views.Grid >= 1.1.0",
     "ReUI.Options >= 1.0.0",
     "ReUI.Units >= 1.0.0",
+    "ReUI.Actions >= 1.3.0",
     "ReUI.Units.Enhancements >= 1.2.0",
 }
 
@@ -49,9 +50,7 @@ function Main(isReplay)
     local LazyGrid               = import("Modules/Views/LazyGrid.lua").LazyGrid
     local ButtonWithOverlay      = import("Modules/Views/ButtonWithOverlay.lua").ButtonWithOverlay
     local ConstructionBorder     = import("Modules/Views/Border.lua").Border
-    local Event                  = import("Modules/Event.lua").Event
     local Item                   = import("Modules/Views/Item.lua").Item
-
 
 
     ---@alias UpdateReason
@@ -840,7 +839,6 @@ function Main(isReplay)
     ---@field _secondary ReUI.Construction.Grid
     ---@field _border ConstructionBorder
     ---@field _actionCheckBoxes ReUI.Construction.ActionCheckBox[]
-    ---@field UpdateEvent Event
     local ConstructionPanel = ReUI.Core.Class(Group)
     {
 
@@ -934,8 +932,6 @@ function Main(isReplay)
 
             self.Layouter = ReUI.UI.RoundLayouter(LF.Div(options.scale:Raw(), 100))
             self.AutoLayout = false
-
-            self.UpdateEvent = Event()
 
             self._canScroll = false
             self._context = {
@@ -1265,8 +1261,6 @@ function Main(isReplay)
                 checkbox.Behavior = self._actionsBehavior[ actions[i] ]
                 checkbox:Update()
             end
-
-            self.UpdateEvent:Invoke(self, self._context)
         end,
 
         ---@param self ReUI.Construction.Panel
@@ -1365,15 +1359,33 @@ function Main(isReplay)
         end
     }
 
+
+    -- local CommandModeHook = ReUI.Core.HookModule "/lua/ui/game/commandmode.lua"
+
+    -- ---@type Event
+    -- local onCommandIssuedEvent = Event()
+
+    -- CommandModeHook("OnCommandIssued", function(OnCommandIssued, module)
+    --     ---@param command UserCommand
+    --     return function(command)
+    --         OnCommandIssued(command)
+    --         onCommandIssuedEvent:Invoke(module, command)
+    --     end
+    -- end)
+
+
     local ConstructionHook = ReUI.Core.HookModule "/lua/ui/game/construction.lua"
 
     ConstructionHook("OnQueueChanged", function(field, module)
         return function(newQueue)
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
-            if not IsDestroyed(panel) then
-                panel:Update("queue")
+
+            if IsDestroyed(panel) then
+                return
             end
+
+            panel:Update("queue")
         end
     end)
 
@@ -1381,9 +1393,12 @@ function Main(isReplay)
         return function()
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
-            if not IsDestroyed(panel) then
-                panel:Update("refresh")
+
+            if IsDestroyed(panel) then
+                return
             end
+
+            panel:Update("refresh")
         end
     end)
 
@@ -1391,10 +1406,13 @@ function Main(isReplay)
         return function()
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
-            if not IsDestroyed(panel) then
-                panel:Show()
-                panel:Refresh()
+
+            if IsDestroyed(panel) then
+                return
             end
+
+            panel:Show()
+            panel:Refresh()
         end
     end)
 
@@ -1402,9 +1420,12 @@ function Main(isReplay)
         return function()
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
-            if not IsDestroyed(panel) then
-                panel:Hide()
+
+            if IsDestroyed(panel) then
+                return
             end
+
+            panel:Hide()
         end
     end)
 
@@ -1522,6 +1543,30 @@ function Main(isReplay)
         end
     end)
 
+    ReUI.Actions.SelectionAction("Append unit for transportation",
+        function(selection)
+            ---@type ReUI.Construction.Panel
+            local panel = ReUI.UI.Global["Construction"]
+            if IsDestroyed(panel) then
+                return
+            end
+
+            local h = panel:GetHandler "TransportCargo" --[[@as TransportCargoHandler?]]
+            if h == nil then
+                return
+            end
+
+            if h:AppendNextUnitForDrop() then
+                panel:Refresh()
+            end
+        end,
+        "ReUI.Construction",
+        "reui_construction_append_transport_cargo",
+        {
+            shift = true
+        }
+    )
+
     --TODO
     --[x] Fix queue display for engineers (upgrades, etc)
     --[x] Fix mobile factory queue logic (drag specifically)
@@ -1546,8 +1591,12 @@ function Main(isReplay)
     --[ ] fix construction tab disabling when current tab is selection
     -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
 
+    ---@class ReUI.Construction : ReUI.Module
     return {
         Panel = ConstructionPanel,
         Grid = ConstructionGrid,
+        -- Misc = {
+        --     OnCommandIssuedEvent = onCommandIssuedEvent
+        -- }
     }
 end
