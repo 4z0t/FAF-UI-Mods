@@ -2,9 +2,11 @@ local setmetatable = setmetatable
 local LazyVar = import("/lua/lazyvar.lua").Create
 local Prefs = import("/lua/user/prefs.lua")
 
+
 local function FormatName(name)
     return (name:gsub("[^A-Za-z0-9]+", "_"))
 end
+
 
 ---@alias Opt<T> OptionVar<T>|fun():T
 

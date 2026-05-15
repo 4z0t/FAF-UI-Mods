@@ -1,6 +1,7 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.5.0",
+    "ReUI.Core.Events >= 1.0.0",
     "ReUI.LINQ >= 1.0.0",
     "ReUI.UI.Views >= 1.0.0"
 }
@@ -134,5 +135,6 @@ function Main(isReplay)
         },
         Mods = _setmetatable({}, ModsOptionsMetaTable),
         Opt = MakeOpt,
+        ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption
     }
 end
