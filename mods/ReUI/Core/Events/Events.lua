@@ -1,0 +1,248 @@
+ReUI.Require
+{
+    "ReUI.Core >= 1.6.0"
+}
+
+function Main()
+    local pcall = pcall
+    local ipairs = ipairs
+    local TableInsert = table.insert
+    local TableRemove = table.remove
+    local setmetatable = setmetatable
+
+    ---@alias EventCallback fun(sender:any, eventArgs:any)
+
+    ---@class ReUI.Core.Event
+    ---@field _name string
+    ---@field _callbacks EventCallback[]
+    local Event = ReUI.Core.Class()
+    {
+        ---@param self ReUI.Core.Event
+        ---@param name? string
+        __init = function(self, name)
+            self._name = name or "unnamed"
+            self._callbacks = nil
+        end,
+
+        ---@param self ReUI.Core.Event
+        ---@param callback function
+        ---@return function
+        Add = function(self, callback)
+            if self._callbacks == nil then
+                self._callbacks = {}
+            end
+
+            TableInsert(self._callbacks, callback)
+            return callback
+        end,
+
+        ---@param self ReUI.Core.Event
+        ---@param callback function
+        ---@return boolean
+        Remove = function(self, callback)
+            if self._callbacks ~= nil then
+                for i, f in ipairs(self._callbacks) do
+                    if f == callback then
+                        TableRemove(self._callbacks, i)
+                        return true
+                    end
+                end
+            end
+            return false
+        end,
+
+        ---@param self ReUI.Core.Event
+        ---@param sender any
+        ---@param eventArgs any
+        Invoke = function(self, sender, eventArgs)
+            if self._callbacks == nil then
+                return
+            end
+
+            for i, f in ipairs(self._callbacks) do
+                f(sender, eventArgs)
+            end
+        end,
+
+        ---@param self ReUI.Core.Event
+        Clear = function(self)
+            self._callbacks = nil
+        end
+    }
+
+    ---@class ReUI.Core.SafeEvent : ReUI.Core.Event
+    local SafeEvent = ReUI.Core.Class(Event)
+    {
+        ---@param self ReUI.Core.SafeEvent
+        ---@param sender any
+        ---@param eventArgs any
+        Invoke = function(self, sender, eventArgs)
+            if self._callbacks == nil then
+                return
+            end
+
+            for i, f in ipairs(self._callbacks) do
+                local ok, err = pcall(f, sender, eventArgs)
+                if not ok then
+                    WARN(("ReUI.Core.Event [%s]: %s"):format(self._name, err))
+                end
+            end
+        end,
+    }
+
+    local function SetEvent()
+        error "ReUI.Core.Event: attempt to manually set event property."
+    end
+
+    ---Makes event property for ReUI.Core.Class
+    ---@param class ReUI.Core.Event?
+    ---@return ReUI.Core.Event
+    local function EventProperty(class)
+        class = class or Event
+        return ReUI.Core.Property
+        {
+            get = function(self, key)
+                local field = "_event" .. key
+                local event = self[field]
+
+                if event == nil then
+                    event = class(key)
+                    self[field] = event
+                end
+
+                return event
+            end,
+
+            set = SetEvent
+        }
+    end
+
+    ---#region Lazy event
+
+    ---@class EventProxy
+    ---@field _key any
+    ---@field _object any
+    ---@field _class fun(name?:string):ReUI.Core.Event
+    local EventProxy = ReUI.Core.Class()
+    {
+        ---@param self EventProxy
+        ---@param object table
+        ---@param key any
+        Proxy = function(self, object, key, class)
+            self._object = object
+            self._key = key
+            self._class = class
+            return self
+        end,
+
+        ---@param self EventProxy
+        ---@param callback function
+        ---@return function
+        Add = function(self, callback)
+            local object = self._object
+            local key = self._key
+            local class = self._class
+            self:Clear()
+
+            if key == nil or object == nil or class == nil then
+                error "EventProxy:Add : attempt to proxy after clear."
+            end
+
+            local event = class(key)
+            object["_event" .. key] = event
+
+            return event:Add(callback)
+        end,
+
+        ---@param self EventProxy
+        ---@param callback function
+        Remove = function(self, callback)
+            self:Clear()
+        end,
+
+        ---@param self EventProxy
+        ---@param sender any
+        ---@param eventArgs any
+        Invoke = function(self, sender, eventArgs)
+            self:Clear()
+        end,
+
+        ---@param self EventProxy
+        Clear = function(self)
+            self._object = nil
+            self._key = nil
+            self._class = nil
+        end,
+    }
+
+    ---@type EventProxy
+    local eventProxy = EventProxy()
+
+    local function GetEvent(self, key, class)
+        local field = "_event" .. key
+        local event = self[field]
+        if event then
+            return event
+        end
+
+        return eventProxy:Proxy(self, key, class)
+    end
+
+    ---Makes lazy event property for ReUI.Core.Class
+    ---Lazy event is instantiated when a listener is added
+    ---@param class ReUI.Core.Event?
+    ---@return ReUI.Core.Event
+    local function LazyEventProperty(class)
+        class = class or Event
+        return ReUI.Core.Property
+        {
+            get = function(self, key)
+                return GetEvent(self, key, class)
+            end,
+
+            set = SetEvent
+        }
+    end
+
+    ---#endregion
+
+    ---@class EventMethodBind:function
+    ---@field [1] any
+    ---@field [2] fun(object:any, sender:any, event:any)
+    local EventMethodBindMeta =
+    {
+        ---@param self EventMethodBind
+        ---@param other EventMethodBind
+        ---@return boolean
+        __eq = function(self, other)
+            return self[1] == other[1] and self[2] == other[2]
+        end,
+
+        ---@param self EventMethodBind
+        ---@param sender any
+        ---@param event any
+        __call = function(self, sender, event)
+            return self[2](self[1], sender, event)
+        end
+    }
+
+    ---Binds object and method to be consumed by event
+    ---@param object any
+    ---@param method fun(object:any, sender:any, event:any)
+    ---@return EventMethodBind
+    local function Bind(object, method)
+        if object == nil or method == nil then
+            error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
+        end
+        return setmetatable({ object, method }, EventMethodBindMeta)
+    end
+
+    ---@class ReUI.Core.Events : ReUI.Module
+    return {
+        Bind = Bind,
+        EventProperty = EventProperty,
+        -- LazyEventProperty = LazyEventProperty,
+        Event = Event,
+        SafeEvent = SafeEvent,
+    }
+end
