@@ -90,8 +90,23 @@ function Main()
         end,
     }
 
-    local function SetEvent()
-        error "ReUI.Core.Event: attempt to manually set event property."
+    ---@param self any
+    ---@param value any
+    ---@param key any
+    local function SetEvent(self, value, key)
+        if type(value) ~= "nil" then
+            error(("ReUI.Core.Event [%s]: attempt to manually set event property."):format(key))
+        end
+
+        local field = "_event" .. key
+        local event = self[field]
+
+        if event == nil then
+            return
+        end
+
+        event:Clear()
+        self[field] = nil
     end
 
     ---Makes event property for ReUI.Core.Class
