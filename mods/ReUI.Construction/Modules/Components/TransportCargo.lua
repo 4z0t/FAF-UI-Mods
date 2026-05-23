@@ -4,12 +4,27 @@ local ASelectionHandler = ReUI.UI.Views.Grid.Abstract.ASelectionHandler
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 local Enumerate = ReUI.LINQ.Enumerate
+local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+local ToSet = IPairsEnumerator:ToSet()
+
+local function EqualSets(s1, s2)
+    local c = 0
+    for k in s1 do
+        c = c + 1
+        if s2[k] == nil then
+            return false
+        end
+    end
+    return c == table.getsize(s2)
+end
 
 ---@class CargoData
 ---@field id string
 ---@field index integer
 
 ---@class TransportCargoContext
+---@field mode "manual"|"auto"
+---@field index integer
 ---@field units table<UserUnit, boolean>
 ---@field cargoUnits UserUnit[]
 ---@field lastEnabled integer
@@ -18,11 +33,81 @@ local TransportCargoContext = ReUI.Core.Class()
     ---@param self TransportCargoContext
     __init = function(self)
         self.units = {}
+        self.mode = "manual"
+        self.index = 1
     end,
 
     ---@param self TransportCargoContext
+    ---@param cargo UserUnit[]
+    CargoChanged = function(self, cargo)
+        local n1 = self.cargoUnits == nil and 0 or table.getn(self.cargoUnits)
+        local n2 = cargo == nil and 0 or table.getn(cargo)
+        return n1 ~= n2 or self.cargoUnits and cargo and not EqualSets(ToSet(self.cargoUnits), ToSet(cargo))
+    end,
+
+    ---@param self TransportCargoContext
+    ---@param cargo UserUnit[]
     SetCargo = function(self, cargo)
+
+        local cargoChanged = self:CargoChanged(cargo)
+
         self.cargoUnits = cargo
+        local firstToDrop = nil
+        for i, unit in cargo do
+            if unit:HasUnloadCommandQueuedUp() then
+                self:AddUnit(unit)
+            else
+                firstToDrop = firstToDrop or i
+            end
+        end
+        if cargoChanged then
+            self.index = firstToDrop
+        end
+
+
+        -- ReUI.Construction.Misc.OnCommandIssuedEvent:AddByKey("TransportCargoContext",
+        --     ---@param command UserCommand
+        --     function(module, command)
+        --         if command.CommandType == 'TransportUnloadSpecificUnits' and self.mode == "auto" then
+        --             local unit = self.cargoUnits[self.index]
+        --             if unit then
+        --                 self:AddUnit(unit)
+        --                 self.index = self.index + 1
+        --             else
+        --                 self.mode = "manual"
+        --                 module.EndCommandMode(true)
+        --                 PlaySound(Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', })
+        --             end
+        --         end
+        --     end)
+    end,
+
+    ---@param self TransportCargoContext
+    AppendNextUnit = function(self)
+        if self.index == nil then
+            self.index = 1
+        end
+        local unit = self.cargoUnits[self.index]
+        if unit then
+            self:AddUnit(unit)
+            self.index = self.index + 1
+            PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+        else
+            PlaySound(Sound { Cue = 'UI_Menu_Error_01', Bank = 'Interface', })
+        end
+    end,
+
+    ---@param self TransportCargoContext
+    StartAutoMode = function(self)
+        self.index = 1
+        local unit = self.cargoUnits[self.index]
+        if unit then
+            self.mode = "auto"
+            self:AddUnit(unit)
+            self.index = self.index + 1
+        else
+            self.mode = "manual"
+        end
     end,
 
     ---@param self TransportCargoContext
@@ -93,11 +178,20 @@ local TransportCargoContext = ReUI.Core.Class()
     end,
 
     ---@param self TransportCargoContext
+    IsActive = function(self)
+        return self.cargoUnits ~= nil
+    end,
+
+    ---@param self TransportCargoContext
     Clear = function(self)
         -- This check is done to prevent us from breaking other handlers' SessionExtraSelectList
         if self.cargoUnits == nil then
             return
         end
+
+        -- ReUI.Construction.Misc.OnCommandIssuedEvent:RemoveByKey("TransportCargoContext")
+        self.index = 1
+        self.mode = "manual"
         self.units = nil
         self.cargoUnits = nil
         self.lastEnabled = nil
@@ -112,8 +206,21 @@ TransportCargoHandler = ReUI.Core.Class(ASelectionHandler)
 {
     Name = "TransportCargo",
 
+    ---@param self TransportCargoHandler
     OnInit = function(self)
         self._context = TransportCargoContext()
+    end,
+
+    ---@param self TransportCargoHandler
+    ---@return boolean
+    AppendNextUnitForDrop = function(self)
+        if not self._context:IsActive() then
+            return false
+        end
+
+        self._context:AppendNextUnit()
+
+        return true
     end,
 
     ---@param self TransportCargoHandler
@@ -154,6 +261,8 @@ TransportCargoHandler = ReUI.Core.Class(ASelectionHandler)
 
     ---@param self TransportCargoHandler
     OnDestroy = function(self)
+        self._context:Clear()
+        self._context = nil
     end,
 
     ---@class TransportCargoItem : AItemComponent
@@ -175,12 +284,17 @@ TransportCargoHandler = ReUI.Core.Class(ASelectionHandler)
             if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
 
                 if self.context then
-                    if event.Modifiers.Shift then
-                        self.context:AddRange(self.data.index)
-                        item:UpdatePanel()
-                    else
-                        self.context:ToggleUnit(self.data.index)
-                        item:UpdatePanel()
+                    if event.Modifiers.Left then
+
+                        if event.Modifiers.Ctrl then
+                            self.context:AddRange(self.data.index)
+                            item:UpdatePanel()
+                        else
+                            self.context:ToggleUnit(self.data.index)
+                            item:UpdatePanel()
+                        end
+                    elseif event.Modifiers.Right then
+                        -- self.context:StartAutoMode()
                     end
                 end
 
@@ -222,3 +336,15 @@ TransportCargoHandler = ReUI.Core.Class(ASelectionHandler)
         end,
     },
 }
+
+
+--[[
+   CreateUnitAtMouse('ual0105', 0,    0.85,   -0.37,  2.31069)
+   CreateUnitAtMouse('ual0105', 0,   -0.34,    1.02,  0.21479)
+   CreateUnitAtMouse('uaa0107', 0,   -0.15,   -0.17,  2.31285)
+   CreateUnitAtMouse('ual0105', 0,   -0.92,    0.11, -1.85973)
+   CreateUnitAtMouse('ual0105', 0,   -0.85,   -0.56, -1.86647)
+   CreateUnitAtMouse('ual0105', 0,    0.60,   -0.84,  2.30749)
+   CreateUnitAtMouse('ual0105', 0,    0.82,    0.80,  0.21269)
+
+]]
