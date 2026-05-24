@@ -216,7 +216,7 @@ OptionsWindow = Class(Window) {
     Add = function(self, data, passSizing)
         local option
         if data.optionVar then
-            option = data.optionVar:Option()
+            option = data.optionVar.OptionName
             self._optionVars[option] = data.optionVar
         end
         local function CreateSplitter()

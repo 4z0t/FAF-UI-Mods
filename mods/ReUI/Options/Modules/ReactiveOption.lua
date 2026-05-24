@@ -30,6 +30,32 @@ ReactiveOption = ReUI.Core.Class()
         end
     } --[[@as any]] ,
 
+    OptionName = ReUI.Core.Property
+    {
+        ---@param self ReUI.Options.ReactiveOption
+        get = function(self)
+            return self._optionName
+        end,
+
+        ---@param self ReUI.Options.ReactiveOption
+        set = function(self, value)
+            error "ReactiveOption: attempt to set OptionName"
+        end
+    } --[[@as  string]] ,
+
+    ModName = ReUI.Core.Property
+    {
+        ---@param self ReUI.Options.ReactiveOption
+        get = function(self)
+            return self._modName
+        end,
+
+        ---@param self ReUI.Options.ReactiveOption
+        set = function(self, value)
+            error "ReactiveOption: attempt to set ModName"
+        end
+    } --[[@as  string]] ,
+
     ---@param self ReUI.Options.ReactiveOption
     ---@param modName string
     ---@param optionName string
@@ -112,10 +138,11 @@ ReactiveOption = ReUI.Core.Class()
         self._prev = nil
     end,
 
-    ---@deprecated use OnChanged event to observe when the value of the option changes and get current value with `Get`
+    ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
     ---@param self ReUI.Options.ReactiveOption
     ---@param f fun(opt: ReUI.Options.ReactiveOption)
     Bind = function(self, f)
+        WARN (("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged'"):format(self.ModName, self.OptionName))
         self.OnChanged:Add(f)
         f(self)
     end,

@@ -20,7 +20,7 @@ function Main(isReplay)
 
     ---#region Options Loading
 
-    local OptionVar = import("Modules/OptionVar.lua").Create
+    local ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption
 
     local OptValueMetaTable = {}
     local function IsOpt(value)
@@ -29,7 +29,7 @@ function Main(isReplay)
 
     ---@generic T
     ---@param value T
-    ---@return OptionVar
+    ---@return ReUI.Options.ReactiveOption
     local function MakeOpt(value)
         return _setmetatable({ value = value }, OptValueMetaTable)
     end
@@ -42,13 +42,13 @@ function Main(isReplay)
             if _type(defaultValue) == "table" then
                 if IsOpt(defaultValue) then
                     LOG(("ReUI.Options: loading option '%s':'%s'"):format(modName, opt))
-                    options[optName] = OptionVar(modName, opt, defaultValue.value)
+                    options[optName] = ReactiveOption(modName, opt, defaultValue.value)
                 else
                     options[optName] = LoadOptions(defaultValue, modName, opt)
                 end
             else
                 LOG(("ReUI.Options: loading option '%s':'%s'"):format(modName, opt))
-                options[optName] = OptionVar(modName, opt, defaultValue)
+                options[optName] = ReactiveOption(modName, opt, defaultValue)
             end
         end
 

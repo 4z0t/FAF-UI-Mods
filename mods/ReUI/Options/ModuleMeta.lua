@@ -32,7 +32,7 @@ ReUI.Options.Mods = {}
 ---```
 ---@generic T
 ---@param value T
----@return Opt<T>
+---@return ReUI.Options.ReactiveOption
 function ReUI.Options.Opt(value)
 end
 
