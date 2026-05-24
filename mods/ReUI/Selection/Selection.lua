@@ -95,7 +95,7 @@ function Main(isReplay)
         ---@param handler ReUI.Selection.Handler
         Add = function(self, handler)
             if self:Get(handler.Name) then
-                WARN("ReUI.Selection: Handler with name " + tostring(handler.Name) + " already exists in selector")
+                WARN("ReUI.Selection: Handler with name " .. tostring(handler.Name) .. " already exists in selector")
                 return
             end
             table.insert(self._handlers, handler)
