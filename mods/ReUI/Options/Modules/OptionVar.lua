@@ -39,8 +39,8 @@ function OptionVarMetaTable:Set(value)
     self:OnChange()
 end
 
----resets value to previous saved one
-function OptionVarMetaTable:Reset()
+---Restore value to previously saved one
+function OptionVarMetaTable:Restores()
     if self._prev ~= nil then
         self:Set(self._prev)
         self._prev = nil

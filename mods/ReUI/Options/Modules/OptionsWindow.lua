@@ -472,7 +472,7 @@ OptionsWindow = Class(Window) {
 
     RestoreOptions = function(self)
         for id, var in self._optionVars do
-            var:Reset()
+            var:Restore()
         end
     end,
 
