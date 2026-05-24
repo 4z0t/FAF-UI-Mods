@@ -110,8 +110,10 @@ function Main()
     end
 
     ---Makes event property for ReUI.Core.Class
-    ---@param class ReUI.Core.Event?
-    ---@return ReUI.Core.Event
+    ---@overload fun():ReUI.Core.Event
+    ---@generic T : ReUI.Core.Event
+    ---@param class T
+    ---@return T
     local function EventProperty(class)
         class = class or Event
         return ReUI.Core.Property

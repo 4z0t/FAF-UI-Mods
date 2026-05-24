@@ -17,6 +17,9 @@ ReUI.Options = {}
 ---@type table<string, table>
 ReUI.Options.Mods = {}
 
+
+---@alias ReUI.Options.Opt<T> (fun():T)|ReUI.Options.ReactiveOption
+
 ---Creates OptionVar from value when used within `ReUI.Options.Mods`.
 ---Example:
 ---```lua
@@ -32,7 +35,7 @@ ReUI.Options.Mods = {}
 ---```
 ---@generic T
 ---@param value T
----@return ReUI.Options.ReactiveOption
+---@return ReUI.Options.Opt<T>
 function ReUI.Options.Opt(value)
 end
 
