@@ -61,12 +61,12 @@ ReactiveOption = ReUI.Core.Class()
     ---@param optionName string
     ---@param default any
     __init = function(self, modName, optionName, default)
-        modName = FormatName(modName)
-        optionName = FormatName(optionName)
-
         if default == nil then
             error(("Attempt to set option %s:%s to nil by default, don't do that!"):format(modName, optionName))
         end
+
+        modName = FormatName(modName)
+        optionName = FormatName(optionName)
 
         local modOptionsTable = Prefs.GetFromCurrentProfile(modName)
         local val = modOptionsTable and modOptionsTable[optionName]
@@ -143,7 +143,7 @@ ReactiveOption = ReUI.Core.Class()
     ---@param self ReUI.Options.ReactiveOption
     ---@param f fun(opt: ReUI.Options.ReactiveOption)
     Bind = function(self, f)
-        WARN (("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged'"):format(self.ModName, self.OptionName))
+        WARN(("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged'"):format(self.ModName, self.OptionName))
         self.OnChanged:Add(f)
         f(self)
     end,
