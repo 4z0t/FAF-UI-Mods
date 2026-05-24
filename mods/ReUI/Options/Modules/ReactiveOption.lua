@@ -103,6 +103,7 @@ ReactiveOption = ReUI.Core.Class()
     end,
 
     ---@param self ReUI.Options.ReactiveOption
+    ---@return any
     Prev = function(self)
         return self._prev
     end,

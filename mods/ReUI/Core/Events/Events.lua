@@ -244,8 +244,9 @@ function Main()
     }
 
     ---Binds object and method to be consumed by event
-    ---@param object any
-    ---@param method fun(object:any, sender:any, event:any)
+    ---@generic T
+    ---@param object T
+    ---@param method fun(object:T, sender:any, event:any)
     ---@return EventMethodBind
     local function Bind(object, method)
         if object == nil or method == nil then
