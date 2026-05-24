@@ -26,7 +26,7 @@ function Main()
     if options.movableMenuPanel() then
 
         local function SetPos(self, x)
-            local f = GetFrame(0) --[[@as Frame]]
+            local f = self:GetRootFrame()
             ReUI.UI.FloorLayoutFor(self)
                 :Left(function() return x + f.Left() - self.Width() * 0.5 end)
         end
