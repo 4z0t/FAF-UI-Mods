@@ -1,5 +1,4 @@
 local Group = ReUI.UI.Controls.Group
-local Events = ReUI.Core.Events
 
 ---@class ReUI.Options.OptionControl : ReUI.UI.Controls.Group
 ---@field _option ReUI.Options.ReactiveOption
@@ -12,7 +11,7 @@ OptionControl = ReUI.Core.Class(Group)
         Group.__init(self, parent)
 
         self._option = option
-        self._option.OnChanged:Add(Events.Bind(self, self.ValueChanged))
+        self._option.OnChanged:Add { self, self.ValueChanged }
     end,
 
     ---@param self ReUI.Options.OptionControl
@@ -23,7 +22,7 @@ OptionControl = ReUI.Core.Class(Group)
 
     ---@param self ReUI.Options.OptionControl
     Destroy = function(self)
-        self._option.OnChanged:Remove(Events.Bind(self, self.ValueChanged))
+        self._option.OnChanged:Remove { self, self.ValueChanged }
         self._option = nil
         Group.Destroy(self)
     end
