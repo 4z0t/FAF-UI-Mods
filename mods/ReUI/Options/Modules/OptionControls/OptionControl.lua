@@ -14,6 +14,18 @@ OptionControl = ReUI.Core.Class(Group)
         self._option.OnChanged:Add { self, self.ValueChanged }
     end,
 
+    Option = ReUI.Core.Property
+    {
+        ---@param self ReUI.Options.OptionControl
+        get = function(self)
+            return self._option
+        end,
+
+        set = function(self, value)
+            error "Attempt to set Option"
+        end
+    } --[[@as ReUI.Options.ReactiveOption]] ,
+
     ---@param self ReUI.Options.OptionControl
     ---@param option ReUI.Options.ReactiveOption
     ---@param value any
