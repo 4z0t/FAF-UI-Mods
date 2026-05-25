@@ -1,6 +1,6 @@
 name = "ReUI.Construction"
-uid = "ReUI.Construction-1.2.0"
-version = 5
+uid = "ReUI.Construction-1.2.1"
+version = 6
 copyright = ""
 description = [[Check on Github and official Discord server for mode details.
 https://github.com/4z0t/FAF-UI-Mods
@@ -14,4 +14,4 @@ enabled = true
 exclusive = false
 ui_only = true
 
-ReUI = 'ReUI.Construction=1.2.0'
+ReUI = 'ReUI.Construction=1.2.1'
