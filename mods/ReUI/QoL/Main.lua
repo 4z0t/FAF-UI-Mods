@@ -23,6 +23,19 @@ function Main()
         end
     end)
 
+    if options.multifunctionPanelCollapsed() then
+        ReUI.Core.Hook("/lua/ui/game/multifunction.lua", "InitialAnimation", function(field, module)
+            return function()
+                local controls = module.controls
+                local savedParent = module.savedParent
+
+                controls.bg.Left:Set(savedParent.Left() - controls.bg.Width() - 10)
+                controls.collapseArrow:SetCheck(true, true)
+                controls.bg:Hide()
+            end
+        end)
+    end
+
     if options.movableMenuPanel() then
 
         local function SetPos(self, x)
