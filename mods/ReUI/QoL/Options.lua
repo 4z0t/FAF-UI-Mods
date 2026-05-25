@@ -11,6 +11,6 @@ function Main()
     local options = ReUI.Options.Mods["ReUI.QoL"]
     Options.AddOptions("ReUI.QoL", "ReUI.QoL", {
         Options.Filter("Movable menu panel", options.movableMenuPanel, 4),
-        Options.Filter("Closed multifunction panel", options.multifunctionPanelCollapsed, 4),
+        Options.Filter("Start game with multifunction panel closed", options.multifunctionPanelCollapsed, 4),
     })
 end
