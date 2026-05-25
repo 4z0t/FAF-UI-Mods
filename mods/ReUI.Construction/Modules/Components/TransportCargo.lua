@@ -55,7 +55,7 @@ local TransportCargoContext = ReUI.Core.Class()
         local firstToDrop = nil
         for i, unit in cargo do
             if unit:HasUnloadCommandQueuedUp() then
-                self:AddUnit(unit)
+                self:MarkUnit(unit)
             else
                 firstToDrop = firstToDrop or i
             end
@@ -112,13 +112,15 @@ local TransportCargoContext = ReUI.Core.Class()
 
     ---@param self TransportCargoContext
     ---@param unit UserUnit
-    AddUnit = function(self, unit)
+    MarkUnit = function(self, unit)
         self.units = self.units or {}
-        if self.units[unit] then
-            return
-        end
-
         self.units[unit] = true
+    end,
+
+    ---@param self TransportCargoContext
+    ---@param unit UserUnit
+    AddUnit = function(self, unit)
+        self:MarkUnit(unit)
         AddToSessionExtraSelectList(unit)
     end,
 
