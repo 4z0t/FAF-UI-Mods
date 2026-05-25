@@ -1,7 +1,7 @@
 name = "ReUI.QoL"
-version = 4
+version = 1
 copyright = "MIT License"
-description = [[ ]]
+description = [[QoL changes for base game]]
 author = "4z0t"
 icon = "/mods/ReUI/icon.png"
 url = "https://github.com/4z0t/FAF-UI-Mods"
