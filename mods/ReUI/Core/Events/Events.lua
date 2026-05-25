@@ -9,6 +9,64 @@ function Main()
     local TableInsert = table.insert
     local TableRemove = table.remove
     local setmetatable = setmetatable
+    local getmetatable = getmetatable
+    local type = type
+    local emptyMetaTable = getmetatable {}
+
+    ---@return boolean
+    local function IsSimpleTable(t)
+        return getmetatable(t) == emptyMetaTable
+    end
+
+    ---@class EventMethodBind:function
+    ---@field [1] any
+    ---@field [2] fun(object:any, sender:any, event:any)
+    local EventMethodBindMeta =
+    {
+        ---@param self EventMethodBind
+        ---@param other EventMethodBind
+        ---@return boolean
+        __eq = function(self, other)
+            return self[1] == other[1] and self[2] == other[2]
+        end,
+
+        ---@param self EventMethodBind
+        ---@param sender any
+        ---@param event any
+        __call = function(self, sender, event)
+            return self[2](self[1], sender, event)
+        end
+    }
+
+    ---Binds object and method to be consumed by event
+    ---@generic T
+    ---@param object T
+    ---@param method fun(object:T, sender:any, event:any)
+    ---@return EventMethodBind
+    local function Bind(object, method)
+        if object == nil or method == nil then
+            error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
+        end
+
+        return setmetatable({ object, method }, EventMethodBindMeta)
+    end
+
+    ---@generic T
+    ---@param v T
+    ---@return T
+    local function FilterEvent(v)
+        local ty = type(v)
+        if ty == "function" then
+            return v
+        end
+        if ty == "table" then
+            if not IsSimpleTable(v) then
+                return v
+            end
+            return setmetatable(v, EventMethodBindMeta)
+        end
+        error("Unsupported event type " .. ty)
+    end
 
     ---@alias EventCallback fun(sender:any, eventArgs:any)
 
@@ -24,10 +82,12 @@ function Main()
             self._callbacks = nil
         end,
 
+        ---@generic F : function
         ---@param self ReUI.Core.Event
-        ---@param callback function
-        ---@return function
+        ---@param callback F
+        ---@return F
         Add = function(self, callback)
+            callback = FilterEvent(callback)
             if self._callbacks == nil then
                 self._callbacks = {}
             end
@@ -36,11 +96,13 @@ function Main()
             return callback
         end,
 
+        ---@generic F : function
         ---@param self ReUI.Core.Event
-        ---@param callback function
+        ---@param callback F
         ---@return boolean
         Remove = function(self, callback)
             if self._callbacks ~= nil then
+                callback = FilterEvent(callback)
                 for i, f in ipairs(self._callbacks) do
                     if f == callback then
                         TableRemove(self._callbacks, i)
@@ -222,38 +284,6 @@ function Main()
     end
 
     ---#endregion
-
-    ---@class EventMethodBind:function
-    ---@field [1] any
-    ---@field [2] fun(object:any, sender:any, event:any)
-    local EventMethodBindMeta =
-    {
-        ---@param self EventMethodBind
-        ---@param other EventMethodBind
-        ---@return boolean
-        __eq = function(self, other)
-            return self[1] == other[1] and self[2] == other[2]
-        end,
-
-        ---@param self EventMethodBind
-        ---@param sender any
-        ---@param event any
-        __call = function(self, sender, event)
-            return self[2](self[1], sender, event)
-        end
-    }
-
-    ---Binds object and method to be consumed by event
-    ---@generic T
-    ---@param object T
-    ---@param method fun(object:T, sender:any, event:any)
-    ---@return EventMethodBind
-    local function Bind(object, method)
-        if object == nil or method == nil then
-            error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
-        end
-        return setmetatable({ object, method }, EventMethodBindMeta)
-    end
 
     ---@class ReUI.Core.Events : ReUI.Module
     return {
