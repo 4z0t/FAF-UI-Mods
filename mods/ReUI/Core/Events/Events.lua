@@ -63,6 +63,9 @@ function Main()
             if not IsSimpleTable(v) then
                 return v
             end
+            if v[1] == nil or v[2] == nil then
+                error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
+            end
             return setmetatable(v, EventMethodBindMeta)
         end
         error("Unsupported event type " .. ty)
