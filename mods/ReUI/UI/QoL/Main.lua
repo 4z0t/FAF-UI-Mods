@@ -11,7 +11,7 @@ function Main()
     local Prefs = import("/lua/user/prefs.lua")
 
 
-    local options = ReUI.Options.Mods["ReUI.QoL"]
+    local options = ReUI.Options.Mods["ReUI.UI.QoL"]
 
     --- Set multifunction collapse arrow to its center
     ReUI.Core.Hook("/lua/ui/game/layouts/multifunction_mini.lua", "SetLayout", function(field, module)
