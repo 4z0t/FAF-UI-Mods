@@ -15,10 +15,11 @@ ReUI.Require
 }
 
 function Main()
-    local Templates = import("/lua/ui/game/build_templates.lua")
+    local Templates        = import("/lua/ui/game/build_templates.lua")
     local FactoryTemplates = import("/lua/ui/templates_factory.lua")
-    local CommandMode = import("/lua/ui/game/commandmode.lua")
-    local UIUtil = import('/lua/ui/uiutil.lua')
+    local CommandMode      = import("/lua/ui/game/commandmode.lua")
+    local UIUtil           = import('/lua/ui/uiutil.lua')
+    local Edit             = import("/lua/maui/edit.lua").Edit
 
     local AItemComponent = ReUI.UI.Views.Grid.Abstract.AItemComponent
     local ASelectionHandler = ReUI.UI.Views.Grid.Abstract.ASelectionHandler
@@ -27,6 +28,12 @@ function Main()
     local Enumerate = ReUI.LINQ.Enumerate
     local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
     local PairsEnumerator = ReUI.LINQ.PairsEnumerator
+
+
+    local Bitmap   = ReUI.UI.Controls.Bitmap
+    local Text     = ReUI.UI.Controls.Text
+    local CheckBox = ReUI.UI.Controls.CheckBox
+    local Group    = ReUI.UI.Controls.Group
 
     local ToSet = IPairsEnumerator:ToSet()
     local Contains = IPairsEnumerator:Contains()
@@ -103,7 +110,7 @@ function Main()
     ---@param buildable table<string, true>
     local function GetAvailableFactoryTemplates(templates, buildable)
         local availableTemplates = {}
-        for _, template in ipairs(templates) do
+        for i, template in ipairs(templates) do
             local valid = true
             for _, entry in ipairs(template.templateData) do
                 if not buildable[entry.id] then
@@ -112,7 +119,10 @@ function Main()
                 end
             end
             if valid then
-                table.insert(availableTemplates, template)
+                table.insert(availableTemplates, {
+                    index = i,
+                    template = template
+                })
             end
         end
         return availableTemplates
@@ -132,9 +142,13 @@ function Main()
         templateNameLength = opt()
     end)
 
+    ---@class TemplateData
+    ---@field template any
+    ---@field index integer
+
     ---@class TemplateComponentBase : AItemComponent
+    ---@field data TemplateData
     ---@field name ReUI.UI.Controls.Text
-    ---@field data any
     local TemplateComponentBase = ReUI.Core.Class(AItemComponent)
     {
         ---Called when component is bond to an item
@@ -156,13 +170,14 @@ function Main()
         ---Called when item is activated with this component event handling
         ---@param self TemplateComponentBase
         ---@param item ReUI.Construction.Grid.Item
-        ---@param action any
+        ---@param action TemplateData
         ---@param context ConstructionContext
         Enable = function(self, item, action, context)
             self.data = action
-            local id = self.data.icon
+            local template = action.template
+            local id = template.icon
             item:DisplayBPID(id)
-            self.name:SetText(string.sub(self.data.name, 1, templateNameLength))
+            self.name:SetText(string.sub(template.name, 1, templateNameLength))
             self.name:Show()
         end,
 
@@ -198,6 +213,169 @@ function Main()
         ReUI.UI.Global["FactoryTemplatePreview"] = nil
     end
 
+    ---@class BaseTemplateEditMenu : ReUI.UI.Controls.Group
+    ---@field item ReUI.Construction.Grid.Item
+    ---@field data TemplateData
+    ---@field _title ReUI.UI.Controls.Text
+    ---@field _edit Edit
+    ---@field _deleteBtn  Button
+    ---@field _closeBtn  Button
+    local BaseTemplateEditMenu = ReUI.Core.Class(Group)
+    {
+
+        ---@param self BaseTemplateEditMenu
+        __init = function(self, parent)
+            Group.__init(self, parent)
+
+            self.item = parent
+
+            self._title = Text(self)
+
+            self._edit = Edit(self)
+            self._edit.OnEnterPressed = function(edit, text)
+                self:OnNameChanged(text)
+                return true
+            end
+
+            self._deleteBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Delete>', 16)
+            self._deleteBtn.OnClick = function(btn, modifiers)
+                self:OnDelete()
+            end
+
+            self._closeBtn = UIUtil.CreateButtonStd(self, '/widgets02/small', '<LOC _Close>', 16)
+            self._closeBtn.OnClick = function(btn, modifiers)
+                self:Close()
+            end
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        ---@param layouter ReUI.UI.Layouter
+        InitLayout = function(self, layouter)
+            layouter(self)
+                :AtCenterIn(self:GetRootFrame())
+                :Width(200)
+                :Height(150)
+                :Depth(self:GetRootFrame():GetTopmostDepth() + 1)
+
+            layouter(self._title)
+                :AtTopIn(self, 10)
+                :AtHorizontalCenterIn(self)
+                :Color(UIUtil.factionTextColor)
+            self._title:SetFont("Arial", 20)
+            self._title:SetText("Edit menu")
+
+
+            layouter(self._edit)
+                :Height(function() return self._edit:GetFontHeight() end)
+                :AtRightIn(self, 10)
+                :AtLeftIn(self, 10)
+                :AtTopIn(self, 35)
+            UIUtil.SetupEditStd(self._edit, "ffffffff", nil, "ffaaffaa", UIUtil.highlightColor, UIUtil.bodyFont, 16, 200)
+            self._edit:SetDropShadow(true)
+            self._edit:ShowBackground(true)
+            self._edit:SetText("")
+
+
+            layouter(self._closeBtn)
+                :AtBottomIn(self, 10)
+                :AtHorizontalCenterIn(self)
+
+            layouter(self._deleteBtn)
+                :AnchorToTop(self._closeBtn, 10)
+                :AtHorizontalCenterIn(self)
+
+            UIUtil.SurroundWithNinePatch(self, "/game/chat_brd/", 4, 4)
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        ---@param data TemplateData
+        SetData = function(self, data)
+            self.data = data
+            self._edit:SetText(self.data.template.name)
+        end,
+
+        HandleEvent = function(self, event)
+            return true
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        ---@param name string
+        OnNameChanged = function(self, name)
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        OnDelete = function(self)
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        Close = function(self)
+            self:OnClose()
+        end,
+
+        ---@param self BaseTemplateEditMenu
+        OnClose = function(self)
+            self:Destroy()
+        end,
+    }
+
+
+    ---@class BuildTemplateEditMenu : BaseTemplateEditMenu
+    local BuildTemplateEditMenu = ReUI.Core.Class(BaseTemplateEditMenu)
+    {
+        ---@param self BuildTemplateEditMenu
+        ---@param name string
+        OnNameChanged = function(self, name)
+            Templates.RenameTemplate(self.data.index, name)
+            self.item:UpdatePanel()
+        end,
+
+        ---@param self BuildTemplateEditMenu
+        OnDelete = function(self)
+            Templates.RemoveTemplate(self.data.index)
+            self.item:UpdatePanel()
+            self:Close()
+        end,
+    }
+
+
+    ---@class FactoryTemplateEditMenu : BaseTemplateEditMenu
+    local FactoryTemplateEditMenu = ReUI.Core.Class(BaseTemplateEditMenu)
+    {
+        ---@param self FactoryTemplateEditMenu
+        ---@param name string
+        OnNameChanged = function(self, name)
+            FactoryTemplates.RenameTemplate(self.data.index, name)
+            self.item:UpdatePanel()
+        end,
+
+        ---@param self FactoryTemplateEditMenu
+        OnDelete = function(self)
+            FactoryTemplates.RemoveTemplate(self.data.index)
+            self.item:UpdatePanel()
+            self:Close()
+        end,
+    }
+
+
+    ---@return BaseTemplateEditMenu
+    local function CreateEditMenu(class, item)
+        local menu = ReUI.UI.Global["ReUI.Construction.Templates.EditMenu"]
+        if not IsDestroyed(menu) then
+            menu:Destroy()
+        end
+        menu = class(item)
+        ReUI.UI.Global["ReUI.Construction.Templates.EditMenu"] = menu
+        return menu
+    end
+
+    local function CloseEditMenu()
+        local menu = ReUI.UI.Global["ReUI.Construction.Templates.EditMenu"]
+        if not IsDestroyed(menu) then
+            menu:Destroy()
+        end
+        ReUI.UI.Global["ReUI.Construction.Templates.EditMenu"] = nil
+    end
+
     ---@class BuildTemplatesHandler : ASelectionHandler
     local BuildTemplatesHandler = ReUI.Core.Class(ASelectionHandler)
     {
@@ -213,6 +391,7 @@ function Main()
         ---@return string[]?
         Update = function(self, context)
             if context.tech ~= "BUILD_TEMPLATES" then
+                CloseEditMenu()
                 ClearBuildPreview()
                 return
             end
@@ -242,9 +421,12 @@ function Main()
             local buildableSet = ToSet(buildableUnits)
 
             local items = {}
-            for _, template in templates do
+            for i, template in templates do
                 if CanBuildTemplate(template, buildableSet) then
-                    table.insert(items, ConvertBuildTemplate(template, buildableSet))
+                    table.insert(items, {
+                        index = i,
+                        template = ConvertBuildTemplate(template, buildableSet)
+                    })
                 end
             end
 
@@ -265,10 +447,15 @@ function Main()
             ---@param event KeyEvent
             HandleEvent = function(self, item, event)
                 if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
-                    ClearBuildTemplates()
-                    local cmd = self.data.templateData[3][1]
-                    CommandMode.StartCommandMode("build", { name = cmd })
-                    SetActiveBuildTemplate(self.data.templateData)
+                    if event.Modifiers.Left then
+                        ClearBuildTemplates()
+                        local cmd = self.data.template.templateData[3][1]
+                        CommandMode.StartCommandMode("build", { name = cmd })
+                        SetActiveBuildTemplate(self.data.template.templateData)
+                    elseif event.Modifiers.Right then
+                        CreateEditMenu(BuildTemplateEditMenu, item)
+                            :SetData(self.data)
+                    end
                 elseif event.Type == "MouseEnter" and options.previewBuildTemplates() then
                     self:CreatePreview(item)
                 elseif event.Type == "MouseExit" then
@@ -285,7 +472,7 @@ function Main()
             ---@param item ReUI.Construction.Grid.Item
             CreatePreview = function(self, item)
                 self:ClearPreview()
-                local preview = BuildTemplatePreview(item, self.data)
+                local preview = BuildTemplatePreview(item, self.data.template)
                 ReUI.UI.Global["BuildTemplatePreview"] = preview
                 preview:Layouter()
                     :AnchorToTop(item, 10)
@@ -303,22 +490,6 @@ function Main()
         ---@param self FactoryTemplatesHandler
         ---@param panel ReUI.Construction.Panel
         OnInit = function(self, panel)
-            -- self.panel = panel
-
-            -- ---@param panel ReUI.Construction.Panel
-            -- ---@param context ConstructionContext
-            -- panel.UpdateEvent:AddByKey(self.Name, function(panel, context)
-            --     if context.tab == "selection" or context.tab == "enhancements" then
-            --         return
-            --     end
-
-            --     LOG "here"
-            --     LOG(self.displayTemplates)
-
-            --     panel:SetAvailableTech {
-            --         ["BUILD_TEMPLATES"] = self.displayTemplates,
-            --     }
-            -- end)
         end,
 
         ---@param self FactoryTemplatesHandler
@@ -326,6 +497,7 @@ function Main()
         ---@return string[]?
         Update = function(self, context)
             if context.tech ~= "BUILD_TEMPLATES" then
+                CloseEditMenu()
                 ClearFactoryPreview()
                 return
             end
@@ -361,7 +533,6 @@ function Main()
 
         ---@param self FactoryTemplatesHandler
         OnDestroy = function(self)
-            -- self.panel.UpdateEvent:RemoveByKey(self.Name)
         end,
 
         ---@class FactoryTemplateItem : TemplateComponentBase
@@ -374,9 +545,12 @@ function Main()
             HandleEvent = function(self, item, event)
                 if event.Type == "ButtonPress" or event.Type == "ButtonDClick" then
                     if event.Modifiers.Left then
-                        IssueFactoryTemplate(self.data)
+                        IssueFactoryTemplate(self.data.template)
+                        PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
+                    elseif event.Modifiers.Right then
+                        CreateEditMenu(FactoryTemplateEditMenu, item)
+                            :SetData(self.data)
                     end
-                    PlaySound(Sound({ Cue = "UI_MFD_Click", Bank = "Interface" }))
                 elseif event.Type == "MouseEnter" and options.previewFactoryTemplates() then
                     self:CreatePreview(item)
                 elseif event.Type == "MouseExit" then
@@ -395,7 +569,7 @@ function Main()
                 self:ClearPreview()
                 ---@type FactoryTemplatePreview
                 local preview = FactoryTemplatePreview(item)
-                preview:DisplayTemplate(self.data)
+                preview:DisplayTemplate(self.data.template)
                 ReUI.UI.Global["FactoryTemplatePreview"] = preview
                 preview:Layouter()
                     :Above(item, 30)
