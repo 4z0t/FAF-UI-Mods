@@ -3,7 +3,7 @@ uid = "reui-score-1.2.4"
 version = 5
 copyright = ""
 description = [[Thanks HotCheese for adding Union Control Support
-Check on Github and official Discord server for mode details.
+Check on Github and official Discord server for more details.
 https://github.com/4z0t/FAF-UI-Mods
 https://discord.gg/EZb6h6gbWz
 ]]
