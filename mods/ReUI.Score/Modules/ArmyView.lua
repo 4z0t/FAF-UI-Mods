@@ -515,7 +515,7 @@ AllyView = ReUI.Core.Class(ArmyView)
                     else
                         ShareManager.GiveUnitsToPlayer(self.id)
                     end
-                elseif event.Modifiers.right then
+                elseif event.Modifiers.Right then
                     ShareManager.RequestUnitFromPlayer(self.id)
                 else
                 end
