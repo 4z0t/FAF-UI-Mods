@@ -509,7 +509,7 @@ AllyView = ReUI.Core.Class(ArmyView)
         end
         self._unitsBtn.HandleEvent = function(control, event)
             if event.Type == "ButtonPress" then
-                if event.Modifiers.Left then
+                if not event.Modifiers.shift then
                     ShareManager.GiveUnitsToPlayer(self.id)
                 elseif event.Modifiers.Right then
                     ShareManager.RequestUnitFromPlayer(self.id)
