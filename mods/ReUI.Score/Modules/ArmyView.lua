@@ -509,12 +509,14 @@ AllyView = ReUI.Core.Class(ArmyView)
         end
         self._unitsBtn.HandleEvent = function(control, event)
             if event.Type == "ButtonPress" then
-                if not event.Modifiers.shift then
-                    ShareManager.GiveUnitsToPlayer(self.id)
-                elseif event.Modifiers.Right then
+                if event.Modifiers.Left then
+                    if event.Modifiers.Shift then
+                        ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
+                    else
+                        ShareManager.GiveUnitsToPlayer(self.id)
+                    end
+                elseif event.Modifiers.right then
                     ShareManager.RequestUnitFromPlayer(self.id)
-                elseif event.Modifiers.Shift then
-                    ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
                 else
                 end
                 return true
