@@ -513,6 +513,8 @@ AllyView = ReUI.Core.Class(ArmyView)
                     ShareManager.GiveUnitsToPlayer(self.id)
                 elseif event.Modifiers.Right then
                     ShareManager.RequestUnitFromPlayer(self.id)
+                elseif event.Modifiers.Shift then
+                    ConExecute('SetFocusArmy ' .. tostring(self.id - 1))
                 else
                 end
                 return true
