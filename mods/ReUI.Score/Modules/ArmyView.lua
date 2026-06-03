@@ -544,6 +544,7 @@ AllyView = ReUI.Core.Class(ArmyView)
             "",
             [[By left click gives selected units to this ally.
         By right click requests engineer from this ally.
+        By shift+left click changes Union Control to this ally.
         ]]   ,
             0.5
         )
