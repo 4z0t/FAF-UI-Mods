@@ -71,10 +71,20 @@ function Main()
         error("Unsupported event type " .. ty)
     end
 
+    ---@param callbacks function[]
+    local function CopyCallbacks(callbacks)
+        local t = {}
+        for i, f in ipairs(callbacks) do
+            t[i] = f
+        end
+        return t
+    end
+
     ---@alias EventCallback fun(sender:any, eventArgs:any)
 
     ---@class ReUI.Core.Event
     ---@field _name string
+    ---@field _needsCopy boolean
     ---@field _callbacks EventCallback[]
     local Event = ReUI.Core.Class()
     {
@@ -82,6 +92,7 @@ function Main()
         ---@param name? string
         __init = function(self, name)
             self._name = name or "unnamed"
+            self._needsCopy = false
             self._callbacks = nil
         end,
 
@@ -93,8 +104,10 @@ function Main()
             callback = FilterEvent(callback)
             if self._callbacks == nil then
                 self._callbacks = {}
+            elseif self._needsCopy then
+                self._callbacks = CopyCallbacks(self._callbacks)
+                self._needsCopy = false
             end
-
             TableInsert(self._callbacks, callback)
             return callback
         end,
@@ -108,6 +121,10 @@ function Main()
                 callback = FilterEvent(callback)
                 for i, f in ipairs(self._callbacks) do
                     if f == callback then
+                        if self._needsCopy then
+                            self._callbacks = CopyCallbacks(self._callbacks)
+                            self._needsCopy = false
+                        end
                         TableRemove(self._callbacks, i)
                         return true
                     end
@@ -120,13 +137,18 @@ function Main()
         ---@param sender any
         ---@param eventArgs any
         Invoke = function(self, sender, eventArgs)
-            if self._callbacks == nil then
+            local callbacks = self._callbacks
+            if callbacks == nil then
                 return
             end
 
-            for i, f in ipairs(self._callbacks) do
+            self._needsCopy = true
+
+            for i, f in ipairs(callbacks) do
                 f(sender, eventArgs)
             end
+
+            self._needsCopy = false
         end,
 
         ---@param self ReUI.Core.Event
@@ -142,16 +164,21 @@ function Main()
         ---@param sender any
         ---@param eventArgs any
         Invoke = function(self, sender, eventArgs)
-            if self._callbacks == nil then
+            local callbacks = self._callbacks
+            if callbacks == nil then
                 return
             end
 
-            for i, f in ipairs(self._callbacks) do
+            self._needsCopy = true
+
+            for i, f in ipairs(callbacks) do
                 local ok, err = pcall(f, sender, eventArgs)
                 if not ok then
                     WARN(("ReUI.Core.Event [%s]: %s"):format(self._name, err))
                 end
             end
+
+            self._needsCopy = false
         end,
     }
 
