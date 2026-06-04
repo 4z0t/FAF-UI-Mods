@@ -49,4 +49,47 @@ function Main()
         a.MySafeEvent:Invoke(nil, {})
         a.MyEvent:Invoke(nil, {})
     end)
+
+
+    safecall("Failed remove during invoke 1", function()
+        ---@type ReUI.Core.Event
+        local e = ReUI.Core.Events.Event('A')
+        local function f1()
+            e:Remove(f1)
+        end
+
+        e:Add(f1)
+
+        local flag = false
+        local function f2()
+            flag = true
+        end
+
+        e:Add(f2)
+        e:Invoke(nil, nil)
+        assert(flag, "flag must be true")
+
+    end)
+
+    safecall("Failed remove during invoke 2", function()
+        ---@type ReUI.Core.Event
+        local e = ReUI.Core.Events.Event('A')
+
+
+        local flag = false
+        local function f2()
+            flag = true
+        end
+
+        local function f1()
+            e:Remove(f2)
+        end
+
+        e:Add(f1)
+        e:Add(f2)
+
+        e:Invoke(nil, nil)
+        assert(flag, "flag must be true")
+
+    end)
 end
