@@ -71,7 +71,10 @@ function Main()
         error("Unsupported event type " .. ty)
     end
 
-    ---@param callbacks function[]
+    ---@alias EventCallback fun(sender:any, eventArgs:any)
+
+    ---@param callbacks EventCallback[]
+    ---@return EventCallback[]
     local function CopyCallbacks(callbacks)
         local t = {}
         for i, f in ipairs(callbacks) do
@@ -79,8 +82,6 @@ function Main()
         end
         return t
     end
-
-    ---@alias EventCallback fun(sender:any, eventArgs:any)
 
     ---@class ReUI.Core.Event
     ---@field _name string
@@ -154,6 +155,7 @@ function Main()
         ---@param self ReUI.Core.Event
         Clear = function(self)
             self._callbacks = nil
+            self._needsCopy = false
         end
     }
 
