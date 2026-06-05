@@ -7,7 +7,7 @@ icon = "/mods/ReUI/icon.png"
 url = "https://github.com/4z0t/FAF-UI-Mods"
 uid = "reui-ui-qol-1.0.0"
 exclusive = false
-selectable = true
+selectable = false
 ui_only = true
 conflicts = {}
 
