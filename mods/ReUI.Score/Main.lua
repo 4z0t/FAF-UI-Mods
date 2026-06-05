@@ -306,6 +306,19 @@ function Main(isReplay)
         end
     end)
 
+    AddOnSyncHashedCallback(
+        function()
+            local scoreboard = ReUI.UI.Global["ScoreBoard"]
+            if _IsDestroyed(scoreboard) then
+                return
+            end
+
+            scoreboard:FocusArmyChanged()
+        end,
+        "FocusArmyChanged",
+        "ReUI.Score:FocusArmyChanged"
+    )
+
     ReUI.Core.OnPostCreateUI(function(isReplay)
         import('/lua/ui/game/score.lua').CreateScoreUI()
     end)

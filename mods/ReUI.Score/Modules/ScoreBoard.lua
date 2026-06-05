@@ -229,6 +229,12 @@ ScoreBoard = ReUI.Core.Class(Group)
         end
     end,
 
+    ---@param self ReUI.Score.ScoreBoard
+    FocusArmyChanged = function(self)
+        self:ApplyToViews(function(armyId, view)
+            view:ResetFont()
+        end)
+    end,
 
     GameSpeed = ReUI.Core.Property
     {
@@ -346,6 +352,13 @@ ReplayScoreBoard = ReUI.Core.Class(ScoreBoard)
             :DisableHitTest()
     end,
 
+    ---@param self ReUI.Score.ScoreBoard
+    FocusArmyChanged = function(self)
+        ScoreBoard.ApplyToViews(self, function(armyId, view)
+            view:ResetFont()
+        end)
+    end,
+
     GameSpeed = ReUI.Core.Property
     {
         get = function(self)
@@ -356,18 +369,11 @@ ReplayScoreBoard = ReUI.Core.Class(ScoreBoard)
         end
     },
 
-
     ---@param self ReUI.Score.ReplayScoreBoard
     ---@param data any
     UpdateArmiesData = function(self, data)
         self._armiesContainer:Update(data)
         self._teamsContainer:Update(data)
-        if self._focusArmy ~= GetFocusArmy() then
-            self._focusArmy = GetFocusArmy()
-            ScoreBoard.ApplyToViews(self, function(id, view)
-                view:ResetFont()
-            end)
-        end
     end,
 
     SortArmies = function(self, func, direction)
