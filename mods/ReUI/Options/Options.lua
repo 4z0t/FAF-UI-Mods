@@ -120,7 +120,7 @@ function Main(isReplay)
     end)
 
     return {
-        Builder = {
+        Builder        = {
             AddOptions  = OptionsSelector.AddOptions,
             Splitter    = OptionsSelector.Splitter,
             Column      = OptionsSelector.Column,
@@ -133,8 +133,9 @@ function Main(isReplay)
             Strings     = OptionsSelector.Strings,
             Fonts       = OptionsSelector.Fonts,
         },
-        Mods = _setmetatable({}, ModsOptionsMetaTable),
-        Opt = MakeOpt,
-        ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption
+        Mods           = _setmetatable({}, ModsOptionsMetaTable),
+        Opt            = MakeOpt,
+        ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption,
+        OptionRef      = import("Modules/OptionRef.lua").OptionRef
     }
 end
