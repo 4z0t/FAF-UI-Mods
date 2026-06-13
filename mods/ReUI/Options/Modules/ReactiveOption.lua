@@ -139,15 +139,6 @@ ReactiveOption = ReUI.Core.Class()
         self._prev = nil
     end,
 
-    ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
-    ---@param self ReUI.Options.ReactiveOption
-    ---@param f fun(opt: ReUI.Options.ReactiveOption)
-    Bind = function(self, f)
-        WARN(("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged'"):format(self.ModName, self.OptionName))
-        self.OnChanged:Add(f)
-        f(self)
-    end,
-
     ---@param self ReUI.Options.ReactiveOption
     Destroy = function(self)
         self.OnChanged = nil
@@ -158,4 +149,43 @@ ReactiveOption = ReUI.Core.Class()
         self._modName = nil
         self._optionName = nil
     end,
+}
+
+---@class DeprecatedOption : ReUI.Options.ReactiveOption
+---@field _onChange fun(opt: DeprecatedOption)
+DeprecatedOption = ReUI.Core.Class(ReactiveOption)
+{
+    ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
+    ---@param self DeprecatedOption
+    ---@param f fun(opt: DeprecatedOption)
+    Bind = function(self, f)
+        WARN(("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged' event"):format(self.ModName,
+            self.OptionName))
+        self.OnChange = f
+        f(self)
+    end,
+
+    ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
+    OnChange = ReUI.Core.Property
+    {
+        ---@param self DeprecatedOption
+        get = function(self)
+            WARN(("ReUI.Options: [%s:%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.ModName,
+                self.OptionName))
+            return self._onChange
+        end,
+
+        ---@param self DeprecatedOption
+        set = function(self, value)
+            WARN(("ReUI.Options: [%s:%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.ModName,
+                self.OptionName))
+
+            local prevOnChange = self._onChange
+            if prevOnChange then
+                self.OnChanged:Remove(prevOnChange)
+            end
+            self.OnChanged:Add(value)
+            self._onChange = value
+        end
+    } --[[@as fun(opt: DeprecatedOption)]] ,
 }

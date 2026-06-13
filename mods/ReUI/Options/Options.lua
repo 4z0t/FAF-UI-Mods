@@ -9,9 +9,10 @@ ReUI.Require
 function Main(isReplay)
     local _rawget = rawget
     local _rawset = rawset
-    local _getmetatable = getmetatable
-    local _setmetatable = setmetatable
     local _type = type
+
+    ---@alias ReUI.Options.Opt<T> (fun():T)|ReUI.Options.ReactiveOption
+
 
     local isLoadedMains = false
     ---Main functions of Mods' Options files
@@ -21,17 +22,49 @@ function Main(isReplay)
     ---#region Options Loading
 
     local ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption
+    local DeprecatedOption = import("Modules/ReactiveOption.lua").DeprecatedOption
 
-    local OptValueMetaTable = {}
-    local function IsOpt(value)
-        return OptValueMetaTable == _getmetatable(value)
-    end
 
+    ---@class OptionPrototype
+    ---@field _value any
+    ---@field _class fun(modName:string, optionName:string, defaultValue:any, valueType?:any):(ReUI.Options.ReactiveOption)
+    ---@field _type any?
+    local OptionPrototype = ReUI.Core.Class()
+    {
+        __option = true,
+
+        ---@param self OptionPrototype
+        __init = function(self, value, class, type)
+            self._value = value
+            self._class = class
+            self._type = type
+        end,
+
+        ---@param self OptionPrototype
+        ---@return ReUI.Options.ReactiveOption
+        Create = function(self, modName, optionName)
+            return self._class(modName, optionName, self._value, self._type)
+        end,
+    }
+
+    ---Creates OptionVar from value when used within `ReUI.Options.Mods`.
+    ---Example:
+    ---```lua
+    ---ReUI.Options.Mods["MyMod"] = {
+    ---    boolOpt = Opt(true),
+    ---    numberOpt = Opt(10),
+    ---    stringOpt = Opt("ffff00ff"),
+    ---    nestedTable = {
+    ---         otherOpt = Opt(10),
+    ---         ...
+    ---   }
+    ---}
+    ---```
     ---@generic T
     ---@param value T
-    ---@return ReUI.Options.ReactiveOption
-    local function MakeOpt(value)
-        return _setmetatable({ value = value }, OptValueMetaTable)
+    ---@return DeprecatedOption
+    local function MakeDeprecatedOpt(value)
+        return OptionPrototype(value, DeprecatedOption)
     end
 
     local function LoadOptions(values, modName, prefix)
@@ -40,9 +73,10 @@ function Main(isReplay)
         for optName, defaultValue in values do
             local opt = prefix and (prefix .. "." .. optName) or optName
             if _type(defaultValue) == "table" then
-                if IsOpt(defaultValue) then
+                if defaultValue.__option then
+                    ---@cast defaultValue OptionPrototype
                     LOG(("ReUI.Options: loading option '%s':'%s'"):format(modName, opt))
-                    options[optName] = ReactiveOption(modName, opt, defaultValue.value)
+                    options[optName] = defaultValue:Create(modName, opt)
                 else
                     options[optName] = LoadOptions(defaultValue, modName, opt)
                 end
@@ -119,8 +153,10 @@ function Main(isReplay)
         }
     end)
 
+    ---@class ReUI.Options : ReUI.Module
     return {
-        Builder        = {
+        ---@deprecated
+        Builder = {
             AddOptions  = OptionsSelector.AddOptions,
             Splitter    = OptionsSelector.Splitter,
             Column      = OptionsSelector.Column,
@@ -133,9 +169,25 @@ function Main(isReplay)
             Strings     = OptionsSelector.Strings,
             Fonts       = OptionsSelector.Fonts,
         },
-        Mods           = _setmetatable({}, ModsOptionsMetaTable),
-        Opt            = MakeOpt,
-        ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption,
+
+        ---Table with options provided by mods.
+        ---
+        ---Whenever this table is indexed it will try to find options file within mod's folder.
+        ---```lua
+        ---local myOptions = ReUI.Options.Mods["MyMod"]
+        ---```
+        ---Will look for `/mods/MyMod/Options.lua` file where you assign options
+        ---for your mod.
+        ---
+        ---This file also must have `Main` function where you setup options for being displayed in
+        ---options window. It will be called once user accesses options window.
+        ---@type table<string, table>
+        Mods = setmetatable({}, ModsOptionsMetaTable),
+
+        ---@deprecated
+        Opt = MakeDeprecatedOpt,
+
+        ReactiveOption = ReactiveOption,
         OptionRef      = import("Modules/OptionRef.lua").OptionRef
     }
 end
