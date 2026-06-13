@@ -11,6 +11,9 @@ function Main(isReplay)
     local _rawset = rawset
     local _type = type
 
+    local Prefs = import("/lua/user/prefs.lua")
+
+
     ---@alias ReUI.Options.Opt<T> (fun():T)|ReUI.Options.ReactiveOption
 
 
@@ -21,13 +24,42 @@ function Main(isReplay)
 
     ---#region Options Loading
 
-    local ReactiveOption = import("Modules/ReactiveOption.lua").ReactiveOption
+    local OptionRef        = import("Modules/OptionRef.lua").OptionRef
+    local ReactiveOption   = import("Modules/ReactiveOption.lua").ReactiveOption
     local DeprecatedOption = import("Modules/ReactiveOption.lua").DeprecatedOption
 
+    local function FormatName(name)
+        return (name:gsub("[^A-Za-z0-9]+", "_"))
+    end
+
+    ---@param ref ReUI.Options.OptionRef
+    ---@param modName string
+    ---@param optionName string
+    ---@param default any
+    ---@return any
+    local function HandleOldPath(ref, modName, optionName, default)
+        local value = ref:Get()
+        if value ~= nil then
+            return value
+        end
+
+        modName = FormatName(modName)
+        optionName = FormatName(optionName)
+
+        local modOptionsTable = Prefs.GetFromCurrentProfile(modName)
+        value = modOptionsTable and modOptionsTable[optionName]
+
+        if value == nil then
+            value = default
+        end
+
+        ref:Set(value)
+        return value
+    end
 
     ---@class OptionPrototype
     ---@field _value any
-    ---@field _class fun(modName:string, optionName:string, defaultValue:any, valueType?:any):(ReUI.Options.ReactiveOption)
+    ---@field _class fun(ref:ReUI.Options.OptionRef, defaultValue:any, valueType?:any):(ReUI.Options.ReactiveOption)
     ---@field _type any?
     local OptionPrototype = ReUI.Core.Class()
     {
@@ -43,7 +75,18 @@ function Main(isReplay)
         ---@param self OptionPrototype
         ---@return ReUI.Options.ReactiveOption
         Create = function(self, modName, optionName)
-            return self._class(modName, optionName, self._value, self._type)
+            local default = self._value
+
+            if default == nil then
+                error(("Attempt to set option %s:%s to nil by default, don't do that!"):format(modName, optionName))
+            end
+
+            ---@type ReUI.Options.OptionRef
+            local ref = OptionRef { "UIModsOptions", modName, optionName }
+
+            default = HandleOldPath(ref, modName, optionName, default)
+
+            return self._class(ref, default, self._type)
         end,
     }
 
@@ -188,6 +231,6 @@ function Main(isReplay)
         Opt = MakeDeprecatedOpt,
 
         ReactiveOption = ReactiveOption,
-        OptionRef      = import("Modules/OptionRef.lua").OptionRef
+        OptionRef      = OptionRef,
     }
 end

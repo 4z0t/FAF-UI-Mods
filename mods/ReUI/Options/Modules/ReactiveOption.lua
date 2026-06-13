@@ -1,14 +1,7 @@
 local LazyVar = import("/lua/lazyvar.lua").Create
-local Prefs = import("/lua/user/prefs.lua")
-
-
-local function FormatName(name)
-    return (name:gsub("[^A-Za-z0-9]+", "_"))
-end
 
 ---@class ReUI.Options.ReactiveOption
----@field _modName string
----@field _optionName string
+---@field _ref ReUI.Options.OptionRef
 ---@field _var LazyVar
 ---@field _prev any
 ReactiveOption = ReUI.Core.Class()
@@ -30,56 +23,29 @@ ReactiveOption = ReUI.Core.Class()
         end
     } --[[@as any]] ,
 
-    OptionName = ReUI.Core.Property
+    IsChanged = ReUI.Core.Property
     {
         ---@param self ReUI.Options.ReactiveOption
         get = function(self)
-            return self._optionName
+            return self._prev ~= nil
         end,
+    } --[[@as boolean]] ,
 
-        ---@param self ReUI.Options.ReactiveOption
-        set = function(self, value)
-            error "ReactiveOption: attempt to set OptionName"
-        end
-    } --[[@as  string]] ,
-
-    ModName = ReUI.Core.Property
+    Name = ReUI.Core.Property
     {
         ---@param self ReUI.Options.ReactiveOption
         get = function(self)
-            return self._modName
+            return self._ref:GetPath()
         end,
-
-        ---@param self ReUI.Options.ReactiveOption
-        set = function(self, value)
-            error "ReactiveOption: attempt to set ModName"
-        end
-    } --[[@as  string]] ,
+    } --[[@as string]] ,
 
     ---@param self ReUI.Options.ReactiveOption
-    ---@param modName string
-    ---@param optionName string
+    ---@param ref ReUI.Options.OptionRef
     ---@param default any
-    __init = function(self, modName, optionName, default)
-        if default == nil then
-            error(("Attempt to set option %s:%s to nil by default, don't do that!"):format(modName, optionName))
-        end
+    __init = function(self, ref, default)
+        self._ref = ref
+        local val = self._ref:Get(default)
 
-        modName = FormatName(modName)
-        optionName = FormatName(optionName)
-
-        local modOptionsTable = Prefs.GetFromCurrentProfile(modName)
-        local val = modOptionsTable and modOptionsTable[optionName]
-
-        if val == nil then
-            modOptionsTable = modOptionsTable or {}
-            modOptionsTable[optionName] = default
-            Prefs.SetToCurrentProfile(modName, modOptionsTable)
-            val = default
-        end
-
-        self._modName = modName
-        self._optionName = optionName
         self._var = LazyVar(val)
         self._prev = nil
     end,
@@ -131,9 +97,7 @@ ReactiveOption = ReUI.Core.Class()
     Save = function(self)
         local value = self:Get()
 
-        local modOptionsTable = Prefs.GetFromCurrentProfile(self._modName)
-        modOptionsTable[self._optionName] = value
-        Prefs.SetToCurrentProfile(self._modName, modOptionsTable)
+        self._ref:Set(value)
 
         self.OnSaved:Invoke(self, value)
         self._prev = nil
@@ -146,8 +110,7 @@ ReactiveOption = ReUI.Core.Class()
         self._prev = nil
         self._var:Destroy()
         self._var = nil
-        self._modName = nil
-        self._optionName = nil
+        self._ref = nil
     end,
 }
 
@@ -159,8 +122,7 @@ DeprecatedOption = ReUI.Core.Class(ReactiveOption)
     ---@param self DeprecatedOption
     ---@param f fun(opt: DeprecatedOption)
     Bind = function(self, f)
-        WARN(("ReUI.Options: [%s:%s] ':Bind()' is deprecated, use 'OnChanged' event"):format(self.ModName,
-            self.OptionName))
+        WARN(("ReUI.Options: [%s] ':Bind()' is deprecated, use 'OnChanged' event"):format(self.Name))
         self.OnChange = f
         f(self)
     end,
@@ -170,15 +132,13 @@ DeprecatedOption = ReUI.Core.Class(ReactiveOption)
     {
         ---@param self DeprecatedOption
         get = function(self)
-            WARN(("ReUI.Options: [%s:%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.ModName,
-                self.OptionName))
+            WARN(("ReUI.Options: [%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.Name))
             return self._onChange
         end,
 
         ---@param self DeprecatedOption
         set = function(self, value)
-            WARN(("ReUI.Options: [%s:%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.ModName,
-                self.OptionName))
+            WARN(("ReUI.Options: [%s] '.OnChange' is deprecated, use 'OnChanged' event"):format(self.Name))
 
             local prevOnChange = self._onChange
             if prevOnChange then
