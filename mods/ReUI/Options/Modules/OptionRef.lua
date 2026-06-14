@@ -14,6 +14,30 @@ local function IsValidLevels(levels)
     return levels:find(pattern) ~= nil
 end
 
+---@param s string
+---@param n number
+---@return string
+---@return string
+local function SplitAt(s, n)
+    if n <= 0 then
+        return "", s
+    end
+
+    local initial = 1
+    local len = s:len()
+    local splitAt = len
+    for i = 1, n do
+        local start_, end_ = s:find(".", initial, true)
+        initial = (end_ or len) + 1
+        splitAt = start_
+        if splitAt == nil then
+            splitAt = len + 1
+            break
+        end
+    end
+    return s:sub(1, splitAt - 1), s:sub(splitAt + 1)
+end
+
 ---@class ReUI.Options.OptionRef
 ---@field _levels string
 OptionRef = ReUI.Core.Class()
@@ -30,8 +54,13 @@ OptionRef = ReUI.Core.Class()
     end,
 
     ---@param self ReUI.Options.OptionRef
+    ---@param start? number
     ---@return string
-    GetPath = function(self)
+    GetPath = function(self, start)
+        if start then
+            local l, r = SplitAt(self._levels, start - 1)
+            return r
+        end
         return self._levels
     end,
 

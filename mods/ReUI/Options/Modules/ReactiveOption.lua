@@ -35,7 +35,7 @@ ReactiveOption = ReUI.Core.Class()
     {
         ---@param self ReUI.Options.ReactiveOption
         get = function(self)
-            return self._ref:GetPath()
+            return self._ref:GetPath(2)
         end,
     } --[[@as string]] ,
 
