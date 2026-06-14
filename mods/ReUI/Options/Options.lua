@@ -115,17 +115,17 @@ function Main(isReplay)
 
         for optName, defaultValue in values do
             local opt = prefix and (prefix .. "." .. optName) or optName
-            if _type(defaultValue) == "table" then
-                if defaultValue.__option then
-                    ---@cast defaultValue OptionPrototype
-                    LOG(("ReUI.Options: loading option '%s':'%s'"):format(modName, opt))
-                    options[optName] = defaultValue:Create(modName, opt)
-                else
-                    options[optName] = LoadOptions(defaultValue, modName, opt)
-                end
-            else
+
+            if _type(defaultValue) ~= "table" then
+                error(("ReUI.Options: '%s':'%s' has no option specifier"):format(modName, opt))
+            end
+
+            if defaultValue.__option then
+                ---@cast defaultValue OptionPrototype
                 LOG(("ReUI.Options: loading option '%s':'%s'"):format(modName, opt))
-                options[optName] = ReactiveOption(modName, opt, defaultValue)
+                options[optName] = defaultValue:Create(modName, opt)
+            else
+                options[optName] = LoadOptions(defaultValue, modName, opt)
             end
         end
 
