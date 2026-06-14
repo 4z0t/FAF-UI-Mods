@@ -1,6 +1,7 @@
 local rawset = rawset
 local type = type
 local getmetatable = getmetatable
+local setmetatable = setmetatable
 local TableEmpty = table.empty
 local ipairs = ipairs
 ---@diagnostic disable-next-line:deprecated
@@ -21,6 +22,15 @@ end
 ---@class PropertyTable<C,T> :  { set : fun(self: C, value: T, key: string), get : fun(self: C, key: string): T }
 ---@field __property true
 
+
+local function GetError(self, key)
+    error(("ReUI.Core.Property: attempt to get '%s' of '%s'"):format(tostring(key), tostring(self)))
+end
+
+local function SetError(self, value, key)
+    error(("ReUI.Core.Property: attempt to set '%s' on '%s'"):format(tostring(key), tostring(self)))
+end
+
 local PropertyMeta = { __property = true }
 PropertyMeta.__index = PropertyMeta
 
@@ -30,6 +40,8 @@ PropertyMeta.__index = PropertyMeta
 ---@param setup SetupPropertyTable<C,T>
 ---@return PropertyTable<C,T>
 function Property(setup)
+    setup.get = setup.get or GetError
+    setup.set = setup.set or SetError
     return setmetatable(setup, PropertyMeta)
 end
 
