@@ -20,10 +20,6 @@ OptionControl = ReUI.Core.Class(Group)
         get = function(self)
             return self._option
         end,
-
-        set = function(self, value)
-            error "Attempt to set Option"
-        end
     } --[[@as ReUI.Options.ReactiveOption]] ,
 
     ---@param self ReUI.Options.OptionControl
