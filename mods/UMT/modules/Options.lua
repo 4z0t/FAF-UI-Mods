@@ -14,7 +14,7 @@ local EscapeCover = UMT.Views.EscapeCover
 ---@class ControlConfig
 ---@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"|"column"
 ---@field name string
----@field optionVar OptionVar
+---@field optionVar DeprecatedOption
 ---@field indent number
 
 
