@@ -36,6 +36,19 @@ function Main()
         end)
     end
 
+    if options.menuPanelCollapsed() then
+        ReUI.Core.Hook("/lua/ui/game/tabs.lua", "InitialAnimation", function(field, module)
+            return function()
+                local controls = module.controls
+                local savedParent = controls.parent:GetParent()
+
+                controls.parent.Top:Set(savedParent.Top() - controls.parent.Height())
+                controls.collapseArrow:SetCheck(true, true)
+                controls.parent:Hide()
+            end
+        end)
+    end
+
     if options.movableMenuPanel() then
         local function SetPos(self, x)
             local f = self:GetRootFrame()
