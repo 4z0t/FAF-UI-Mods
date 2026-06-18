@@ -14,7 +14,7 @@ function Main(isReplay)
     local Prefs = import("/lua/user/prefs.lua")
 
 
-    ---@alias ReUI.Options.Opt<T> (fun():T)|ReUI.Options.ReactiveOption
+    ---@alias ReUI.Options.OptionValue<T> (fun():T)|ReUI.Options.ReactiveOption
 
 
     local isLoadedMains = false
@@ -108,6 +108,26 @@ function Main(isReplay)
     ---@return DeprecatedOption
     local function MakeDeprecatedOpt(value)
         return OptionPrototype(value, DeprecatedOption)
+    end
+
+    ---Creates ReactiveOption from value when used within `ReUI.Options.Mods`.
+    ---Example:
+    ---```lua
+    ---ReUI.Options.Mods["MyMod"] = {
+    ---    boolOpt = OptionValue(true),
+    ---    numberOpt = OptionValue(10),
+    ---    stringOpt = OptionValue("ffff00ff"),
+    ---    nestedTable = {
+    ---         otherOpt = OptionValue(10),
+    ---         ...
+    ---   }
+    ---}
+    ---```
+    ---@generic T
+    ---@param defaultValue T
+    ---@return ReUI.Options.OptionValue<T>
+    local function OptionValue(defaultValue)
+        return OptionPrototype(defaultValue, ReactiveOption)
     end
 
     local function LoadOptions(values, modName, prefix)
@@ -229,6 +249,8 @@ function Main(isReplay)
 
         ---@deprecated
         Opt = MakeDeprecatedOpt,
+
+        OptionValue = OptionValue,
 
         ReactiveOption = ReactiveOption,
         OptionRef      = OptionRef,
