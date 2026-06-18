@@ -51,6 +51,41 @@ function Main()
             end
         end
 
+        ---@param selection UserUnit[]?
+        local function TogglePause(selection)
+            if table.empty(selection) then
+                return
+            end
+            ---@cast selection -nil
+
+            local paused = not GetIsPaused(selection)
+            SetPaused(selection, paused)
+            local checkedS = paused and "true" or "false"
+            -- If we have exFacs platforms or exFac units selected, we'll pause their counterparts as well
+            for _, exFac in EntityCategoryFilterDown(categories.EXTERNALFACTORY +
+                categories.EXTERNALFACTORYUNIT,
+                selection) do
+                exFac:GetCreator():ProcessInfo('SetPaused', checkedS)
+            end
+        end
+
+        local ReConstruction = ReUI.Exists "ReUI.Construction >= 1.2.0" --[[@as ReUI.Construction?]]
+        if ReConstruction then
+            CategoryMatcher "Pause / Append unit for transportation"
+                :Modifiers { shift = true }
+                {
+                    CategoryAction(categories.TRANSPORTATION)
+                        :Action(function(selection)
+                            ReUI.Actions.ProcessAction "reui_construction_append_transport_cargo"
+                        end),
+                    CategoryAction()
+                        :Match(function(selection, category)
+                            return true
+                        end)
+                        :Action(TogglePause),
+                }
+        end
+
         CategoryMatcher "Transportation / Overcharge / Repeat queue"
             :Modifiers { shift = true }
             {
