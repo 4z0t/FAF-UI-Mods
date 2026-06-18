@@ -50,8 +50,11 @@ function Main()
     end
 
     if options.movableMenuPanel() then
+        ---@param self Control
+        ---@param x number
         local function SetPos(self, x)
             local f = self:GetRootFrame()
+            x = math.clamp(x, f.Left(), f.Right())
             ReUI.UI.FloorLayoutFor(self)
                 :Left(function() return x + f.Left() - self.Width() * 0.5 end)
         end
