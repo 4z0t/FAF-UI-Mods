@@ -1,5 +1,5 @@
 name = "Advanced Key Actions"
-version = 4
+version = 5
 copyright = "MIT License"
 description = [[
 Adds these keybinds that combine multiple actions into one based on current selection:
@@ -11,15 +11,16 @@ Adds these keybinds that combine multiple actions into one based on current sele
 * Select nearest air scout / build sensors
 * Zoom out / Soft stop / Hard stop
 * Zoom out / Hard stop
+* Pause / Append unit for transportation
 
 Can be found at ReUI.Actions section.
 Requires ReUI
 ]]
 author = "4z0t"
 url = "https://github.com/4z0t/FAF-UI-Mods"
-uid = "advanced-key-actions-1.2.1"
+uid = "advanced-key-actions-1.2.2"
 exclusive = false
 ui_only = true
 conflicts = {}
 
-ReUI = "AKA=1.2.1"
+ReUI = "AKA=1.2.2"
