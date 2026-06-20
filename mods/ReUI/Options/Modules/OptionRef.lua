@@ -73,7 +73,9 @@ OptionRef = ReUI.Core.Class()
 
     ---@param self ReUI.Options.OptionRef
     ---@param value any
+    ---@return boolean
     Set = function(self, value)
         SetPreference(self._levels, value)
+        return true
     end
 }
