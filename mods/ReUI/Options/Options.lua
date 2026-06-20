@@ -107,12 +107,15 @@ function Main(isReplay)
     ---@param value T
     ---@return DeprecatedOption
     local function MakeDeprecatedOpt(value)
+        WARN("ReUI.Options.Opt is deprecated. Use ReUI.Options.OptionValue")
         return OptionPrototype(value, DeprecatedOption)
     end
 
     ---Creates ReactiveOption from value when used within `ReUI.Options.Mods`.
     ---Example:
     ---```lua
+    ---local OptionValue = ReUI.Options.OptionValue
+    ---
     ---ReUI.Options.Mods["MyMod"] = {
     ---    boolOpt = OptionValue(true),
     ---    numberOpt = OptionValue(10),
