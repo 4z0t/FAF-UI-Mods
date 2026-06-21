@@ -8,9 +8,8 @@ function Main()
 
 
     ---@param s string
-    ---@param sep string|string[]
-    ---@param n? number
-    local function SplitIter(s, sep, n)
+    ---@param sep string
+    local function SplitIter(s, sep)
         local _end = 0
         return function(_s, i)
             if _end == nil then
@@ -24,20 +23,16 @@ function Main()
     end
 
     ---@param s string
-    ---@param sep string|string[]
-    ---@param n? number
+    ---@param sep string
     ---@return string[]
-    local function Split(s, sep, n)
-        local strings = {}
-        local prev
-        local _start
-        local _end = 0
-        repeat
-            prev = _end + 1
-            _start, _end = StringFind(s, sep, prev, true)
-            TableInsert(strings, StringSub(s, prev, _start and (_start - 1)))
-        until _start == nil
-        return strings
+    local function Split(s, sep)
+        local result = {}
+
+        for _, split in SplitIter(s, sep or " ") do
+            TableInsert(result, split)
+        end
+
+        return result
     end
 
     ---@param s string
@@ -65,8 +60,9 @@ function Main()
         Trim      = Trim,
         TrimStart = TrimStart,
         TrimEnd   = TrimEnd,
-        Split     = Split,
 
+        Split     = Split,
+        SplitIter = SplitIter,
     }
 
 
