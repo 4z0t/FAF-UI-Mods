@@ -31,9 +31,6 @@ local function SetError(self, value, key)
     error(("ReUI.Core.Property: attempt to set '%s' on '%s'"):format(tostring(key), tostring(self)))
 end
 
-local PropertyMeta = { __property = true }
-PropertyMeta.__index = PropertyMeta
-
 ---Creates property for `ReUI.Core.Class`
 ---@generic T
 ---@generic C: fa-class
@@ -42,7 +39,8 @@ PropertyMeta.__index = PropertyMeta
 function Property(setup)
     setup.get = setup.get or GetError
     setup.set = setup.set or SetError
-    return setmetatable(setup, PropertyMeta)
+    setup.__property = true
+    return setup
 end
 
 local function MakeProperties(class)
