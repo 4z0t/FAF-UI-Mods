@@ -28,6 +28,8 @@ function Main(isReplay)
     local ReactiveOption   = import("Modules/ReactiveOption.lua").ReactiveOption
     local DeprecatedOption = import("Modules/ReactiveOption.lua").DeprecatedOption
 
+    ---@param name string
+    ---@return string
     local function FormatName(name)
         return (name:gsub("[^A-Za-z0-9]+", "_"))
     end
