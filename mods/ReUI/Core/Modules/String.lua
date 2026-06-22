@@ -6,8 +6,13 @@ function Main()
     local TableInsert = table.insert
 
 
+    ---@param sep string
+    ---@return fun(s:string): (number, string)
     local function SplitIterNext(sep)
         local _end = 0
+        ---@param s string
+        ---@return number?
+        ---@return string?
         return function(s)
             if _end == nil then
                 return nil, nil
@@ -21,6 +26,8 @@ function Main()
 
     ---@param s string
     ---@param sep string
+    ---@return fun(str:string): (number, string)
+    ---@return string
     local function SplitIter(s, sep)
         return SplitIterNext(sep), s
     end
@@ -29,6 +36,7 @@ function Main()
     ---@param sep string
     ---@return string[]
     local function Split(s, sep)
+        ---@type string[]
         local result = {}
 
         for _, split in SplitIter(s, sep or " ") do
