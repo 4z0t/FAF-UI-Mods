@@ -6,20 +6,23 @@ function Main()
     local TableInsert = table.insert
 
 
-
-    ---@param s string
-    ---@param sep string
-    local function SplitIter(s, sep)
+    local function SplitIterNext(sep)
         local _end = 0
-        return function(_s, i)
+        return function(s)
             if _end == nil then
                 return nil, nil
             end
             local _start
-            i = _end + 1
-            _start, _end = StringFind(_s, sep, i, true)
-            return i, StringSub(_s, i, _start and (_start - 1))
-        end, s, 0
+            local pos = _end + 1
+            _start, _end = StringFind(s, sep, pos, true)
+            return pos, StringSub(s, pos, _start and (_start - 1))
+        end
+    end
+
+    ---@param s string
+    ---@param sep string
+    local function SplitIter(s, sep)
+        return SplitIterNext(sep), s
     end
 
     ---@param s string
