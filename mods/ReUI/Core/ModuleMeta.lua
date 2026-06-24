@@ -53,21 +53,9 @@ end
 ---    end
 ---end)
 ---```
----You can also do this way:
----
----```lua
----local EconomyHook = ReUI.Core.HookModule "/lua/ui/game/economy.lua"
----
----function EconomyHook.CreateEconomyBar(field, module)
----    return function(parent)
----        ...
----        return ...
----    end
----end
----```
 ---@generic T
 ---@param moduleName FileName
----@return table<string, HookCallback<T>> | (fun(fieldName:string, callback:HookCallback<T>):T)
+---@return fun(fieldName:string, callback:HookCallback<T>):T
 function ReUI.Core.HookModule(moduleName)
 end
 

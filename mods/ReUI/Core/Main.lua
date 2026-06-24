@@ -63,28 +63,16 @@ function Main()
 
     local ReUIClass = import("Modules/Class.lua")
 
-    ---@class ModuleHook
-    local ModuleHookMeta = {
-        __newindex = function(self, key, value)
-            PerformHook(self.__moduleName, key, value)
-        end,
-
-        __call = function(self, key, value)
-            PerformHook(self.__moduleName, key, value)
-        end
-    }
-
     return {
         Hook = PerformHook,
 
         ---@param moduleName FileName
         HookModule = function(moduleName)
-            return setmetatable({ __moduleName = moduleName }, ModuleHookMeta)
-            -- ---@param fieldName string
-            -- ---@param callback HookCallback
-            -- return function(fieldName, callback)
-            --     PerformHook(moduleName, fieldName, callback)
-            -- end
+            ---@param fieldName string
+            ---@param callback HookCallback
+            return function(fieldName, callback)
+                PerformHook(moduleName, fieldName, callback)
+            end
         end,
 
         ---@param callback OnCreateUICallback
