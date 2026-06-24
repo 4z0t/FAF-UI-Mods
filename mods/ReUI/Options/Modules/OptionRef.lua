@@ -1,6 +1,7 @@
 local GetPreference = GetPreference
 local SetPreference = SetPreference
 
+local String = ReUI.Core.String
 
 ---@param levels string?
 ---@return boolean
@@ -12,30 +13,6 @@ local function IsValidLevels(levels)
 
     local pattern = "^[a-zA-Z_][a-zA-Z0-9_]*(%.[a-zA-Z_][a-zA-Z0-9_]*)*$"
     return levels:find(pattern) ~= nil
-end
-
----@param s string
----@param n number
----@return string
----@return string
-local function SplitAt(s, n)
-    if n <= 0 then
-        return "", s
-    end
-
-    local initial = 1
-    local len = s:len()
-    local splitAt = len
-    for i = 1, n do
-        local start_, end_ = s:find(".", initial, true)
-        initial = (end_ or len) + 1
-        splitAt = start_
-        if splitAt == nil then
-            splitAt = len + 1
-            break
-        end
-    end
-    return s:sub(1, splitAt - 1), s:sub(splitAt + 1)
 end
 
 ---@class ReUI.Options.OptionRef
@@ -54,12 +31,12 @@ OptionRef = ReUI.Core.Class()
     end,
 
     ---@param self ReUI.Options.OptionRef
-    ---@param start? number
+    ---@param start? integer
     ---@return string
     GetPath = function(self, start)
         if start then
-            local l, r = SplitAt(self._levels, start - 1)
-            return r
+            local ss = String.Split(self._levels, '.')
+            return table.concat(ss, '.', start)
         end
         return self._levels
     end,
