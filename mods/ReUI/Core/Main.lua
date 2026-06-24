@@ -111,5 +111,7 @@ function Main()
 
         Class = ReUIClass.UIClass,
         Property = ReUIClass.Property,
+
+        String = import("Modules/String.lua").String
     }
 end

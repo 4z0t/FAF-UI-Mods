@@ -107,3 +107,6 @@ end
 ---@return PropertyTable<C,T>
 function ReUI.Core.Property(setup)
 end
+
+---@class ReUI.Core.String
+ReUI.Core.String = ...

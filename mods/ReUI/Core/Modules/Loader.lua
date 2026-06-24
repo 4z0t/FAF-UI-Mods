@@ -11,6 +11,11 @@ local setmetatable = setmetatable
 local _assert = assert
 local import = import
 
+
+---@type ReUI.Core.String
+---@diagnostic disable-next-line:undefined-field
+local String = import("String.lua").String
+
 ---@class ReUI.Version
 ---@field major number
 ---@field minor number
@@ -85,28 +90,10 @@ local function ParseNameAndVersion(s)
     return name, ParseVersion(version)
 end
 
----@param s string
----@return string[]
-local function SplitName(s)
-    local strings = {}
-    local prev = 1
-    while true do
-        local _start, _end = StringFind(s, ".", prev, true)
-        if _start then
-            TableInsert(strings, StringSub(s, prev, _start - 1))
-        else
-            break
-        end
-        prev = _end + 1
-    end
-    TableInsert(strings, StringSub(s, prev))
-    return strings
-end
-
 ---@param moduleName string
 ---@return string[]
 local function DemangleName(moduleName)
-    local splitName = SplitName(moduleName)
+    local splitName = String.Split(moduleName, '.')
     if table.empty(splitName) then
         _error("Name can't have 0 parts")
     end
@@ -121,8 +108,11 @@ end
 ---@param moduleName string
 ---@return string
 local function GetLastPartOfModuleName(moduleName)
-    local splitName = DemangleName(moduleName)
-    return splitName[table.getn(splitName)] or ""
+    local splitName = ""
+    for _, s in String.SplitIter(moduleName, '.') do
+        splitName = s
+    end
+    return splitName
 end
 
 ---Returns whether v1 is equal to v2
@@ -307,6 +297,8 @@ Loader = Class()
             mainPath = modPath .. "Main.lua"
         end
 
+        LOG(("ReUI.Loader: importing '%s':%s at '%s'."):format(moduleName, VersionToString(moduleVersion), mainPath))
+
         ---@type ReUI.Module
         local module = self._modules[moduleName]
         module.Version = moduleVersion
@@ -350,7 +342,7 @@ Loader = Class()
             _error(("Failed to load module '%s' due to following error:\n%s"):format(moduleName, result))
         end
 
-        LOG(("ReUI: loaded module '%s':%s"):format(moduleName, VersionToString(result.Version)))
+        LOG(("ReUI.Loader: loaded module '%s':%s"):format(moduleName, VersionToString(result.Version)))
 
         TableInsert(self._loadedModulesInOrder, loadingModule)
         local demangledName = DemangleName(moduleName)
@@ -651,7 +643,7 @@ Loader = Class()
     ---@param moduleName string
     ---@return FileName
     FindModuleInfoPath = function(self, moduleName)
-        local splitName = SplitName(moduleName)
+        local splitName = String.Split(moduleName, '.')
         --[[
         for example module is 'ReUI.Construction.Selection'
         it splits into { ReUI, Construction, Selection }
