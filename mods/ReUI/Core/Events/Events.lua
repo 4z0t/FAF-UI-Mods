@@ -20,7 +20,7 @@ function Main()
 
     ---@class EventMethodBind:function
     ---@field [1] any
-    ---@field [2] fun(object:any, sender:any, event:any)
+    ---@field [2] fun(object:any, sender:any, eventArgs:any)
     local EventMethodBindMeta =
     {
         ---@param self EventMethodBind
@@ -32,16 +32,16 @@ function Main()
 
         ---@param self EventMethodBind
         ---@param sender any
-        ---@param event any
-        __call = function(self, sender, event)
-            return self[2](self[1], sender, event)
+        ---@param eventArgs any
+        __call = function(self, sender, eventArgs)
+            return self[2](self[1], sender, eventArgs)
         end
     }
 
     ---Binds object and method to be consumed by event
     ---@generic T
     ---@param object T
-    ---@param method fun(object:T, sender:any, event:any)
+    ---@param method fun(object:T, sender:any, eventArgs:any)
     ---@return EventMethodBind
     local function Bind(object, method)
         if object == nil or method == nil then
@@ -59,16 +59,19 @@ function Main()
         if ty == "function" then
             return v
         end
-        if ty == "table" then
-            if not IsSimpleTable(v) then
-                return v
-            end
-            if v[1] == nil or v[2] == nil then
-                error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
-            end
-            return setmetatable(v, EventMethodBindMeta)
+
+        if ty ~= "table" then
+            error("Unsupported event type " .. ty)
         end
-        error("Unsupported event type " .. ty)
+
+        if not IsSimpleTable(v) then
+            return v
+        end
+
+        if v[1] == nil or v[2] == nil then
+            error("ReUI.Core.Events.Bind: expected object and method to be non-nil")
+        end
+        return setmetatable(v, EventMethodBindMeta)
     end
 
     ---@alias EventCallback fun(sender:any, eventArgs:any)
