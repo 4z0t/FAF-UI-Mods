@@ -4,9 +4,24 @@ local StringGSub = string.gsub
 local StringFind = string.find
 local TableInsert = table.insert
 
+---@param s string
+---@param i number?
+---@return number?
+---@return string?
+local function EmptySeparatorIterator(s, i)
+    if i then
+        return nil, nil
+    end
+    return 1, s
+end
+
 ---@param sep string
 ---@return fun(s:string): (number, string)
 local function SplitIterNext(sep)
+    if sep == "" then
+        return EmptySeparatorIterator
+    end
+
     local _end = 0
     ---@param s string
     ---@return number?
