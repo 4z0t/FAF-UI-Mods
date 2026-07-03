@@ -186,6 +186,14 @@ local function MatchDependencyString(s)
     return moduleName, op, ParseVersion(versionS)
 end
 
+---@param path FileName
+---@return table
+local function DoScript(path)
+    local r = {}
+    doscript(path, r)
+    return r
+end
+
 local ModuleMeta = {
     ---@param self ReUI.Module
     ---@param key any
@@ -277,8 +285,7 @@ Loader = Class()
         for _, mod in __active_mods do
             if mod.ReUI and mod.ui_only then
                 if mod.selectable then
-                    --! definitely must change this. It has to use only mod's name and then find it. But it also must check that found module is the same as mod
-                    self:PreLoadModule(mod.ReUI)
+                    self:PreLoadMod(mod)
                 else
                     self:AddError((
                         "Do not select mods through client mod list! Use ingame mod manager. Mod '%s' is unselectable.")
@@ -312,9 +319,7 @@ Loader = Class()
         local v = rawget(m, "Version")
         if v == nil then
             WARN("ReUI.Loader: Specify Version in main file, it is deprecated to set it in mod_info.lua")
-            local modInfoFile = {}
-            doscript(path .. "mod_info.lua", modInfoFile)
-            local tag = modInfoFile.ReUI
+            local tag = DoScript(path .. "mod_info.lua").ReUI
             local name, version = ParseNameAndVersion(tag)
             moduleVersion = version
         else
@@ -384,12 +389,46 @@ Loader = Class()
         return module
     end,
 
+    ---Preloads the module declared by a mod's ReUI tag and verifies that the
+    ---module resolved to that same mod's folder (tag and location match).
     ---@param self ReUI.Loader
-    ---@param moduleTag string
-    PreLoadModule = function(self, moduleTag)
-        local ok, result = _pcall(self.TryPreLoad, self, moduleTag)
+    ---@param mod table @entry from __active_mods
+    PreLoadMod = function(self, mod)
+        local ok, module = _pcall(self.TryPreLoad, self, mod.ReUI)
         if not ok then
-            WARN(result)
+            WARN(module)
+            return
+        end
+
+        local cok, cerr = _pcall(self.CheckPreloadedModule, self, module, mod)
+        if not cok then
+            module.Status = "failed"
+            self:AddError(("Failed to load module '%s' from mod '%s': %s")
+                :format(module.Name, mod.name or mod.uid or "?", cerr))
+            WARN(cerr)
+        end
+    end,
+
+    ---Verifies that a module preloaded from a mod's tag was resolved to that
+    ---same mod: it must be a `mod` type and its resolved `mod_info.lua` uid
+    ---must match the enabled mod's uid. Prevents a tag from silently pointing
+    ---at a different copy of the module installed elsewhere.
+    ---@param self ReUI.Loader
+    ---@param module ReUI.Module
+    ---@param mod ModInfo
+    CheckPreloadedModule = function(self, module, mod)
+        if module.Type ~= "mod" then
+            _error(("module resolved to a %s at '%s', but an enabled mod must be a mod folder containing a mod_info.lua"
+                )
+                :format(module.Type or "?", module.Path))
+        end
+
+        local info = DoScript(module.Path .. "mod_info.lua")
+        if info.uid ~= mod.uid then
+            _error((
+                "module declared by mod '%s' (uid '%s') resolved to '%s' which belongs to a different mod (uid '%s'). Tag and location do not match."
+                )
+                :format(mod.name or "?", mod.uid or "?", module.Path, info.uid or "?"))
         end
     end,
 
@@ -423,7 +462,7 @@ Loader = Class()
     ---@param self ReUI.Loader
     ---@param module ReUI.Module
     TryCallModuleMain = function(self, module)
-        if module.Status == "loaded" then
+        if module.Status == "loaded" or module.Status == "failed" then
             return
         end
 
@@ -719,11 +758,11 @@ Loader = Class()
     PrintLoadedModules = function(self)
         LOG "ReUI modules:"
         for _, module in ipairs(self._loadedModulesInOrder) do
-            LOG("\t", module.Name .. ":")
-            LOG("\t\t", "Version: " .. VersionToString(module.Version))
-            LOG("\t\t", "Type: " .. module.Type)
-            LOG("\t\t", "Path: " .. module.Path)
-            LOG("\t\t", "Status: " .. module.Status)
+            LOG(module.Name .. ":")
+            LOG("\t", "Version: " .. VersionToString(module.Version))
+            LOG("\t", "Type: " .. module.Type)
+            LOG("\t", "Path: " .. module.Path)
+            LOG("\t", "Status: " .. module.Status)
         end
     end,
 

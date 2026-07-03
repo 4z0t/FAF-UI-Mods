@@ -1,7 +1,7 @@
 ---@meta ReUI.Core
 
 ---@declare-global
----@type table
+---@type ModInfo[]
 __active_mods = {}
 
 
