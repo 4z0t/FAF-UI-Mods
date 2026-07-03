@@ -120,16 +120,6 @@ local function DemangleName(moduleName)
     return splitName
 end
 
----@param moduleName string
----@return string
-local function GetLastPartOfModuleName(moduleName)
-    local splitName = ""
-    for _, s in String.SplitIter(moduleName, '.') do
-        splitName = s
-    end
-    return splitName
-end
-
 ---Returns whether v1 is equal to v2
 ---@param v1 ReUI.Version
 ---@param v2 ReUI.Version
