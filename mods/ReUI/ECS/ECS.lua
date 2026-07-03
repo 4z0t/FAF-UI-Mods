@@ -1,3 +1,5 @@
+Version = "1.0.0"
+
 function Main(isReplay)
     return {
         ---@diagnostic disable-next-line: different-requires

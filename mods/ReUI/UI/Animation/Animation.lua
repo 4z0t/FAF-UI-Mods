@@ -1,3 +1,5 @@
+Version = "1.1.0"
+
 ReUI.Require
 {
     "ReUI.UI >= 1.0.0",
