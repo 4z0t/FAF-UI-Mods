@@ -20,4 +20,4 @@ conflicts = {
     "selection-fix-v01"
 }
 
-ReUI = 'ReUI=1.2.0'
+ReUI = 'ReUI'
