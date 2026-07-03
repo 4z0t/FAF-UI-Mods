@@ -1,3 +1,5 @@
+Version = "1.6.0"
+
 ---@class Hook
 ---@field moduleName FileName
 ---@field fieldName string

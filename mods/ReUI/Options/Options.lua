@@ -164,7 +164,7 @@ function Main(isReplay)
         ---@type FileName
         local path
         local module = ReUI.Get(modName)
-        if module then
+        if module and module.Type ~= "file" then
             path = module.Path .. "Options.lua"
         else
             path = string.format("/mods/%s/Options.lua", modName) --[[@as FileName]]

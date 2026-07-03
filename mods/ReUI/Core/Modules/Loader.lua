@@ -10,6 +10,7 @@ local TableInsert = table.insert
 local setmetatable = setmetatable
 local _assert = assert
 local import = import
+local exists = exists
 
 
 ---@type ReUI.Core.String
@@ -20,6 +21,11 @@ local String = import("String.lua").String
 ---@field major number
 ---@field minor number
 ---@field revision number
+
+---@alias ModuleType
+---| "file"
+---| "package"
+---| "mod"
 
 ---@alias LoadStatus
 ---| "loading"
@@ -37,6 +43,7 @@ local String = import("String.lua").String
 ---@field Status LoadStatus
 ---@field Dependencies ReUI.Module[]
 ---@field Path FileName
+---@field Type ModuleType
 
 ---@class InternalModuleInfo
 ---@field path FileName
@@ -76,18 +83,26 @@ local function ParseVersion(vs)
     return { major = _tonumber(major), minor = _tonumber(minor), revision = _tonumber(revision) }
 end
 
-local MARKER_VERSION = '^(%a[%a%.%d]*)=(%d+%.%d+%.%d+)$'
+local NAME_REGEX = '^%a[%a%.%d]*$'
+local TAG_REGEX = '^(%a[%a%.%d]*)=(%d+%.%d+%.%d+)$'
+
 ---@param s string
----@return string, ReUI.Version
+---@return string
+---@return ReUI.Version
 local function ParseNameAndVersion(s)
     s = RemoveSpaces(s)
-    local start = StringFind(s, MARKER_VERSION)
-    if not start then
+    local start = StringFind(s, TAG_REGEX)
+    if start ~= nil then
+        local name = StringGSub(s, TAG_REGEX, '%1')
+        local version = StringGSub(s, TAG_REGEX, '%2')
+        return name, ParseVersion(version)
+    end
+
+    start = StringFind(s, NAME_REGEX)
+    if start == nil then
         error("invalid ReUI tag: " .. s)
     end
-    local name = StringGSub(s, MARKER_VERSION, '%1')
-    local version = StringGSub(s, MARKER_VERSION, '%2')
-    return name, ParseVersion(version)
+    return s, { major = 0, minor = 0, revision = 0 }
 end
 
 ---@param moduleName string
@@ -291,20 +306,33 @@ Loader = Class()
             error("ReUI.Loader: attempt to import module '" .. moduleName .. "' in load stage")
         end
 
-        local moduleVersion, modPath = self:GetModulePathAndInfo(moduleName)
-        local mainPath = modPath .. GetLastPartOfModuleName(moduleName) .. ".lua"
-        if not exists(mainPath) then
-            mainPath = modPath .. "Main.lua"
-        end
-
-        LOG(("ReUI.Loader: importing '%s':%s at '%s'."):format(moduleName, VersionToString(moduleVersion), mainPath))
-
         ---@type ReUI.Module
         local module = self._modules[moduleName]
+        local moduleType, path, name = self:FindModuleMainFilePath(moduleName)
+        module.Path = path
+        module.Type = moduleType
+
+        local mainPath = path .. name .. ".lua"
+
+        LOG(("ReUI.Loader: importing '%s' at '%s'."):format(moduleName, mainPath))
+
+        local m = import(mainPath)
+
+        local moduleVersion
+        local v = rawget(m, "Version")
+        if v == nil then
+            WARN("ReUI.Loader: Specify Version in main file, it is deprecated to set it in mod_info.lua")
+            local modInfoFile = {}
+            doscript(path .. "mod_info.lua", modInfoFile)
+            local tag = modInfoFile.ReUI
+            local name, version = ParseNameAndVersion(tag)
+            moduleVersion = version
+        else
+            moduleVersion = ParseVersion(v)
+        end
+
         module.Version = moduleVersion
-        module.Dependencies = {}
-        module.Path = modPath
-        module.Main = import(mainPath).Main
+        module.Main = m.Main
         return module
     end,
 
@@ -324,6 +352,7 @@ Loader = Class()
             {
                 Name = moduleName,
                 Status = "loading",
+                Dependencies = {},
             }, ModuleMeta)
 
         self._modules[moduleName] = loadingModule
@@ -531,14 +560,16 @@ Loader = Class()
     ---@param self ReUI.Loader
     ---@param module ReUI.Module
     CheckModEnabled = function(self, module)
-        local uid = import(module.Path .. "mod_info.lua").uid
-        for _, mod in __active_mods do
-            if mod.uid == uid then
-                return
+        if module.Type == "mod" then
+            local uid = import(module.Path .. "mod_info.lua").uid
+            for _, mod in __active_mods do
+                if mod.uid == uid then
+                    return
+                end
             end
         end
 
-        local msg = ("Module '%s' is not enabled."):format(module.Name)
+        local msg = ("Mod '%s' is not enabled."):format(module.Name)
         self:AddError(msg)
         _error(msg)
     end,
@@ -641,84 +672,68 @@ Loader = Class()
 
     ---@param self ReUI.Loader
     ---@param moduleName string
+    ---@return ModuleType
     ---@return FileName
-    FindModuleInfoPath = function(self, moduleName)
+    ---@return string?
+    FindModuleMainFilePath = function(self, moduleName)
         local splitName = String.Split(moduleName, '.')
         --[[
         for example module is 'ReUI.Construction.Selection'
         it splits into { ReUI, Construction, Selection }
         then one by one it checks paths
-            /mods/ReUI/Construction/Selection/mod_info.lua
-            /mods/ReUI.Construction/Selection/mod_info.lua
-            /mods/ReUI.Construction.Selection/mod_info.lua
+            /mods/ReUI/Construction/Selection/...
+            /mods/ReUI.Construction/Selection/...
+            /mods/ReUI.Construction.Selection/...
         ]]
-        local path = "/mods/" .. splitName[1]
+        local lastPart = splitName[table.getn(splitName)]
+        local path = "/mods/" .. splitName[1] --[[@as FileName]]
+        local moduleType = "package" --[[@as ModuleType]]
+
         for i = 2, table.getn(splitName) do
-            local dotPath = path
-            for j = i, table.getn(splitName) do
-                local part = splitName[j]
-                dotPath = dotPath .. "/" .. part
-            end
-            if exists(dotPath .. "/mod_info.lua") then
+            local dotPath = path .. "/" .. table.concat(splitName, "/", i)
+
+            if exists(dotPath .. "/" .. lastPart .. ".lua") then
                 path = dotPath
                 break
             end
+            if exists(dotPath .. "/Main.lua") then
+                path = dotPath
+                break
+            end
+            if exists(dotPath .. ".lua") then
+                path = path .. "/" .. table.concat(splitName, "/", i, table.getn(splitName) - 1)
+                moduleType = "file"
+                break
+            end
+
             path = path .. "." .. splitName[i]
         end
 
-        return path .. "/"
-    end,
-
-    ---@param self ReUI.Loader
-    ---@param moduleName string
-    ---@return ReUI.Version
-    ---@return FileName
-    GetModulePathAndInfo = function(self, moduleName)
-        local moduleInfo = self._internalModules[moduleName]
-        if moduleInfo then
-            return moduleInfo.version, moduleInfo.path
-        end
-        local modulePath = self:FindModuleInfoPath(moduleName)
-        if not exists(modulePath .. "mod_info.lua") then
-            error("Unable to find module " .. moduleName)
+        if moduleType ~= "file" then
+            local existsInfo = exists(path .. "/mod_info.lua")
+            moduleType = existsInfo and "mod" or "package"
         end
 
-        local tag = import(modulePath .. "mod_info.lua").ReUI
-        if type(tag) ~= "string" then
-            error("invalid ReUI tag for " .. moduleName)
+        if exists(path .. "/" .. lastPart .. ".lua") then
+            return moduleType, path .. "/", lastPart
         end
 
-        local name, version = ParseNameAndVersion(tag)
-        -- local start = StringFind(tag, VERSION_NUMBER_REGEX)
-        -- if start then
-        --     version = ParseVersion(tag)
-        --     name = moduleName
-        -- else
-        --     name, version = ParseNameAndVersion(tag)
-        --     WARN("ReUI.Loader: Deprecated version tag. Use just version instead.")
-        --     WARN(tag)
-        -- end
-
-        if name ~= moduleName then
-            error("name mismatch for " .. moduleName)
+        if moduleType ~= "file" and exists(path .. "/Main.lua") then
+            return moduleType, path .. "/", "Main"
         end
 
-        return version, modulePath
+        error(StringFormat("ReUI.Loader: couldn't find module '%s'", moduleName))
     end,
 
     ---@param self ReUI.Loader
     PrintLoadedModules = function(self)
-        LOG "ReUI: Loaded modules:"
+        LOG "ReUI modules:"
         for _, module in ipairs(self._loadedModulesInOrder) do
-            if module.Status ~= "failed" then
-                LOG("\t", module.Name .. ": " .. VersionToString(module.Version))
-            end
-        end
-        LOG "ReUI: Failed to load modules:"
-        for _, module in ipairs(self._loadedModulesInOrder) do
-            if module.Status == "failed" then
-                LOG("\t", module.Name .. ": " .. VersionToString(module.Version))
-            end
+            LOG("\t", module.Name .. ":")
+            LOG("\t\t", "Version: " .. VersionToString(module.Version))
+            LOG("\t\t", "Type: " .. module.Type)
+            LOG("\t\t", "Path: " .. module.Path)
+            LOG("\t\t", "Status: " .. module.Status)
         end
     end,
 

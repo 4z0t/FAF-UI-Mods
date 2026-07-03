@@ -110,3 +110,6 @@ end
 
 ---@class ReUI.Core.String
 ReUI.Core.String = ...
+
+---@type ReUI.Core.Events
+ReUI.Core.Events = {}
