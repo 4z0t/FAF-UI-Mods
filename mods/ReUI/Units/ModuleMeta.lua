@@ -16,3 +16,6 @@ end
 ---@return table<string, UserUnit>
 function ReUI.Units.Get()
 end
+
+---@type ReUI.Units.Overlay
+ReUI.Units.Overlay = ...

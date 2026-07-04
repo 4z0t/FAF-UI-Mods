@@ -216,7 +216,7 @@ OptionsWindow = Class(Window) {
     Add = function(self, data, passSizing)
         local option
         if data.optionVar then
-            option = data.optionVar:Option()
+            option = data.optionVar.Name
             self._optionVars[option] = data.optionVar
         end
         local function CreateSplitter()
@@ -472,7 +472,7 @@ OptionsWindow = Class(Window) {
 
     RestoreOptions = function(self)
         for id, var in self._optionVars do
-            var:Reset()
+            var:Restore()
         end
     end,
 

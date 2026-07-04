@@ -10,9 +10,9 @@ ALazyComponentContainer = Class(ComponentContainer)
     GetComponent = function(self, name)
         local component = ComponentContainer.GetComponent(self, name)
 
-        if not component then
-            self:AddComponent(name, self:CreateComponent(name))
-            component = self._components[name]
+        if component == nil then
+            component = self:CreateComponent(name)
+            self:AddComponent(name, component)
         end
 
         return component

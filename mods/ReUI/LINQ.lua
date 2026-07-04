@@ -27,6 +27,8 @@
  * software.
  *]]
 
+Version = "1.4.0"
+
 function Main(isReplay)
 
     ---#region Upvalues

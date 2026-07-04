@@ -1,3 +1,5 @@
+Version = "1.2.0"
+
 ReUI.Require
 {
     "ReUI.UI.Controls >= 1.0.0"
