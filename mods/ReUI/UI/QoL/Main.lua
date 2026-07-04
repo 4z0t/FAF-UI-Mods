@@ -25,7 +25,7 @@ function Main()
         end
     end)
 
-    if options.multifunctionPanelCollapsed() then
+    if options.multifunctionPanelCollapsed.Value then
         ReUI.Core.Hook("/lua/ui/game/multifunction.lua", "InitialAnimation", function(field, module)
             return function()
                 local controls = module.controls
@@ -38,7 +38,7 @@ function Main()
         end)
     end
 
-    if options.menuPanelCollapsed() then
+    if options.menuPanelCollapsed.Value then
         ReUI.Core.Hook("/lua/ui/game/tabs.lua", "InitialAnimation", function(field, module)
             return function()
                 local controls = module.controls
@@ -51,7 +51,7 @@ function Main()
         end)
     end
 
-    if options.movableMenuPanel() then
+    if options.movableMenuPanel.Value then
         ---@param self Control
         ---@param x number
         local function SetPos(self, x)

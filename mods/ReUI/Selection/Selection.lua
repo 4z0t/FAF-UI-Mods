@@ -15,9 +15,9 @@ function Main(isReplay)
 
     local options = ReUI.Options.Mods["ReUI.Selection"]
 
-    local enabled = false
-    options.enabled:Bind(function(var)
-        enabled = var()
+    local enabled = options.enabled.Value
+    options.enabled.OnChanged:Add(function(o, v)
+        enabled = v
     end)
 
 

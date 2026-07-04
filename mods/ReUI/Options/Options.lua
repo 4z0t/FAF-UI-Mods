@@ -16,7 +16,7 @@ function Main(isReplay)
     local Prefs = import("/lua/user/prefs.lua")
 
 
-    ---@alias ReUI.Options.OptionValue<T> (fun():T)|ReUI.Options.ReactiveOption
+    ---@alias ReUI.Options.OptionValue<T> ReUI.Options.ReactiveOption
 
 
     local isLoadedMains = false

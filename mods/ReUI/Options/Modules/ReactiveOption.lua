@@ -51,12 +51,6 @@ ReactiveOption = ReUI.Core.Class()
     end,
 
     ---@param self ReUI.Options.ReactiveOption
-    ---@return any
-    __call = function(self)
-        return self:Get()
-    end,
-
-    ---@param self ReUI.Options.ReactiveOption
     ---@return LazyVar
     Raw = function(self)
         return self._var
@@ -118,6 +112,13 @@ ReactiveOption = ReUI.Core.Class()
 ---@field _onChange fun(opt: DeprecatedOption)
 DeprecatedOption = ReUI.Core.Class(ReactiveOption)
 {
+    ---@param self DeprecatedOption
+    ---@return any
+    __call = function(self)
+        WARN(("ReUI.Options: [%s] call operator is deprecated, use '.Value' or ':Get()'"):format(self.Name))
+        return self:Get()
+    end,
+
     ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
     ---@param self DeprecatedOption
     ---@param f fun(opt: DeprecatedOption)

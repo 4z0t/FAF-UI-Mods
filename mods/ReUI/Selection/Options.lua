@@ -1,5 +1,5 @@
 local Options = ReUI.Options.Builder
-local Opt = ReUI.Options.Opt
+local Opt = ReUI.Options.OptionValue
 
 
 ReUI.Options.Mods["ReUI.Selection"] = {
