@@ -225,7 +225,6 @@ function Main(isReplay)
 
     ---@class ReUI.Options : ReUI.Module
     return {
-        ---@deprecated
         Builder = {
             AddOptions  = OptionsSelector.AddOptions,
             Splitter    = OptionsSelector.Splitter,
