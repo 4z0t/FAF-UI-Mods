@@ -1,4 +1,4 @@
-Version = "1.1.1"
+Version = "1.2.0"
 
 ReUI.Require
 {
@@ -15,9 +15,7 @@ function Main(isReplay)
 
     local Prefs = import("/lua/user/prefs.lua")
 
-
     ---@alias ReUI.Options.OptionValue<T> ReUI.Options.ReactiveOption
-
 
     local isLoadedMains = false
     ---Main functions of Mods' Options files
