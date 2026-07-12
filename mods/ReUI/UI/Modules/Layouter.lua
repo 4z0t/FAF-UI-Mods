@@ -91,6 +91,26 @@ Layouter = ReUI.Core.Class()
         return scale * value
     end,
 
+    ---Unscales given number / NumberVar
+    ---@param self ReUI.UI.Layouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
+    UnscaleVar = function(self, value)
+        return Functions.Div(value, self.Scale)
+    end,
+
+    ---Unscales given number
+    ---@param self ReUI.UI.Layouter
+    ---@param value number
+    ---@return number
+    UnscaleNumber = function(self, value)
+        local scale = self.Scale
+        if iscallable(scale) then
+            return value / scale()
+        end
+        return value / scale
+    end,
+
     ---@param self ReUI.UI.Layouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
@@ -686,6 +706,22 @@ FloorLayouter = ReUI.Core.Class(Layouter)
         return FuncFloor(Layouter.ScaleNumber(self, value)) --[[@as number]]
     end,
 
+    ---Unscales given number / NumberVar
+    ---@param self ReUI.UI.Layouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
+    UnscaleVar = function(self, value)
+        return FuncFloor(Layouter.UnscaleVar(self, value))
+    end,
+
+    ---Unscales given number
+    ---@param self ReUI.UI.Layouter
+    ---@param value number
+    ---@return number
+    UnscaleNumber = function(self, value)
+        return FuncFloor(Layouter.UnscaleNumber(self, value)) --[[@as number]]
+    end,
+
     ---@param self ReUI.UI.FloorLayouter
     ---@param n1 FunctionalNumber
     ---@param n2 FunctionalNumber
@@ -747,6 +783,22 @@ RoundLayouter = ReUI.Core.Class(Layouter)
     ---@return number
     ScaleNumber = function(self, value)
         return FuncRound(Layouter.ScaleNumber(self, value)) --[[@as number]]
+    end,
+
+    ---Unscales given number / NumberVar
+    ---@param self ReUI.UI.Layouter
+    ---@param value FunctionalNumber
+    ---@return FunctionalNumber
+    UnscaleVar = function(self, value)
+        return FuncRound(Layouter.UnscaleVar(self, value))
+    end,
+
+    ---Unscales given number
+    ---@param self ReUI.UI.Layouter
+    ---@param value number
+    ---@return number
+    UnscaleNumber = function(self, value)
+        return FuncRound(Layouter.UnscaleNumber(self, value)) --[[@as number]]
     end,
 
     ---@param self ReUI.UI.RoundLayouter
