@@ -24,13 +24,15 @@ function Main()
             Options.Strings("Hover Preview key",
                 {
                     "SHIFT",
-                    "CONTROL"
+                    "CONTROL",
+                    "EITHER"
                 },
                 options.hoverPreviewKey),
             Options.Strings("Selected Preview key",
                 {
                     "SHIFT",
-                    "CONTROL"
+                    "CONTROL",
+                    "EITHER"
                 },
                 options.selectedPreviewKey),
             Options.Filter("Show range rings in minimap", options.showInMinimap, 4),
@@ -47,7 +49,8 @@ function Main()
             Options.Strings("Build Preview key",
                 {
                     "SHIFT",
-                    "CONTROL"
+                    "CONTROL",
+                    "EITHER"
                 },
                 options.buildPreviewKey),
         })
