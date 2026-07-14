@@ -11,7 +11,7 @@ local EscapeCover = ReUI.UI.Views.EscapeCover
 ---@class ControlConfig
 ---@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"|"column"
 ---@field name string
----@field optionVar OptionVar
+---@field optionVar ReUI.Options.ReactiveOption
 ---@field indent number
 
 ---@class OptionsInfo
