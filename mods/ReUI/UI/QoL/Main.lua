@@ -3,7 +3,7 @@ Version = "1.0.0"
 ReUI.Require
 {
     "ReUI.Core >= 1.2.0",
-    "ReUI.Options >= 1.0.0",
+    "ReUI.Options >= 1.2.0",
     "ReUI.UI >= 1.4.0"
 }
 
