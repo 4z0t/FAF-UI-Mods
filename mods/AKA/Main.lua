@@ -17,6 +17,7 @@ function Main()
         local CM     = import("/lua/ui/game/commandmode.lua")
         local Misc   = import("/lua/keymap/misckeyactions.lua")
         local Orders = import("/lua/ui/game/orders.lua")
+        local Smart  = import("/lua/keymap/smartselection.lua")
 
         local attackMoveModeData = {
             name        = "RULEUCC_Script",
