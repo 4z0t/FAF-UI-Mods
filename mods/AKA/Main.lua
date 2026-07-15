@@ -172,6 +172,17 @@ function Main()
                     end)
                     :Action "StartCommandMode order RULEUCC_Move",
             }
+        CategoryMatcher "select All Direct Fire Land Experimentals/Interrupt Pathfinding"
+            :Modifiers { shift = true }
+            {
+                CategoryAction(categories.ENGINEER - categories.COMMAND)
+                    :Action(function() Misc.AbortNavigation() end),
+                CategoryAction()
+                    :Match(function(selection, category)
+                        return true
+                    end)
+                    :Action(function() Smart.smartSelect("MOBILE LAND EXPERIMENTAL DIRECTFIRE -SNIPER -ARTILLERY") end),
+            }
 
         local BuildSensorsF
         if Hotbuild then
