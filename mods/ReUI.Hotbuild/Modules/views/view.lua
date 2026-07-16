@@ -97,17 +97,6 @@ function CreateUI(parent)
     end
 
 
-    group.ShareButton = UIUtil.CreateButtonWithDropshadow(group, '/BUTTON/medium/', LOC("<LOC _Share>Share"))
-
-    LayoutFor(group.ShareButton)
-        :AtHorizontalCenterIn(group, -300)
-        :AtBottomIn(group, 5)
-        :Over(group)
-
-    group.ShareButton.OnClick = function(control, modifiers)
-        ViewModel.SendActiveBuildTable()
-    end
-
     ---@type Edit
     group.edit = Edit(group)
     LayoutFor(group.edit)
