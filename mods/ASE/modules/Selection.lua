@@ -105,20 +105,10 @@ local CursorDomains = UMT.Class(Bitmap)
 -- determines whether last selected units not containing active category replace active actegory
 local isAuto
 
-local assistBPs = {
-    -- t1 scouts
-    ["ual0101"] = true, --Spirit
-    ["url0101"] = true, --Mole
-    ["xsl0101"] = true, --Selen
-    ["uel0101"] = true, --Snoop
-    -- mobile shields
-    ["xsl0307"] = true, --Athanah
-    ["uel0307"] = true, --Parashield
-    ["ual0307"] = true, --Asylum
+local assistCategory
 
-    ["url0306"] = true, --Deceiver
-    ["xrs0205"] = true -- mermaid
-}
+-- double click only selects assisters with the same target
+local doubleClickSimilarAssisters
 
 local layerCategory = {
     NAVAL = categories.NAVAL, -- + categories.LAND * categories.HOVER,
@@ -131,12 +121,42 @@ function SetActiveLayer(layer)
     print("Active layer is " .. layer)
 end
 
+--- Returns the unit's focus if it is performing an instant shield assist.
+---@param unit UserUnit
+---@return UserUnit?
+local function GetShieldAssistTarget(unit)
+    local unitQueue = unit:GetCommandQueue()
+    if unitQueue[1].type == "Repair" and unitQueue[2].type == "Guard" then
+        local pos1 = unitQueue[1].position
+        local pos2 = unitQueue[2].position
+        if pos1.x == pos2.x and pos1.y == pos2.y and pos1.z == pos2.z then
+            return unit:GetFocus()
+        end
+    end
+end
+
+local isDoubleClick = false
+local clickedAssisterTarget
+
 function FilterAssisters(selection)
-    local newSelection = {}
+    local possibleAssisters = EntityCategoryFilterDown(assistCategory, selection)
+    if TableEmpty(possibleAssisters) then
+        return selection, false
+    end
     local changed = false
-    for _, unit in selection do
-        local guard = unit:GetGuardedEntity()
-        if not (assistBPs[unit:GetBlueprint().BlueprintId:lower()] and guard ~= nil) then
+    local newSelection = EntityCategoryFilterOut(assistCategory, selection)
+    for _, unit in possibleAssisters do
+        local unitTarget = unit:GetGuardedEntity() or GetShieldAssistTarget(unit)
+        if not isDoubleClick then
+            clickedAssisterTarget = unitTarget
+        end
+        if isDoubleClick and clickedAssisterTarget and
+            (
+                not doubleClickSimilarAssisters and unitTarget ~= nil
+                or doubleClickSimilarAssisters and clickedAssisterTarget == unitTarget
+            )
+            or (not isDoubleClick or not clickedAssisterTarget) and unitTarget == nil
+        then
             TableInsert(newSelection, unit)
         else
             changed = true
@@ -210,6 +230,9 @@ local domainsOrders =
     { key = "AIR   > NAVAL > LAND", value = { "AIR", "NAVAL", "LAND" } },
 }
 
+local includeHoverInNavy
+local hoverUnitsCategory = categories.LAND * categories.HOVER - categories.ENGINEER
+
 local function UpdateDomainsCursor()
     if isAuto then
         return
@@ -246,6 +269,9 @@ function FilterLayer(selection)
         for _, domain in domainOrder do
             filtered = EntityCategoryFilterDown(layerCategory[domain], selection)
             if not TableEmpty(filtered) then
+                if domain == "NAVAL" and includeHoverInNavy then
+                    filtered = EntityCategoryFilterDown(layerCategory[domain] + hoverUnitsCategory, selection)
+                end
                 break
             end
         end
@@ -258,6 +284,38 @@ function FilterLayer(selection)
         return selection, false
     end
     return filtered, (TableGetN(filtered) ~= TableGetN(selection))
+end
+
+local function InitOptionAssisterCategories()
+    local Options = UMT.Options.Mods["ASE"]
+    local categories = categories
+
+    local onlySupportCategory = categories.ALLUNITS
+        -- units with support capability that also have weapons, such as ML or fatboy
+        - categories.DIRECTFIRE - categories.INDIRECTFIRE - categories.ANTIAIR - categories.ANTINAVY
+        -- air units have special attack categories
+        - categories.GROUNDATTACK - categories.STRATEGICBOMBER - categories.BOMBER
+        -- continental
+        - categories.TRANSPORTATION
+
+    local originalAssistcategory =
+        categories.SCOUT * categories.LAND
+        + (categories.MOBILE * categories.SHIELD * onlySupportCategory)
+        -- shouldn't use overlay categories but its the best way to include both stealthfields and cloakfields
+        + (categories.MOBILE * categories.COUNTERINTELLIGENCE * categories.OVERLAYCOUNTERINTEL * onlySupportCategory)
+
+    local engiStationAssistCategory = originalAssistcategory + categories.ENGINEERSTATION + categories.POD
+    local engiAssistCategory = originalAssistcategory + categories.ENGINEER
+
+    local assistCategories = {
+        ["Disabled"] = originalAssistcategory,
+        ["Engi stations & drones"] = engiStationAssistCategory,
+        ["All engineers"] = engiAssistCategory
+    }
+
+    Options.filterAssistingEngineers:Bind(function(var)
+        assistCategory = assistCategories[var()]
+    end)
 end
 
 local function InitOptionsExoticCategories()
@@ -309,21 +367,37 @@ local function InitOptionsExoticCategories()
     UpdateExotics()
 end
 
+local function CheckForDoubleClick(mouseEvent)
+    if mouseEvent.Type == "ButtonDClick" then
+        isDoubleClick = true
+    else
+        isDoubleClick = false
+    end
+end
+
 function Main(_isReplay)
     local Options = UMT.Options.Mods["ASE"]
     Options.autoLayer:Bind(function(var)
         isAuto = var()
     end)
 
-    Options.includeHovers:Bind(function(opt)
-        if opt() then
-            layerCategory.NAVAL = categories.NAVAL + categories.LAND * categories.HOVER
-        else
-            layerCategory.NAVAL = categories.NAVAL
-        end
+    Options.includeHovers:Bind(function(var)
+        includeHoverInNavy = var()
+    end)
+
+    InitOptionAssisterCategories()
+
+    Options.doubleClickSimilarAssisters:Bind(function(var)
+        doubleClickSimilarAssisters = var()
     end)
 
     InitOptionsExoticCategories()
 
+    import("/lua/ui/uimain.lua").AddOnMouseClickedFunc(CheckForDoubleClick)
+
     -- UpdateDomainsCursor()
+end
+
+__moduleinfo.OnDirty = function()
+    import("/lua/ui/uimain.lua").RemoveOnMouseClickedFunc(CheckForDoubleClick)
 end
