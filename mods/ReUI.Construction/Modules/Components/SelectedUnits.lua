@@ -148,6 +148,29 @@ AirFuelGroupMatcher = Class(UnitGroupMatcher)
     end,
 }
 
+---@class IdleConstructionGroupMatcher : UnitGroupMatcher
+IdleConstructionGroupMatcher = Class(UnitGroupMatcher)
+{
+    ---@param self IdleConstructionGroupMatcher
+    ---@param unit UserUnit
+    ---@return boolean
+    Match = function(self, unit)
+        if not EntityCategoryContains(categories.CONSTRUCTION, unit) then
+            return false
+        end
+        return unit:IsIdle()
+    end,
+
+    ---@param self IdleConstructionGroupMatcher
+    ---@param component SelectedUnitsListItem
+    ---@param item ReUI.Construction.Grid.Item
+    ---@param action SelectedUnitsAction
+    Display = function(self, component, item, action)
+        component.icon:SetTexture(UIUtil.UIFile('/game/idle_mini_icon/idle_icon.dds'))
+        component.icon:Show()
+    end,
+}
+
 ---@param name string
 ---@return FileName
 local function IconPath(name)
@@ -197,6 +220,7 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
         CategoryGroupMatcher("STRUCTURE", IconPath "structure_generic", categories.STRUCTURE),
         CategoryGroupMatcher("CONSTRUCTION", IconPath "factory_generic", categories.SORTCONSTRUCTION),
         AirFuelGroupMatcher("LOWFUEL", '/game/unit_view_icons/fuel.dds'),
+        IdleConstructionGroupMatcher("IDLECONSTRUCTION", '/game/idle_mini_icon/idle_icon.dds'),
     },
 
     ---@param self SelectedUnitsListHandler
