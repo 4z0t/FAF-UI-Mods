@@ -66,6 +66,7 @@ function Main(isReplay)
     ---| "TECH2"
     ---| "TECH3"
     ---| "EXPERIMENTAL"
+    ---| "TEMPLATES"
 
     ---@class ConstructionHandlerData
     ---@field tab TabNames
@@ -718,6 +719,7 @@ function Main(isReplay)
     ---@class TechTabs : ReUI.UI.Controls.Group
     ---@field _constructionPanel ReUI.Construction.Panel
     ---@field _tabs ReUI.UI.Controls.CheckBox[]
+    ---@field _activeTech TechLevel
     local TechTabs = ReUI.Core.Class(Group)
     {
         AutoLayout = false,
@@ -729,6 +731,7 @@ function Main(isReplay)
             Group.__init(self, parent)
 
             self._constructionPanel = parent
+            self._activeTech = "NONE"
 
             ---@param tab TechTab
             ---@param checked boolean
@@ -747,10 +750,25 @@ function Main(isReplay)
         ---@param self TechTabs
         ---@param tech TechLevel
         SetActiveTechTab = function(self, tech)
+            self._activeTech = tech
             ---@param tab TechTab
             for i, tab in self._tabs do
                 tab:SetCheck(tab.name == tech, true)
             end
+        end,
+
+        ---@param self TechTabs
+        ---@return 1|2|3|4|5
+        GetCurrentTechTab = function(self)
+            local techTabs = {
+                TECH1 = 1,
+                TECH2 = 2,
+                TECH3 = 3,
+                EXPERIMENTAL = 4,
+                TEMPLATES = 5,
+            }
+
+            return techTabs[self._activeTech] or 5
         end,
 
         ---@param self TechTabs
@@ -807,6 +825,7 @@ function Main(isReplay)
         ---@param self TechTabs
         ---@param name string
         OnTabCheck = function(self, name)
+            self._activeTech = name
             ---@param tab TechTab
             for _, tab in self._tabs do
                 if tab.name ~= name then
@@ -1138,6 +1157,13 @@ function Main(isReplay)
             self._techTabs:SetActiveTechTab(tech)
         end,
 
+        ---Returns the selected construction tab: T1, T2, T3, T4, or templates.
+        ---@param self ReUI.Construction.Panel
+        ---@return 1|2|3|4|5
+        GetCurrentTechTab = function(self)
+            return self._techTabs:GetCurrentTechTab()
+        end,
+
         ---@param self ReUI.Construction.Panel
         ---@param func fun(self: ReUI.Construction.Panel, slot:ReUI.UI.Controls.CheckBox)
         ApplyToSlots = function(self, func)
@@ -1375,6 +1401,18 @@ function Main(isReplay)
 
 
     local ConstructionHook = ReUI.Core.HookModule "/lua/ui/game/construction.lua"
+
+    ConstructionHook("GetCurrentTechTab", function(field, module)
+        return function()
+            ---@type ReUI.Construction.Panel
+            local panel = ReUI.UI.Global["Construction"]
+            if not panel or IsDestroyed(panel) then
+                return 5
+            end
+
+            return panel:GetCurrentTechTab()
+        end
+    end)
 
     ConstructionHook("OnQueueChanged", function(field, module)
         return function(newQueue)
