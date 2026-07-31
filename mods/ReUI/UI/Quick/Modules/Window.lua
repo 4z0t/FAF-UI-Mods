@@ -18,8 +18,24 @@ local closeButton = {
     dis  = UIUtil.SkinnableFile('/game/menu-btns/close_btn_dis.dds'),
 }
 
+---@class Quick.Border : ReUI.UI.Views.WindowFrame
+local Border = ReUI.Core.Class(WindowFrame)
+{
+    Textures = {
+        tl = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_ul.dds"),
+        tr = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_ur.dds"),
+        tm = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_horz_um.dds"),
+        ml = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_vert_l.dds"),
+        m  = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_m.dds"),
+        mr = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_vert_r.dds"),
+        bl = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_ll.dds"),
+        bm = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_lm.dds"),
+        br = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_lr.dds"),
+    },
+}
+
 ---@class Quick.Window : Group
----@field _frame ReUI.UI.Views.WindowFrame
+---@field _frame Quick.Border
 ---@field _titleBar Group
 ---@field _title Text
 ---@field _closeBtn Button
@@ -41,7 +57,7 @@ QuickWindow = Class(Group)
         self._minWidth = 0
         self._minHeight = 0
 
-        self._frame      = WindowFrame(self)
+        self._frame      = Border(self)
         self._titleBar   = Group(self)
         self._title      = UIUtil.CreateText(self._titleBar, title, 14, UIUtil.titleFont)
         self._closeBtn   = Button(self._titleBar,
@@ -68,7 +84,7 @@ QuickWindow = Class(Group)
     ---@param self Quick.Window
     SetupLayout = function(self)
         LayoutFor(self._frame)
-            :FillFixedBorder(self, -5)
+            :OffsetIn(self, -5, -1, -5, -5)
             :Under(self)
             :DisableHitTest(true)
 
@@ -80,7 +96,7 @@ QuickWindow = Class(Group)
 
         LayoutFor(self._title)
             :AtLeftIn(self._titleBar, 8)
-            :AtVerticalCenterIn(self._titleBar)
+            :AtVerticalCenterIn(self._titleBar, 2)
             :DisableHitTest()
 
         LayoutFor(self._closeBtn)

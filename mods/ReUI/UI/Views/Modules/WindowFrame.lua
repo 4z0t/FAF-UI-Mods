@@ -1,20 +1,7 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
-local LazyVar = import('/lua/lazyvar.lua').Create
 
 local Group = ReUI.UI.Controls.Group
 local Bitmap = ReUI.UI.Controls.Bitmap
-
-local textures = {
-    tl = UIUtil.SkinnableFile("/game/panel/panel_brd_ul.dds"),
-    tr = UIUtil.SkinnableFile("/game/panel/panel_brd_ur.dds"),
-    tm = UIUtil.SkinnableFile("/game/panel/panel_brd_horz_um.dds"),
-    ml = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_l.dds"),
-    m = UIUtil.SkinnableFile("/game/panel/panel_brd_m.dds"),
-    mr = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_r.dds"),
-    bl = UIUtil.SkinnableFile("/game/panel/panel_brd_ll.dds"),
-    bm = UIUtil.SkinnableFile("/game/panel/panel_brd_lm.dds"),
-    br = UIUtil.SkinnableFile("/game/panel/panel_brd_lr.dds"),
-}
 
 ---@class ReUI.UI.Views.WindowFrame : ReUI.UI.Controls.Group
 ---@field tl ReUI.UI.Controls.Bitmap
@@ -28,10 +15,25 @@ local textures = {
 ---@field br ReUI.UI.Controls.Bitmap
 WindowFrame = ReUI.Core.Class(Group)
 {
+    ---@type table<string, fun():FileName>
+    Textures = {
+        tl = UIUtil.SkinnableFile("/game/panel/panel_brd_ul.dds"),
+        tr = UIUtil.SkinnableFile("/game/panel/panel_brd_ur.dds"),
+        tm = UIUtil.SkinnableFile("/game/panel/panel_brd_horz_um.dds"),
+        ml = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_l.dds"),
+        m  = UIUtil.SkinnableFile("/game/panel/panel_brd_m.dds"),
+        mr = UIUtil.SkinnableFile("/game/panel/panel_brd_vert_r.dds"),
+        bl = UIUtil.SkinnableFile("/game/panel/panel_brd_ll.dds"),
+        bm = UIUtil.SkinnableFile("/game/panel/panel_brd_lm.dds"),
+        br = UIUtil.SkinnableFile("/game/panel/panel_brd_lr.dds"),
+    },
+
     ---@param self ReUI.UI.Views.WindowFrame
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+
+        local textures = self.Textures
 
         self.tl = Bitmap(self, textures.tl)
         self.tr = Bitmap(self, textures.tr)
