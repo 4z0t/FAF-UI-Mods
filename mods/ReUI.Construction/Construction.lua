@@ -8,7 +8,7 @@ ReUI.Require
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.1.0",
-    "ReUI.Options >= 1.0.0",
+    "ReUI.Options >= 1.2.0",
     "ReUI.Units >= 1.0.0",
     "ReUI.Actions >= 1.3.0",
     "ReUI.Units.Enhancements >= 1.2.0",
@@ -1501,8 +1501,9 @@ function Main(isReplay)
             ---@type ReUI.Construction.Panel
             local panel = ReUI.Construction.Panel(parent)
 
-            options.canScroll:Bind(function(opt)
-                panel:SetCanScroll(opt())
+            panel:SetCanScroll(options.canScroll.Value)
+            options.canScroll.OnChanged:Add(function(opt, v)
+                panel:SetCanScroll(v)
             end)
 
             ReUI.Construction.Grid.ItemClass.TextColor:Set(options.color:Raw())

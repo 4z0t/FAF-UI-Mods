@@ -12,15 +12,11 @@ local Contains = IPairsEnumerator:Contains()
 
 local options = ReUI.Options.Mods["ReUI.Construction"]
 
-local showGroups
-options.selection.showGroups:Bind(function(opt)
-    showGroups = opt()
-end)
+local showGroups = options.selection.showGroups.Value
+options.selection.showGroups.OnChanged:Add(function(opt, v) showGroups = v end)
 
-local improvedDeselection
-options.selection.improvedDeselection:Bind(function(opt)
-    improvedDeselection = opt()
-end)
+local improvedDeselection = options.selection.showGroups.Value
+options.selection.showGroups.OnChanged:Add(function(opt, v) improvedDeselection = v end)
 
 ---@type table<TechCategory, integer>
 local techCatOrder = {
