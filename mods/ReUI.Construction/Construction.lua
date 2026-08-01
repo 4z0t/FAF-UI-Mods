@@ -1394,8 +1394,8 @@ function Main(isReplay)
         return function()
             ---@type ReUI.Construction.Panel
             local panel = ReUI.UI.Global["Construction"]
-            if not panel or IsDestroyed(panel) then
-                return 5
+            if IsDestroyed(panel) then
+                return 0
             end
 
             return panel:GetCurrentTechTab()
