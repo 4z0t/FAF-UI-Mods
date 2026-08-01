@@ -15,8 +15,8 @@ local options = ReUI.Options.Mods["ReUI.Construction"]
 local showGroups = options.selection.showGroups.Value
 options.selection.showGroups.OnChanged:Add(function(opt, v) showGroups = v end)
 
-local improvedDeselection = options.selection.showGroups.Value
-options.selection.showGroups.OnChanged:Add(function(opt, v) improvedDeselection = v end)
+local improvedDeselection = options.selection.improvedDeselection.Value
+options.selection.improvedDeselection.OnChanged:Add(function(opt, v) improvedDeselection = v end)
 
 ---@type table<TechCategory, integer>
 local techCatOrder = {

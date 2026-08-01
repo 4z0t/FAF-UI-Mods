@@ -1711,30 +1711,6 @@ function Main(isReplay)
         }
     )
 
-    --TODO
-    --[x] Fix queue display for engineers (upgrades, etc)
-    --[x] Fix mobile factory queue logic (drag specifically)
-    --[x] Add logic for enhancements
-    --[x] Fix border of the panel
-    --[ ] Expose toggles for shitty keybinds
-    --[x] Progress bar for construction
-    --[x] don't display count for upgrades of factories
-    --[x] display keybinds in construction menu
-    --[x] old selection check is incorrect and must be done elsewhere
-    --[x] fix progress bar with enhancements and regular construction
-    --[ ] fix order of items with queue and enhancements (including cases with deleting items and when upgrades are reset)
-    --[x] tech enhancements don't show available construction options
-    --[x] display support factories for acus if corresponding hq presents
-    --[ ] improve items logic of the grid
-    --[x] bottom panel doesn't display other things in enhancements mode
-    --[x] add reui error messages into game chat
-    --[x] fix tech switch when queue is changed
-    --[x] fix queue and chain upgrades for t2 shields of UEF and Seraphim (use command queue instead of factory queue) (it has to be fixed on sim side.)
-    --[ ] display upgrade keybinds in construction menu
-    --[x] add logic for removing items from queue in build options of factories
-    --[ ] fix construction tab disabling when current tab is selection
-    -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
-
     ---@class ReUI.Construction : ReUI.Module
     return {
         Panel = ConstructionPanel,
