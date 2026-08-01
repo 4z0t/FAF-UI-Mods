@@ -2,14 +2,20 @@ local instance
 
 function Run()
     local LayoutFor = ReUI.UI.FloorLayoutFor
+
+    local i = 1
+
     ---@type Quick.Window
-    local w = ReUI.UI.Quick.Window("Test",
+    local w
+
+    w = ReUI.UI.Quick.Window("Test",
         function(q)
             q:Group(200, 100, function(g)
                 g:Title("Title", 20)
                 g:Button("Button")
                 g:Checkbox("Checkbox")
-                g:SameLine() g:Text("AAAA")
+                g:SameLine()
+                g:Text("AAAA")
                 g:Slider("Slider", 0, 100, 1, function(slider, value)
                 end)
             end)
@@ -30,8 +36,11 @@ function Run()
                 g:Indent(20)
                 g:Text("Text")
                 g:SameLine()
-                g:Text("Other text")
-                g:Button("Button")
+                g:Text("Other text " .. i)
+                g:Button("Rebuild", function(button, modifiers)
+                    w:Rebuild()
+                    i = i + 1
+                end)
                 g:Checkbox("Checkbox")
                 g:Combo("Combo", {
                     "one",

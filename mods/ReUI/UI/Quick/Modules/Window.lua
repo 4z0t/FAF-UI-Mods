@@ -44,6 +44,7 @@ local Border = ReUI.Core.Class(WindowFrame)
 ---@field _padding number
 ---@field _minWidth number
 ---@field _minHeight number
+---@field _fn fun(q: Quick.Container)
 QuickWindow = Class(Group)
 {
     ---@param self Quick.Window
@@ -56,6 +57,7 @@ QuickWindow = Class(Group)
         self._padding = 8
         self._minWidth = 0
         self._minHeight = 0
+        self._fn = fn
 
         self._frame      = Border(self)
         self._titleBar   = Group(self)
@@ -65,19 +67,35 @@ QuickWindow = Class(Group)
             closeButton.down,
             closeButton.over,
             closeButton.dis)
-        self._content    = Group(self)
         self._resizeGrip = Bitmap(self)
 
         self:SetupLayout()
+        self:Rebuild()
+        self:SetupInteractions()
+    end,
 
-        local w, h = QuickContainer(self._content):Build(fn)
+    ---@param self Quick.Window
+    Rebuild = function(self)
+        if not IsDestroyed(self._content) then
+            self._content:Destroy()
+            self._content = nil
+        end
+
+        self._content = Group(self)
+
+        local w, h = QuickContainer(self._content):Build(self._fn)
         self._minWidth = w + self._padding * 2
         self._minHeight = h + self._padding * 2 + self._titleBar.Height()
+
+        LayoutFor(self._content)
+            :Below(self._titleBar)
+            :AtLeftIn(self, self._padding)
+            :AtRightIn(self, self._padding)
+            :AtBottomIn(self, self._padding)
 
         LayoutFor(self)
             :Width(self._minWidth)
             :Height(self._minHeight)
-        self:SetupInteractions()
     end,
 
 
@@ -102,12 +120,6 @@ QuickWindow = Class(Group)
         LayoutFor(self._closeBtn)
             :AtRightIn(self._titleBar, 4)
             :AtVerticalCenterIn(self._titleBar)
-
-        LayoutFor(self._content)
-            :Below(self._titleBar)
-            :AtLeftIn(self, self._padding)
-            :AtRightIn(self, self._padding)
-            :AtBottomIn(self, self._padding)
 
         LayoutFor(self._resizeGrip)
             :AtRightBottomIn(self)
