@@ -33,6 +33,7 @@ local sliderTextures = {
 ---@field _controlsOnLine Control[]
 ---@field _sameLine boolean
 ---@field _terminatedLine boolean
+---@field _prevControl Control?
 local Builder = Class()
 {
     ---@param self Quick.Builder
@@ -51,6 +52,8 @@ local Builder = Class()
 
         self._sameLine = false
         self._terminatedLine = false
+
+        self._prevControl = nil
     end,
 
     ---@param self Quick.Builder
@@ -112,6 +115,14 @@ local Builder = Class()
 
         self._maxWidth  = math.max(self._maxWidth, self._cursorX)
         self._maxHeight = math.max(self._maxHeight, self._cursorY + self._lineHeight)
+
+        self._prevControl = control
+    end,
+
+    ---@param self Quick.Builder
+    ---@return Control?
+    PrevControl = function(self)
+        return self._prevControl
     end,
 
     ---@param self Quick.Builder
