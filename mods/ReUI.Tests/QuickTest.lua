@@ -41,6 +41,7 @@ function Run()
                     w:Rebuild()
                     i = i + 1
                 end)
+                g:Tooltip("Click to rebuild me", "Hello world")
                 g:Checkbox("Checkbox")
                 g:Combo("Combo", {
                     "one",

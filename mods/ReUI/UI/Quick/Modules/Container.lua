@@ -4,8 +4,8 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local IntegerSlider = import("/lua/maui/slider.lua").IntegerSlider
 local Edit = import("/lua/maui/edit.lua").Edit
 local Combo = import('/lua/ui/controls/combo.lua').Combo
+local Tooltip = import('/lua/ui/game/tooltip.lua')
 
-local LazyVar = import('/lua/lazyvar.lua').Create
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local LF = ReUI.UI.LayoutFunctions
@@ -196,8 +196,7 @@ _QuickContainer = Class()
     Text = function(self, text, size, font, color)
         local t = UIUtil.CreateText(self._control, text, size or 14, font or UIUtil.bodyFont)
 
-        if color then LayoutFor(t):Color(color) end
-        t:DisableHitTest()
+        if color then t:SetColor(color) end
 
         self:Builder():AddControl(t, {
             width = LayoutFor:UnscaleNumber(t.Width()),
@@ -439,6 +438,19 @@ _QuickContainer = Class()
     Unindent = function(self, amount)
         self:Builder():Unindent(amount)
     end,
+
+
+    ---@param self Quick.Container
+    ---@param title string
+    ---@param text string
+    ---@param delay? number
+    Tooltip = function(self, title, text, delay)
+        local prev = self:Builder():PrevControl()
+        if prev == nil then
+            return
+        end
+        Tooltip.AddControlTooltipManual(prev, title, text, delay)
+    end
 }
 
 QuickContainer = _QuickContainer
