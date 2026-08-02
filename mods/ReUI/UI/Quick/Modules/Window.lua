@@ -6,10 +6,12 @@ local Button = import("/lua/maui/button.lua").Button
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local WindowFrame = ReUI.UI.Views.WindowFrame
+local OptionRef = ReUI.Options.OptionRef
 
 local QuickContainer = import("Container.lua").QuickContainer
 
 local GRIP_SIZE = 14
+local TITLE_BAR_HEIGHT = 24
 
 local closeButton = {
     up   = UIUtil.SkinnableFile('/game/menu-btns/close_btn_up.dds'),
@@ -34,6 +36,12 @@ local Border = ReUI.Core.Class(WindowFrame)
     },
 }
 
+---@param name string
+---@return string
+local function FormatName(name)
+    return (name:gsub("[^A-Za-z0-9]+", "_"))
+end
+
 ---@class Quick.Window : Group
 ---@field _frame Quick.Border
 ---@field _titleBar Group
@@ -44,6 +52,7 @@ local Border = ReUI.Core.Class(WindowFrame)
 ---@field _padding number
 ---@field _minWidth number
 ---@field _minHeight number
+---@field _position ReUI.Options.OptionRef
 ---@field _fn fun(q: Quick.Container)
 QuickWindow = Class(Group)
 {
@@ -58,6 +67,8 @@ QuickWindow = Class(Group)
         self._minWidth = 0
         self._minHeight = 0
         self._fn = fn
+
+        self._position = OptionRef { "Quick.Windows", FormatName(title) }
 
         self._frame      = Border(self)
         self._titleBar   = Group(self)
@@ -85,7 +96,7 @@ QuickWindow = Class(Group)
 
         local w, h = QuickContainer(self._content):Build(self._fn)
         self._minWidth = w + self._padding * 2
-        self._minHeight = h + self._padding * 2 + self._titleBar.Height()
+        self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
 
         LayoutFor(self._content)
             :Below(self._titleBar)
@@ -109,7 +120,7 @@ QuickWindow = Class(Group)
         LayoutFor(self._titleBar)
             :AtLeftTopIn(self)
             :AtRightIn(self)
-            :Height(24)
+            :Height(TITLE_BAR_HEIGHT)
             :Over(self)
 
         LayoutFor(self._title)
@@ -128,10 +139,12 @@ QuickWindow = Class(Group)
             :Color("30ffffff")
             :Over(self, 100)
 
+        local pos = self._position:Get { 400, 100 }
+
         local frame = self:GetRootFrame()
         LayoutFor(self)
-            :Top(0)
-            :Left(0)
+            :Left(pos[1])
+            :Top(pos[2])
             :Width(400)
             :Height(300)
             :Over(frame, frame:GetTopmostDepth() + 1)
@@ -147,6 +160,10 @@ QuickWindow = Class(Group)
                 local offY = event.MouseY - self.Top()
                 drag.OnMove = function(d, x, y)
                     LayoutFor(self):Left(x - offX):Top(y - offY)
+                end
+                drag.OnRelease = function(d, x, y)
+                    self._position:Set { x - offX, y - offY }
+                    d:Destroy()
                 end
                 PostDragger(self:GetRootFrame(), event.KeyCode, drag)
                 return true

@@ -51,10 +51,9 @@ function Run()
             end)
             q:SameLine(2)
             q:Image("/mods/ReUI/icon.png", 200)
+            q:SameLine(2)
+            q:Image("/mods/ReUI/icon.png", 20)
         end)
-    LayoutFor(w)
-        :Top(100)
-        :Left(100)
 
     instance = w
 end
