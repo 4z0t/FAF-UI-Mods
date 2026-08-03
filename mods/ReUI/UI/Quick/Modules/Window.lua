@@ -87,12 +87,11 @@ QuickWindow = Class(Group)
 
     ---@param self Quick.Window
     Rebuild = function(self)
-        if not IsDestroyed(self._content) then
-            self._content:Destroy()
-            self._content = nil
+        if IsDestroyed(self._content) then
+            self._content = Group(self)
+        else
+            self._content:ClearChildren()
         end
-
-        self._content = Group(self)
 
         local w, h = QuickContainer(self._content):Build(self._fn)
         self._minWidth = w + self._padding * 2

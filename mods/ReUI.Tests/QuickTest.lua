@@ -1,8 +1,6 @@
 local instance
 
 function Run()
-    local LayoutFor = ReUI.UI.FloorLayoutFor
-
     local i = 1
 
     ---@type Quick.Window
@@ -24,7 +22,10 @@ function Run()
                 g:Text("Text")
                 g:SameLine()
                 g:Text("Other text")
-                g:Button("Button")
+                g:Button("Clear", function(button, modifiers)
+                    i = 1
+                    w:Rebuild()
+                end)
                 g:Checkbox("Checkbox")
                 g:Edit("Input", function(edit, text)
                 end)
@@ -38,8 +39,8 @@ function Run()
                 g:SameLine()
                 g:Text("Other text " .. i)
                 g:Button("Rebuild", function(button, modifiers)
-                    w:Rebuild()
                     i = i + 1
+                    w:Rebuild()
                 end)
                 g:Tooltip("Click to rebuild me", "Hello world")
                 for j = 1, i do
