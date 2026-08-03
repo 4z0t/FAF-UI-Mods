@@ -419,7 +419,11 @@ _QuickContainer = Class()
         ---@type Group
         local g = Group(self._control)
 
-        _QuickContainer(g):Build(fn)
+        local w, h = _QuickContainer(g):Build(fn)
+
+        if height == 0 then
+            height = h
+        end
 
         self:Builder():AddControl(g, {
             width = width,

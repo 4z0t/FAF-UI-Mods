@@ -32,7 +32,7 @@ function Run()
                 g:Slider("Slider", 0, 100, 1, function(slider, value)
                 end)
             end)
-            q:Group(200, 200, function(g)
+            q:Group(200, 0, function(g)
                 g:Indent(20)
                 g:Text("Text")
                 g:SameLine()
@@ -42,7 +42,9 @@ function Run()
                     i = i + 1
                 end)
                 g:Tooltip("Click to rebuild me", "Hello world")
-                g:Checkbox("Checkbox")
+                for j = 1, i do
+                    g:Checkbox("Checkbox")
+                end
                 g:Combo("Combo", {
                     "one",
                     "two",
