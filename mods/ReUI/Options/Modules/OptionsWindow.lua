@@ -129,6 +129,7 @@ local windowTextures = {
 }
 
 ---@class OptionsWindow : Window
+---@field _optionVars table<string, ReUI.Options.ReactiveOption>
 OptionsWindow = Class(Window) {
     __init = function(self, parent, title, options, buildTable)
         Window.__init(self, parent, title, nil, false, false, true, false, options .. "window", {
@@ -456,10 +457,16 @@ OptionsWindow = Class(Window) {
         end
     end,
 
+    ---@param self OptionsWindow
+    ---@param option string
+    ---@return any
     GetOption = function(self, option)
-        return self._optionVars[option]()
+        return self._optionVars[option].Value
     end,
 
+    ---@param self OptionsWindow
+    ---@param option string
+    ---@param value any
     SetOption = function(self, option, value)
         self._optionVars[option]:Set(value)
     end,
