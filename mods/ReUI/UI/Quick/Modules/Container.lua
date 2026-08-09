@@ -215,12 +215,12 @@ _QuickContainer = Class()
 
     ---@param self Quick.Container
     ---@param text string
-    ---@param onClick? fun(button:Button, modifiers:table)
+    ---@param onClick? fun(modifiers:KeyModifiers)
     ---@param size? number
     Button = function(self, text, onClick, size)
         local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, size or 14)
         if onClick then
-            btn.OnClick = function(control, modifiers) onClick(control, modifiers) end
+            btn.OnClick = function(control, modifiers) onClick(modifiers) end
         end
         self:Builder():AddControl(btn, {
             width = LayoutFor:UnscaleNumber(btn.Width()),
@@ -230,12 +230,12 @@ _QuickContainer = Class()
 
     ---@param self Quick.Container
     ---@param text string
-    ---@param onCheck? fun(checkbox:Checkbox, checked:boolean)
+    ---@param onCheck? fun(checked:boolean)
     ---@param checked? boolean
     Checkbox = function(self, text, onCheck, checked)
         local cb = UIUtil.CreateCheckbox(self._control, "/dialogs/check-box_btn/", text, true)
         if onCheck then
-            cb.OnCheck = function(control, state) onCheck(control, state) end
+            cb.OnCheck = function(control, state) onCheck(state) end
         end
         if checked ~= nil then cb:SetCheck(checked, true) end
         self:Builder():AddControl(cb, {
@@ -249,7 +249,7 @@ _QuickContainer = Class()
     ---@param min number
     ---@param max number
     ---@param inc number
-    ---@param onValue? fun(slider:IntegerSlider, value:number)
+    ---@param onValue? fun(value:number)
     ---@param initial? number
     Slider = function(self, label, min, max, inc, onValue, initial)
         local group = Group(self._control)
@@ -286,8 +286,8 @@ _QuickContainer = Class()
         slider.OnValueChanged = function(s, newValue)
             valueText:SetText(string.format("%d", newValue))
         end
-        slider.OnValueSet = function(s, newValue)
-            if onValue then onValue(s, newValue) end
+        if onValue then
+            slider.OnValueSet = function(s, newValue) onValue(newValue) end
         end
 
         slider:SetValue(initial or 0)
@@ -304,7 +304,7 @@ _QuickContainer = Class()
 
     ---@param self Quick.Container
     ---@param label string
-    ---@param onEdit? fun(edit:Edit, text:string)
+    ---@param onEdit? fun(text:string)
     ---@param charLimit? number
     ---@param initial? string
     Edit = function(self, label, onEdit, charLimit, initial)
@@ -331,9 +331,11 @@ _QuickContainer = Class()
         UIUtil.SetupEditStd(edit, "ff00ff00", 'ff000000', "ffffffff",
             UIUtil.highlightColor, UIUtil.bodyFont, 16, charLimit or 100)
         if initial then edit:SetText(initial) end
-        edit.OnEnterPressed = function(e, text)
-            if onEdit then onEdit(e, text) end
-            return true
+        if onEdit then
+            edit.OnEnterPressed = function(e, text)
+                onEdit(text)
+                return true
+            end
         end
 
         group.Edit = edit
@@ -373,7 +375,7 @@ _QuickContainer = Class()
     ---@param self Quick.Container
     ---@param label string
     ---@param items string[]
-    ---@param onSelected? fun(c:Combo, index:number, text:string)
+    ---@param onSelected? fun(index:number, text:string)
     ---@param selectedIndex? number
     Combo = function(self, label, items, onSelected, selectedIndex)
         selectedIndex = selectedIndex or 1
@@ -397,7 +399,7 @@ _QuickContainer = Class()
             :AtRightIn(group, 2)
 
         if onSelected then
-            combo.OnClick = onSelected
+            combo.OnClick = function(c, i, text) onSelected(i, text) end
         end
 
         combo:AddItems(items, selectedIndex)
