@@ -341,12 +341,14 @@ function AddOptions(option, title, buildTable)
     })
 end
 
-local function CreateUI(parent)
+local function ToggleUI(parent)
     if IsDestroyed(optionsSelector) then
         optionsSelector = OptionSelector(parent)
+    else
+        optionsSelector:Destroy()
     end
 end
 
 function Main()
-    CreateUI(GetFrame(0))
+    ToggleUI(GetFrame(0))
 end
