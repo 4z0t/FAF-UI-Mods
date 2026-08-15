@@ -6,6 +6,7 @@ local Edit = import("/lua/maui/edit.lua").Edit
 local Combo = import('/lua/ui/controls/combo.lua').Combo
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 
+local StaticScrollable = ReUI.UI.Views.StaticScrollable
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local LF = ReUI.UI.LayoutFunctions
@@ -30,7 +31,6 @@ local sliderTextures = {
 ---@field _indent number
 ---@field _maxWidth number
 ---@field _maxHeight number
----@field _controlsOnLine Control[]
 ---@field _sameLine boolean
 ---@field _terminatedLine boolean
 ---@field _prevControl Control?
@@ -149,6 +149,85 @@ local Builder = Class()
 }
 
 local _QuickContainer
+
+
+---@class Quick.ScrollableList : ReUI.UI.Views.StaticScrollable
+---@field _itemCount number
+---@field _itemHeight number
+---@field _lines Group
+local QuickScrollableList = Class(StaticScrollable) {
+    ---@param self Quick.ScrollableList
+    ---@param parent Control
+    ---@param itemCount number
+    ---@param itemHeight number
+    ---@param renderFn fun(q:Quick.Container, index:number)
+    __init = function(self, parent, itemCount, itemHeight, renderFn)
+        StaticScrollable.__init(self, parent)
+        self._itemCount = itemCount
+        self._itemHeight = itemHeight
+        self._renderFn = renderFn
+
+        self._lines = Group(self)
+        LayoutFor(self._lines)
+            :Fill(self)
+
+        self._scroll = UIUtil.CreateVertScrollbarFor(self, -30)
+        LayoutFor(self._scroll)
+            :Over(self, 10)
+
+        self._topLine = 1
+    end,
+
+    ---@param self Quick.ScrollableList
+    CalcVisible = function(self)
+        local h = LayoutFor:UnscaleNumber(self.Height())
+        local numLines = math.floor(h / self._itemHeight)
+        if numLines < 1 then numLines = 1 end
+        self._numLines = numLines
+        self._dataSize = self._itemCount
+
+        self._lines:ClearChildren()
+        local lineIndex = 1
+        for index = self._topLine, self._numLines + self._topLine - 1 do
+            local currentLineIndex = lineIndex
+            self:RenderLine(currentLineIndex, index)
+            lineIndex = lineIndex + 1
+        end
+    end,
+
+    ---@param self Quick.ScrollableList
+    GetScrollValues = function(self, axis)
+        local h = LayoutFor:UnscaleNumber(self.Height())
+        local numLines = math.floor(h / self._itemHeight)
+        if numLines < 1 then numLines = 1 end
+        self._numLines = numLines
+        self._dataSize = self._itemCount
+        return 1, self._dataSize, self._topLine, math.min(self._topLine + self._numLines - 1, self._dataSize)
+    end,
+
+    ---@param self Quick.ScrollableList
+    ---@param lineIndex integer
+    ---@param scrollIndex integer
+    RenderLine = function(self, lineIndex, scrollIndex)
+        local parent = self._lines
+        local lineGroup = Group(parent)
+
+        LayoutFor(lineGroup)
+            :Height(self._itemHeight)
+            :AtLeftIn(parent)
+            :AtRightIn(parent, 30)-- Leave space for scrollbar
+            :AtTopIn(parent, (lineIndex - 1) * self._itemHeight)
+            :DisableHitTest(false)
+
+        if scrollIndex <= self._itemCount then
+            local container = _QuickContainer(lineGroup)
+            container:Build(function(q)
+                self._renderFn(q, scrollIndex)
+            end)
+        end
+    end,
+}
+
 ---@class Quick.Container
 ---@field _control Control
 ---@field _builder Quick.Builder
@@ -431,6 +510,24 @@ _QuickContainer = Class()
             width = width,
             height = height
         })
+    end,
+
+    ---@param self Quick.Container
+    ---@param width number
+    ---@param height number
+    ---@param itemCount number
+    ---@param itemHeight number
+    ---@param renderFn fun(row:Quick.Container, index:number)
+    ScrollableList = function(self, width, height, itemCount, itemHeight, renderFn)
+        local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn)
+
+        self:Builder():AddControl(list, {
+            width = width,
+            height = height
+        })
+
+        -- Force initial render now that height is set
+        list:CalcVisible()
     end,
 
     ---@param self Quick.Container
