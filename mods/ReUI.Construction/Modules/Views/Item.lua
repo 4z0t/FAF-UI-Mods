@@ -17,7 +17,7 @@ local validIcons = { land = true, air = true, sea = true, amph = true }
 local function GetBackgroundTextures(unitID)
     local bp = __blueprints[unitID]
     local icon = "land"
-    if unitID and unitID ~= 'default' then
+    if bp and unitID and unitID ~= 'default' then
         local bpIcon = bp.General.Icon
         if not validIcons[bpIcon] then
             if bpIcon then
