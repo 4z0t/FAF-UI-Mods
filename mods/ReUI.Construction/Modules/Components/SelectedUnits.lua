@@ -205,7 +205,7 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
         --     end)
     end,
 
-    --These are scanned from top to bottom to match group
+    --These are scanned from bottom to top to match group
     UnitGroupMatchers =
     {
         CategoryGroupMatcher("ALLUNITS", IconPath "experimental_generic", categories.ALLUNITS),
@@ -344,6 +344,7 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
             self.icon = ReUI.UI.Controls.Bitmap(item)
             item.Layouter(self.icon)
                 :AtLeftBottomIn(item, 2, 2)
+                :Over(item, 10)
                 :DisableHitTest()
                 :Hide()
         end,
