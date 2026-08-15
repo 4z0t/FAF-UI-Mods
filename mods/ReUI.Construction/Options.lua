@@ -2,17 +2,18 @@ local Options = ReUI.Options.Builder
 local Opt = ReUI.Options.OptionValue
 
 ReUI.Options.Mods["ReUI.Construction"] = {
-    rows = Opt(1),
-    columns = Opt(8),
-    itemSize = Opt(48),
-    space = Opt(2),
-    scale = Opt(100),
-    width = Opt(400),
+    rows      = Opt(1),
+    columns   = Opt(8),
+    itemSize  = Opt(48),
+    space     = Opt(2),
+    scale     = Opt(100),
+    width     = Opt(400),
     canScroll = Opt(false),
-    color = Opt("ffffffff"),
+    color     = Opt("ffffffff"),
     selection = {
-        improvedDeselection = Opt(false),
-        showGroups = Opt(false),
+        improvedDeselection  = Opt(false),
+        showGroups           = Opt(false),
+        separateIdleBuilders = Opt(false),
     },
 }
 
@@ -30,6 +31,7 @@ function Main()
         Options.ColorSlider("Text color", options.color, 4),
         Options.Title("Selection", nil, nil, UIUtil.factionTextColor),
         Options.Filter("Improved deselection", options.selection.improvedDeselection, 4),
+        Options.Filter("Separate idle builders", options.selection.separateIdleBuilders, 4),
     })
 
 end
