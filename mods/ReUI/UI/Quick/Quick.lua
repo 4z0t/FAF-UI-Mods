@@ -10,10 +10,13 @@ ReUI.Require
 function Main(isReplay)
     ---@class ReUI.UI.Quick : ReUI.Module
     return {
-        ---@type Quick.Window |  fun(title: string, fn: fun(q: Quick.Container)): Quick.Window
+        ---@type Quick.Window | fun(title: string, fn: fun(q: Quick.Container)): Quick.Window
         Window = import("Modules/Window.lua").QuickWindow,
 
         ---@type Quick.Container
         Container = import("Modules/Container.lua").QuickContainer,
+
+        ---@type Quick.Context
+        Context = import("Modules/Container.lua").Context,
     }
 end

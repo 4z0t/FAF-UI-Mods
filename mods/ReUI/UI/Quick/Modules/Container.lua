@@ -22,9 +22,6 @@ local sliderTextures = {
 ---@field width number
 ---@field height number
 
----@class Quick.Context
----@field _window Quick.Window
-
 ---@class Quick.Builder
 ---@field _content Control
 ---@field _cursorX number
@@ -36,14 +33,12 @@ local sliderTextures = {
 ---@field _sameLine boolean
 ---@field _terminatedLine boolean
 ---@field _prevControl Control?
----@field _context Quick.Context
 local Builder = Class()
 {
     ---@param self Quick.Builder
     ---@param content Control
-    __init = function(self, content, context)
+    __init = function(self, content)
         self._content = content
-        self._context = context
 
         self._cursorX = 0
         self._cursorY = 0
@@ -140,12 +135,6 @@ local Builder = Class()
     end,
 
     ---@param self Quick.Builder
-    ---@return Quick.Context
-    Context = function(self)
-        return self._context
-    end,
-
-    ---@param self Quick.Builder
     ---@param amount? number
     Indent = function(self, amount)
         self._indent = self._indent + (amount or 16)
@@ -157,9 +146,6 @@ local Builder = Class()
         self._indent = math.max(0, self._indent - (amount or 16))
     end,
 }
-
-local _QuickContainer
-
 
 ---@class Quick.ScrollableList : ReUI.UI.Views.StaticScrollable
 ---@field _itemCount number
@@ -228,30 +214,38 @@ local QuickScrollableList = Class(StaticScrollable) {
             :DisableHitTest(false)
 
         if scrollIndex <= self._itemCount then
-            _QuickContainer(lineGroup):Build(function(q)
+            self._context:MakeContainer(lineGroup):Build(function(q)
                 self._renderFn(q, scrollIndex)
-            end, self._context)
+            end)
         end
     end,
 }
 
 ---@class Quick.Container
 ---@field _control Control
+---@field _context Quick.Context
 ---@field _builder Quick.Builder
-_QuickContainer = Class()
+QuickContainer = Class()
 {
     ---@param self Quick.Container
+    ---@param context Quick.Context
     ---@param control Control
-    __init = function(self, control)
+    __init = function(self, control, context)
         self._control = control
+        self._context = context
+    end,
+
+    ---@param self Quick.Builder
+    ---@return Quick.Context
+    Context = function(self)
+        return self._context
     end,
 
     ---@param self Quick.Container
     ---@param fn fun(q:Quick.Container)
-    ---@param context Quick.Context
     ---@return number, number
-    Build = function(self, fn, context)
-        self._builder = Builder(self._control, context)
+    Build = function(self, fn)
+        self._builder = Builder(self._control)
 
         local ok, err = pcall(fn, self)
         if not ok then
@@ -508,7 +502,7 @@ _QuickContainer = Class()
         ---@type Group
         local g = Group(self._control)
 
-        local w, h = _QuickContainer(g):Build(fn, self:Builder():Context())
+        local w, h = self._context:MakeContainer(g):Build(fn)
 
         if height == 0 then
             height = h
@@ -527,7 +521,7 @@ _QuickContainer = Class()
     ---@param itemHeight number
     ---@param renderFn fun(row:Quick.Container, index:number)
     ScrollableList = function(self, width, height, itemCount, itemHeight, renderFn)
-        local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn, self:Builder():Context())
+        local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn, self:Context())
 
         self:Builder():AddControl(list, {
             width = width,
@@ -544,7 +538,7 @@ _QuickContainer = Class()
     ---@param id? string
     ---@return boolean
     Collapsible = function(self, label, defaultOpen, id)
-        local ctx = self:Builder():Context()
+        local ctx = self:Context()
         local key = id or label
 
         -- Initialize state if it doesn't exist yet
@@ -555,7 +549,7 @@ _QuickContainer = Class()
 
         local header = Group(self._control)
 
-        local arrowChar = isOpen and "v " or "> "
+        local arrowChar = isOpen and "▼" or "►"
         local arrow = UIUtil.CreateText(header, arrowChar, 14, UIUtil.bodyFont)
         local text = UIUtil.CreateText(header, label, 14, UIUtil.titleFont)
 
@@ -575,7 +569,7 @@ _QuickContainer = Class()
         header.HandleEvent = function(ctrl, event)
             if event.Type == "ButtonPress" then
                 ctx[key] = not isOpen
-                ctx._window:Rebuild()
+                ctx:UpdateWindow()
                 return true
             elseif event.Type == "MouseEnter" then
                 text:SetColor(hoverColor)
@@ -622,4 +616,25 @@ _QuickContainer = Class()
     end
 }
 
-QuickContainer = _QuickContainer
+---@class Quick.Context
+---@field _window Quick.Window
+Context = Class()
+{
+    ---@param self Quick.Context
+    ---@param window Quick.Window
+    __init = function(self, window)
+        self._window = window
+    end,
+
+    ---@param self Quick.Context
+    UpdateWindow = function(self)
+        self._window:Rebuild()
+    end,
+
+    ---@param self Quick.Context
+    ---@param control Control
+    ---@return Quick.Container
+    MakeContainer = function(self, control)
+        return QuickContainer(control, self)
+    end
+}

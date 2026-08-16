@@ -1,100 +1,93 @@
 local instance
 
 function Run()
-    pcall(function()
+    local i = 1
 
-        local i = 1
-
-        ---@type Quick.Window
-        local w
-        local function f(q)
-            q:Group(200, 100, function(g)
-                g:Title("Title", 20)
-                g:Button("Crash", function()
-                    GetUnitCommandData("nil")
-                end)
+    ---@param q Quick.Container
+    local function f(q)
+        q:Group(200, 100, function(g)
+            g:Title("Title", 20)
+            g:Button("Crash", function()
+                GetUnitCommandData("nil")
+            end)
+            g:Checkbox("Checkbox")
+            g:SameLine()
+            g:Text("AAAA")
+            g:Slider("Slider", 0, 100, 1, function(value)
+            end)
+        end)
+        q:SameLine()
+        q:Group(-20, 200, function(g)
+            g:Text("Text")
+            g:SameLine()
+            g:Text("Other text")
+            g:Button("Clone", function(modifiers)
+                i = i + 1
+                ReUI.UI.Quick.Window("Test" .. i, f)
+            end)
+            g:Checkbox("Checkbox")
+            g:Edit("Input", function(text)
+            end)
+            g:Text("Text")
+            g:Slider("Slider", 0, 100, 1, function(value)
+            end)
+        end)
+        q:Group(200, 0, function(g)
+            g:Indent(20)
+            g:Text("Text")
+            g:SameLine()
+            g:Text("Other text " .. i)
+            g:Button("Rebuild", function(modifiers)
+                i = i + 1
+                g:Context():UpdateWindow()
+            end)
+            g:Tooltip("Click to rebuild me", "Hello world")
+            for j = 1, i do
                 g:Checkbox("Checkbox")
-                g:SameLine()
-                g:Text("AAAA")
-                g:Slider("Slider", 0, 100, 1, function(value)
-                end)
-            end)
-            q:SameLine()
-            q:Group(-20, 200, function(g)
-                g:Text("Text")
-                g:SameLine()
-                g:Text("Other text")
-                g:Button("Clone", function(modifiers)
-                    i = i + 1
-                    ReUI.UI.Quick.Window("Test" .. i, f)
-                end)
-                g:Checkbox("Checkbox")
-                g:Edit("Input", function(text)
-                end)
-                g:Text("Text")
-                g:Slider("Slider", 0, 100, 1, function(value)
-                end)
-            end)
-            q:Group(200, 0, function(g)
-                g:Indent(20)
-                g:Text("Text")
-                g:SameLine()
-                g:Text("Other text " .. i)
-                g:Button("Rebuild", function(modifiers)
-                    i = i + 1
-                    w:Rebuild()
-                end)
-                g:Tooltip("Click to rebuild me", "Hello world")
-                for j = 1, i do
-                    g:Checkbox("Checkbox")
-                end
-                g:Combo("Combo", {
-                    "one",
-                    "two",
-                    "three"
-                }, function(index, text)
-                end)
-            end)
-            q:SameLine(2)
-            q:Image("/mods/ReUI/icon.png", 200)
-            q:SameLine(2)
-            q:Image("/mods/ReUI/icon.png", 20)
-            q:ScrollableList(0, 200, 20, 50, function(r, index)
-                r:Indent(index * 10)
-                r:Text("Line " .. index)
-                r:Slider("Slider", 0, 100, 1, function(value)
-                end)
-            end)
-
-            q:Title("Game Settings")
-
-            if q:Collapsible("General", true) then
-                q:Checkbox("Enable Feature")
-                q:Slider("Brightness", 0, 100, 1)
-
-                if q:Collapsible("Audio", true) then
-                    q:Slider("Master Volume", 0, 100, 1)
-                end
             end
+            g:Combo("Combo", {
+                "one",
+                "two",
+                "three"
+            }, function(index, text)
+            end)
+        end)
+        q:SameLine(2)
+        q:Image("/mods/ReUI/icon.png", 200)
+        q:SameLine(2)
+        q:Image("/mods/ReUI/icon.png", 20)
+        q:ScrollableList(0, 200, 20, 50, function(r, index)
+            r:Indent(index * 10)
+            r:Text("Line " .. index)
+            r:Slider("Slider", 0, 100, 1, function(value)
+            end)
+        end)
 
-            if q:Collapsible("Advanced", false, "advanced_settings_1") then
-                q:Text("Warning: Changing these may affect performance.")
-            end
+        q:Title("Game Settings")
 
-            if q:Collapsible("Advanced", false, "advanced_settings_2") then
-                q:Text("aaah")
+        if q:Collapsible("General") then
+            q:Checkbox("Enable Feature")
+            q:Slider("Brightness", 0, 100, 1)
+
+            if q:Collapsible("Audio") then
+                q:Slider("Master Volume", 0, 100, 1)
             end
         end
 
-        w = ReUI.UI.Quick.Window("Test", f)
+        if q:Collapsible("Advanced", false, "advanced_settings_1") then
+            q:Text("Warning: Changing these may affect performance.")
+        end
 
-        instance = w
-    end)
+        if q:Collapsible("Advanced", false, "advanced_settings_2") then
+            q:Text("aaah")
+        end
+    end
 
+    instance = ReUI.UI.Quick.Window("Test", f)
 end
 
 function __moduleinfo.OnReload(newModule)
-    newModule.Run()
+    pcall(newModule.Run)
 end
 
 function __moduleinfo.OnDirty()

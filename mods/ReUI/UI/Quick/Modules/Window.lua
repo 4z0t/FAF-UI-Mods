@@ -8,7 +8,7 @@ local LayoutFor = ReUI.UI.FloorLayoutFor
 local WindowFrame = ReUI.UI.Views.WindowFrame
 local OptionRef = ReUI.Options.OptionRef
 
-local QuickContainer = import("Container.lua").QuickContainer
+local QuickContext = import("Container.lua").Context
 
 local GRIP_SIZE = 14
 local TITLE_BAR_HEIGHT = 24
@@ -73,9 +73,7 @@ QuickWindow = Class(Group)
         self._height = 0
         self._fn = fn
 
-        self._context = {
-            _window = self, -- Reference to window to allow triggering Rebuilds
-        }
+        self._context = self:CreateContext()
 
         self._position = OptionRef { "Quick.Windows", FormatName(title) }
 
@@ -95,6 +93,25 @@ QuickWindow = Class(Group)
     end,
 
     ---@param self Quick.Window
+    OnDestroy = function(self)
+        self._fn         = nil
+        self._context    = nil
+        self._position   = nil
+        self._frame      = nil
+        self._titleBar   = nil
+        self._title      = nil
+        self._closeBtn   = nil
+        self._resizeGrip = nil
+        Group.OnDestroy(self)
+    end,
+
+    ---@param self Quick.Window
+    ---@return Quick.Context
+    CreateContext = function(self)
+        return QuickContext(self)
+    end,
+
+    ---@param self Quick.Window
     Rebuild = function(self)
         if IsDestroyed(self._content) then
             self._content = Group(self)
@@ -102,7 +119,7 @@ QuickWindow = Class(Group)
             self._content:ClearChildren()
         end
 
-        local w, h = QuickContainer(self._content):Build(self._fn, self._context)
+        local w, h = self._context:MakeContainer(self._content):Build(self._fn)
         self._minWidth = w + self._padding * 2
         self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
 
