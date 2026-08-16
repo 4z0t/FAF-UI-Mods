@@ -155,6 +155,7 @@ local _QuickContainer
 ---@field _itemCount number
 ---@field _itemHeight number
 ---@field _lines Group
+---@field _renderFn fun(q:Quick.Container, index:number)
 local QuickScrollableList = Class(StaticScrollable) {
     ---@param self Quick.ScrollableList
     ---@param parent Control
@@ -187,12 +188,7 @@ local QuickScrollableList = Class(StaticScrollable) {
         self._dataSize = self._itemCount
 
         self._lines:ClearChildren()
-        local lineIndex = 1
-        for index = self._topLine, self._numLines + self._topLine - 1 do
-            local currentLineIndex = lineIndex
-            self:RenderLine(currentLineIndex, index)
-            lineIndex = lineIndex + 1
-        end
+        StaticScrollable.CalcVisible(self)
     end,
 
     ---@param self Quick.ScrollableList
@@ -220,8 +216,7 @@ local QuickScrollableList = Class(StaticScrollable) {
             :DisableHitTest(false)
 
         if scrollIndex <= self._itemCount then
-            local container = _QuickContainer(lineGroup)
-            container:Build(function(q)
+            _QuickContainer(lineGroup):Build(function(q)
                 self._renderFn(q, scrollIndex)
             end)
         end
