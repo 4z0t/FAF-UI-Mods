@@ -22,6 +22,8 @@ local sliderTextures = {
 ---@field width number
 ---@field height number
 
+---@class Quick.Context
+---@field _window Quick.Window
 
 ---@class Quick.Builder
 ---@field _content Control
@@ -34,12 +36,14 @@ local sliderTextures = {
 ---@field _sameLine boolean
 ---@field _terminatedLine boolean
 ---@field _prevControl Control?
+---@field _context Quick.Context
 local Builder = Class()
 {
     ---@param self Quick.Builder
     ---@param content Control
-    __init = function(self, content)
+    __init = function(self, content, context)
         self._content = content
+        self._context = context
 
         self._cursorX = 0
         self._cursorY = 0
@@ -136,6 +140,12 @@ local Builder = Class()
     end,
 
     ---@param self Quick.Builder
+    ---@return Quick.Context
+    Context = function(self)
+        return self._context
+    end,
+
+    ---@param self Quick.Builder
     ---@param amount? number
     Indent = function(self, amount)
         self._indent = self._indent + (amount or 16)
@@ -156,17 +166,19 @@ local _QuickContainer
 ---@field _itemHeight number
 ---@field _lines Group
 ---@field _renderFn fun(q:Quick.Container, index:number)
+---@field _context Quick.Context
 local QuickScrollableList = Class(StaticScrollable) {
     ---@param self Quick.ScrollableList
     ---@param parent Control
     ---@param itemCount number
     ---@param itemHeight number
     ---@param renderFn fun(q:Quick.Container, index:number)
-    __init = function(self, parent, itemCount, itemHeight, renderFn)
+    __init = function(self, parent, itemCount, itemHeight, renderFn, context)
         StaticScrollable.__init(self, parent)
         self._itemCount = itemCount
         self._itemHeight = itemHeight
         self._renderFn = renderFn
+        self._context = context
 
         self._lines = Group(self)
         LayoutFor(self._lines)
@@ -218,7 +230,7 @@ local QuickScrollableList = Class(StaticScrollable) {
         if scrollIndex <= self._itemCount then
             _QuickContainer(lineGroup):Build(function(q)
                 self._renderFn(q, scrollIndex)
-            end)
+            end, self._context)
         end
     end,
 }
@@ -236,9 +248,10 @@ _QuickContainer = Class()
 
     ---@param self Quick.Container
     ---@param fn fun(q:Quick.Container)
+    ---@param context Quick.Context
     ---@return number, number
-    Build = function(self, fn)
-        self._builder = Builder(self._control)
+    Build = function(self, fn, context)
+        self._builder = Builder(self._control, context)
 
         local ok, err = pcall(fn, self)
         if not ok then
@@ -495,7 +508,7 @@ _QuickContainer = Class()
         ---@type Group
         local g = Group(self._control)
 
-        local w, h = _QuickContainer(g):Build(fn)
+        local w, h = _QuickContainer(g):Build(fn, self:Builder():Context())
 
         if height == 0 then
             height = h
@@ -514,7 +527,7 @@ _QuickContainer = Class()
     ---@param itemHeight number
     ---@param renderFn fun(row:Quick.Container, index:number)
     ScrollableList = function(self, width, height, itemCount, itemHeight, renderFn)
-        local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn)
+        local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn, self:Builder():Context())
 
         self:Builder():AddControl(list, {
             width = width,
@@ -523,6 +536,68 @@ _QuickContainer = Class()
 
         -- Force initial render now that height is set
         list:CalcVisible()
+    end,
+
+    ---@param self Quick.Container
+    ---@param label string
+    ---@param defaultOpen? boolean
+    ---@param fn fun(g:Quick.Container)
+    ---@param id? string
+    Collapsible = function(self, label, defaultOpen, fn, id)
+        local ctx = self:Builder():Context()
+        local key = id or label
+
+        -- Initialize state if it doesn't exist yet
+        if ctx[key] == nil then
+            ctx[key] = defaultOpen == nil and true or defaultOpen
+        end
+        local isOpen = ctx[key]
+
+        local header = Group(self._control)
+
+        local arrowChar = isOpen and "v " or "> "
+        local arrow = UIUtil.CreateText(header, arrowChar, 14, UIUtil.bodyFont)
+        local text = UIUtil.CreateText(header, label, 14, UIUtil.titleFont)
+
+        LayoutFor(arrow)
+            :AtLeftTopIn(header, 2)
+            :DisableHitTest()
+
+        LayoutFor(text)
+            :RightOf(arrow)
+            :AtVerticalCenterIn(header)
+            :DisableHitTest()
+
+        local normalColor = "ffffffff"
+        local hoverColor = UIUtil.highlightColor or "ffffaa00"
+        text:SetColor(normalColor)
+
+        header.HandleEvent = function(ctrl, event)
+            if event.Type == "ButtonPress" then
+                ctx[key] = not isOpen
+                ctx._window:Rebuild()
+                return true
+            elseif event.Type == "MouseEnter" then
+                text:SetColor(hoverColor)
+                return true
+            elseif event.Type == "MouseExit" then
+                text:SetColor(normalColor)
+                return true
+            end
+            return false
+        end
+
+        -- width = 0 stretches the header to the right edge, making the whole row clickable
+        self:Builder():AddControl(header, {
+            width = 0,
+            height = 24
+        })
+
+        if isOpen then
+            self:Indent(16)
+            self:Group(0, 0, fn)
+            self:Unindent(16)
+        end
     end,
 
     ---@param self Quick.Container

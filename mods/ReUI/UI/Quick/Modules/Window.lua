@@ -52,7 +52,10 @@ end
 ---@field _padding number
 ---@field _minWidth number
 ---@field _minHeight number
+---@field _width number
+---@field _height number
 ---@field _position ReUI.Options.OptionRef
+---@field _context Quick.Context
 ---@field _fn fun(q: Quick.Container)
 QuickWindow = Class(Group)
 {
@@ -66,7 +69,13 @@ QuickWindow = Class(Group)
         self._padding = 8
         self._minWidth = 0
         self._minHeight = 0
+        self._width = 0
+        self._height = 0
         self._fn = fn
+
+        self._context = {
+            _window = self, -- Reference to window to allow triggering Rebuilds
+        }
 
         self._position = OptionRef { "Quick.Windows", FormatName(title) }
 
@@ -93,9 +102,12 @@ QuickWindow = Class(Group)
             self._content:ClearChildren()
         end
 
-        local w, h = QuickContainer(self._content):Build(self._fn)
+        local w, h = QuickContainer(self._content):Build(self._fn, self._context)
         self._minWidth = w + self._padding * 2
         self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
+
+        self._width = math.max(self._minWidth, self._width)
+        self._height = math.max(self._minHeight, self._height)
 
         LayoutFor(self._content)
             :Below(self._titleBar)
@@ -104,8 +116,8 @@ QuickWindow = Class(Group)
             :AtBottomIn(self, self._padding)
 
         LayoutFor(self)
-            :Width(self._minWidth)
-            :Height(self._minHeight)
+            :Width(self._width)
+            :Height(self._height)
     end,
 
 
@@ -193,6 +205,8 @@ QuickWindow = Class(Group)
                     if newH >= self._minHeight then
                         LayoutFor(self):Height(newH)
                     end
+                    self._width = math.max(self._minWidth, newW)
+                    self._height = math.max(self._minHeight, newH)
                 end
                 drag.OnRelease = function(d, x, y)
                     LayoutFor(grip):Color("30ffffff")

@@ -1,13 +1,13 @@
 local instance
 
 function Run()
-    local i = 1
+    pcall(function()
 
-    ---@type Quick.Window
-    local w
+        local i = 1
 
-    w = ReUI.UI.Quick.Window("Test",
-        function(q)
+        ---@type Quick.Window
+        local w
+        local function f(q)
             q:Group(200, 100, function(g)
                 g:Title("Title", 20)
                 g:Button("Crash", function()
@@ -24,9 +24,9 @@ function Run()
                 g:Text("Text")
                 g:SameLine()
                 g:Text("Other text")
-                g:Button("Clear", function(modifiers)
-                    i = 1
-                    w:Rebuild()
+                g:Button("Clone", function(modifiers)
+                    i = i + 1
+                    ReUI.UI.Quick.Window("Test" .. i, f)
                 end)
                 g:Checkbox("Checkbox")
                 g:Edit("Input", function(text)
@@ -60,15 +60,38 @@ function Run()
             q:SameLine(2)
             q:Image("/mods/ReUI/icon.png", 20)
             q:ScrollableList(0, 200, 20, 50, function(r, index)
-                r:Indent(index  * 10)
+                r:Indent(index * 10)
                 r:Text("Line " .. index)
                 r:Slider("Slider", 0, 100, 1, function(value)
                 end)
             end)
 
-        end)
+            q:Title("Game Settings")
 
-    instance = w
+            q:Collapsible("General", true, function(g)
+                g:Checkbox("Enable Feature")
+                g:Slider("Brightness", 0, 100, 1)
+
+                q:Collapsible("Audio", true, function(g2)
+                    g2:Slider("Master Volume", 0, 100, 1)
+                end)
+            end)
+
+            q:Collapsible("Advanced", false, function(g)
+                g:Text("Warning: Changing these may affect performance.")
+            end, "advanced_settings_1")
+
+            q:Collapsible("Advanced", false, function(g)
+                g:Text("More advanced settings.")
+            end, "advanced_settings_2")
+
+        end
+
+        w = ReUI.UI.Quick.Window("Test", f)
+
+        instance = w
+    end)
+
 end
 
 function __moduleinfo.OnReload(newModule)
