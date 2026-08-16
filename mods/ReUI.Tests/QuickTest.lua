@@ -68,23 +68,22 @@ function Run()
 
             q:Title("Game Settings")
 
-            q:Collapsible("General", true, function(g)
-                g:Checkbox("Enable Feature")
-                g:Slider("Brightness", 0, 100, 1)
+            if q:Collapsible("General", true) then
+                q:Checkbox("Enable Feature")
+                q:Slider("Brightness", 0, 100, 1)
 
-                q:Collapsible("Audio", true, function(g2)
-                    g2:Slider("Master Volume", 0, 100, 1)
-                end)
-            end)
+                if q:Collapsible("Audio", true) then
+                    q:Slider("Master Volume", 0, 100, 1)
+                end
+            end
 
-            q:Collapsible("Advanced", false, function(g)
-                g:Text("Warning: Changing these may affect performance.")
-            end, "advanced_settings_1")
+            if q:Collapsible("Advanced", false, "advanced_settings_1") then
+                q:Text("Warning: Changing these may affect performance.")
+            end
 
-            q:Collapsible("Advanced", false, function(g)
-                g:Text("More advanced settings.")
-            end, "advanced_settings_2")
-
+            if q:Collapsible("Advanced", false, "advanced_settings_2") then
+                q:Text("aaah")
+            end
         end
 
         w = ReUI.UI.Quick.Window("Test", f)

@@ -541,9 +541,9 @@ _QuickContainer = Class()
     ---@param self Quick.Container
     ---@param label string
     ---@param defaultOpen? boolean
-    ---@param fn fun(g:Quick.Container)
     ---@param id? string
-    Collapsible = function(self, label, defaultOpen, fn, id)
+    ---@return boolean
+    Collapsible = function(self, label, defaultOpen, id)
         local ctx = self:Builder():Context()
         local key = id or label
 
@@ -593,11 +593,7 @@ _QuickContainer = Class()
             height = 24
         })
 
-        if isOpen then
-            self:Indent(16)
-            self:Group(0, 0, fn)
-            self:Unindent(16)
-        end
+        return isOpen
     end,
 
     ---@param self Quick.Container
