@@ -1,5 +1,6 @@
-local instance
+local options = ReUI.Options.Mods["ReUI.Tests"]
 
+local instance
 function Run()
     local i = 1
 
@@ -10,7 +11,7 @@ function Run()
             g:Button("Crash", function()
                 GetUnitCommandData("nil")
             end)
-            g:Checkbox("Checkbox")
+            g:OptionCheckbox("Checkbox", options.test)
             g:SameLine()
             g:Text("AAAA")
             g:Slider("Slider", 0, 100, 1, function(value)

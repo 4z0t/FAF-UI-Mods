@@ -602,7 +602,6 @@ QuickContainer = Class()
         self:Builder():Unindent(amount)
     end,
 
-
     ---@param self Quick.Container
     ---@param title string
     ---@param text string
@@ -613,7 +612,18 @@ QuickContainer = Class()
             return
         end
         Tooltip.AddControlTooltipManual(prev, title, text, delay)
-    end
+    end,
+
+    ---@param self Quick.Container
+    ---@param label string
+    ---@param option ReUI.Options.ReactiveOption
+    OptionCheckbox = function(self, label, option)
+        local cb = ReUI.Options.Controls.OptionCheckbox(self._control, option, label)
+        self:Builder():AddControl(cb, {
+            width = LayoutFor:UnscaleNumber(cb.Width()),
+            height = LayoutFor:UnscaleNumber(cb.Height())
+        })
+    end,
 }
 
 ---@class Quick.Context
