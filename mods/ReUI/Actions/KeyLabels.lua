@@ -4,7 +4,8 @@ local Prefs = import("/lua/user/prefs.lua")
 local LINQ = ReUI.LINQ
 
 -- Turn engine string reference to certain symbols into the actual symbol
-local signs = {
+local short = {
+    ["CapsLock"] = "Cap",
     ["Comma"] = ",",
     ["Period"] = ".",
     ["Slash"] = "/",
@@ -236,16 +237,16 @@ function GetKeyLabels(unitkeygroups, ids, orders)
     -- Rename signs for Unit ID list and orders
     for _, metagroup in { idRelations, orderKeys } do
         for id1, group in metagroup do
-            if signs[group.key] then
-                metagroup[id1].key = signs[group.key]
+            if short[group.key] then
+                metagroup[id1].key = short[group.key]
             end
         end
     end
 
     -- Handle signs for upgrades seperately
     if upgradeKey then
-        if signs[upgradeKey.key] then
-            upgradeKey.key = signs[upgradeKey.key]
+        if short[upgradeKey.key] then
+            upgradeKey.key = short[upgradeKey.key]
         end
     end
 
