@@ -2,6 +2,7 @@ Version = "1.2.0"
 
 ReUI.Require
 {
+    "ReUI.UI.Controls >= 1.0.0",
     "ReUI.Core >= 1.5.0",
     "ReUI.Core.Events >= 1.0.0",
     "ReUI.LINQ >= 1.0.0",
@@ -223,6 +224,11 @@ function Main(isReplay)
 
     ---@class ReUI.Options : ReUI.Module
     return {
+        Controls = {
+            OptionControl = import("Modules/OptionControls/OptionControl.lua").OptionControl,
+            OptionCheckbox = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
+        },
+
         Builder = {
             AddOptions  = OptionsSelector.AddOptions,
             Splitter    = OptionsSelector.Splitter,

@@ -2,6 +2,8 @@ ReUI.Require
 {
     "ReUI.Core >= 1.6.0",
     "ReUI.Core.Events >= 1.0.0",
+    "ReUI.UI >= 1.0.0",
+    "ReUI.UI.Quick >= 0.1.0",
 }
 
 function Main()
@@ -92,4 +94,9 @@ function Main()
         assert(flag, "flag must be true")
 
     end)
+
+    ReUI.Core.OnPostCreateUI(function(isReplay)
+       import("QuickTest.lua").Run()
+    end)
 end
+
