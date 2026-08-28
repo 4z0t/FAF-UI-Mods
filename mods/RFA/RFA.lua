@@ -27,6 +27,14 @@ function Main(isReplay)
 
     local options = ReUI.Options.Mods["RFA"]
 
+    ---@param key string
+    local function IsPreviewKeyDown(key)
+        if key == "EITHER" then
+            return IsKeyDown("Shift") or IsKeyDown("Control")
+        end
+        return IsKeyDown(key)
+    end
+
     local Enumerate = ReUI.LINQ.Enumerate
     local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
     local PairsEnumerator = ReUI.LINQ.PairsEnumerator
@@ -797,14 +805,14 @@ function Main(isReplay)
             local notIssuingOrder = not commandMode[2]
             self._isCachedSelection = false
 
-            if IsKeyDown(self.HoverPreviewKey) and notIssuingOrder then
+            if IsPreviewKeyDown(self.HoverPreviewKey) and notIssuingOrder then
                 self:UpdateHoverRings()
             else
                 self:ClearHoverRings()
             end
 
             if notIssuingOrder or givingMoveOrder then
-                if IsKeyDown(self.SelectedPreviewKey) then
+                if IsPreviewKeyDown(self.SelectedPreviewKey) then
                     self:UpdateSelectionRings()
                 else
                     self:ClearSelectionRings()
@@ -812,7 +820,7 @@ function Main(isReplay)
 
                 if IsKeyDown(18) then --alt
                     self:UpdateReclaimRings()
-                elseif IsKeyDown(self.BuildPreviewKey) then
+                elseif IsPreviewKeyDown(self.BuildPreviewKey) then
                     self:UpdateBuildRings(true)
                 else
                     self:ClearBuildRings()
