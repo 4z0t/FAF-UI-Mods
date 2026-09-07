@@ -16,6 +16,7 @@ function Main(isReplay)
     local IsKeyDown = IsKeyDown
     local MathMax = math.max
     local MathFloor = math.floor
+    local MathSqrt = math.sqrt
     local TableInsert = table.insert
     local TableGetn = table.getn
     local TableEmpty = table.empty
@@ -37,6 +38,7 @@ function Main(isReplay)
     local overlayParams = import("/lua/ui/game/rangeoverlayparams.lua").RangeOverlayParams
     local GetWorldViews = import("/lua/ui/game/worldview.lua").GetWorldViews
     local GetEnhancements = import("/lua/enhancementcommon.lua").GetEnhancements
+    local XZDistanceTwoVectorsSquared = import("/lua/utilities.lua").XZDistanceTwoVectorsSquared
 
     ---@class RingData
     ---@field [1] string # type
@@ -52,6 +54,8 @@ function Main(isReplay)
     local showRadar = false
     local showSonar = false
     local showCounterIntel = false
+    local showShield = false
+    local displayBuildRingAtMouseHeight = false
 
     options.showDirectFire:Bind(function(opt)
         showDirectFire = opt()
@@ -79,6 +83,12 @@ function Main(isReplay)
     end)
     options.showCounterIntel:Bind(function(opt)
         showCounterIntel = opt()
+    end)
+    options.showShield:Bind(function(opt)
+        showShield = opt()
+    end)
+    options.displayBuildRingAtMouseHeight:Bind(function (opt)
+        displayBuildRingAtMouseHeight = opt()
     end)
     options.showInMinimap.OnChange = function(opt)
         -- local minimap = GetWorldViews()["MiniMap"]
@@ -187,6 +197,12 @@ function Main(isReplay)
         "RadarStealthFieldRadius",
     }
 
+    local isWaterSurfaceMotionType = {
+        RULEUMT_Water = true,
+        RULEUMT_Hover = true,
+        RULEUMT_AmphibiousFloating = true,
+    }
+
     ---@type table<UnitId, IUnitBlueprint>
     local IBPByBpIdCache = ReUI.Core.Weak.Value {}
     ---@type table<UserUnit, IUnitBlueprint>
@@ -275,6 +291,10 @@ function Main(isReplay)
 
         ---@param w WeaponBlueprint
         for i, w in obp.Weapon do
+            local rangeCategory = w.RangeCategory
+            if rangeCategory == "UWRC_Undefined" then
+                continue
+            end
             -- Skip adding disabled weapons to IBp
             local enh = w.EnabledByEnhancement
             if enh and not Contains(activeEnhs, enh) then
@@ -282,8 +302,9 @@ function Main(isReplay)
             end
 
             TableInsert(ibp.Weapon, {
-                RangeCategory = w.RangeCategory,
-                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius
+                RangeCategory = rangeCategory,
+                MaxRadius = weaponsAffectedByRangeEnh[w.Label] and newMaxRadius or w.MaxRadius,
+                MinRadius = w.MinRadius,
             })
         end
 
@@ -349,16 +370,21 @@ function Main(isReplay)
         if bp.Weapon ~= nil and not TableEmpty(bp.Weapon) then
             for _wIndex, w in bp.Weapon do
                 local radius = w.MaxRadius
+                local minRadius = w.MinRadius
+                local function AddRadii(type)
+                    TableInsert(weapons, { type, radius })
+                    if minRadius > 0 then TableInsert(weapons, { type, minRadius }) end
+                end
                 if showDirectFire and w.RangeCategory == "UWRC_DirectFire" then
-                    TableInsert(weapons, { "AllMilitary", radius })
+                    AddRadii("AllMilitary")
                 elseif showIndirectFire and w.RangeCategory == "UWRC_IndirectFire" then
-                    TableInsert(weapons, { "IndirectFire", radius })
+                    AddRadii("IndirectFire")
                 elseif showAntiAir and w.RangeCategory == "UWRC_AntiAir" then
-                    TableInsert(weapons, { "AntiAir", radius })
+                    AddRadii("AntiAir")
                 elseif showCountermeasure and w.RangeCategory == "UWRC_Countermeasure" then
-                    TableInsert(weapons, { "Defense", radius })
+                    AddRadii("Defense")
                 elseif showAntiNavy and w.RangeCategory == "UWRC_AntiNavy" then
-                    TableInsert(weapons, { "AntiNavy", radius })
+                    AddRadii("AntiNavy")
                 end
             end
         end
@@ -383,6 +409,16 @@ function Main(isReplay)
                 TableInsert(weapons,
                     { "CounterIntel",
                         MathMax(intel.CloakFieldRadius, intel.SonarStealthFieldRadius, intel.RadarStealthFieldRadius) })
+            end
+        end
+
+        if showShield then
+            local shield = bp.Defense.Shield
+            if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
+                local radius = (shield.ShieldSize or 10) / 2
+                local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+                local range = MathSqrt(radius * radius - height * height)
+                TableInsert(weapons, { "Defense", range })
             end
         end
 
@@ -419,6 +455,25 @@ function Main(isReplay)
                         buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
                     end
                 end
+            elseif orderName == "RULEUCC_Capture" then
+                local info = GetRolloverInfo()
+                if info then
+                    local bpFoot = __blueprints[info.blueprintId].Footprint
+                    if bpFoot then
+                        ---@diagnostic disable-next-line: cast-local-type
+                        buildPreviewSkirtSize = MathMax(bpFoot.SizeX, bpFoot.SizeZ)
+                    end
+                end
+                local bp = unit:GetBlueprint()
+                local bpFoot = bp.Footprint
+                local captureDistance
+                if bp.Physics.MotionType == "RULEUMT_None" then
+                    captureDistance = 10
+                else
+                    captureDistance = 5
+                end
+                ---@diagnostic disable-next-line: need-check-nil
+                return captureDistance + MathMax(bpFoot.SizeX, bpFoot.SizeZ) + buildPreviewSkirtSize
             end
         end
 
@@ -467,17 +522,41 @@ function Main(isReplay)
         :Max()
 
     ---@param type string
+    ---@param colorType "NormalColor" | "SelectColor" | "RolloverColor" | nil
     ---@return string
     ---@return number
-    local function GetColorAndThickness(type)
+    local function GetColorAndThickness(type, colorType)
         local params = overlayParams[type]
-        return ("ff%s"):format((params.NormalColor):sub(3)), params.Outer[1] / params.Type
+        if not colorType then colorType = "NormalColor" end
+        return ("ff%s"):format((params[colorType]):sub(3)), params.Outer[1] / params.Type
     end
 
     local function TableClear(t)
         for k in t do
             t[k] = nil
         end
+    end
+
+    --- Retrieves cursor information from the engine statistics
+    ---@return { Position: string, Elevation: number, OCell: string, LODMetric: number }
+    local function GetCursorInformation()
+        local cursor = { }
+        if __EngineStats and __EngineStats.Children then
+            for _, a in __EngineStats.Children do
+                if a.Name == 'Camera' then
+                    for _, b in a.Children do
+                        if b.Name == 'Cursor' then
+                            for _, c in b.Children do
+                                cursor[c.Name] = c.Value
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+        end
+
+        return cursor
     end
 
     ---@class Ring
@@ -746,11 +825,16 @@ function Main(isReplay)
 
             local radius = GetMaxBuildRange(builders)
 
+            local orderType
+            local colorType
+
             ---@type Ring
             local ring = Ring()
             if useMousePos then
                 ring.pos = GetMouseWorldPos()
             else
+                orderType = GetCommandMode()[1]
+
                 local unit = builders[1]
                 local pos = unit:GetInterpolatedPosition()
                 if IsKeyDown("Shift") then
@@ -769,17 +853,58 @@ function Main(isReplay)
                     end
                 end
 
-                -- local cursorData = import("/lua/ui/game/cursor/depth.lua").GetCursorInformationGlobal()
-                -- local elevation = cursorData.Elevation
 
-                -- local mouseY = GetMouseWorldPos()[2]
-                -- if pos[2] < mouseY then
-                --     pos[2] = mouseY
-                -- end
+                local info = GetRolloverInfo()
+                local rolloverUnit = info.userUnit
+                if displayBuildRingAtMouseHeight then
+                    local newY
+
+                    if orderType == "build" then
+                        newY = GetMouseWorldPos()[2]
+                    else
+                        if info then
+                            if rolloverUnit then
+                                newY = rolloverUnit:GetPosition()[2]
+                            else
+                                local rolloverBp = __blueprints[info.blueprintId]
+                                local bpPhysics = rolloverBp.Physics
+                                local motionType = bpPhysics.MotionType
+
+                                if isWaterSurfaceMotionType[motionType]
+                                    or motionType == "RULEUMT_None" and not bpPhysics.BuildOnLayerCaps["LAYER_Seabed"]
+                                then
+                                    newY = GetMouseWorldPos()[2]
+                                elseif motionType == "RULEUMT_SurfacingSub" then
+                                    newY = GetMouseWorldPos()[2] + bpPhysics.Elevation
+                                else
+                                    newY = GetCursorInformation().Elevation
+                                end
+                            end
+                        else
+                            newY = GetCursorInformation().Elevation
+                        end
+                    end
+
+                    pos[2] = newY
+                end
                 ring.pos = pos
+
+                local targetPos
+                if orderType == "build" then
+                    targetPos = GetMouseWorldPos()
+                    targetPos[1] = MathFloor(targetPos[1]) + 0.5
+                    targetPos[3] = MathFloor(targetPos[3]) + 0.5
+                elseif rolloverUnit then
+                    targetPos = rolloverUnit:GetPosition()
+                else
+                    targetPos = GetMouseWorldPos()
+                end
+                if XZDistanceTwoVectorsSquared(targetPos, pos) <= radius * radius then
+                    colorType = "RolloverColor"
+                end
             end
             ring.radius = radius
-            local color, thick = GetColorAndThickness "Miscellaneous"
+            local color, thick = GetColorAndThickness("Miscellaneous", colorType)
             ring.thickness = thick
             ring:SetColor(color)
             self._buildRing = ring
@@ -819,10 +944,11 @@ function Main(isReplay)
                 end
             elseif self._buildRing
                 or orderType == "build"
-                or orderType == 'order'
+                or orderType == "order"
                 and (orderName == "RULEUCC_Repair"
                     or orderName == "RULEUCC_Reclaim"
-                    or orderName == "RULEUCC_Guard")
+                    or orderName == "RULEUCC_Guard"
+                    or orderName == "RULEUCC_Capture")
             then
                 self:UpdateBuildRings(false)
             end
