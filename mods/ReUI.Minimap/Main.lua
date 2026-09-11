@@ -70,12 +70,12 @@ function Main(isReplay)
 
             local mapWidth = SessionGetScenarioInfo().size[1]
             local mapHeight = SessionGetScenarioInfo().size[2]
-            mapZoomScale = mapWidth / 512
             local areaData = Sync.NewPlayableArea
             if areaData then
                 mapWidth = areaData[3] - areaData[1]
                 mapHeight = areaData[4] - areaData[2]
             end
+            mapZoomScale = math.max(mapWidth, mapHeight) / 512
             if mapWidth and mapHeight then
                 local displayGroup = controls.displayGroup
                 local left = displayGroup.Left()
