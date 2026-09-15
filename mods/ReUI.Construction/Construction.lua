@@ -8,7 +8,7 @@ ReUI.Require
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.1.0",
-    "ReUI.Options >= 1.0.0",
+    "ReUI.Options >= 1.2.0",
     "ReUI.Units >= 1.0.0",
     "ReUI.Actions >= 1.3.0",
     "ReUI.Units.Enhancements >= 1.2.0",
@@ -467,8 +467,8 @@ function Main(isReplay)
 
             local tabFiles = {
                 construction = '/game/construct-tab_btn/top_tab_btn_',
-                selection = '/game/construct-tab_btn/mid_tab_btn_',
-                enhancement = '/game/construct-tab_btn/bot_tab_btn_',
+                selection    = '/game/construct-tab_btn/mid_tab_btn_',
+                enhancement  = '/game/construct-tab_btn/bot_tab_btn_',
             }
 
             ---@param name FileName
@@ -714,10 +714,18 @@ function Main(isReplay)
         end,
     }
 
+    local techTabs = {
+        TECH1 = 1,
+        TECH2 = 2,
+        TECH3 = 3,
+        EXPERIMENTAL = 4,
+    }
+
 
     ---@class TechTabs : ReUI.UI.Controls.Group
     ---@field _constructionPanel ReUI.Construction.Panel
     ---@field _tabs ReUI.UI.Controls.CheckBox[]
+    ---@field _activeTech TechLevel
     local TechTabs = ReUI.Core.Class(Group)
     {
         AutoLayout = false,
@@ -729,6 +737,7 @@ function Main(isReplay)
             Group.__init(self, parent)
 
             self._constructionPanel = parent
+            self._activeTech = "NONE"
 
             ---@param tab TechTab
             ---@param checked boolean
@@ -747,10 +756,17 @@ function Main(isReplay)
         ---@param self TechTabs
         ---@param tech TechLevel
         SetActiveTechTab = function(self, tech)
+            self._activeTech = tech
             ---@param tab TechTab
             for i, tab in self._tabs do
                 tab:SetCheck(tab.name == tech, true)
             end
+        end,
+
+        ---@param self TechTabs
+        ---@return number
+        GetCurrentTechTab = function(self)
+            return techTabs[self._activeTech] or 0
         end,
 
         ---@param self TechTabs
@@ -807,6 +823,7 @@ function Main(isReplay)
         ---@param self TechTabs
         ---@param name string
         OnTabCheck = function(self, name)
+            self._activeTech = name
             ---@param tab TechTab
             for _, tab in self._tabs do
                 if tab.name ~= name then
@@ -1138,6 +1155,13 @@ function Main(isReplay)
             self._techTabs:SetActiveTechTab(tech)
         end,
 
+        ---Returns the selected construction tab: T1, T2, T3, T4.
+        ---@param self ReUI.Construction.Panel
+        ---@return number
+        GetCurrentTechTab = function(self)
+            return self._techTabs:GetCurrentTechTab()
+        end,
+
         ---@param self ReUI.Construction.Panel
         ---@param func fun(self: ReUI.Construction.Panel, slot:ReUI.UI.Controls.CheckBox)
         ApplyToSlots = function(self, func)
@@ -1243,11 +1267,13 @@ function Main(isReplay)
                     self._constructionTabs:SetTabEnabled("construction", true)
                     self._constructionTabs:SetTabEnabled("selection", true)
                 elseif tab == "selection" then
+                    self._techTabs:SetActiveTechTab "NONE"
                     self._techTabs:Hide()
                     self:ApplyToSlots(self.HideCheckBox)
                     self._constructionTabs:SetTabEnabled("construction", false)
                     self._constructionTabs:SetTabEnabled("selection", true)
                 elseif tab == "enhancements" then
+                    self._techTabs:SetActiveTechTab "NONE"
                     self._techTabs:Hide()
                     self:ApplyToSlots(self.ShowCheckBox)
                 end
@@ -1283,12 +1309,15 @@ function Main(isReplay)
             self._context.tab = tab
 
             if tab == "construction" then
+                self._techTabs:SetActiveTechTab "NONE"
                 self._techTabs:Show()
                 self:ApplyToSlots(self.HideCheckBox)
             elseif tab == "selection" then
+                self._techTabs:SetActiveTechTab "NONE"
                 self._techTabs:Hide()
                 self:ApplyToSlots(self.HideCheckBox)
             elseif tab == "enhancements" then
+                self._techTabs:SetActiveTechTab "NONE"
                 self._techTabs:Hide()
                 for _, slot in self._slots do
                     slot:Show()
@@ -1359,22 +1388,19 @@ function Main(isReplay)
         end
     }
 
-
-    -- local CommandModeHook = ReUI.Core.HookModule "/lua/ui/game/commandmode.lua"
-
-    -- ---@type Event
-    -- local onCommandIssuedEvent = Event()
-
-    -- CommandModeHook("OnCommandIssued", function(OnCommandIssued, module)
-    --     ---@param command UserCommand
-    --     return function(command)
-    --         OnCommandIssued(command)
-    --         onCommandIssuedEvent:Invoke(module, command)
-    --     end
-    -- end)
-
-
     local ConstructionHook = ReUI.Core.HookModule "/lua/ui/game/construction.lua"
+
+    ConstructionHook("GetCurrentTechTab", function(field, module)
+        return function()
+            ---@type ReUI.Construction.Panel
+            local panel = ReUI.UI.Global["Construction"]
+            if IsDestroyed(panel) then
+                return 0
+            end
+
+            return panel:GetCurrentTechTab()
+        end
+    end)
 
     ConstructionHook("OnQueueChanged", function(field, module)
         return function(newQueue)
@@ -1475,8 +1501,9 @@ function Main(isReplay)
             ---@type ReUI.Construction.Panel
             local panel = ReUI.Construction.Panel(parent)
 
-            options.canScroll:Bind(function(opt)
-                panel:SetCanScroll(opt())
+            panel:SetCanScroll(options.canScroll.Value)
+            options.canScroll.OnChanged:Add(function(opt, v)
+                panel:SetCanScroll(v)
             end)
 
             ReUI.Construction.Grid.ItemClass.TextColor:Set(options.color:Raw())
@@ -1543,6 +1570,123 @@ function Main(isReplay)
         end
     end)
 
+    ConstructionHook("updateCommandQueue", function(field, module)
+        return function()
+            ---@type ReUI.Construction.Panel
+            local panel = ReUI.UI.Global["Construction"]
+
+            if IsDestroyed(panel) then
+                return
+            end
+
+            panel:Update("refresh")
+        end
+    end)
+
+    --[[
+    ---@param unitID string
+    ---@param iconID string
+    ---@return string
+    function GetEnhancementPrefix(unitID, iconID)
+        local faction = string.sub(unitID, 2, 2)
+        if faction == 'a' then
+            return '/game/aeon-enhancements/' .. iconID
+        elseif faction == 'e' then
+            return '/game/uef-enhancements/' .. iconID
+        elseif faction == 'r' then
+            return '/game/cybran-enhancements/' .. iconID
+        elseif faction == 's' then
+            return '/game/seraphim-enhancements/' .. iconID
+        end
+        return ''
+    end
+
+    local function GetEnhancementTextures(unitID, iconID)
+        local prefix = GetEnhancementPrefix(unitID, iconID)
+        return UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+            UIUtil.UIFile(prefix .. '_btn_down.dds', true),
+            UIUtil.UIFile(prefix .. '_btn_over.dds', true),
+            UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+            UIUtil.UIFile(prefix .. '_btn_sel.dds', true)
+    end
+
+    ConstructionHook("GetEnhancementPrefix", function(field, module)
+        return function(unitID, iconID)
+            local prefix = GetEnhancementPrefix(unitID, iconID)
+            return UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+                UIUtil.UIFile(prefix .. '_btn_down.dds', true),
+                UIUtil.UIFile(prefix .. '_btn_over.dds', true),
+                UIUtil.UIFile(prefix .. '_btn_up.dds', true),
+                UIUtil.UIFile(prefix .. '_btn_sel.dds', true)
+        end
+    end)
+
+    ConstructionHook("GetEnhancementTextures", function(field, module)
+        return GetEnhancementTextures
+    end)
+    ]]
+
+
+    ConstructionHook("ButtonReleaseCallback", function(field, module)
+        return function()
+        end
+    end)
+    ConstructionHook("DisablePauseToggle", function(field, module)
+        return function()
+        end
+    end)
+    ConstructionHook("EnablePauseToggle", function(field, module)
+        return function()
+        end
+    end)
+
+    local function ConstructionUnhook(name)
+        ConstructionHook(name, function(field, module)
+            return function()
+                WARN(debug.traceback(("Attempt to call unhooked construction.lua function '%s'"):format(name)))
+            end
+        end)
+    end
+
+    ConstructionUnhook "dragPause"
+    ConstructionUnhook "UpdateBuildList"
+    ConstructionUnhook "MoveItemInQueue"
+    ConstructionUnhook "ToggleInfinateMode"
+    ConstructionUnhook "IsConstructionEnabled"
+    ConstructionUnhook "CycleTabs"
+    ConstructionUnhook "OnEscapeInBuildMode"
+    ConstructionUnhook "BuildTemplate"
+    ConstructionUnhook "HandleBuildModeKey"
+    ConstructionUnhook "SetCurrentTechTab"
+    ConstructionUnhook "ShowBuildModeKeys"
+    ConstructionUnhook "CheckForOrderQueue"
+    ConstructionUnhook "SetSecondaryDisplay"
+    ConstructionUnhook "IntegrateEnhancements"
+    ConstructionUnhook "HandleIntegrationIssue"
+    ConstructionUnhook "FormatData"
+    ConstructionUnhook "CreateExtraControls"
+    ConstructionUnhook "GetTabByID"
+    ConstructionUnhook "CreateSubMenu"
+    ConstructionUnhook "CreateFacTemplateOptionsMenu"
+    ConstructionUnhook "CreateTemplateOptionsMenu"
+    ConstructionUnhook "CreateTemplateOptionMenu"
+    ConstructionUnhook "ProcessKeybinding"
+    ConstructionUnhook "OnClickHandler"
+    ConstructionUnhook "OrderEnhancement"
+    ConstructionUnhook "GetPrerequisites"
+    ConstructionUnhook "checkBadClean"
+    ConstructionUnhook "QueueChangeWatchThread"
+    ConstructionUnhook "watchForQueueChange"
+    ConstructionUnhook "OnRolloverHandler"
+    ConstructionUnhook "StratIconReplacement"
+    ConstructionUnhook "CommonLogic"
+    ConstructionUnhook "GetBackgroundTextures"
+    ConstructionUnhook "CreateTabs"
+    ConstructionUnhook "OnNestedTabCheck"
+    ConstructionUnhook "OnTabCheck"
+    ConstructionUnhook "CreateUI"
+
+
     ReUI.Actions.SelectionAction("Append unit for transportation",
         function(selection)
             ---@type ReUI.Construction.Panel
@@ -1567,36 +1711,9 @@ function Main(isReplay)
         }
     )
 
-    --TODO
-    --[x] Fix queue display for engineers (upgrades, etc)
-    --[x] Fix mobile factory queue logic (drag specifically)
-    --[x] Add logic for enhancements
-    --[x] Fix border of the panel
-    --[ ] Expose toggles for shitty keybinds
-    --[x] Progress bar for construction
-    --[x] don't display count for upgrades of factories
-    --[x] display keybinds in construction menu
-    --[x] old selection check is incorrect and must be done elsewhere
-    --[x] fix progress bar with enhancements and regular construction
-    --[ ] fix order of items with queue and enhancements (including cases with deleting items and when upgrades are reset)
-    --[x] tech enhancements don't show available construction options
-    --[x] display support factories for acus if corresponding hq presents
-    --[ ] improve items logic of the grid
-    --[x] bottom panel doesn't display other things in enhancements mode
-    --[x] add reui error messages into game chat
-    --[x] fix tech switch when queue is changed
-    --[x] fix queue and chain upgrades for t2 shields of UEF and Seraphim (use command queue instead of factory queue) (it has to be fixed on sim side.)
-    --[ ] display upgrade keybinds in construction menu
-    --[x] add logic for removing items from queue in build options of factories
-    --[ ] fix construction tab disabling when current tab is selection
-    -- Enhancement logic is terrible... please kill me AAAAAAAAAAAAAAAAAAAAAAAA
-
     ---@class ReUI.Construction : ReUI.Module
     return {
         Panel = ConstructionPanel,
         Grid = ConstructionGrid,
-        -- Misc = {
-        --     OnCommandIssuedEvent = onCommandIssuedEvent
-        -- }
     }
 end

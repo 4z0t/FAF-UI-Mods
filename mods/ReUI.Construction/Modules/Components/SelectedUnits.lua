@@ -10,17 +10,17 @@ local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 
 local Contains = IPairsEnumerator:Contains()
 
-local options = ReUI.Options.Mods["ReUI.Construction"]
+local options = ReUI.Options.Mods["ReUI.Construction"].selection
 
-local showGroups
-options.selection.showGroups:Bind(function(opt)
-    showGroups = opt()
-end)
+local showGroups = options.showGroups.Value
+options.showGroups.OnChanged:Add(function(opt, v) showGroups = v end)
 
-local improvedDeselection
-options.selection.improvedDeselection:Bind(function(opt)
-    improvedDeselection = opt()
-end)
+local improvedDeselection = options.improvedDeselection.Value
+options.improvedDeselection.OnChanged:Add(function(opt, v) improvedDeselection = v end)
+
+local separateIdleBuilders = options.separateIdleBuilders.Value
+options.separateIdleBuilders.OnChanged:Add(function(opt, v) separateIdleBuilders = v end)
+
 
 ---@type table<TechCategory, integer>
 local techCatOrder = {
@@ -87,6 +87,12 @@ local UnitGroupMatcher = Class()
     end,
 
     ---@param self UnitGroupMatcher
+    ---@return boolean
+    IsEnabled = function(self)
+        return true
+    end,
+
+    ---@param self UnitGroupMatcher
     ---@param unit UserUnit
     ---@return boolean
     Match = function(self, unit)
@@ -148,6 +154,30 @@ AirFuelGroupMatcher = Class(UnitGroupMatcher)
     end,
 }
 
+---@class IdleGroupMatcher : CategoryGroupMatcher
+IdleGroupMatcher = Class(CategoryGroupMatcher)
+{
+    IsEnabled = function(self)
+        return separateIdleBuilders
+    end,
+
+    ---@param self IdleGroupMatcher
+    ---@param unit UserUnit
+    ---@return boolean
+    Match = function(self, unit)
+        return CategoryGroupMatcher.Match(self, unit) and unit:IsIdle()
+    end,
+
+    ---@param self IdleGroupMatcher
+    ---@param component SelectedUnitsListItem
+    ---@param item ReUI.Construction.Grid.Item
+    ---@param action SelectedUnitsAction
+    Display = function(self, component, item, action)
+        component.icon:SetTexture(UIUtil.UIFile('/game/idle_mini_icon/idle_icon.dds'))
+        component.icon:Show()
+    end,
+}
+
 ---@param name string
 ---@return FileName
 local function IconPath(name)
@@ -186,7 +216,7 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
         --     end)
     end,
 
-    --These are scanned from top to bottom to match group
+    --These are scanned from bottom to top to match group
     UnitGroupMatchers =
     {
         CategoryGroupMatcher("ALLUNITS", IconPath "experimental_generic", categories.ALLUNITS),
@@ -197,6 +227,8 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
         CategoryGroupMatcher("STRUCTURE", IconPath "structure_generic", categories.STRUCTURE),
         CategoryGroupMatcher("CONSTRUCTION", IconPath "factory_generic", categories.SORTCONSTRUCTION),
         AirFuelGroupMatcher("LOWFUEL", '/game/unit_view_icons/fuel.dds'),
+        IdleGroupMatcher("IDLE_ENGINEER", '/game/idle_mini_icon/idle_icon.dds', categories.ENGINEER),
+        IdleGroupMatcher("IDLE_CONSTRUCTION", '/game/idle_mini_icon/idle_icon.dds', categories.SORTCONSTRUCTION),
     },
 
     ---@param self SelectedUnitsListHandler
@@ -208,6 +240,8 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
         ---@type SelectedUnitsGroup[]
         local result = Enumerate(matchers)
             ---@param matcher UnitGroupMatcher
+            :Where(function(matcher) return matcher:IsEnabled() end)
+            ---@param matcher UnitGroupMatcher
             :Select(function(matcher)
                 return {
                     matcher = matcher,
@@ -218,8 +252,8 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
             :ToArray()
 
         for _, unit in selection do
-            for i = table.getn(matchers), 1, -1 do
-                local matcher = matchers[i]
+            for i = table.getn(result), 1, -1 do
+                local matcher = result[i].matcher
                 if matcher:Match(unit) then
                     table.insert(result[i].units, unit)
                     break
@@ -324,6 +358,7 @@ SelectedUnitsListHandler = ReUI.Core.Class(ASelectionHandler)
             self.icon = ReUI.UI.Controls.Bitmap(item)
             item.Layouter(self.icon)
                 :AtLeftBottomIn(item, 2, 2)
+                :Over(item, 10)
                 :DisableHitTest()
                 :Hide()
         end,
