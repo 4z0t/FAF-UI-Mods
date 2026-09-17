@@ -4,8 +4,9 @@
 ---@class ReUI.Hotbuild : ReUI.Module
 ReUI.Hotbuild = {}
 
-
+---Returns true if the hotbuild was processed
 ---@param name string
+---@return boolean
 function ReUI.Hotbuild.ProcessHotbuild(name)
 end
 

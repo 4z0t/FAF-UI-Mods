@@ -5,24 +5,87 @@ local BaseGridPanel = ReUI.UI.Views.Grid.BaseGridPanel
 local UIUtil = import("/lua/ui/uiutil.lua")
 
 ---@class CycleMapBorder : ReUI.UI.Controls.Group
+---@field tl ReUI.UI.Controls.Bitmap
+---@field tr ReUI.UI.Controls.Bitmap
+---@field tm ReUI.UI.Controls.Bitmap
+---@field ml ReUI.UI.Controls.Bitmap
+---@field m  ReUI.UI.Controls.Bitmap
+---@field mr ReUI.UI.Controls.Bitmap
+---@field bl ReUI.UI.Controls.Bitmap
+---@field bm ReUI.UI.Controls.Bitmap
+---@field br ReUI.UI.Controls.Bitmap
 CycleMapBorder = ReUI.Core.Class(Group)
 {
-    ---@param self CycleMapBorder
+    ---@param self ReUI.UI.Views.WindowFrame
     ---@param parent Control
     __init = function(self, parent)
         Group.__init(self, parent)
+
+        self.tl = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-tl.dds')
+        self.tr = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-tr.dds')
+        self.tm = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-t.dds')
+        self.ml = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-l.dds')
+
+        self.m = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-m.dds')
+
+        self.mr = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-r.dds')
+        self.bl = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-bl.dds')
+        self.bm = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-b.dds')
+        self.br = Bitmap(self, '/textures/ui/hotbuild/cycle-panel-bg-br.dds')
     end,
 
-    ---@param self CycleMapBorder
+    ---@param self ReUI.UI.Views.WindowFrame
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
 
+        layouter(self.tl)
+            :Left(self.Left)
+            :Top(self.Top)
+
+        layouter(self.tr)
+            :Top(self.Top)
+            :Right(self.Right)
+
+        layouter(self.bl)
+            :Left(self.Left)
+            :Bottom(self.Bottom)
+
+        layouter(self.br)
+            :Bottom(self.Bottom)
+            :Right(self.Right)
+
+        layouter(self.tm)
+            :Left(self.tl.Right)
+            :Right(self.tr.Left)
+            :AtTopIn(self)
+
+        layouter(self.bm)
+            :Left(self.bl.Right)
+            :Right(self.br.Left)
+            :AtBottomIn(self)
+
+        layouter(self.mr)
+            :Top(self.tr.Bottom)
+            :Bottom(self.br.Top)
+            :AtRightIn(self)
+
+        layouter(self.ml)
+            :Top(self.tl.Bottom)
+            :Bottom(self.bl.Top)
+            :AtLeftIn(self)
+
+        layouter(self.m)
+            :Top(self.tm.Bottom)
+            :Bottom(self.bm.Top)
+            :Left(self.ml.Right)
+            :Right(self.mr.Left)
     end,
+
 }
 
 
-
 ---@class CycleMap : BaseGridPanel
+---@field _border CycleMapBorder
 ---@field _position number
 ---@field _frameTimer number
 ---@field _max number
@@ -37,6 +100,7 @@ CycleMap = ReUI.Core.Class(BaseGridPanel)
     ---@param parent Control
     __init = function(self, parent)
         BaseGridPanel.__init(self, parent)
+
         self.Rows = 1
         self.Columns = 1
 
@@ -45,6 +109,8 @@ CycleMap = ReUI.Core.Class(BaseGridPanel)
 
         self.HorizontalSpacing = 2
         self.VerticalSpacing = 2
+
+        self._border = CycleMapBorder(self)
 
         self._position = 0
         self._frameTimer = 0
@@ -68,6 +134,14 @@ CycleMap = ReUI.Core.Class(BaseGridPanel)
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
         BaseGridPanel.InitLayout(self, layouter)
+
+        layouter(self._border)
+            :AtTopIn(self, -15)
+            :AtBottomIn(self, -15)
+            :AtLeftIn(self, -25)
+            :AtRightIn(self, -25)
+            :Under(self)
+            :DisableHitTest(true)
 
         layouter(self)
             :Depth(1000)

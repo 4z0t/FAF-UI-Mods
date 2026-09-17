@@ -1,6 +1,7 @@
 ReUI.Require
 {
     "ReUI.Core >= 1.2.0",
+    "ReUI.Actions >= 1.3.0",
     "ReUI.LINQ >= 1.4.0",
     "ReUI.UI >= 1.4.0",
     "ReUI.UI.Animation >= 1.0.0",
@@ -11,71 +12,31 @@ ReUI.Require
 }
 
 function Main(isReplay)
-
-    local CycleMap = import('Modules/CycleMap.lua').CycleMap
+    local type = type
     local TableEmpty = table.empty
+
     local ToSet = ReUI.LINQ.IPairsEnumerator:ToSet()
     local Layouter = ReUI.UI.FloorLayoutFor
+
     local Construction = import("/lua/ui/game/construction.lua")
-
-
-    ReUI.Core.Hook("/lua/keymap/keymapper.lua", "GenerateHotbuildModifiers", function(field, module)
-        return function()
-            local modifiers = field()
-            local keyDetails = module.GetKeyMappingDetails()
-            for key, info in keyDetails do
-                local cat = info.action["category"]
-                if cat == 'ReUI.Hotbuild' then
-                    local shiftModKey = "Shift-" .. key
-                    local altModKey = "Alt-" .. key
-                    local shiftModBinding = keyDetails[shiftModKey]
-                    local altModBinding = keyDetails[altModKey]
-                    if not shiftModBinding and not altModBinding then
-                        modifiers[shiftModKey] = info.action
-                        modifiers[altModKey] = info.action
-                    elseif not shiftModBinding then
-                        modifiers[shiftModKey] = info.action
-                        WARN('Hotbuild key ' ..
-                            altModKey ..
-                            ' is already bound to action "' ..
-                            altModBinding.name .. '" under "' .. altModBinding.category .. '" category')
-                    elseif not altModBinding then
-                        modifiers[altModKey] = info.action
-                        WARN('Hotbuild key ' ..
-                            shiftModKey ..
-                            ' is already bound to action "' ..
-                            shiftModBinding.name .. '" under "' .. shiftModBinding.category .. '" category')
-                    else
-                        WARN('Hotbuild key ' ..
-                            shiftModKey ..
-                            ' is already bound to action "' ..
-                            shiftModBinding.name .. '" under "' .. shiftModBinding.category .. '" category')
-                        WARN('Hotbuild key ' ..
-                            altModKey ..
-                            ' is already bound to action "' ..
-                            altModBinding.name .. '" under "' .. altModBinding.category .. '" category')
-                    end
-                end
-            end
-            return modifiers
-        end
-    end)
-
-
-
     local CommandMode = import("/lua/ui/game/commandmode.lua")
+
+    local CycleMap = import('Modules/CycleMap.lua').CycleMap
+
     local cycleMap
     ---@return CycleMap
     local function GetCycleMap()
         if not IsDestroyed(cycleMap) then
             return cycleMap
         end
+        local frame = GetFrame(0) --[[@as Frame]]
+
         ---@type CycleMap
-        cycleMap = CycleMap(GetFrame(0))
+        cycleMap = CycleMap(frame)
 
         Layouter(cycleMap)
-            :Top(function() return GetFrame(0).Bottom() * .75 end)
-            :AtHorizontalCenterIn(GetFrame(0))
+            :Top(ReUI.UI.LayoutFunctions.Mult(frame.Bottom, 0.75))
+            :AtHorizontalCenterIn(frame)
 
         local function ResetCycle(commandMode, modeData)
             if commandMode == false or (not modeData) or not (modeData.isCancel) then
@@ -105,6 +66,10 @@ function Main(isReplay)
     ---@return boolean
     local function CanBuildTemplate(template, buildableUnits)
         local templateData = template.templateData
+        if type(templateData[1]) ~= "number" or
+            type(templateData[2]) ~= "number" then
+            return false
+        end
         for i = 3, table.getn(templateData) do
             local entry = templateData[i]
             local id = entry[1]
@@ -119,7 +84,11 @@ function Main(isReplay)
     ---@param buildableUnits any
     ---@return boolean
     local function CanBuildFactoryTemplate(template, buildableUnits)
-        for _, entry in ipairs(template.templateData) do
+        local templateData = template.templateData
+        if type(templateData[1]) ~= "table" then
+            return false
+        end
+        for _, entry in ipairs(templateData) do
             local id = entry.id
             if not id or not buildableUnits[id] then
                 return false
@@ -132,11 +101,16 @@ function Main(isReplay)
     ---@param name string
     ---@param data string[]
     ---@param modifier any
+    ---@return boolean
     local function BuildUnit(selection, name, data, modifier)
 
         GetCycleMap():HideCycle()
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
         local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
+
+        if table.empty(buildable) then
+            return false
+        end
 
         local items = {}
         local icons = {}
@@ -154,7 +128,7 @@ function Main(isReplay)
 
         local maxPos = table.getn(items)
         if maxPos == 0 then
-            return
+            return false
         end
 
         GetCycleMap():Cycle(1, name, icons, modifier)
@@ -178,34 +152,38 @@ function Main(isReplay)
 
             if type(item) == "string" then
                 IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", item, count)
-                return
+            else
+                for _, entry in ipairs(item.templateData) do
+                    IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", entry.id, entry.count)
+                end
             end
-            for _, entry in ipairs(item.templateData) do
-                IssueBlueprintCommandToUnits(exFacUnits, "UNITCOMMAND_BuildFactory", entry.id, entry.count)
-            end
-
         else
             if type(item) == "string" then
                 IssueBlueprintCommand("UNITCOMMAND_BuildFactory", item, count)
-                return
-            end
-
-            for _, entry in ipairs(item.templateData) do
-                IssueBlueprintCommand("UNITCOMMAND_BuildFactory", entry.id, entry.count)
+            else
+                for _, entry in ipairs(item.templateData) do
+                    IssueBlueprintCommand("UNITCOMMAND_BuildFactory", entry.id, entry.count)
+                end
             end
         end
         Construction.RefreshUI()
+        return true
     end
 
     ---@param selection UserUnit[]
     ---@param name string
     ---@param data string[]
     ---@param modifier any
+    ---@return boolean
     local function BuildStructure(selection, name, data, modifier)
 
         GetCycleMap():HideCycle()
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
         local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
+
+        if table.empty(buildable) then
+            return false
+        end
 
         local items = {}
         local icons = {}
@@ -223,7 +201,7 @@ function Main(isReplay)
 
         local maxPos = table.getn(items)
         if maxPos == 0 then
-            return
+            return false
         end
 
         local pos = GetCycleMap():Cycle(maxPos, name, icons, modifier)
@@ -237,14 +215,17 @@ function Main(isReplay)
             CommandMode.StartCommandMode("build", { name = cmd })
             SetActiveBuildTemplate(item.templateData)
         end
+        return true
     end
 
+    ---@param name string
+    ---@return boolean
     local function ProcessHotbuild(name)
         local data = hotbuilds[name]
 
         if not data then
-            WARN("Hotbuild " .. name .. "doesn't exist")
-            return
+            WARN("Hotbuild " .. name .. " doesn't exist")
+            return false
         end
 
         local modifier = ""
@@ -254,27 +235,25 @@ function Main(isReplay)
 
         local selection = GetSelectedUnits()
         if not selection then
-            return
+            return false
         end
+
         if not
             table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE + categories.xrl0403,
                 selection)) then
-            BuildStructure(selection, name, data, modifier)
+            return BuildStructure(selection, name, data, modifier)
         else
-            BuildUnit(selection, name, data, modifier)
+            return BuildUnit(selection, name, data, modifier)
         end
-
     end
 
     ReUI.Core.OnPostCreateUI(function(isReplay)
         local ViewModel = import('Modules/viewmodel.lua')
         local Model = import('Modules/model.lua')
         local View = import("Modules/views/view.lua")
-        local Share = import("Modules/share.lua")
 
         Model.init()
         ViewModel.init()
-        Share.Init(isReplay)
 
         ReUI.Options.Builder.AddOptions("ReUI.Hotbuild", "ReUI.Hotbuild", View.init)
     end)
