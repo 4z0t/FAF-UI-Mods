@@ -15,6 +15,7 @@ ReUI.Options.Mods["RFA"] = {
     showCounterIntel = Opt(true),
     showInMinimap = Opt(false),
     displayActualBuildRange = Opt(false),
+    ringOpacity = Opt(255),
 }
 
 function Main()
@@ -50,5 +51,6 @@ function Main()
                     "CONTROL"
                 },
                 options.buildPreviewKey),
+            Options.Slider("Ring opacity", 0, 255, 1, options.ringOpacity, 4),
         })
 end
