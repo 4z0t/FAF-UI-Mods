@@ -4,6 +4,7 @@ ReUI.Require
 {
     "ReUI.Core >= 1.5.0",
     "ReUI.Core.Events >= 1.0.0",
+    "ReUI.Actions >= 1.3.0",
     "ReUI.LINQ >= 1.0.0",
     "ReUI.UI.Views >= 1.0.0"
 }
@@ -199,25 +200,35 @@ function Main(isReplay)
 
     local OptionsSelector = import("Modules/Selector.lua")
 
+    local function OpenOptions()
+        if not isLoadedMains then
+            for modName, mainF in pairs(optionsMainFuncs) do
+                local success, err = pcall(mainF, isReplay)
+                if not success then
+                    LOG(("ReUI.Options: Error loading options of mod '%s'"):format(modName))
+                    LOG(err)
+                end
+            end
+            isLoadedMains = true
+        end
+        OptionsSelector.Main()
+    end
+
+    ReUI.Actions.AddSimpleAction
+    {
+        action = "UI_Lua ReUI.Options.Open()",
+        category = "ReUI.Actions",
+        description = "Open ReUI Options",
+        formattedName = "Open_ReUI_Options",
+    }
+
     ReUI.Core.OnPreCreateUI(function()
         import("/lua/ui/game/tabs.lua").AddToMenu
         {
             action = "ReUI.Options",
             label = "ReUI Options",
             tooltip = "ReUI Options",
-            func = function()
-                if not isLoadedMains then
-                    for modName, mainF in pairs(optionsMainFuncs) do
-                        local success, err = pcall(mainF, isReplay)
-                        if not success then
-                            LOG(("ReUI.Options: Error loading options of mod '%s'"):format(modName))
-                            LOG(err)
-                        end
-                    end
-                    isLoadedMains = true
-                end
-                OptionsSelector.Main()
-            end
+            func = OpenOptions,
         }
     end)
 
@@ -258,5 +269,6 @@ function Main(isReplay)
 
         ReactiveOption = ReactiveOption,
         OptionRef      = OptionRef,
+        Open           = OpenOptions,
     }
 end
