@@ -5,6 +5,7 @@ ReUI.Require
     "ReUI.UI.Animation >= 1.0.0",
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.2.0",
+    "ReUI.Units >= 1.1.0",
     "ReUI.Options >= 1.0.0"
 }
 

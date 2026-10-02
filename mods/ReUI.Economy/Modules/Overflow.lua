@@ -1,11 +1,7 @@
-local Selection = import('/lua/ui/game/selection.lua')
-
 local GetFocusArmy = GetFocusArmy
-local GetSelectedUnits = GetSelectedUnits
 local GameTick = GameTick
 local LOG = LOG
 local math = math
-local table = table
 
 local SCAN_INTERVAL_TICKS = 10
 
@@ -25,23 +21,14 @@ end
 local function SumOwnEnergyProduction()
     local production = 0
 
-    Selection.Hidden(function()
-        -- ENERGYPRODUCTION covers power generators, hydrocarbon plants,
-        -- ACUs, SACUs and other units that currently produce energy.
-        UISelectionByCategory('ENERGYPRODUCTION', false, false, false, false)
-        local units = GetSelectedUnits()
-        if not units then
-            return
+    -- ENERGYPRODUCTION covers power generators, hydrocarbon plants,
+    -- ACUs, SACUs and other units that currently produce energy.
+    for _, unit in ReUI.Units.Get() do
+        if not unit:IsDead() and unit:IsInCategory('ENERGYPRODUCTION') then
+            local econ = unit:GetEconData()
+            production = production + (econ and econ.energyProduced or 0)
         end
-
-        for i = 1, table.getn(units) do
-            local unit = units[i]
-            if unit and not unit:IsDead() then
-                local econ = unit:GetEconData()
-                production = production + (econ and econ.energyProduced or 0)
-            end
-        end
-    end)
+    end
 
     return production
 end
@@ -70,8 +57,8 @@ local function Calculate(totals, tps)
     local reclaimRate = (reclaimed - lastReclaimed) / ticksPassed * tps
     local ownProduction = SumOwnEnergyProduction()
 
-    -- A focus-army change during the hidden selection invalidates both the
-    -- selected units and the economy totals used for this sample.
+    -- A focus-army change while enumerating the shared unit cache invalidates
+    -- both its units and the economy totals used for this sample.
     if GetFocusArmy() ~= army then
         currentArmy = false
         lastScanTick = false
