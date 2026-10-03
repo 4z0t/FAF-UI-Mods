@@ -74,7 +74,9 @@ function Main()
         ReUI.Core.Hook("/lua/ui/game/tabs.lua", "CommonLogic", function(field, module)
             return function()
                 field()
-                module.controls.parent.HandleEvent = function(self, event)
+                local controls = module.controls
+
+                controls.parent.HandleEvent = function(self, event)
                     if event.Type == "ButtonPress" and event.Modifiers.Middle then
                         local drag = Dragger()
                         local offX = event.MouseX - self.Left() - self.Width() * 0.5
@@ -91,6 +93,18 @@ function Main()
                         return true
                     end
                     return false
+                end
+
+                for i = 1, 3 do
+                    local handleEvent = controls.tabs[i].HandleEvent
+                    ---@param self MauiCheckbox
+                    ---@param event KeyEvent
+                    controls.tabs[i].HandleEvent = function(self, event)
+                        if (event.Type == 'ButtonPress' or event.Type == 'ButtonDClick') and event.Modifiers.Middle then
+                            return false
+                        end
+                        return handleEvent(self, event)
+                    end
                 end
 
             end
