@@ -34,6 +34,14 @@ function Main()
                 controls.bg.Left:Set(savedParent.Left() - controls.bg.Width() - 10)
                 controls.collapseArrow:SetCheck(true, true)
                 controls.bg:Hide()
+
+                -- Game shows all controls at start and MULTIFUNCTION thinks it is expanded
+                -- So we tell it to HIDE anyway
+                ForkThread(function()
+                    WaitSeconds(1)
+                    module.ToggleMFDPanel(false)
+                end)
+
             end
         end)
     end
@@ -47,6 +55,13 @@ function Main()
                 controls.parent.Top:Set(savedParent.Top() - controls.parent.Height())
                 controls.collapseArrow:SetCheck(true, true)
                 controls.parent:Hide()
+
+                -- Game shows all controls at start and TABS thinks it is expanded
+                -- So we tell it to HIDE anyway
+                ForkThread(function()
+                    WaitSeconds(1)
+                    module.ToggleTabDisplay(false)
+                end)
             end
         end)
     end
