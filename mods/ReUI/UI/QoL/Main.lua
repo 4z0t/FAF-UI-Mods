@@ -34,6 +34,14 @@ function Main()
                 controls.bg.Left:Set(savedParent.Left() - controls.bg.Width() - 10)
                 controls.collapseArrow:SetCheck(true, true)
                 controls.bg:Hide()
+
+                -- Game shows all controls at start and MULTIFUNCTION thinks it is expanded
+                -- So we tell it to HIDE anyway
+                ForkThread(function()
+                    WaitSeconds(1)
+                    module.ToggleMFDPanel(false)
+                end)
+
             end
         end)
     end
@@ -47,6 +55,13 @@ function Main()
                 controls.parent.Top:Set(savedParent.Top() - controls.parent.Height())
                 controls.collapseArrow:SetCheck(true, true)
                 controls.parent:Hide()
+
+                -- Game shows all controls at start and TABS thinks it is expanded
+                -- So we tell it to HIDE anyway
+                ForkThread(function()
+                    WaitSeconds(1)
+                    module.ToggleTabDisplay(false)
+                end)
             end
         end)
     end
@@ -74,7 +89,9 @@ function Main()
         ReUI.Core.Hook("/lua/ui/game/tabs.lua", "CommonLogic", function(field, module)
             return function()
                 field()
-                module.controls.parent.HandleEvent = function(self, event)
+                local controls = module.controls
+
+                controls.parent.HandleEvent = function(self, event)
                     if event.Type == "ButtonPress" and event.Modifiers.Middle then
                         local drag = Dragger()
                         local offX = event.MouseX - self.Left() - self.Width() * 0.5
@@ -91,6 +108,18 @@ function Main()
                         return true
                     end
                     return false
+                end
+
+                for i = 1, 3 do
+                    local handleEvent = controls.tabs[i].HandleEvent
+                    ---@param self MauiCheckbox
+                    ---@param event KeyEvent
+                    controls.tabs[i].HandleEvent = function(self, event)
+                        if (event.Type == 'ButtonPress' or event.Type == 'ButtonDClick') and event.Modifiers.Middle then
+                            return false
+                        end
+                        return handleEvent(self, event)
+                    end
                 end
 
             end
