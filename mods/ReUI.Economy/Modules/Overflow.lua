@@ -4,27 +4,55 @@ local LOG = LOG
 local math = math
 
 local SCAN_INTERVAL_TICKS = 10
+local PRODUCER_REFRESH_TICKS = 50
 
 local currentArmy = false
 local lastReclaimed = 0
 local lastScanTick = false
+local lastProducerRefreshTick = false
 local cachedOverflow = 0
 local lastError = false
+local producers = {}
 
 local function Reset(army, tick, totals)
     currentArmy = army
     lastScanTick = tick
+    lastProducerRefreshTick = false
     lastReclaimed = totals.reclaimed.ENERGY or 0
     cachedOverflow = 0
+    producers = {}
 end
 
-local function SumOwnEnergyProduction()
-    local production = 0
+local function RefreshProducers(tick)
+    if lastProducerRefreshTick
+        and tick - lastProducerRefreshTick < PRODUCER_REFRESH_TICKS then
+        return
+    end
+
+    lastProducerRefreshTick = tick
+    producers = {}
 
     -- ENERGYPRODUCTION covers power generators, hydrocarbon plants,
     -- ACUs, SACUs and other units that currently produce energy.
-    for _, unit in ReUI.Units.Get() do
-        if not unit:IsDead() and unit:IsInCategory('ENERGYPRODUCTION') then
+    for id, unit in ReUI.Units.Get() do
+        if not unit:IsDead() then
+            local blueprint = unit:GetBlueprint()
+            if blueprint.CategoriesHash.ENERGYPRODUCTION then
+                producers[id] = unit
+            end
+        end
+    end
+end
+
+local function SumOwnEnergyProduction(tick)
+    RefreshProducers(tick)
+
+    local production = 0
+
+    for id, unit in producers do
+        if unit:IsDead() then
+            producers[id] = nil
+        else
             local econ = unit:GetEconData()
             production = production + (econ and econ.energyProduced or 0)
         end
@@ -38,7 +66,9 @@ local function Calculate(totals, tps)
     if not army or army < 1 then
         currentArmy = false
         lastScanTick = false
+        lastProducerRefreshTick = false
         cachedOverflow = 0
+        producers = {}
         return cachedOverflow
     end
 
@@ -55,14 +85,16 @@ local function Calculate(totals, tps)
 
     local reclaimed = totals.reclaimed.ENERGY or 0
     local reclaimRate = (reclaimed - lastReclaimed) / ticksPassed * tps
-    local ownProduction = SumOwnEnergyProduction()
+    local ownProduction = SumOwnEnergyProduction(tick)
 
     -- A focus-army change while enumerating the shared unit cache invalidates
     -- both its units and the economy totals used for this sample.
     if GetFocusArmy() ~= army then
         currentArmy = false
         lastScanTick = false
+        lastProducerRefreshTick = false
         cachedOverflow = 0
+        producers = {}
         return cachedOverflow
     end
 
