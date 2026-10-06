@@ -502,7 +502,7 @@ QuickContainer = Class()
         ---@type Group
         local g = Group(self._control)
 
-        local w, h = self._context:MakeContainer(g):Build(fn)
+        local w, h = self:Context():MakeContainer(g):Build(fn)
 
         if height == 0 then
             height = h
@@ -622,6 +622,20 @@ QuickContainer = Class()
         self:Builder():AddControl(cb, {
             width = LayoutFor:UnscaleNumber(cb.Width()),
             height = LayoutFor:UnscaleNumber(cb.Height())
+        })
+    end,
+
+    ---@param self Quick.Container
+    ---@param label string
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param min number
+    ---@param max number
+    ---@param inc? number
+    OptionSlider = function(self, label, option, min, max, inc)
+        local slider = ReUI.Options.Controls.OptionSlider(self._control, option, label, min, max, inc)
+        self:Builder():AddControl(slider, {
+            width = 0,
+            height = 40
         })
     end,
 }

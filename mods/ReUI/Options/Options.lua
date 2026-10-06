@@ -227,6 +227,7 @@ function Main(isReplay)
         Controls = {
             OptionControl = import("Modules/OptionControls/OptionControl.lua").OptionControl,
             OptionCheckbox = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
+            OptionSlider = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
         },
 
         Builder = {
