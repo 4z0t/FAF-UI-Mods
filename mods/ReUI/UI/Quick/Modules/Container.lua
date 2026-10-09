@@ -638,6 +638,18 @@ QuickContainer = Class()
             height = 40
         })
     end,
+
+    ---@param self Quick.Container
+    ---@param label string
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param items ItemData[]
+    OptionCombo = function(self, label, option, items)
+        local slider = ReUI.Options.Controls.OptionCombo(self._control, option, label, items)
+        self:Builder():AddControl(slider, {
+            width = 0,
+            height = 40
+        })
+    end,
 }
 
 ---@class Quick.Context

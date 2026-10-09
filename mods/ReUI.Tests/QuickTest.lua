@@ -44,12 +44,20 @@ function Run()
             for j = 1, i do
                 g:Checkbox("Checkbox")
             end
-            g:Combo("Combo", {
-                "one",
-                "two",
-                "three"
-            }, function(index, text)
-            end)
+            g:OptionCombo("Combo", options.item, {
+                {
+                    value = "one",
+                    text = "lmao",
+                },
+                {
+                    value = "two",
+                    text = "kekw",
+                },
+                {
+                    value = "three",
+                    text = "lol",
+                },
+            })
         end)
         q:SameLine(2)
         q:Image("/mods/ReUI/icon.png", 200)
