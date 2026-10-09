@@ -613,43 +613,6 @@ QuickContainer = Class()
         end
         Tooltip.AddControlTooltipManual(prev, title, text, delay)
     end,
-
-    ---@param self Quick.Container
-    ---@param label string
-    ---@param option ReUI.Options.ReactiveOption
-    OptionCheckbox = function(self, label, option)
-        local cb = ReUI.Options.Controls.OptionCheckbox(self._control, option, label)
-        self:Builder():AddControl(cb, {
-            width = LayoutFor:UnscaleNumber(cb.Width()),
-            height = LayoutFor:UnscaleNumber(cb.Height())
-        })
-    end,
-
-    ---@param self Quick.Container
-    ---@param label string
-    ---@param option ReUI.Options.ReactiveOption
-    ---@param min number
-    ---@param max number
-    ---@param inc? number
-    OptionSlider = function(self, label, option, min, max, inc)
-        local slider = ReUI.Options.Controls.OptionSlider(self._control, option, label, min, max, inc)
-        self:Builder():AddControl(slider, {
-            width = 0,
-            height = 40
-        })
-    end,
-
-    ---@param self Quick.Container
-    ---@param label string
-    ---@param option ReUI.Options.ReactiveOption
-    ---@param items ItemData[]
-    OptionCombo = function(self, label, option, items)
-        local slider = ReUI.Options.Controls.OptionCombo(self._control, option, label, items)
-        self:Builder():AddControl(slider, {
-            width = 0,
-            height = 40
-        })
-    end,
 }
 
 ---@class Quick.Context

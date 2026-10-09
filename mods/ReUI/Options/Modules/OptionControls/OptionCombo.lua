@@ -6,7 +6,9 @@ local OptionControl = import("OptionControl.lua").OptionControl
 
 local LINQ = ReUI.LINQ
 
-local Contains = LINQ.IPairsEnumerator:Select "value":Contains()
+local Contains = LINQ.IPairsEnumerator
+    :Select "value"
+    :Contains()
 
 ---@class ItemData
 ---@field value string
@@ -14,6 +16,7 @@ local Contains = LINQ.IPairsEnumerator:Select "value":Contains()
 
 ---@class ReUI.Options.OptionCombo : ReUI.Options.OptionControl
 ---@field _combo Combo
+---@field _text ReUI.UI.Controls.Text
 ---@field _items ItemData[]
 OptionCombo = ReUI.Core.Class(OptionControl) {
 
@@ -55,6 +58,7 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
     end,
 
     ---@param self ReUI.Options.OptionCombo
+    ---@param option ReUI.Options.ReactiveOption
     ---@param newValue string
     ValueChanged = function(self, option, newValue)
         local i = Contains(self._items, newValue)

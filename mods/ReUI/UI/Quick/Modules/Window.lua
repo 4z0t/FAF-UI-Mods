@@ -1,12 +1,11 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
-local Group = import('/lua/maui/group.lua').Group
 local Button = import("/lua/maui/button.lua").Button
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local WindowFrame = ReUI.UI.Views.WindowFrame
-local OptionRef = ReUI.Options.OptionRef
+local Group = ReUI.UI.Controls.Group
 
 local QuickContext = import("Container.lua").Context
 
@@ -42,7 +41,7 @@ local function FormatName(name)
     return (name:gsub("[^A-Za-z0-9]+", "_"))
 end
 
----@class Quick.Window : Group
+---@class Quick.Window : ReUI.UI.Controls.Group
 ---@field _frame Quick.Border
 ---@field _titleBar Group
 ---@field _title Text
@@ -57,8 +56,10 @@ end
 ---@field _position ReUI.Options.OptionRef
 ---@field _context Quick.Context
 ---@field _fn fun(q: Quick.Container)
-QuickWindow = Class(Group)
+QuickWindow = ReUI.Core.Class(Group)
 {
+    Prefix = "Quick.Windows",
+
     ---@param self Quick.Window
     ---@param title string
     ---@param fn fun(q: Quick.Container)
@@ -74,8 +75,9 @@ QuickWindow = Class(Group)
         self._fn = fn
 
         self._context = self:CreateContext()
+        self._content = Group(self)
 
-        self._position = OptionRef { "Quick.Windows", FormatName(title) }
+        self._position = ReUI.Options.OptionRef { self.Prefix, FormatName(title) }
 
         self._frame      = Border(self)
         self._titleBar   = Group(self)
@@ -87,9 +89,13 @@ QuickWindow = Class(Group)
             closeButton.dis)
         self._resizeGrip = Bitmap(self)
 
-        self:SetupLayout()
-        self:Rebuild()
         self:SetupInteractions()
+    end,
+
+    ---@param self Quick.Window
+    __post_init = function(self)
+        Group.__post_init(self)
+        self:Rebuild()
     end,
 
     ---@param self Quick.Window
@@ -106,40 +112,8 @@ QuickWindow = Class(Group)
     end,
 
     ---@param self Quick.Window
-    ---@return Quick.Context
-    CreateContext = function(self)
-        return QuickContext(self)
-    end,
-
-    ---@param self Quick.Window
-    Rebuild = function(self)
-        if IsDestroyed(self._content) then
-            self._content = Group(self)
-        else
-            self._content:ClearChildren()
-        end
-
-        local w, h = self._context:MakeContainer(self._content):Build(self._fn)
-        self._minWidth = w + self._padding * 2
-        self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
-
-        self._width = math.max(self._minWidth, self._width)
-        self._height = math.max(self._minHeight, self._height)
-
-        LayoutFor(self._content)
-            :Below(self._titleBar)
-            :AtLeftIn(self, self._padding)
-            :AtRightIn(self, self._padding)
-            :AtBottomIn(self, self._padding)
-
-        LayoutFor(self)
-            :Width(self._width)
-            :Height(self._height)
-    end,
-
-
-    ---@param self Quick.Window
-    SetupLayout = function(self)
+    ---@param layouter ReUI.UI.Layouter
+    InitLayout = function(self, layouter)
         LayoutFor(self._frame)
             :OffsetIn(self, -5, -1, -5, -5)
             :Under(self)
@@ -173,10 +147,55 @@ QuickWindow = Class(Group)
         LayoutFor(self)
             :Left(pos[1])
             :Top(pos[2])
-            :Width(400)
-            :Height(300)
+            :Width(self._width)
+            :Height(self._height)
             :Over(frame, frame:GetTopmostDepth() + 1)
 
+        LayoutFor(self._content)
+            :Below(self._titleBar)
+            :AtLeftIn(self, self._padding)
+            :AtRightIn(self, self._padding)
+            :AtBottomIn(self, self._padding)
+    end,
+
+    ---@param self Quick.Window
+    ---@return Quick.Context
+    CreateContext = function(self)
+        return QuickContext(self)
+    end,
+
+    ---@param self Quick.Window
+    ---@param w number
+    ---@param h number
+    OnContentResize = function(self, w, h)
+        self._minWidth = w + self._padding * 2
+        self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
+
+        self._width = math.max(self._minWidth, self._width)
+        self._height = math.max(self._minHeight, self._height)
+
+        LayoutFor(self._content)
+            :Below(self._titleBar)
+            :AtLeftIn(self, self._padding)
+            :AtRightIn(self, self._padding)
+            :AtBottomIn(self, self._padding)
+
+        LayoutFor(self)
+            :Width(self._width)
+            :Height(self._height)
+    end,
+
+    ---@param self Quick.Window
+    Rebuild = function(self)
+        self._content:ClearChildren()
+
+        local w, h = self._context:MakeContainer(self._content):Build(self._fn)
+        self:OnContentResize(w, h)
+    end,
+
+    ---@param self Quick.Window
+    OnClose = function(self)
+        self:Destroy()
     end,
 
     ---@param self Quick.Window
@@ -200,7 +219,7 @@ QuickWindow = Class(Group)
         end
 
         self._closeBtn.OnClick = function(control, modifiers)
-            self:Destroy()
+            self:OnClose()
         end
 
         self._resizeGrip.HandleEvent = function(grip, event)

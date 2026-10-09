@@ -3,6 +3,7 @@ ReUI.Require
     "ReUI.Core >= 1.6.0",
     "ReUI.Core.Events >= 1.0.0",
     "ReUI.UI >= 1.0.0",
+    "ReUI.Options >= 1.2.0",
     "ReUI.UI.Quick >= 0.1.0",
 }
 

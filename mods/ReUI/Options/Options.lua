@@ -6,7 +6,8 @@ ReUI.Require
     "ReUI.Core >= 1.5.0",
     "ReUI.Core.Events >= 1.0.0",
     "ReUI.LINQ >= 1.0.0",
-    "ReUI.UI.Views >= 1.0.0"
+    "ReUI.UI.Views >= 1.0.0",
+    "ReUI.UI.Quick >= 1.0.0",
 }
 
 function Main(isReplay)
@@ -225,23 +226,40 @@ function Main(isReplay)
     ---@class ReUI.Options : ReUI.Module
     return {
         Controls = {
-            OptionControl = import("Modules/OptionControls/OptionControl.lua").OptionControl,
-            OptionCheckbox = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
-            OptionSlider = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
-            OptionCombo = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
+            Control = import("Modules/OptionControls/OptionControl.lua").OptionControl,
+            Checkbox = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
+            Slider = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
+            Combo = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
         },
 
+        ---@type ReUI.Options.Window | fun(title: string, fn: fun(q: OptionsContainer)): ReUI.Options.Window
+        Window = import("Modules/OptionControls/OptionsWindow.lua").OptionsWindow,
+
+        Add = OptionsSelector.AddOptions,
+
+        ---@deprecated
         Builder = {
+            ---@deprecated
             AddOptions  = OptionsSelector.AddOptions,
+            ---@deprecated
             Splitter    = OptionsSelector.Splitter,
+            ---@deprecated
             Column      = OptionsSelector.Column,
+            ---@deprecated
             Title       = OptionsSelector.Title,
+            ---@deprecated
             Color       = OptionsSelector.Color,
+            ---@deprecated
             Filter      = OptionsSelector.Filter,
+            ---@deprecated
             Slider      = OptionsSelector.Slider,
+            ---@deprecated
             TextEdit    = OptionsSelector.TextEdit,
+            ---@deprecated
             ColorSlider = OptionsSelector.ColorSlider,
+            ---@deprecated
             Strings     = OptionsSelector.Strings,
+            ---@deprecated
             Fonts       = OptionsSelector.Fonts,
         },
 
