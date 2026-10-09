@@ -33,6 +33,7 @@ local sliderTextures = {
 ---@field _sameLine boolean
 ---@field _terminatedLine boolean
 ---@field _prevControl Control?
+---@field _widthStack number[]
 local Builder = Class()
 {
     ---@param self Quick.Builder
@@ -53,6 +54,29 @@ local Builder = Class()
         self._terminatedLine = false
 
         self._prevControl = nil
+
+        self._widthStack = {}
+    end,
+
+    ---@param self Quick.Builder
+    ---@return number
+    GetItemWidth = function(self)
+        local n = table.getn(self._widthStack)
+        if n == 0 then
+            return 0
+        end
+        return self._widthStack[n]
+    end,
+
+    ---@param self Quick.Builder
+    ---@param width number
+    PushItemWidth = function(self, width)
+        table.insert(self._widthStack, width)
+    end,
+
+    ---@param self Quick.Builder
+    PopItemWidth = function(self)
+        table.remove(self._widthStack)
     end,
 
     ---@param self Quick.Builder
@@ -264,9 +288,32 @@ QuickContainer = Class()
     end,
 
     ---@param self Quick.Container
+    ---@param width number
+    PushItemWidth = function(self, width)
+        self:Builder():PushItemWidth(width)
+    end,
+
+    ---@param self Quick.Container
+    PopItemWidth = function(self)
+        self:Builder():PopItemWidth()
+    end,
+
+    ---@param self Quick.Container
     ---@param spacing? number
     SameLine = function(self, spacing)
         self:Builder():SameLine(spacing)
+    end,
+
+    ---@param self Quick.Container
+    ---@param amount? number
+    Indent = function(self, amount)
+        self:Builder():Indent(amount)
+    end,
+
+    ---@param self Quick.Container
+    ---@param amount? number
+    Unindent = function(self, amount)
+        self:Builder():Unindent(amount)
     end,
 
     ---@param self Quick.Container
@@ -378,7 +425,7 @@ QuickContainer = Class()
         group.ValueText = valueText
 
         self:Builder():AddControl(group, {
-            width = 0,
+            width = self:Builder():GetItemWidth(),
             height = 40
         })
     end,
@@ -423,7 +470,7 @@ QuickContainer = Class()
         group.Label = name
 
         self:Builder():AddControl(group, {
-            width = 0,
+            width = self:Builder():GetItemWidth(),
             height = 40
         })
     end,
@@ -489,7 +536,7 @@ QuickContainer = Class()
         group.Label = name
 
         self:Builder():AddControl(group, {
-            width = 0,
+            width = self:Builder():GetItemWidth(),
             height = 40
         })
     end,
@@ -588,18 +635,6 @@ QuickContainer = Class()
         })
 
         return isOpen
-    end,
-
-    ---@param self Quick.Container
-    ---@param amount? number
-    Indent = function(self, amount)
-        self:Builder():Indent(amount)
-    end,
-
-    ---@param self Quick.Container
-    ---@param amount? number
-    Unindent = function(self, amount)
-        self:Builder():Unindent(amount)
     end,
 
     ---@param self Quick.Container

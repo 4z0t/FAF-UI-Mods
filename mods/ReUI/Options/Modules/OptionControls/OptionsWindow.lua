@@ -34,7 +34,7 @@ OptionsContainer = Class(QuickContainer)
         self:Context():TrackOption(option)
         local slider = ReUI.Options.Controls.Slider(self._control, option, label, min, max, inc)
         self:Builder():AddControl(slider, {
-            width = 0,
+            width = self:Builder():GetItemWidth(),
             height = 40
         })
     end,
@@ -47,7 +47,7 @@ OptionsContainer = Class(QuickContainer)
         self:Context():TrackOption(option)
         local slider = ReUI.Options.Controls.Combo(self._control, option, label, items)
         self:Builder():AddControl(slider, {
-            width = 0,
+            width = self:Builder():GetItemWidth(),
             height = 40
         })
     end,

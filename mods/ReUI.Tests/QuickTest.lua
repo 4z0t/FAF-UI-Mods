@@ -11,10 +11,8 @@ function Run()
             g:Button("Crash", function()
                 GetUnitCommandData("nil")
             end)
-            g:OptionCheckbox("Checkbox", options.test)
             g:SameLine()
             g:Text("AAAA")
-            g:OptionSlider("Slider", options.value, 0, 100)
         end)
         q:SameLine()
         q:Group(-20, 200, function(g)
@@ -29,7 +27,6 @@ function Run()
             g:Edit("Input", function(text)
             end)
             g:Text("Text")
-            g:OptionSlider("Slider 2", options.value, 0, 100)
         end)
         q:Group(200, 0, function(g)
             g:Indent(20)
@@ -44,20 +41,6 @@ function Run()
             for j = 1, i do
                 g:Checkbox("Checkbox")
             end
-            g:OptionCombo("Combo", options.item, {
-                {
-                    value = "one",
-                    text = "lmao",
-                },
-                {
-                    value = "two",
-                    text = "kekw",
-                },
-                {
-                    value = "three",
-                    text = "lol",
-                },
-            })
         end)
         q:SameLine(2)
         q:Image("/mods/ReUI/icon.png", 200)
