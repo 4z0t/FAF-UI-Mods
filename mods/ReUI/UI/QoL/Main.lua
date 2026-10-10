@@ -18,6 +18,9 @@ function Main()
 
     local LayoutFor = ReUI.UI.FloorLayoutFor
 
+    local QuickWindow = ReUI.UI.Quick.Window
+    local QuickContainer = ReUI.UI.Quick.Container
+    local QuickContext = ReUI.UI.Quick.Context
 
     local options = ReUI.Options.Mods["ReUI.UI.QoL"]
 
@@ -145,153 +148,151 @@ function Main()
         end)
     end
 
-    if options.advancedPingDialog.Value then
 
-        local QuickWindow = ReUI.UI.Quick.Window
-        local QuickContainer = ReUI.UI.Quick.Container
-        local QuickContext = ReUI.UI.Quick.Context
-
-        ---@class ReUI.UI.QoL.PingDialog : Quick.Window
-        local Dialog = ReUI.Core.Class(QuickWindow)
+    ---@class ReUI.UI.QoL.PingDialog : Quick.Window
+    local Dialog = ReUI.Core.Class(QuickWindow)
+    {
+        ContextClass = ReUI.Core.Class(QuickContext)
         {
-            ContextClass = ReUI.Core.Class(QuickContext)
+            ---@class ReUI.UI.QoL.PingDialog.Container : Quick.Container
+            ContainerClass = ReUI.Core.Class(QuickContainer)
             {
-                ---@class ReUI.UI.QoL.PingDialog.Container : Quick.Container
-                ContainerClass = ReUI.Core.Class(QuickContainer)
-                {
-                    ---@param self ReUI.UI.QoL.PingDialog.Container
-                    Input = function(self, cb, onEscape)
-                        local edit = Edit(self._control)
+                ---@param self ReUI.UI.QoL.PingDialog.Container
+                Input = function(self, cb, onEscape)
+                    local edit = Edit(self._control)
+                    edit:AcquireFocus()
+
+                    edit.OnLoseKeyboardFocus = function(self)
                         edit:AcquireFocus()
+                    end
 
-                        edit.OnLoseKeyboardFocus = function(self)
-                            edit:AcquireFocus()
-                        end
+                    LayoutFor(edit)
+                        :Top(0)
+                        :Left(0)
+                        :Width(0)
+                        :Height(24)
 
-                        LayoutFor(edit)
-                            :Top(0)
-                            :Left(0)
-                            :Width(0)
-                            :Height(24)
+                    UIUtil.SetupEditStd(edit, "ff00ff00", 'ff000000', "ffffffff",
+                        UIUtil.highlightColor, UIUtil.bodyFont, 20, 100)
 
-                        UIUtil.SetupEditStd(edit, "ff00ff00", 'ff000000', "ffffffff",
-                            UIUtil.highlightColor, UIUtil.bodyFont, 20, 100)
+                    edit.OnEnterPressed = function(e, text)
+                        cb(text)
+                        return true
+                    end
 
-                        edit.OnEnterPressed = function(e, text)
-                            cb(text)
-                            return true
-                        end
+                    edit.OnEscPressed = function(self, text)
+                        onEscape(text)
+                        return true
+                    end
 
-                        edit.OnEscPressed = function(self, text)
-                            onEscape(text)
-                            return true
-                        end
+                    self:Builder():AddControl(edit, {
+                        width = self:Builder():GetItemWidth(),
+                        height = 24
+                    })
 
-                        self:Builder():AddControl(edit, {
-                            width = self:Builder():GetItemWidth(),
-                            height = 24
-                        })
+                end,
 
-                    end,
+                ---@param self ReUI.UI.QoL.PingDialog.Container
+                SelectorLine = function(self, text, cb)
+                    local line = CheckBox(self._control,
+                        UIUtil.SkinnableFile('/MODS/blank.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/single.dds'),
+                        UIUtil.SkinnableFile('/MODS/double.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                        UIUtil.SkinnableFile('/MODS/disabled.dds'),
+                        'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
 
-                    ---@param self ReUI.UI.QoL.PingDialog.Container
-                    SelectorLine = function(self, text, cb)
-                        local line = CheckBox(self._control,
-                            UIUtil.SkinnableFile('/MODS/blank.dds'),
-                            UIUtil.SkinnableFile('/MODS/single.dds'),
-                            UIUtil.SkinnableFile('/MODS/single.dds'),
-                            UIUtil.SkinnableFile('/MODS/double.dds'),
-                            UIUtil.SkinnableFile('/MODS/disabled.dds'),
-                            UIUtil.SkinnableFile('/MODS/disabled.dds'),
-                            'UI_Tab_Click_01', 'UI_Tab_Rollover_01')
+                    line.text = UIUtil.CreateText(line, '', 18, UIUtil.bodyFont, true)
+                    line.text:SetText(text)
 
-                        line.text = UIUtil.CreateText(line, '', 18, UIUtil.bodyFont, true)
-                        line.text:SetText(text)
+                    line.OnCheck = function(l, checked)
+                        cb()
+                    end
 
-                        line.OnCheck = function(l, checked)
-                            cb()
-                        end
+                    LayoutFor(line.text)
+                        :Color('FFE9ECE9')
+                        :DisableHitTest()
+                        :AtLeftIn(line, 5)
+                        :AtVerticalCenterIn(line)
 
-                        LayoutFor(line.text)
-                            :Color('FFE9ECE9')
-                            :DisableHitTest()
-                            :AtLeftIn(line, 5)
-                            :AtVerticalCenterIn(line)
+                    self:Builder():AddControl(line, {
+                        width = self:Builder():GetItemWidth(),
+                        height = 30
+                    })
+                end,
 
-                        self:Builder():AddControl(line, {
-                            width = self:Builder():GetItemWidth(),
-                            height = 30
-                        })
-                    end,
-
-                }
             }
         }
+    }
 
-        ReUI.Core.Hook("/lua/ui/game/ping.lua", "NamePing", function(field, module)
-            local UTF = import("/lua/utf.lua")
-            local Enumerate = ReUI.LINQ.Enumerate
+    ReUI.Core.Hook("/lua/ui/game/ping.lua", "NamePing", function(field, module)
+        local UTF = import("/lua/utf.lua")
+        local Enumerate = ReUI.LINQ.Enumerate
 
-            ---@type ReUI.Options.OptionRef
-            local history = ReUI.Options.OptionRef { "PingHistory" }
+        ---@type ReUI.Options.OptionRef
+        local history = ReUI.Options.OptionRef { "PingHistory" }
 
-            local function AddEntry(text)
-                text = UTF.EscapeString(text)
+        local function AddEntry(text)
+            text = UTF.EscapeString(text)
 
-                local prev = history:Get({})
-                local i = Enumerate(prev):Select "text":Contains(text)
+            local prev = history:Get({})
+            local i = Enumerate(prev):Select "text":Contains(text)
 
-                if i then
-                    prev[i].count = prev[i].count + 1
-                else
-                    table.insert(prev, { text = text, count = 1 })
-                end
-
-                history:Set(prev)
+            if i then
+                prev[i].count = prev[i].count + 1
+            else
+                table.insert(prev, { text = text, count = 1 })
             end
 
-            return function(callback, curName)
-                if not IsDestroyed(ReUI.UI.Global["PingDialog"]) then
-                    return
-                end
+            history:Set(prev)
+        end
 
-                local function OnInput(text)
-                    if not callback(text) then
-                        AddEntry(text)
-                        ReUI.UI.Global["PingDialog"]:Destroy()
-                    end
-                end
-
-                ---@param q ReUI.UI.QoL.PingDialog.Container
-                ReUI.UI.Global["PingDialog"] = Dialog(LOC("<LOC markers_0000>Enter Marker Name"), function(q)
-                    q:PushItemWidth(324)
-                    q:Input(OnInput, function()
-                        ReUI.UI.Global["PingDialog"]:Destroy()
-                    end)
-                    q:PopItemWidth()
-
-                    local list = history:Get({})
-                    list       = Enumerate(list)
-                        :OrderByDescending(function(v) return v.count end)
-                        :Select(function(v) return UTF.UnescapeString(v.text) end)
-                        :ToArray()
-
-                    ---@param row ReUI.UI.QoL.PingDialog.Container
-                    q:ScrollableList(0, 300, table.getn(list), 30, function(row, index)
-                        local text = list[index]
-                        row:SelectorLine(text, function(modifiers)
-                            OnInput(text)
-                        end)
-                    end)
-
-                    if q:Collapsible("History options", false) then
-                        q:Button("clear history", function(modifiers)
-                            history:Set({})
-                            q:Context():UpdateWindow()
-                        end)
-                    end
-                end, "ping_dialog")
+        return function(callback, curName)
+            if not options.advancedPingDialog.Value then
+                return field(callback, curName)
             end
-        end)
-    end
+
+            if not IsDestroyed(ReUI.UI.Global["PingDialog"]) then
+                return
+            end
+
+            local function OnInput(text)
+                if not callback(text) then
+                    AddEntry(text)
+                    ReUI.UI.Global["PingDialog"]:Destroy()
+                end
+            end
+
+            ---@param q ReUI.UI.QoL.PingDialog.Container
+            ReUI.UI.Global["PingDialog"] = Dialog(LOC("<LOC markers_0000>Enter Marker Name"), function(q)
+                q:PushItemWidth(324)
+                q:Input(OnInput, function()
+                    ReUI.UI.Global["PingDialog"]:Destroy()
+                end)
+                q:PopItemWidth()
+
+                local list = history:Get({})
+                list       = Enumerate(list)
+                    :OrderByDescending(function(v) return v.count end)
+                    :Select(function(v) return UTF.UnescapeString(v.text) end)
+                    :ToArray()
+
+                ---@param row ReUI.UI.QoL.PingDialog.Container
+                q:ScrollableList(0, 300, table.getn(list), 30, function(row, index)
+                    local text = list[index]
+                    row:SelectorLine(text, function(modifiers)
+                        OnInput(text)
+                    end)
+                end)
+
+                if q:Collapsible("History options", false) then
+                    q:Button("clear history", function(modifiers)
+                        history:Set({})
+                        q:Context():UpdateWindow()
+                    end)
+                end
+            end, "ping_dialog")
+        end
+    end)
 end
