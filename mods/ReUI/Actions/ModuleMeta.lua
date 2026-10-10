@@ -23,7 +23,9 @@ end
 ---@param category? string
 ---@param name? string @optional formatted name
 ---@param modifiers? ActionModifiers
-function ReUI.Actions.SelectionAction(description, func, category, name, modifiers)
+---@param orders? OrderName[]
+---@param blueprints? BlueprintId[]
+function ReUI.Actions.SelectionAction(description, func, category, name, modifiers, orders, blueprints)
 end
 
 ---Returns formatted name for the action

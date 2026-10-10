@@ -29,9 +29,10 @@ OptionControl = ReUI.Core.Class(Group)
     end,
 
     ---@param self ReUI.Options.OptionControl
-    Destroy = function(self)
+    OnDestroy = function(self)
         self._option.OnChanged:Remove { self, self.ValueChanged }
         self._option = nil
-        Group.Destroy(self)
+
+        Group.OnDestroy(self)
     end
 }

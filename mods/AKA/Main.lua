@@ -88,6 +88,7 @@ function Main()
 
         CategoryMatcher "Transportation / Overcharge / Repeat queue"
             :Modifiers { shift = true }
+            :Orders { "overcharge", "transport" }
             {
                 CategoryAction(), -- do nothing if no selection
                 CategoryAction(categories.TRANSPORTATION)
@@ -102,6 +103,7 @@ function Main()
 
         CategoryMatcher "Transportation / Overcharge / Repeat queue / Explode Fire Beetle"
             :Modifiers { shift = true }
+            :Orders { "overcharge", "transport" }
             {
                 CategoryAction(), -- do nothing if no selection
                 --     :Action(Misc.AddNearestIdleEngineersSeq),
@@ -123,6 +125,7 @@ function Main()
 
         CategoryMatcher "Launch missile / attack-reclaim / attack order"
             :Modifiers { shift = true }
+            :Orders { "attack", "fire_tactical", "fire_nuke" }
             {
                 CategoryAction(categories.SILO * categories.STRUCTURE * categories.TECH3 + categories.xsb2401)
                     :Action 'StartCommandMode order RULEUCC_Nuke',
@@ -142,6 +145,7 @@ function Main()
 
         CategoryMatcher "Select nearest idle t1 engineer / reclaim / toggle shields / toggle stealth"
             :Modifiers { shift = true }
+            :Orders { "reclaim", "toggle_shield", "toggle_stealth" }
             {
                 CategoryAction()
                     :Action "UI_SelectByCategory +inview +nearest +idle ENGINEER TECH1",
@@ -162,6 +166,7 @@ function Main()
             }
 
         CategoryMatcher "Move / Select nearest transport"
+            :Orders { "move" }
             :Modifiers { shift = true }
             {
                 CategoryAction()
@@ -387,6 +392,55 @@ function Main()
 
         CategoryMatcher "Select nearest air scout / build sensors"
             :Modifiers { shift = true }
+            :Blueprints {
+                -- Air scouts
+                'uea0101',
+                'xsa0101',
+                'ura0101',
+                'uaa0101',
+                -- Land scouts
+                'uel0101',
+                'xsl0101',
+                'url0101',
+                'ual0101',
+                --- t3 omni
+                'ueb3104',
+                'xsb3104',
+                'urb3104',
+                'uab3104',
+                -- t2 radars
+                'ueb3201',
+                'xsb3201',
+                'urb3201',
+                'uab3201',
+
+                -- t1 radars
+                'ueb3101',
+                'xsb3101',
+                'urb3101',
+                'uab3101',
+
+                -- t3 sonars
+                'urs0305',
+                'ues0305',
+                'uas0305',
+
+                -- t2 sonars
+                'ueb3202',
+                'xsb3202',
+                'urb3202',
+                'uab3202',
+
+                -- t1 sonars
+                'ueb3102',
+                'xsb3102',
+                'urb3102',
+                'uab3102',
+
+                -- Eye and Soothsayer
+                'xrb3301',
+                'xab3301',
+            }
             {
                 CategoryAction()
                     :Action "UI_SelectByCategory +nearest AIR INTELLIGENCE",
