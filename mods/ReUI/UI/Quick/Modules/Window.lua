@@ -60,10 +60,13 @@ QuickWindow = ReUI.Core.Class(Group)
 {
     Prefix = "Quick.Windows",
 
+    ContextClass = QuickContext,
+
     ---@param self Quick.Window
     ---@param title string
     ---@param fn fun(q: Quick.Container)
-    __init = function(self, title, fn)
+    ---@param id? string
+    __init = function(self, title, fn, id)
         local f = GetFrame(0) --[[@as Frame]]
         Group.__init(self, f)
 
@@ -77,7 +80,7 @@ QuickWindow = ReUI.Core.Class(Group)
         self._context = self:CreateContext()
         self._content = Group(self)
 
-        self._position = ReUI.Options.OptionRef { self.Prefix, FormatName(title) }
+        self._position = ReUI.Options.OptionRef { self.Prefix, FormatName(id or title) }
 
         self._frame      = Border(self)
         self._titleBar   = Group(self)
@@ -161,7 +164,7 @@ QuickWindow = ReUI.Core.Class(Group)
     ---@param self Quick.Window
     ---@return Quick.Context
     CreateContext = function(self)
-        return QuickContext(self)
+        return self.ContextClass(self)
     end,
 
     ---@param self Quick.Window

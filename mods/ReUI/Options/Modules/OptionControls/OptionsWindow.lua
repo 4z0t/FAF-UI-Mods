@@ -57,17 +57,13 @@ OptionsContainer = Class(QuickContainer)
 ---@field _trackedOptions ReUI.Options.ReactiveOption[]
 OptionsContext = Class(QuickContext)
 {
+    ContainerClass = OptionsContainer,
+
     ---@param self Quick.Context
     ---@param window Quick.Window
     __init = function(self, window)
         QuickContext.__init(self, window)
         self._trackedOptions = {}
-    end,
-    ---@param self Quick.Context
-    ---@param control Control
-    ---@return Quick.Container
-    MakeContainer = function(self, control)
-        return OptionsContainer(control, self)
     end,
 
     ---@param self OptionsContext
@@ -102,6 +98,8 @@ OptionsContext = Class(QuickContext)
 OptionsWindow = ReUI.Core.Class(QuickWindow)
 {
     Prefix = "ReUI.Options.Windows",
+
+    ContextClass = OptionsContext,
 
     ---@param self ReUI.Options.Window
     ---@param title string
@@ -168,11 +166,5 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
             :AtVerticalCenterIn(self._bottomBar)
             :Width(80)
             :Height(24)
-    end,
-
-    ---@param self ReUI.Options.Window
-    ---@return OptionsContext
-    CreateContext = function(self)
-        return OptionsContext(self)
     end,
 }

@@ -654,6 +654,8 @@ QuickContainer = Class()
 ---@field _window Quick.Window
 Context = Class()
 {
+    ContainerClass = QuickContainer,
+
     ---@param self Quick.Context
     ---@param window Quick.Window
     __init = function(self, window)
@@ -669,6 +671,6 @@ Context = Class()
     ---@param control Control
     ---@return Quick.Container
     MakeContainer = function(self, control)
-        return QuickContainer(control, self)
+        return self.ContainerClass(control, self)
     end
 }
