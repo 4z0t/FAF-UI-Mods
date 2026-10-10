@@ -1,5 +1,5 @@
 local Options = ReUI.Options.Builder
-local Opt = ReUI.Options.OptionValue
+local Opt = ReUI.Options.Opt
 ReUI.Options.Mods["RFA"] = {
     hoverPreviewKey = Opt "SHIFT",
     selectedPreviewKey = Opt "SHIFT",
