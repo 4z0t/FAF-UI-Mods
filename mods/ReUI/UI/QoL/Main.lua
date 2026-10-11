@@ -11,8 +11,6 @@ function Main()
     local Dragger = import("/lua/maui/dragger.lua").Dragger
     local UIUtil = import("/lua/ui/uiutil.lua")
     local Prefs = import("/lua/user/prefs.lua")
-    local Group = import('/lua/maui/group.lua').Group
-    local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
     local Edit = import("/lua/maui/edit.lua").Edit
     local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
@@ -180,7 +178,7 @@ function Main()
                         return true
                     end
 
-                    edit.OnEscPressed = function(self, text)
+                    edit.OnEscPressed = function(e, text)
                         onEscape(text)
                         return true
                     end

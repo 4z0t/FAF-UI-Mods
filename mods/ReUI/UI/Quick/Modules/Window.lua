@@ -71,8 +71,8 @@ QuickWindow = ReUI.Core.Class(Group)
         Group.__init(self, f)
 
         self._padding = 8
-        self._minWidth = 0
-        self._minHeight = 0
+        self._minWidth = 100
+        self._minHeight = 50
         self._width = 0
         self._height = 0
         self._fn = fn

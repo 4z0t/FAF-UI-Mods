@@ -1,4 +1,5 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Combo = import('/lua/ui/controls/combo.lua').Combo
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local Group = ReUI.UI.Controls.Group
@@ -6,6 +7,7 @@ local Group = ReUI.UI.Controls.Group
 local QuickWindow = ReUI.UI.Quick.Window
 local QuickContainer = ReUI.UI.Quick.Container
 local QuickContext = ReUI.UI.Quick.Context
+
 
 
 ---@class OptionsContainer : Quick.Container
@@ -94,6 +96,7 @@ OptionsContext = Class(QuickContext)
 
 }
 
+
 ---@class ReUI.Options.Window : Quick.Window
 OptionsWindow = ReUI.Core.Class(QuickWindow)
 {
@@ -143,6 +146,39 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
             :Height(self._height)
     end,
 
+    ---@generic T
+    ---@param self ReUI.Options.Window
+    ---@param presets T[]
+    ---@param onSet fun(preset:T, name: string)
+    ---@param initial? integer
+    ---@return ReUI.Options.Window
+    AddPresets = function(self, presets, onSet, initial)
+        local text = UIUtil.CreateText(self._titleBar, "presets", 10, UIUtil.titleFont)
+        ---@type Combo
+        self._presetsCombo = Combo(self._titleBar, 13, 16)
+
+        LayoutFor(self._presetsCombo)
+            :AnchorToLeft(self._closeBtn, 2)
+            :AtVerticalCenterIn(self._titleBar)
+            :Width(100)
+
+        LayoutFor(text)
+            :AnchorToLeft(self._presetsCombo, 4)
+            :AtVerticalCenterIn(self._titleBar)
+            :DisableHitTest()
+
+        local l = ReUI.LINQ.Enumerate(presets)
+            :Select(function(v)
+                return v[1] or "invalid entry name"
+            end)
+            :ToArray()
+
+        self._presetsCombo:AddItems(l, initial or 0)
+        self._presetsCombo.OnClick = function(c, i, text)
+            onSet(presets[i], presets[i][1])
+        end
+        return self
+    end,
 
     ---@param self ReUI.Options.Window
     ---@param layouter ReUI.UI.Layouter
