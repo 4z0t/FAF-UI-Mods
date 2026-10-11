@@ -161,6 +161,7 @@ QuickWindow = ReUI.Core.Class(Group)
             :AtBottomIn(self, self._padding)
     end,
 
+    ---@nodiscard
     ---@param self Quick.Window
     ---@return Quick.Context
     CreateContext = function(self)

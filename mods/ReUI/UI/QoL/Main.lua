@@ -24,8 +24,7 @@ function Main()
 
     --- Set multifunction collapse arrow to its center
     ReUI.Core.Hook("/lua/ui/game/layouts/multifunction_mini.lua", "SetLayout", function(field, module)
-        return function()
-            field()
+        return function() field()
             local controls = import("/lua/ui/game/multifunction.lua").controls
             LayoutFor(controls.collapseArrow)
                 :AtVerticalCenterIn(controls.bg)
@@ -94,8 +93,7 @@ function Main()
         end
 
         ReUI.Core.Hook("/lua/ui/game/tabs.lua", "CommonLogic", function(field, module)
-            return function()
-                field()
+            return function() field()
                 local controls = module.controls
 
                 controls.parent.HandleEvent = function(self, event)
