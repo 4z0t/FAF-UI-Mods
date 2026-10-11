@@ -11,6 +11,7 @@ function Main(isReplay)
     local _Group = import('/lua/maui/group.lua').Group
     local _Text = import('/lua/maui/text.lua').Text
     local _Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+    local UIUtil = import('/lua/ui/uiutil.lua')
 
     ---@class ReUI.UI.Controls.Control : Control, ReUI.UI.Layoutable
 
@@ -42,7 +43,7 @@ function Main(isReplay)
         end,
     }
 
-    local Text;
+    local Text
     ---@class ReUI.UI.Controls.Text : Text, ReUI.UI.Controls.Control
     Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
     {
@@ -77,11 +78,27 @@ function Main(isReplay)
         end,
     }
 
+    local CheckBox
     ---@class ReUI.UI.Controls.CheckBox : MauiCheckbox, ReUI.UI.Controls.Control
-    local CheckBox = ReUI.Core.Class(_Checkbox, ReUI.UI.Layoutable)
+    CheckBox = ReUI.Core.Class(_Checkbox, ReUI.UI.Layoutable)
     {
         OnInit = Bitmap.OnInit,
         ResetLayout = Bitmap.ResetLayout,
+
+        ---@param parent Control
+        ---@param texturePath FileName
+        ---@return ReUI.UI.Controls.CheckBox
+        Create = function(parent, texturePath)
+            return CheckBox(parent,
+                UIUtil.SkinnableFile(texturePath .. 'd_up.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_up.dds'),
+                UIUtil.SkinnableFile(texturePath .. 'd_over.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_over.dds'),
+                UIUtil.SkinnableFile(texturePath .. 'd_dis.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_dis.dds'),
+                'UI_Mini_MouseDown', 'UI_Mini_Rollover'
+            )
+        end
     }
 
     return {
