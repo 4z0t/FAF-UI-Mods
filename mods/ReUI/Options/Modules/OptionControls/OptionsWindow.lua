@@ -108,42 +108,25 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
     ---@param title string
     ---@param fn fun(q: OptionsContainer)
     __init = function(self, title, fn)
-        QuickWindow.__init(self, title, fn)
-
-        self._bottomBar = Group(self)
-        self._okBtn = UIUtil.CreateButtonStd(self._bottomBar, '/widgets02/small', "OK", 14)
-        self._cancelBtn = UIUtil.CreateButtonStd(self._bottomBar, '/widgets02/small', "Cancel", 14)
-
-        self._okBtn.OnClick = function(control, modifiers)
-            if self._context:SaveOptions() then
-                SavePreferences()
-            end
-        end
-
-        self._cancelBtn.OnClick = function(control, modifiers)
-            self._context:RestoreOptions()
-        end
+        QuickWindow.__init(self, title, self:Wrap(fn))
     end,
 
     ---@param self ReUI.Options.Window
-    ---@param w number
-    ---@param h number
-    OnContentResize = function(self, w, h)
-        self._minWidth = w + self._padding * 2
-        self._minHeight = h + self._padding + 54
-
-        self._width = math.max(self._minWidth, self._width)
-        self._height = math.max(self._minHeight, self._height)
-
-        LayoutFor(self._content)
-            :Below(self._titleBar)
-            :AtLeftIn(self, self._padding)
-            :AtRightIn(self, self._padding)
-            :AnchorToTop(self._bottomBar)
-
-        LayoutFor(self)
-            :Width(self._width)
-            :Height(self._height)
+    ---@param fn fun(q: OptionsContainer)
+    Wrap = function(self, fn)
+        ---@param q OptionsContainer
+        return function(q)
+            fn(q)
+            q:Button("OK", function()
+                if q:Context():SaveOptions() then
+                    SavePreferences()
+                end
+            end)
+            q:SameLine(20)
+            q:Button("Cancel", function()
+                q:Context():RestoreOptions()
+            end)
+        end
     end,
 
     ---@generic T
@@ -178,29 +161,5 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
             onSet(presets[i], presets[i][1])
         end
         return self
-    end,
-
-    ---@param self ReUI.Options.Window
-    ---@param layouter ReUI.UI.Layouter
-    InitLayout = function(self, layouter)
-        QuickWindow.InitLayout(self, layouter)
-
-        LayoutFor(self._bottomBar)
-            :AtLeftIn(self, self._padding)
-            :AtRightIn(self, self._padding)
-            :AtBottomIn(self, self._padding)
-            :Height(30)
-
-        LayoutFor(self._okBtn)
-            :AtHorizontalCenterIn(self._bottomBar, -50)
-            :AtVerticalCenterIn(self._bottomBar)
-            :Width(80)
-            :Height(24)
-
-        LayoutFor(self._cancelBtn)
-            :AtHorizontalCenterIn(self._bottomBar, 50)
-            :AtVerticalCenterIn(self._bottomBar)
-            :Width(80)
-            :Height(24)
-    end,
+    end
 }
