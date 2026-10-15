@@ -58,6 +58,8 @@ end
 ---@field _fn fun(q: Quick.Container)
 QuickWindow = ReUI.Core.Class(Group)
 {
+    DefaultPos = { 400, 100 },
+
     Prefix = "Quick.Windows",
 
     ContextClass = QuickContext,
@@ -144,7 +146,7 @@ QuickWindow = ReUI.Core.Class(Group)
             :Color("30ffffff")
             :Over(self, 100)
 
-        local pos = self._position:Get { 400, 100 }
+        local pos = self._position:Get(self.DefaultPos)
 
         local frame = self:GetRootFrame()
         LayoutFor(self)
