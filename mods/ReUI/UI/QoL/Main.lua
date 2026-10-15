@@ -265,6 +265,7 @@ function Main()
                 q:PushItemWidth(324)
                 q:Input(OnInput, function()
                     ReUI.UI.Global["PingDialog"]:Destroy()
+                    ReUI.UI.Global["PingDialog"] = nil
                 end)
                 q:PopItemWidth()
 

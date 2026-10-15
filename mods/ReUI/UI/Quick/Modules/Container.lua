@@ -501,6 +501,18 @@ QuickContainer = Class()
     end,
 
     ---@param self Quick.Container
+    ---@param color? Color
+    Splitter = function(self, color)
+        local b = Bitmap(self._control)
+        b:SetSolidColor(color or "ff000000")
+
+        self:Builder():AddControl(b, {
+            width = self:Builder():GetItemWidth(),
+            height = 2
+        })
+    end,
+
+    ---@param self Quick.Container
     ---@param label string
     ---@param items string[]
     ---@param onSelected? fun(index:number, text:string)
