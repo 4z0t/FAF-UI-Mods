@@ -107,8 +107,9 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
     ---@param self ReUI.Options.Window
     ---@param title string
     ---@param fn fun(q: OptionsContainer)
-    __init = function(self, title, fn)
-        QuickWindow.__init(self, title, self:Wrap(fn))
+    ---@param id? string
+    __init = function(self, title, fn, id)
+        QuickWindow.__init(self, title, self:Wrap(fn), id)
     end,
 
     ---@param self ReUI.Options.Window
@@ -152,7 +153,7 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
 
         local l = ReUI.LINQ.Enumerate(presets)
             :Select(function(v)
-                return v[1] or "invalid entry name"
+                return tostring(v[1])
             end)
             :ToArray()
 

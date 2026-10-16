@@ -40,7 +40,7 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
         end
 
         self._combo:AddItems(
-            LINQ.Enumerate(self._items):Select "text":ToArray(),
+            LINQ.Enumerate(self._items):Select(function(v) return tostring(v.text) end):ToArray(),
             Contains(self._items, option:Get()) or 1)
     end,
 
