@@ -47,10 +47,23 @@ OptionsContainer = Class(QuickContainer)
     ---@param items ItemData[]
     OptionCombo = function(self, label, option, items)
         self:Context():TrackOption(option)
-        local slider = ReUI.Options.Controls.Combo(self._control, option, label, items)
-        self:Builder():AddControl(slider, {
+        local combo = ReUI.Options.Controls.Combo(self._control, option, label, items)
+        self:Builder():AddControl(combo, {
             width = self:Builder():GetItemWidth(),
             height = 40
+        })
+    end,
+
+    ---@param self OptionsContainer
+    ---@param label string
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param mode "RGB"|"ARGB"
+    OptionColorSliders = function(self, label, option, mode)
+        self:Context():TrackOption(option)
+        local slider = ReUI.Options.Controls.ColorSliders(self._control, option, label, mode)
+        self:Builder():AddControl(slider, {
+            width = LayoutFor:UnscaleNumber(slider.Width()),
+            height = LayoutFor:UnscaleNumber(slider.Height()),
         })
     end,
 }

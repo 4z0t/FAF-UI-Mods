@@ -81,28 +81,12 @@ end
 
 ---@deprecated
 ---@return OptionsContainerF
-function ColorSlider(name, optionVar, indent)
+function ColorSlider(name, optionVar, indent, mode)
     ---@param q OptionsContainer
     return function(q)
-        q:Context():TrackOption(optionVar)
-        local Color = ReUI.UI.Color
-
-        local color = optionVar.Value
-
-        q:Text(name)
-        q:Slider("A", 0, 255, 1,
-            function(value) optionVar.Value = Color.SetAlpha(optionVar.Value, value) end,
-            Color.GetAlpha(color))
-        q:Slider("R", 0, 255, 1,
-            function(value) optionVar.Value = Color.SetRed(optionVar.Value, value) end,
-            Color.GetRed(color))
-        q:Slider("G", 0, 255, 1,
-            function(value) optionVar.Value = Color.SetGreen(optionVar.Value, value) end,
-            Color.GetGreen(color))
-        q:Slider("B", 0, 255, 1,
-            function(value) optionVar.Value = Color.SetBlue(optionVar.Value, value) end,
-            Color.GetBlue(color))
-
+        q:Indent(indent or 0)
+        q:OptionColorSliders(name, optionVar, mode)
+        q:Unindent(indent or 0)
     end
 end
 

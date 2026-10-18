@@ -229,10 +229,11 @@ function Main(isReplay)
     ---@class ReUI.Options : ReUI.Module
     return {
         Controls = {
-            Control  = import("Modules/OptionControls/OptionControl.lua").OptionControl,
-            Checkbox = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
-            Slider   = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
-            Combo    = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
+            Control      = import("Modules/OptionControls/OptionControl.lua").OptionControl,
+            Checkbox     = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
+            Slider       = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
+            Combo        = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
+            ColorSliders = import("Modules/OptionControls/OptionColorSliders.lua").OptionColorSliders,
         },
 
         ---@type ReUI.Options.Window | fun(title: string, fn: fun(q: OptionsContainer), id?: string): ReUI.Options.Window
