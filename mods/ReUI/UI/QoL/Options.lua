@@ -9,8 +9,8 @@ ReUI.Options.Mods["ReUI.UI.QoL"] = {
 }
 
 function Main()
-    local options = ReUI.Options.Mods["ReUI.UI.QoL"]
-    ReUI.Options.Add("ReUI.UI.QoL", "ReUI.UI.QoL", function(frame)
+    ReUI.Options.Add("ReUI.UI.QoL", function(frame)
+        local options = ReUI.Options.Mods["ReUI.UI.QoL"]
         return ReUI.Options.Window("ReUI.UI.QoL", function(q)
             q:OptionCheckbox("Movable menu panel", options.movableMenuPanel)
             q:OptionCheckbox("Start game with multifunction panel closed", options.multifunctionPanelCollapsed)

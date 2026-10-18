@@ -239,7 +239,11 @@ function Main(isReplay)
         ---@type ReUI.Options.Window | fun(title: string, fn: fun(q: OptionsContainer), id?: string): ReUI.Options.Window
         Window = import("Modules/OptionControls/OptionsWindow.lua").OptionsWindow,
 
-        Add = OptionsSelector.AddOptions,
+        ---@param name string
+        ---@param fn fun(frame:Frame):Control
+        Add = function(name, fn)
+            OptionsSelector.AddOptions(name, name, fn)
+        end,
 
         ---@deprecated
         Builder = {

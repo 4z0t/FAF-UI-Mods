@@ -15,6 +15,7 @@ local LF = ReUI.UI.LayoutFunctions
 
 ---@class ReUI.Options.OptionSlider :  ReUI.Options.OptionControl
 ---@field _name ReUI.UI.Controls.Text
+---@field _valueText ReUI.UI.Controls.Text
 ---@field _slider IntegerSlider
 OptionSlider = ReUI.Core.Class(OptionControl) {
 

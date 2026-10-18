@@ -1,4 +1,3 @@
-local Options = ReUI.Options.Builder
 local Opt = ReUI.Options.OptionValue
 
 
@@ -7,8 +6,11 @@ ReUI.Options.Mods["ReUI.Selection"] = {
 }
 
 function Main()
-    local options = ReUI.Options.Mods["ReUI.Selection"]
-    Options.AddOptions("ReUI.Selection", "ReUI.Selection", {
-        Options.Filter("Mod enabled", options.enabled, 4),
-    })
+    ReUI.Options.Add("ReUI.Selection", function(frame)
+        local options = ReUI.Options.Mods["ReUI.Selection"]
+        return ReUI.Options.Window("ReUI.Selection", function(q)
+            q:OptionCheckbox("Mod enabled", options.enabled)
+            q:Tooltip("Selection", "enables all selection extension mods")
+        end)
+    end)
 end
