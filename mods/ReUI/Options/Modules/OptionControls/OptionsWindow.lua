@@ -84,12 +84,12 @@ OptionsContext = Class(QuickContext)
     ---@param self OptionsContext
     ---@param option ReUI.Options.ReactiveOption
     TrackOption = function(self, option)
-        table.insert(self._trackedOptions, option)
+        self._trackedOptions[option.Name] = option
     end,
 
     ---@param self OptionsContext
     RestoreOptions = function(self)
-        for _, option in ipairs(self._trackedOptions) do
+        for _, option in pairs(self._trackedOptions) do
             option:Restore()
         end
     end,
@@ -98,7 +98,7 @@ OptionsContext = Class(QuickContext)
     ---@return boolean
     SaveOptions = function(self)
         local r = false
-        for _, option in ipairs(self._trackedOptions) do
+        for _, option in pairs(self._trackedOptions) do
             if option.IsChanged then
                 r = true
                 option:Save()
