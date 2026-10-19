@@ -29,8 +29,7 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
 
         self._mode = mode or "ARGB"
 
-        self._name = ReUI.UI.Controls.Text.Create(self, UIUtil.bodyFont, 14)
-        self._name:SetText(name)
+        self._name = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
 
         self._color = Bitmap(self)
 
@@ -110,11 +109,9 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
         local slider = IntegerSlider(self, false, 0, 255, 1, sliderTextures[1], sliderTextures[2], sliderTextures[3],
             sliderTextures[4])
 
-        local labelText = ReUI.UI.Controls.Text.Create(slider, UIUtil.bodyFont, 14)
-        labelText:SetText(label)
-        labelText:SetColor(color)
+        local labelText = ReUI.UI.Controls.Text:Make(self, label, 14, UIUtil.bodyFont, color)
 
-        local valueText = ReUI.UI.Controls.Text.Create(slider, UIUtil.bodyFont, 14)
+        local valueText = ReUI.UI.Controls.Text:Make(self, "", 14, UIUtil.bodyFont)
         slider.OnValueChanged = function(slider_, newValue)
             valueText:SetText(string.format("%3d", newValue))
         end

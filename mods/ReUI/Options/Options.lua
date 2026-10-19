@@ -2,7 +2,7 @@ Version = "1.2.0"
 
 ReUI.Require
 {
-    "ReUI.UI.Controls >= 1.0.0",
+    "ReUI.UI.Controls >= 1.1.0",
     "ReUI.Core >= 1.5.0",
     "ReUI.Core.Events >= 1.0.0",
     "ReUI.LINQ >= 1.0.0",

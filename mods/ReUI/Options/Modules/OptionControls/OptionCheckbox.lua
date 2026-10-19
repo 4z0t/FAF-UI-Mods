@@ -14,8 +14,7 @@ OptionCheckbox = ReUI.Core.Class(OptionControl)
     __init = function(self, parent, option, label)
         OptionControl.__init(self, parent, option)
 
-        self._text = ReUI.UI.Controls.Text.Create(self, UIUtil.bodyFont, 14)
-        self._text:SetText(label)
+        self._text = ReUI.UI.Controls.Text:Make(self, label, 14, UIUtil.bodyFont)
 
         self._checkbox = ReUI.UI.Controls.CheckBox:Make(self, "/dialogs/check-box_btn/")
         self._checkbox:SetCheck(option:Get(), true)

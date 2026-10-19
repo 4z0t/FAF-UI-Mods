@@ -30,8 +30,7 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
 
         self._items = items
 
-        self._text = ReUI.UI.Controls.Text.Create(self, UIUtil.bodyFont, 14)
-        self._text:SetText(label)
+        self._text = ReUI.UI.Controls.Text:Make(self, label, 14, UIUtil.bodyFont)
 
         self._combo = Combo(self, 13, 16)
 

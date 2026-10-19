@@ -25,14 +25,13 @@ OptionSlider = ReUI.Core.Class(OptionControl) {
     __init = function(self, parent, option, name, min, max, inc)
         OptionControl.__init(self, parent, option)
 
-        self._name = ReUI.UI.Controls.Text.Create(self, UIUtil.bodyFont, 14)
-        self._name:SetText(name)
+        self._name = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
 
         self._slider = IntegerSlider(self, false, min, max, inc or 1, sliderTextures[1], sliderTextures[2],
             sliderTextures[3]
             , sliderTextures[4])
 
-        self._valueText = ReUI.UI.Controls.Text.Create(self, UIUtil.bodyFont, 14)
+        self._valueText = ReUI.UI.Controls.Text:Make(self, "", 14, UIUtil.bodyFont)
 
         self._slider.OnValueChanged = function(s, newValue)
             self._valueText:SetText(string.format("%d", newValue))

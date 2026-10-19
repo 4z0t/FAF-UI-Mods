@@ -16,6 +16,8 @@ function Main(isReplay)
     ---@class ReUI.UI.Controls.Control : Control, ReUI.UI.Layoutable
 
     ---@class ReUI.UI.Controls.Bitmap : Bitmap, ReUI.UI.Controls.Control
+    ---@field BitmapWidth LazyNumber
+    ---@field BitmapHeight LazyNumber
     local Bitmap = ReUI.Core.Class(_Bitmap, ReUI.UI.Layoutable)
     {
         ---@param self ReUI.UI.Controls.Bitmap
@@ -42,9 +44,9 @@ function Main(isReplay)
             _Group.OnInit(self)
         end,
     }
-
+    local Text
     ---@class ReUI.UI.Controls.Text : Text, ReUI.UI.Controls.Control
-    local Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
+    Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
     {
         ---@deprecated "Use :Make"
         ---@param parent Control
@@ -61,13 +63,21 @@ function Main(isReplay)
         ---@generic T : ReUI.UI.Controls.Text
         ---@param class T
         ---@param parent Control
-        ---@param family LazyOrValue<string>
-        ---@param pointsize LazyOrValue<number>
+        ---@param text? string
+        ---@param pointSize? number
+        ---@param font? string
+        ---@param color? string
+        ---@param dropShadow? boolean
         ---@return T
-        Make = function(class, parent, family, pointsize)
+        Make = function(class, parent, text, pointSize, font, color, dropShadow)
             ---@type ReUI.UI.Controls.Text
             local t = class(parent)
-            t:SetFont(family, pointsize)
+            t:SetText(text or "")
+            t:SetFont(font or "Arial", pointSize or 14)
+            t:SetColor(color or "ffffffff")
+            if dropShadow then
+                t:SetDropShadow(true)
+            end
             return t
         end,
 
