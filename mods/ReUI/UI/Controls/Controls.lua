@@ -1,4 +1,4 @@
-Version = "1.0.0"
+Version = "1.1.0"
 
 ReUI.Require
 {
@@ -43,10 +43,10 @@ function Main(isReplay)
         end,
     }
 
-    local Text
     ---@class ReUI.UI.Controls.Text : Text, ReUI.UI.Controls.Control
-    Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
+    local Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
     {
+        ---@deprecated "Use :Make"
         ---@param parent Control
         ---@param family LazyOrValue<string>
         ---@param pointsize LazyOrValue<number>
@@ -54,6 +54,19 @@ function Main(isReplay)
         Create = function(parent, family, pointsize)
             ---@type ReUI.UI.Controls.Text
             local t = Text(parent)
+            t:SetFont(family, pointsize)
+            return t
+        end,
+
+        ---@generic T : ReUI.UI.Controls.Text
+        ---@param class T
+        ---@param parent Control
+        ---@param family LazyOrValue<string>
+        ---@param pointsize LazyOrValue<number>
+        ---@return T
+        Make = function(class, parent, family, pointsize)
+            ---@type ReUI.UI.Controls.Text
+            local t = class(parent)
             t:SetFont(family, pointsize)
             return t
         end,
@@ -78,18 +91,19 @@ function Main(isReplay)
         end,
     }
 
-    local CheckBox
     ---@class ReUI.UI.Controls.CheckBox : MauiCheckbox, ReUI.UI.Controls.Control
-    CheckBox = ReUI.Core.Class(_Checkbox, ReUI.UI.Layoutable)
+    local CheckBox = ReUI.Core.Class(_Checkbox, ReUI.UI.Layoutable)
     {
         OnInit = Bitmap.OnInit,
         ResetLayout = Bitmap.ResetLayout,
 
+        ---@generic T : ReUI.UI.Controls.CheckBox
+        ---@param class T
         ---@param parent Control
         ---@param texturePath FileName
-        ---@return ReUI.UI.Controls.CheckBox
-        Create = function(parent, texturePath)
-            return CheckBox(parent,
+        ---@return T
+        Make = function(class, parent, texturePath)
+            return class(parent,
                 UIUtil.SkinnableFile(texturePath .. 'd_up.dds'),
                 UIUtil.SkinnableFile(texturePath .. 's_up.dds'),
                 UIUtil.SkinnableFile(texturePath .. 'd_over.dds'),
