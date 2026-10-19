@@ -1,11 +1,11 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 
-local OptionControl = import("OptionControl.lua").OptionControl
-
 local IntegerSlider = import('/lua/maui/slider.lua').IntegerSlider
 
+local OptionControl = import("OptionControl.lua").OptionControl
 
 local Bitmap = ReUI.UI.Controls.Bitmap
+local Color = ReUI.UI.Color
 
 local sliderTextures = {
     UIUtil.SkinnableFile("/slider02/slider_btn_up.dds"),
@@ -14,11 +14,15 @@ local sliderTextures = {
     UIUtil.SkinnableFile("/dialogs/options-02/slider-back_bmp.dds"),
 }
 
-local Color = ReUI.UI.Color
-local LF = ReUI.UI.LayoutFunctions
 
 ---@class ReUI.Options.OptionColorSliders :  ReUI.Options.OptionControl
 ---@field _mode "RGB"|"ARGB"
+---@field _name ReUI.UI.Controls.Text
+---@field _color ReUI.UI.Controls.Bitmap
+---@field _alphaSlider? IntegerSlider
+---@field _redSlider IntegerSlider
+---@field _greenSlider IntegerSlider
+---@field _blueSlider IntegerSlider
 OptionColorSliders = ReUI.Core.Class(OptionControl) {
 
     ---@param self ReUI.Options.OptionColorSliders
