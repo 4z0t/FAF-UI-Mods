@@ -1,8 +1,7 @@
-Version = "1.4.0"
+Version = "1.3.0"
 
 ReUI.Require
 {
-    "ReUI.LINQ >= 1.4.0"
 }
 
 ---@class IAction
@@ -55,12 +54,6 @@ function Main()
     ---@field description string
     ---@field formattedName string
     ---@field modifiers ActionModifiers?
-    ---@field orders OrderName[]?
-    ---@field blueprints BlueprintId[]?
-
-
-    local ordersForActions = {}
-    local idsForActions = {}
 
     ---@param action SimpleActionParams
     local function AddSimpleAction(action)
@@ -76,9 +69,6 @@ function Main()
             alt = action.modifiers.alt
         }
 
-        ordersForActions[formattedName] = action.orders
-        idsForActions[formattedName] = action.blueprints
-
         import("/lua/keymap/keymapper.lua").SetUserKeyAction(formattedName, actionTable)
 
         local keyDescriptions = import("/lua/keymap/keydescriptions.lua").keyDescriptions
@@ -93,9 +83,7 @@ function Main()
     ---@param category? string
     ---@param formattedName? string
     ---@param modifiers? ActionModifiers
-    ---@param orders? OrderName[]
-    ---@param blueprints? BlueprintId[]
-    local function AddAction(name, matcher, category, formattedName, modifiers, orders, blueprints)
+    local function AddAction(name, matcher, category, formattedName, modifiers)
         category      = category or "ReUI.Actions"
         formattedName = formattedName or GetFormattedName(name)
 
@@ -107,9 +95,7 @@ function Main()
             action = "UI_Lua ReUI.Actions.ProcessAction('" .. formattedName .. "')",
             category = category,
             formattedName = formattedName,
-            modifiers = modifiers,
-            orders = orders,
-            blueprints = blueprints
+            modifiers = modifiers
         }
     end
 
@@ -117,9 +103,9 @@ function Main()
     ---@field func fun(selection:UserUnit[]?)
     local SelectionAction = Class()
     {
-        __init = function(self, description, func, category, name, modifiers, orders, blueprints)
+        __init = function(self, description, func, category, name, modifiers)
             self.func = func
-            AddAction(description, self, category, name, modifiers, orders, blueprints)
+            AddAction(description, self, category, name, modifiers)
         end,
 
         Process = function(self, selection)
@@ -130,8 +116,6 @@ function Main()
     ---@class CategoryMatcher : IAction
     ---@field description string
     ---@field modifiers ActionModifiers
-    ---@field orders OrderName[]
-    ---@field blueprints BlueprintId[]
     ---@field _actions CategoryAction[]
     ---@operator call(Action[]):CategoryMatcher
     local CategoryMatcher = Class()
@@ -155,24 +139,8 @@ function Main()
         end,
 
         ---@param self CategoryMatcher
-        ---@param orders OrderName[]
-        ---@return CategoryMatcher
-        Orders = function(self, orders)
-            self.orders = orders
-            return self
-        end,
-
-        ---@param self CategoryMatcher
-        ---@param blueprints BlueprintId[]
-        ---@return CategoryMatcher
-        Blueprints = function(self, blueprints)
-            self.blueprints = blueprints
-            return self
-        end,
-
-        ---@param self CategoryMatcher
         Register = function(self)
-            AddAction(self.description, self, nil, nil, self.modifiers, self.orders, self.blueprints)
+            AddAction(self.description, self, nil, nil, self.modifiers)
         end,
 
         ---@param self CategoryMatcher
@@ -183,6 +151,14 @@ function Main()
                     break
                 end
             end
+        end,
+
+        ---@param self CategoryMatcher
+        ---@param other CategoryMatcher
+        Copy = function(self, other)
+            self._actions = table.copy(other._actions)
+            self:Register()
+            return self
         end,
     }
 
@@ -310,15 +286,6 @@ function Main()
                 end
             end
             return modifiers
-        end
-    end)
-
-    ReUI.Core.Hook("/lua/keymap/hotkeylabels.lua", "getKeyTables", function(field, module)
-        local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
-
-        local GetKeyLabels = import("KeyLabels.lua").GetKeyLabels
-        return function()
-            return GetKeyLabels(unitkeygroups, idsForActions, ordersForActions)
         end
     end)
 
