@@ -58,6 +58,7 @@ local Builder = Class()
         self._widthStack = {}
     end,
 
+    ---@nodiscard
     ---@param self Quick.Builder
     ---@return number
     GetItemWidth = function(self)
@@ -142,6 +143,7 @@ local Builder = Class()
         self._prevControl = control
     end,
 
+    ---@nodiscard
     ---@param self Quick.Builder
     ---@return Control?
     PrevControl = function(self)
@@ -259,6 +261,7 @@ QuickContainer = Class()
         self._context = context
     end,
 
+    ---@nodiscard
     ---@param self Quick.Builder
     ---@return Quick.Context
     Context = function(self)
@@ -281,6 +284,7 @@ QuickContainer = Class()
         return maxWidth, maxHeight
     end,
 
+    ---@nodiscard
     ---@param self Quick.Container
     Builder = function(self)
         assert(self._builder ~= nil, "Building didn't start")
@@ -321,6 +325,7 @@ QuickContainer = Class()
     ---@param size? number
     ---@param font? string
     ---@param color? Color
+    ---@return Text
     Text = function(self, text, size, font, color)
         local t = UIUtil.CreateText(self._control, text, size or 14, font or UIUtil.bodyFont)
 
@@ -330,6 +335,7 @@ QuickContainer = Class()
             width = LayoutFor:UnscaleNumber(t.Width()),
             height = LayoutFor:UnscaleNumber(t.Height())
         })
+        return t
     end,
 
     ---@param self Quick.Container
@@ -337,14 +343,16 @@ QuickContainer = Class()
     ---@param size? number
     ---@param font? string
     ---@param color? Color
+    ---@return Text
     Title = function(self, text, size, font, color)
-        self:Text(text, size or 16, font or UIUtil.titleFont, color or UIUtil.highlightColor)
+        return self:Text(text, size or 16, font or UIUtil.titleFont, color or UIUtil.highlightColor)
     end,
 
     ---@param self Quick.Container
     ---@param text string
     ---@param onClick? fun(modifiers:KeyModifiers)
     ---@param size? number
+    ---@return Button
     Button = function(self, text, onClick, size)
         local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, size or 14)
         if onClick then
@@ -354,12 +362,14 @@ QuickContainer = Class()
             width = LayoutFor:UnscaleNumber(btn.Width()),
             height = LayoutFor:UnscaleNumber(btn.Height()),
         })
+        return btn
     end,
 
     ---@param self Quick.Container
     ---@param text string
     ---@param onCheck? fun(checked:boolean)
     ---@param checked? boolean
+    ---@return Checkbox
     Checkbox = function(self, text, onCheck, checked)
         local cb = UIUtil.CreateCheckbox(self._control, "/dialogs/check-box_btn/", text, true)
         if onCheck then
@@ -370,6 +380,7 @@ QuickContainer = Class()
             width = LayoutFor:UnscaleNumber(cb.Width()),
             height = LayoutFor:UnscaleNumber(cb.Height())
         })
+        return cb
     end,
 
     ---@param self Quick.Container
@@ -379,6 +390,7 @@ QuickContainer = Class()
     ---@param inc number
     ---@param onValue? fun(value:number)
     ---@param initial? number
+    ---@return IntegerSlider
     Slider = function(self, label, min, max, inc, onValue, initial)
         local group = Group(self._control)
 
@@ -428,6 +440,7 @@ QuickContainer = Class()
             width = self:Builder():GetItemWidth(),
             height = 40
         })
+        return slider
     end,
 
     ---@param self Quick.Container
@@ -435,6 +448,7 @@ QuickContainer = Class()
     ---@param onEdit? fun(text:string)
     ---@param charLimit? number
     ---@param initial? string
+    ---@return Edit
     Edit = function(self, label, onEdit, charLimit, initial)
         local group = Group(self._control)
 
@@ -473,12 +487,14 @@ QuickContainer = Class()
             width = self:Builder():GetItemWidth(),
             height = 40
         })
+        return edit
     end,
 
     ---@param self Quick.Container
     ---@param texture FileName
     ---@param width number
     ---@param height? number
+    ---@return Bitmap
     Image = function(self, texture, width, height)
         local img = Bitmap(self._control, texture)
 
@@ -498,6 +514,7 @@ QuickContainer = Class()
             width = LayoutFor:UnscaleNumber(img.Width()),
             height = LayoutFor:UnscaleNumber(img.Height())
         })
+        return img
     end,
 
     ---@param self Quick.Container
@@ -516,10 +533,9 @@ QuickContainer = Class()
     ---@param label string
     ---@param items string[]
     ---@param onSelected? fun(index:number, text:string)
-    ---@param selectedIndex? number
+    ---@param selectedIndex? integer
+    ---@return Combo
     Combo = function(self, label, items, onSelected, selectedIndex)
-        selectedIndex = selectedIndex or 1
-
         local group = Group(self._control)
 
         LayoutFor(group)
@@ -542,7 +558,7 @@ QuickContainer = Class()
             combo.OnClick = function(c, i, text) onSelected(i, text) end
         end
 
-        combo:AddItems(items, selectedIndex)
+        combo:AddItems(items, selectedIndex or 1)
 
         group.Combo = combo
         group.Label = name
@@ -551,12 +567,14 @@ QuickContainer = Class()
             width = self:Builder():GetItemWidth(),
             height = 40
         })
+        return combo
     end,
 
     ---@param self Quick.Container
     ---@param width number
     ---@param height number
     ---@param fn fun(g:Quick.Container)
+    ---@return Group
     Group = function(self, width, height, fn)
         ---@type Group
         local g = Group(self._control)
@@ -571,6 +589,7 @@ QuickContainer = Class()
             width = width,
             height = height
         })
+        return g
     end,
 
     ---@param self Quick.Container
@@ -579,6 +598,7 @@ QuickContainer = Class()
     ---@param itemCount number
     ---@param itemHeight number
     ---@param renderFn fun(row:Quick.Container, index:number)
+    ---@return Quick.ScrollableList
     ScrollableList = function(self, width, height, itemCount, itemHeight, renderFn)
         local list = QuickScrollableList(self._control, itemCount, itemHeight, renderFn, self:Context())
 
@@ -589,6 +609,7 @@ QuickContainer = Class()
 
         -- Force initial render now that height is set
         list:CalcVisible()
+        return list
     end,
 
     ---@param self Quick.Container
