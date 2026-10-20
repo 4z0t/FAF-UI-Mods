@@ -6,6 +6,7 @@ ReUI.Options.Mods["ReUI.UI.QoL"] = {
     multifunctionPanelCollapsed = Opt(true),
     menuPanelCollapsed = Opt(true),
     advancedPingDialog = Opt(false),
+    advancedDisconnectionDialog = Opt(false),
 }
 
 function Main()
@@ -17,6 +18,7 @@ function Main()
             q:OptionCheckbox("Start game with menu panel closed", options.menuPanelCollapsed)
             q:Splitter()
             q:OptionCheckbox("Use advanced ping dialog", options.advancedPingDialog)
+            q:OptionCheckbox("Use advanced disconnection dialog", options.advancedDisconnectionDialog)
         end)
     end)
 end

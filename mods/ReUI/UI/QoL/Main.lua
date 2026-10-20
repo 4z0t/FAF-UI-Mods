@@ -292,4 +292,222 @@ function Main()
             end, "ping_dialog")
         end
     end)
+
+    local disconnectionDelay = tonumber(SessionGetScenarioInfo().Options.DisconnectionDelay02 or 85) - 5
+    local SessionClients = import("/lua/ui/override/sessionclients.lua")
+
+    local function RangeToString(arr)
+        if table.empty(arr) then
+            return ""
+        end
+
+        table.sort(arr)
+
+        local ranges = {}
+        local start = arr[1]
+        local prev = arr[1]
+
+        for i = 2, table.getn(arr) do
+            local curr = arr[i]
+
+            if curr == prev + 1 then
+                prev = curr
+            else
+                if start == prev then
+                    table.insert(ranges, tostring(start))
+                else
+                    table.insert(ranges, start .. "-" .. prev)
+                end
+                start = curr
+                prev = curr
+            end
+        end
+
+        if start == prev then
+            table.insert(ranges, tostring(start))
+        else
+            table.insert(ranges, start .. "-" .. prev)
+        end
+
+        return table.concat(ranges, ", ")
+    end
+
+    ---@class ReUI.UI.QoL.DisconnectionDialog.ClientControls
+    ---@field ping Text
+    ---@field quiet Text
+    ---@field ejectedByTitle Text
+    ---@field ejectedBy Text
+    ---@field eject Button
+
+    ---@class ReUI.UI.QoL.DisconnectionDialog : Quick.Window
+    ---@field controls ReUI.UI.QoL.DisconnectionDialog.ClientControls[]
+    local DisconnectionDialog = ReUI.Core.Class(QuickWindow)
+    {
+        ---@param self ReUI.UI.QoL.DisconnectionDialog
+        ---@param clients Client[]
+        __init = function(self, clients)
+            QuickWindow.__init(self, "<LOC UI_Disco0000>Connectivity", function(q)
+                ---@type ReUI.UI.QoL.DisconnectionDialog.ClientControls[]
+                local controls = {}
+
+                for i, client in ipairs(clients) do
+                    local c = {}
+                    c.index = i
+                    controls[i] = c
+                    -- local x, y = q:GetCursor()
+                    -- q:Image(UIUtil.UIFile('/scx_menu/panel-brd/conn-bg.dds'))
+                    -- q:SetCursor(x, y)
+                    q:Group(150, 0, function(g)
+                        g:Indent(5)
+                        g:Text(tostring(i), 20)
+                        g:SameLine(2)
+                        g:Text(client.name, 20)
+                        c.eject = g:Button("<LOC UI_Disco0005>Eject From Game", function(modifiers)
+                            EjectSessionClient(c.index)
+                        end, 12)
+                        c.eject:Disable()
+                    end)
+                    q:SameLine(50)
+                    q:Group(200, 0, function(g)
+                        c.ping = g:Text(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping))
+                        c.ejectedByTitle = g:Text('<LOC UI_Disco0006>Ejected by', 10)
+                        c.ejectedBy = g:Text("", 14)
+                    end)
+                end
+
+                self.controls = controls
+            end)
+        end,
+
+        ---@param self ReUI.UI.QoL.DisconnectionDialog
+        ---@param clients Client[]
+        Update = function(self, clients)
+            local armiesInfo = GetArmiesTable().armiesTable
+
+            for index, client in ipairs(clients) do
+                local c = self.controls[index]
+
+                if client.connected then
+                    local quietSec = client.quiet / 1000
+                    if quietSec < 5 then
+                        c.eject:Disable()
+                        c.ping:SetText(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping))
+                        c.ping:SetColor('FFbadbdb')
+                    else
+                        if disconnectionDelay + 5 <= quietSec then
+                            c.eject:Enable()
+                        elseif disconnectionDelay * 2 + 5 <= quietSec then
+                            EjectSessionClient(index)
+                            c.eject:Disable()
+                            c.eject:Hide()
+                        end
+                        c.ping:SetColor('FFe24f2d')
+                        local min = quietSec / 60
+                        local sec = math.mod(quietSec, 60)
+                        c.ping:SetText(LOCF("%s: %d:%02d", "<LOC UI_Disco0004>Quiet (m:s)", min, sec))
+                    end
+                else
+                    c.ping:SetText(LOC("<LOC connectivity_0003>Not Connected"))
+                    c.ping:SetColor('FFff0000')
+                end
+
+                local ejectedBy = RangeToString(client.ejectedBy)
+                c.ejectedBy:SetText(ejectedBy)
+
+                if ejectedBy == '' then
+                    c.ejectedByTitle:Hide()
+                else
+                    c.ejectedByTitle:Show()
+                end
+
+                if client.connected and not client['local'] then
+                    if c.eject:IsHidden() then c.eject:Show() end
+                else
+                    if not c.eject:IsHidden() then c.eject:Hide() end
+                end
+            end
+        end
+    }
+
+    if options.advancedDisconnectionDialog.Value then
+        local DisconnectHook = ReUI.Core.HookModule "/lua/ui/dialogs/disconnect.lua"
+
+        local function DestroyDialog()
+            local dialog = ReUI.UI.Global["DisconnectionDialog"]
+            SessionClients.ResetInterval()
+
+            if not IsDestroyed(dialog) then
+                dialog:Destroy()
+            end
+
+            ReUI.UI.Global["DisconnectionDialog"] = nil
+        end
+
+        DisconnectHook("DestroyDialog", function(field, module)
+            return DestroyDialog
+        end)
+
+        DisconnectHook("Update", function(field, module)
+            return function()
+                local needDialog = false
+                local clients = GetSessionClients()
+                local stillin = {}
+
+                for index, client in clients do
+                    if client.connected then
+                        table.insert(stillin, index)
+                    end
+                end
+
+                local quietClients = {}
+                for index, client in clients do
+                    if client.quiet > 5000 then
+                        table.insert(quietClients, client.name)
+                        needDialog = true
+                    end
+                    if client.connected then
+                        if not table.empty(client.ejectedBy) then
+                            needDialog = true
+                        end
+                    else
+                        if not table.equal(table.sorted(client.ejectedBy), stillin) then
+                            needDialog = true
+                        end
+                    end
+                end
+
+                if not needDialog then
+                    DestroyDialog()
+                    return
+                end
+
+                ---@type ReUI.UI.QoL.DisconnectionDialog
+                local dialog = ReUI.UI.Global["DisconnectionDialog"]
+
+                if IsDestroyed(dialog) then
+                    WARN('Connection dialogue opening due to disconnection by players:')
+                    for k, v in quietClients do
+                        LOG(v)
+                    end
+
+                    SessionClients.FastInterval()
+                    import("/lua/ui/game/worldview.lua").UnlockInput()
+                    import("/lua/ui/game/gamemain.lua").KillWaitingDialog()
+
+                    GetCursor():Show()
+
+                    dialog = ReUI.UI.QoL.DisconnectionDialog(clients)
+                    ReUI.UI.Global["DisconnectionDialog"] = dialog
+                end
+
+                dialog:Update(clients)
+            end
+        end)
+
+    end
+
+    ---@class ReUI.UI.QoL
+    return {
+        DisconnectionDialog = DisconnectionDialog
+    }
 end

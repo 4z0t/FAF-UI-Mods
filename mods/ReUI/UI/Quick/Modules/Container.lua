@@ -97,7 +97,6 @@ local Builder = Class()
                 width))
             :Height(height)
 
-
         self._lineHeight = math.max(height, self._lineHeight)
         self._cursorX = self._cursorX + width
     end,
@@ -492,7 +491,7 @@ QuickContainer = Class()
 
     ---@param self Quick.Container
     ---@param texture FileName
-    ---@param width number
+    ---@param width? number
     ---@param height? number
     ---@return Bitmap
     Image = function(self, texture, width, height)
@@ -502,7 +501,7 @@ QuickContainer = Class()
             LayoutFor(img)
                 :Width(width)
                 :Height(height)
-        else
+        elseif width then
             LayoutFor(img)
                 :Width(width)
                 :Height(function()
