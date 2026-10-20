@@ -1,5 +1,5 @@
 name = "ReUI"
-version = 6
+version = 7
 copyright = "MIT License"
 description = [[
 — A revolution?
@@ -10,7 +10,7 @@ See forum post https://forum.faforever.com/topic/8598/reui?_=1753093463914
 author = "4z0t"
 icon = "/mods/ReUI/icon.png"
 url = "https://github.com/4z0t/FAF-UI-Mods"
-uid = "reui-1.3.1"
+uid = "reui-1.3.2"
 exclusive = false
 selectable = true
 ui_only = true

@@ -8,6 +8,8 @@ UMT.Options.Mods["ASE"] = {
     layerFilter = Opt(true),
     lockedFilter = Opt(true),
     assisterFilter = Opt(true),
+    filterAssistingEngineers = Opt "Engi stations & drones",
+    doubleClickSimilarAssisters = Opt(false),
     includeHovers = Opt(true),
     exoticFilter = Opt(true),
     filters = {
@@ -35,6 +37,12 @@ function Main(isReplay)
         Options.Filter("Use auto domain selection", options.autoLayer),
         Options.Filter("Filter locked units", options.lockedFilter),
         Options.Filter("Filter assisters", options.assisterFilter),
+        Options.Strings("Filter assisting engineers", {
+            "Disabled",
+            "Engi stations & drones",
+            "All engineers"
+        }, options.filterAssistingEngineers, 16),
+        Options.Filter("Double click only selects assisters with the same target", options.doubleClickSimilarAssisters, 16),
         Options.Filter("Include hovers in naval domain", options.includeHovers),
         Options.Filter("Filter exotics", options.exoticFilter),
         Options.Title("Land", 12, nil, nil, 16),
