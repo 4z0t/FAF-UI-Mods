@@ -66,6 +66,19 @@ OptionsContainer = Class(QuickContainer)
             height = LayoutFor:UnscaleNumber(slider.Height()),
         })
     end,
+
+    ---@param self OptionsContainer
+    ---@param label string
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param charLimit? number
+    OptionTextEdit = function(self, label, option, charLimit)
+        self:Context():TrackOption(option)
+        local edit = ReUI.Options.Controls.TextEdit(self._control, option, label, charLimit)
+        self:Builder():AddControl(edit, {
+            width = self:Builder():GetItemWidth(),
+            height = 40
+        })
+    end,
 }
 
 ---@class OptionsContext : Quick.Context

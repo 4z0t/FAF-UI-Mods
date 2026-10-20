@@ -394,12 +394,12 @@ function Main()
                         c.ping:SetText(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping))
                         c.ping:SetColor('FFbadbdb')
                     else
-                        if disconnectionDelay + 5 <= quietSec then
-                            c.eject:Enable()
-                        elseif disconnectionDelay * 2 + 5 <= quietSec then
+                        if quietSec >= disconnectionDelay * 2 + 5 then
                             EjectSessionClient(index)
                             c.eject:Disable()
                             c.eject:Hide()
+                        elseif quietSec >= disconnectionDelay + 5 then
+                            c.eject:Enable()
                         end
                         c.ping:SetColor('FFe24f2d')
                         local min = quietSec / 60

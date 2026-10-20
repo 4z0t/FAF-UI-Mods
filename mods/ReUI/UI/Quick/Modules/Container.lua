@@ -497,7 +497,7 @@ QuickContainer = Class()
     Image = function(self, texture, width, height)
         local img = Bitmap(self._control, texture)
 
-        if height then
+        if height and width then
             LayoutFor(img)
                 :Width(width)
                 :Height(height)

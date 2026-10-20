@@ -233,6 +233,7 @@ function Main(isReplay)
             Checkbox     = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
             Slider       = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
             Combo        = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
+            TextEdit     = import("Modules/OptionControls/OptionTextEdit.lua").OptionTextEdit,
             ColorSliders = import("Modules/OptionControls/OptionColorSliders.lua").OptionColorSliders,
         },
 
