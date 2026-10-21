@@ -3,6 +3,7 @@ local GetSimTicksPerSecond = GetSimTicksPerSecond
 local math = math
 
 local UIUtil = import('/lua/ui/uiutil.lua')
+local Overflow = import('Overflow.lua')
 
 local Group = ReUI.UI.Controls.Group
 local Bitmap = ReUI.UI.Controls.Bitmap
@@ -440,6 +441,27 @@ EnergyBlock = ReUI.Core.Class(ResourceBlock)
     ---@param parent Control
     __init = function(self, parent)
         ResourceBlock.__init(self, parent, "ENERGY")
+        self._overflow = Text.Create(self, UIUtil.bodyFont, 10)
+    end,
+
+    ---@param self EnergyBlock
+    ---@param data EconomyTotals
+    ---@param tps number
+    ---@param overflow number
+    Update = function(self, data, tps, overflow)
+        ResourceBlock.Update(self, data, tps)
+        self._overflow:SetText(FormatNumber(overflow))
+    end,
+
+    ---@param self EnergyBlock
+    ---@param layouter ReUI.UI.Layouter
+    InitLayout = function(self, layouter)
+        ResourceBlock.InitLayout(self, layouter)
+        layouter(self._overflow)
+            :AtLeftIn(self._percentage)
+            :AtBottomIn(self)
+            :Color('ff8fd0ff')
+            :DropShadow(true)
     end,
 
     ---@param self EnergyBlock
@@ -522,9 +544,10 @@ EconomyPanel = ReUI.Core.Class(Group)
     Update = function(self)
         local econData = GetEconomyTotals()
         local tps = GetSimTicksPerSecond()
+        local overflow = Overflow.Update(econData, tps)
 
         self._mass:Update(econData, tps)
-        self._energy:Update(econData, tps)
+        self._energy:Update(econData, tps, overflow)
     end,
 
     ---@param self EconomyPanel
