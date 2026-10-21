@@ -1,10 +1,11 @@
-Version = "1.0.0"
+Version = "1.1.0"
 
 ReUI.Require
 {
-    "ReUI.Core >= 1.2.0",
-    "ReUI.Options >= 1.2.0",
-    "ReUI.UI >= 1.4.0",
+    "ReUI.Core >= 1.7.0",
+    "ReUI.LINQ >= 1.4.1",
+    "ReUI.Options >= 2.0.0",
+    "ReUI.UI >= 1.5.0",
 }
 
 function Main()

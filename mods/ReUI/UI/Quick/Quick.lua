@@ -3,7 +3,7 @@ Version = "1.0.0"
 ReUI.Require
 {
     "ReUI.UI >= 1.5.0",
-    "ReUI.UI.Views >= 1.0.0",
+    "ReUI.UI.Views >= 1.2.0",
 }
 
 function Main(isReplay)
