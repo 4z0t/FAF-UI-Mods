@@ -351,17 +351,16 @@ function Main()
                 local controls = {}
 
                 for i, client in ipairs(clients) do
-                    local c = {}
-                    c.index = i
+                    local c = { index = i }
                     controls[i] = c
                     -- local x, y = q:GetCursor()
                     -- q:Image(UIUtil.UIFile('/scx_menu/panel-brd/conn-bg.dds'))
                     -- q:SetCursor(x, y)
                     q:Group(150, 0, function(g)
                         g:Indent(5)
-                        g:Text(tostring(i), 20)
+                        g:Text(tostring(i), 18)
                         g:SameLine(2)
-                        g:Text(client.name, 20)
+                        g:Text(client.name, 18)
                         c.eject = g:Button("<LOC UI_Disco0005>Eject From Game", function(modifiers)
                             EjectSessionClient(c.index)
                         end, 12)
@@ -369,7 +368,7 @@ function Main()
                     end)
                     q:SameLine(50)
                     q:Group(200, 0, function(g)
-                        c.ping = g:Text(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping))
+                        c.ping = g:Text(LOCF("%s: %d", "<LOC UI_Disco0003>Ping (ms)", client.ping), 16)
                         c.ejectedByTitle = g:Text('<LOC UI_Disco0006>Ejected by', 10)
                         c.ejectedBy = g:Text("", 14)
                     end)

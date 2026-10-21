@@ -144,15 +144,17 @@ OptionsWindow = ReUI.Core.Class(QuickWindow)
         ---@param q OptionsContainer
         return function(q)
             fn(q)
-            q:Button("OK", function()
+            q:Button("Save", function()
                 if q:Context():SaveOptions() then
                     SavePreferences()
                 end
             end)
+            q:Tooltip("", "Saves changed options to prefs")
             q:SameLine(20)
             q:Button("Cancel", function()
                 q:Context():RestoreOptions()
             end)
+            q:Tooltip("", "Returns changed options to previously saved value")
         end
     end,
 
