@@ -2,140 +2,16 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Group = import('/lua/maui/group.lua').Group
 local CheckBox = import('/lua/maui/checkbox.lua').Checkbox
 
-local OptionsWindow = import('OptionsWindow.lua').OptionsWindow
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local DynamicScrollable = ReUI.UI.Views.DynamicScrollable
 local EscapeCover = ReUI.UI.Views.EscapeCover
 
-
----@class ControlConfig
----@field type  "splitter"|"title"|"color"|"slider"|"filter"|"edit"|"colorslider"|"strings"|"column"
----@field name string
----@field optionVar ReUI.Options.ReactiveOption
----@field indent number
 
 ---@class OptionsInfo
 ---@field name string
 ---@field title string
 ---@field builder (fun(frame:Frame):Control)|ControlConfig[]
 
----#region Options build items
-
-local splitterTable = {
-    type = "splitter"
-}
-
----comment
----@return ControlConfig
-function Splitter()
-    return splitterTable
-end
-
-function Column(index)
-    return {
-        type = "column",
-        index = index
-    }
-end
-
----comment
----@return ControlConfig
-function Title(name, fontSize, fontFamily, fontColor, indent)
-    return {
-        type = "title",
-        name = name,
-        size = fontSize or 16,
-        family = fontFamily or UIUtil.titleFont,
-        color = fontColor or UIUtil.highlightColor,
-        indent = indent or 0
-    }
-end
-
----comment
----@return ControlConfig
-function Color(name, optionVar, indent)
-    return {
-        type = "color",
-        name = name,
-        optionVar = optionVar,
-        indent = indent or 0
-    }
-end
-
----comment
----@return ControlConfig
-function Filter(name, optionVar, indent)
-    return {
-        type = "filter",
-        name = name,
-        optionVar = optionVar,
-        indent = indent or 0
-    }
-end
-
----comment
----@return ControlConfig
-function Slider(name, min, max, inc, optionVar, indent)
-    return {
-        type = "slider",
-        name = name,
-        optionVar = optionVar,
-        min = min,
-        max = max,
-        inc = inc,
-        indent = indent or 0
-    }
-end
-
----comment
----@return ControlConfig
-function TextEdit(name, optionVar, charLimit, indent)
-    return {
-        type = "edit",
-        name = name,
-        optionVar = optionVar,
-        charLimit = charLimit or 100,
-        indent = indent or 0
-    }
-end
-
----comment
----@return ControlConfig
-function ColorSlider(name, optionVar, indent)
-    return {
-        type = "colorslider",
-        name = name,
-        optionVar = optionVar,
-        indent = indent or 0
-    }
-end
-
----@return ControlConfig
-function Strings(name, items, optionVar, indent)
-    return {
-        type      = "strings",
-        name      = name,
-        optionVar = optionVar,
-        items     = items,
-        indent    = indent or 0
-    }
-end
-
-function Fonts(name, optionVar, indent)
-    return Strings(name,
-        {
-            "Arial",
-            "Arial Black",
-            "Arial Narrow",
-            "Zeroes Three",
-            "Butterbelly",
-            "Arial Rounded MT Bold",
-            "VDub",
-            "Wintermute"
-        }, optionVar, indent)
-end
-
----#endregion
 
 ---@type OptionsInfo[]
 local globalOptions = {}
@@ -169,11 +45,29 @@ local OptionLine = Class(Group)
             if iscallable(self.data.builder) then
                 optionsWindows[self.id] = self.data.builder(parent:GetRootFrame())
             else
-                optionsWindows[self.id] = OptionsWindow(
-                    parent:GetRootFrame(),
+                optionsWindows[self.id] = ReUI.Options.Window(
                     self.data.title,
-                    self.id,
-                    self.data.builder
+                    function(q)
+                        local i = 1
+                        local b = self.data.builder
+                        local n = table.getn(b)
+                        while i <= n do
+                            q:Group(300, 0, function(g)
+                                while i <= n do
+                                    local fn = b[i]
+                                    i = i + 1
+                                    if not fn then
+                                        break
+                                    end
+                                    fn(g)
+                                end
+                            end)
+                            if i <= n then
+                                q:SameLine(50)
+                            end
+                        end
+                    end,
+                    self.data.name
                 )
             end
 

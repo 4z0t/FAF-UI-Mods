@@ -1,11 +1,15 @@
-Version = "1.2.0"
+Version = "2.0.0"
 
 ReUI.Require
 {
+    "ReUI.UI >= 1.5.0",
+    "ReUI.UI.Controls >= 1.1.0",
     "ReUI.Core >= 1.5.0",
     "ReUI.Core.Events >= 1.0.0",
     "ReUI.LINQ >= 1.0.0",
-    "ReUI.UI.Views >= 1.0.0"
+    "ReUI.UI.Views >= 1.0.0",
+    "ReUI.UI.Quick >= 1.0.0",
+    "ReUI.UI.Color >= 1.0.0",
 }
 
 function Main(isReplay)
@@ -221,20 +225,42 @@ function Main(isReplay)
         }
     end)
 
+    local Deprecated = import("Modules/Deprecated.lua")
+
     ---@class ReUI.Options : ReUI.Module
     return {
+        Controls = {
+            Control      = import("Modules/OptionControls/OptionControl.lua").OptionControl,
+            Checkbox     = import("Modules/OptionControls/OptionCheckbox.lua").OptionCheckbox,
+            Slider       = import("Modules/OptionControls/OptionSlider.lua").OptionSlider,
+            Combo        = import("Modules/OptionControls/OptionCombo.lua").OptionCombo,
+            TextEdit     = import("Modules/OptionControls/OptionTextEdit.lua").OptionTextEdit,
+            ColorSliders = import("Modules/OptionControls/OptionColorSliders.lua").OptionColorSliders,
+        },
+
+        ---@type ReUI.Options.Window | fun(title: string, fn: fun(q: OptionsContainer), id?: string): ReUI.Options.Window
+        Window = import("Modules/OptionControls/OptionsWindow.lua").OptionsWindow,
+
+        ---@param name string
+        ---@param fn fun(frame:Frame):Control
+        Add = function(name, fn)
+            OptionsSelector.AddOptions(name, name, fn)
+        end,
+
+        ---@deprecated
         Builder = {
+            ---@deprecated
             AddOptions  = OptionsSelector.AddOptions,
-            Splitter    = OptionsSelector.Splitter,
-            Column      = OptionsSelector.Column,
-            Title       = OptionsSelector.Title,
-            Color       = OptionsSelector.Color,
-            Filter      = OptionsSelector.Filter,
-            Slider      = OptionsSelector.Slider,
-            TextEdit    = OptionsSelector.TextEdit,
-            ColorSlider = OptionsSelector.ColorSlider,
-            Strings     = OptionsSelector.Strings,
-            Fonts       = OptionsSelector.Fonts,
+            Splitter    = Deprecated.Splitter,
+            Column      = Deprecated.Column,
+            Title       = Deprecated.Title,
+            Color       = Deprecated.Color,
+            Filter      = Deprecated.Filter,
+            Slider      = Deprecated.Slider,
+            TextEdit    = Deprecated.TextEdit,
+            ColorSlider = Deprecated.ColorSlider,
+            Strings     = Deprecated.Strings,
+            Fonts       = Deprecated.Fonts,
         },
 
         ---Table with options provided by mods.

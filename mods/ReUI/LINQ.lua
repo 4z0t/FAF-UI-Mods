@@ -27,7 +27,7 @@
  * software.
  *]]
 
-Version = "1.4.0"
+Version = "1.4.1"
 
 function Main(isReplay)
 
@@ -589,7 +589,7 @@ function Main(isReplay)
             end
         end
         return function(a, b)
-            return selector(b) > selector(a)
+            return selector(b) < selector(a)
         end
     end
 

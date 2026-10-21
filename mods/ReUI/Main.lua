@@ -1,9 +1,9 @@
-Version = "1.3.2"
+Version = "1.4.0"
 
 ReUI.Require
 {
     "ReUI.Core >= 1.7.0",
-    "ReUI.UI.QoL >= 1.0.0",
+    "ReUI.UI.QoL >= 1.1.0",
     version = 3816,
 }
 

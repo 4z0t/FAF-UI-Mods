@@ -1,4 +1,4 @@
-Version = "1.0.0"
+Version = "1.1.0"
 
 ReUI.Require
 {
@@ -11,10 +11,13 @@ function Main(isReplay)
     local _Group = import('/lua/maui/group.lua').Group
     local _Text = import('/lua/maui/text.lua').Text
     local _Checkbox = import('/lua/maui/checkbox.lua').Checkbox
+    local UIUtil = import('/lua/ui/uiutil.lua')
 
     ---@class ReUI.UI.Controls.Control : Control, ReUI.UI.Layoutable
 
     ---@class ReUI.UI.Controls.Bitmap : Bitmap, ReUI.UI.Controls.Control
+    ---@field BitmapWidth LazyNumber
+    ---@field BitmapHeight LazyNumber
     local Bitmap = ReUI.Core.Class(_Bitmap, ReUI.UI.Layoutable)
     {
         ---@param self ReUI.UI.Controls.Bitmap
@@ -41,11 +44,11 @@ function Main(isReplay)
             _Group.OnInit(self)
         end,
     }
-
-    local Text;
+    local Text
     ---@class ReUI.UI.Controls.Text : Text, ReUI.UI.Controls.Control
     Text = ReUI.Core.Class(_Text, ReUI.UI.Layoutable)
     {
+        ---@deprecated "Use :Make"
         ---@param parent Control
         ---@param family LazyOrValue<string>
         ---@param pointsize LazyOrValue<number>
@@ -54,6 +57,27 @@ function Main(isReplay)
             ---@type ReUI.UI.Controls.Text
             local t = Text(parent)
             t:SetFont(family, pointsize)
+            return t
+        end,
+
+        ---@generic T : ReUI.UI.Controls.Text
+        ---@param class T
+        ---@param parent Control
+        ---@param text? string
+        ---@param pointSize? number
+        ---@param font? string
+        ---@param color? string
+        ---@param dropShadow? boolean
+        ---@return T
+        Make = function(class, parent, text, pointSize, font, color, dropShadow)
+            ---@type ReUI.UI.Controls.Text
+            local t = class(parent)
+            t:SetText(text or "")
+            t:SetFont(font or "Arial", pointSize or 14)
+            t:SetColor(color or "ffffffff")
+            if dropShadow then
+                t:SetDropShadow(true)
+            end
             return t
         end,
 
@@ -82,6 +106,23 @@ function Main(isReplay)
     {
         OnInit = Bitmap.OnInit,
         ResetLayout = Bitmap.ResetLayout,
+
+        ---@generic T : ReUI.UI.Controls.CheckBox
+        ---@param class T
+        ---@param parent Control
+        ---@param texturePath FileName
+        ---@return T
+        Make = function(class, parent, texturePath)
+            return class(parent,
+                UIUtil.SkinnableFile(texturePath .. 'd_up.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_up.dds'),
+                UIUtil.SkinnableFile(texturePath .. 'd_over.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_over.dds'),
+                UIUtil.SkinnableFile(texturePath .. 'd_dis.dds'),
+                UIUtil.SkinnableFile(texturePath .. 's_dis.dds'),
+                'UI_Mini_MouseDown', 'UI_Mini_Rollover'
+            )
+        end
     }
 
     return {

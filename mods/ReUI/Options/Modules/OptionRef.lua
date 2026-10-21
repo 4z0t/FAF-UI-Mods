@@ -30,6 +30,7 @@ OptionRef = ReUI.Core.Class()
         self._levels = lvls
     end,
 
+    ---@nodiscard
     ---@param self ReUI.Options.OptionRef
     ---@param start? integer
     ---@return string
@@ -41,6 +42,7 @@ OptionRef = ReUI.Core.Class()
         return self._levels
     end,
 
+    ---@nodiscard
     ---@param self ReUI.Options.OptionRef
     ---@param default? any
     ---@return any

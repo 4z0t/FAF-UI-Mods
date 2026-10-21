@@ -98,6 +98,15 @@ ReactiveOption = ReUI.Core.Class()
     end,
 
     ---@param self ReUI.Options.ReactiveOption
+    ---@param f fun(opt: ReUI.Options.ReactiveOption, value:any)
+    ---@return fun(opt: ReUI.Options.ReactiveOption, value:any)
+    Bind = function(self, f)
+        self.OnChanged:Add(f)
+        f(self, self.Value)
+        return f
+    end,
+
+    ---@param self ReUI.Options.ReactiveOption
     Destroy = function(self)
         self.OnChanged = nil
         self.OnSaved = nil
@@ -117,15 +126,6 @@ DeprecatedOption = ReUI.Core.Class(ReactiveOption)
     __call = function(self)
         WARN(("ReUI.Options: [%s] call operator is deprecated, use '.Value' or ':Get()'"):format(self.Name))
         return self:Get()
-    end,
-
-    ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
-    ---@param self DeprecatedOption
-    ---@param f fun(opt: DeprecatedOption)
-    Bind = function(self, f)
-        WARN(("ReUI.Options: [%s] ':Bind()' is deprecated, use 'OnChanged' event"):format(self.Name))
-        self.OnChange = f
-        f(self)
     end,
 
     ---@deprecated use `OnChanged` event to observe when the value of the option changes and get current value with `Value` property
