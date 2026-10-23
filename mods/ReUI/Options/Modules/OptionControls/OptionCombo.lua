@@ -41,6 +41,12 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
         self._combo:AddItems(
             LINQ.Enumerate(self._items):Select(function(v) return tostring(v.text) end):ToArray(),
             Contains(self._items, option:Get()) or 1)
+
+        if not option.IsChanged then
+            self._text:SetColor("white")
+        else
+            self._text:SetColor("yellow")
+        end
     end,
 
     ---@param self ReUI.Options.OptionCombo
@@ -62,5 +68,11 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
     ValueChanged = function(self, option, newValue)
         local i = Contains(self._items, newValue)
         self._combo:SetItem(i or 1)
+
+        if not option.IsChanged then
+            self._text:SetColor("white")
+        else
+            self._text:SetColor("yellow")
+        end
     end
 }

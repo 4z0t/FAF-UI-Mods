@@ -17,10 +17,10 @@ OptionCheckbox = ReUI.Core.Class(OptionControl)
         self._text = ReUI.UI.Controls.Text:Make(self, label, 14, UIUtil.bodyFont)
 
         self._checkbox = ReUI.UI.Controls.CheckBox:Make(self, "/dialogs/check-box_btn/")
-        self._checkbox:SetCheck(option:Get(), true)
         self._checkbox.OnCheck = function(control, state)
             option:Set(state)
         end
+        self:ValueChanged(option, option:Get())
     end,
 
     ---@param self ReUI.Options.OptionCheckbox
@@ -52,5 +52,11 @@ OptionCheckbox = ReUI.Core.Class(OptionControl)
     ---@param value any
     ValueChanged = function(self, option, value)
         self._checkbox:SetCheck(value, true)
+
+        if not option.IsChanged then
+            self._text:SetColor("white")
+        else
+            self._text:SetColor("yellow")
+        end
     end,
 }
