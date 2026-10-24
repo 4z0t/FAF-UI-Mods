@@ -54,12 +54,11 @@ local OptionLine = Class(Group)
                         while i <= n do
                             q:Group(300, 0, function(g)
                                 while i <= n do
-                                    local fn = b[i]
+                                    local r = b[i] and b[i](g) and i > 1
                                     i = i + 1
-                                    if not fn then
+                                    if r then
                                         break
                                     end
-                                    fn(g)
                                 end
                             end)
                             if i <= n then

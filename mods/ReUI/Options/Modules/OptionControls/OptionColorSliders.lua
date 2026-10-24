@@ -17,7 +17,7 @@ local sliderTextures = {
 
 ---@class ReUI.Options.OptionColorSliders :  ReUI.Options.OptionControl
 ---@field _mode "RGB"|"ARGB"
----@field _name ReUI.UI.Controls.Text
+---@field _text ReUI.UI.Controls.Text
 ---@field _color ReUI.UI.Controls.Bitmap
 ---@field _alphaSlider? IntegerSlider
 ---@field _redSlider IntegerSlider
@@ -33,7 +33,7 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
 
         self._mode = mode or "ARGB"
 
-        self._name = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
+        self._text = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
 
         self._color = Bitmap(self)
 
@@ -67,11 +67,11 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
     ---@param self ReUI.Options.OptionColorSliders
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
-        layouter(self._name)
+        layouter(self._text)
             :AtLeftTopIn(self)
 
         layouter(self._color)
-            :AnchorToBottom(self._name)
+            :AnchorToBottom(self._text)
             :Left(self.Left)
             :Right(self.Right)
             :Height(5)
@@ -132,6 +132,7 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
     end,
 
     ---@param self ReUI.Options.OptionColorSliders
+    ---@param option ReUI.Options.ReactiveOption
     ---@param newValue string
     ValueChanged = function(self, option, newValue)
         if self._alphaSlider then
@@ -140,5 +141,18 @@ OptionColorSliders = ReUI.Core.Class(OptionControl) {
         self._redSlider:SetValue(Color.GetRed(newValue))
         self._greenSlider:SetValue(Color.GetGreen(newValue))
         self._blueSlider:SetValue(Color.GetBlue(newValue))
-    end
+
+        if not option.IsChanged then
+            self._text:SetColor("white")
+        else
+            self._text:SetColor("yellow")
+        end
+    end,
+
+    ---@param self ReUI.Options.OptionColorSliders
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param value any
+    ValueSaved = function(self, option, value)
+        self._text:SetColor("white")
+    end,
 }

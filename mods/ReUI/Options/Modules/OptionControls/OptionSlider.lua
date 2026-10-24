@@ -14,7 +14,7 @@ local sliderTextures = {
 local LF = ReUI.UI.LayoutFunctions
 
 ---@class ReUI.Options.OptionSlider :  ReUI.Options.OptionControl
----@field _name ReUI.UI.Controls.Text
+---@field _text ReUI.UI.Controls.Text
 ---@field _valueText ReUI.UI.Controls.Text
 ---@field _slider IntegerSlider
 OptionSlider = ReUI.Core.Class(OptionControl) {
@@ -25,7 +25,7 @@ OptionSlider = ReUI.Core.Class(OptionControl) {
     __init = function(self, parent, option, name, min, max, inc)
         OptionControl.__init(self, parent, option)
 
-        self._name = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
+        self._text = ReUI.UI.Controls.Text:Make(self, name, 14, UIUtil.bodyFont)
 
         self._slider = IntegerSlider(self, false, min, max, inc or 1, sliderTextures[1], sliderTextures[2],
             sliderTextures[3]
@@ -40,7 +40,7 @@ OptionSlider = ReUI.Core.Class(OptionControl) {
             option:Set(newValue)
         end
 
-        self._slider:SetValue(option:Get() or 0)
+        self:ValueChanged(option, option:Get() or min)
     end,
 
     ---@param self ReUI.Options.OptionSlider
@@ -49,12 +49,12 @@ OptionSlider = ReUI.Core.Class(OptionControl) {
         layouter(self)
             :Height(40)
 
-        layouter(self._name)
+        layouter(self._text)
             :AtLeftTopIn(self)
             :DisableHitTest()
 
         layouter(self._slider)
-            :Below(self._name, 2)
+            :Below(self._text, 2)
             :Width(LF.Mult(self.Width, 3 / 4))
             :Height(20)
 
@@ -66,12 +66,25 @@ OptionSlider = ReUI.Core.Class(OptionControl) {
             :RightOf(self._slider, 4)
             :AtVerticalCenterIn(self._slider)
             :DisableHitTest()
-
     end,
 
     ---@param self ReUI.Options.OptionSlider
+    ---@param option ReUI.Options.ReactiveOption
     ---@param newValue number
     ValueChanged = function(self, option, newValue)
         self._slider:SetValue(newValue)
-    end
+
+        if not option.IsChanged then
+            self._text:SetColor("white")
+        else
+            self._text:SetColor("yellow")
+        end
+    end,
+
+    ---@param self ReUI.Options.OptionSlider
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param value any
+    ValueSaved = function(self, option, value)
+        self._text:SetColor("white")
+    end,
 }
