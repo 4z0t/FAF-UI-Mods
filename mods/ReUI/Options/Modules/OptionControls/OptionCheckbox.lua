@@ -59,4 +59,11 @@ OptionCheckbox = ReUI.Core.Class(OptionControl)
             self._text:SetColor("yellow")
         end
     end,
+
+    ---@param self ReUI.Options.OptionCheckbox
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param value any
+    ValueSaved = function(self, option, value)
+        self._text:SetColor("white")
+    end,
 }

@@ -74,5 +74,12 @@ OptionCombo = ReUI.Core.Class(OptionControl) {
         else
             self._text:SetColor("yellow")
         end
-    end
+    end,
+
+    ---@param self ReUI.Options.OptionCombo
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param value any
+    ValueSaved = function(self, option, value)
+        self._text:SetColor("white")
+    end,
 }
