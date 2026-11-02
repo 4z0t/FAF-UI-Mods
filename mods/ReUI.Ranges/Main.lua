@@ -1031,6 +1031,7 @@ function Main(isReplay)
 
     ReUI.WorldView.PrimaryComponents.Ranges = RangesWorldViewComponent
 
+    ---@class ReUI.Ranges
     return {
         RangesWorldViewComponent = RangesWorldViewComponent,
     }
