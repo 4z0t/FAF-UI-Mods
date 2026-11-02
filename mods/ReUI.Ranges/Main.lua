@@ -335,6 +335,19 @@ function Main(isReplay)
         end
     end
 
+    ---Helper to add a range to a type's range set
+    ---@param rangesByType table<string, table<number, true>>
+    ---@param overlayType string
+    ---@param radius number
+    local function AddRangeForType(rangesByType, overlayType, radius)
+        local typeRanges = rangesByType[overlayType]
+        if not typeRanges then
+            typeRanges = {}
+            rangesByType[overlayType] = typeRanges
+        end
+        typeRanges[radius] = true
+    end
+
     ---Returns key-based ring data for a single unit blueprint (used for rollover/hover preview).
     ---Duplicate weapons with the same range are automatically merged by range key.
     ---@param bp IUnitBlueprint | UnitBlueprint
@@ -389,12 +402,11 @@ function Main(isReplay)
     end
 
     ---Collects all ring data for current selection, using key-based deduplication
-    ---and applying the selectionRangeMode option ("all", "min_max", or "max").
+    ---and applying the selectionRangeMode option ("all", "min_max", or "max") PER TYPE.
     ---@param selection UserUnit[]
     ---@return table<number, string> # key is range, value is overlayType
     local function GetSelectionRingsData(selection)
-        local allWeaponRanges = {}
-        local intelRanges = {}
+        local rangesByType = {}
         local visitedBPs = {}
 
         for _, unit in selection do
@@ -402,38 +414,38 @@ function Main(isReplay)
             if bp and not visitedBPs[bp] then
                 visitedBPs[bp] = true
 
-                -- Collect weapon ranges
+                -- Collect weapon ranges grouped by overlay type
                 if bp.Weapon and not TableEmpty(bp.Weapon) then
                     for _, w in bp.Weapon do
                         local radius = w.MaxRadius
                         if radius and radius > 0 then
                             local cat = w.RangeCategory
                             if showDirectFire and cat == "UWRC_DirectFire" then
-                                SetRingDataKeyed(allWeaponRanges, radius, "AllMilitary")
+                                AddRangeForType(rangesByType, "AllMilitary", radius)
                             elseif showIndirectFire and cat == "UWRC_IndirectFire" then
-                                SetRingDataKeyed(allWeaponRanges, radius, "IndirectFire")
+                                AddRangeForType(rangesByType, "IndirectFire", radius)
                             elseif showAntiAir and cat == "UWRC_AntiAir" then
-                                SetRingDataKeyed(allWeaponRanges, radius, "AntiAir")
+                                AddRangeForType(rangesByType, "AntiAir", radius)
                             elseif showCountermeasure and cat == "UWRC_Countermeasure" then
-                                SetRingDataKeyed(allWeaponRanges, radius, "Defense")
+                                AddRangeForType(rangesByType, "Defense", radius)
                             elseif showAntiNavy and cat == "UWRC_AntiNavy" then
-                                SetRingDataKeyed(allWeaponRanges, radius, "AntiNavy")
+                                AddRangeForType(rangesByType, "AntiNavy", radius)
                             end
                         end
                     end
                 end
 
-                -- Collect intel ranges
+                -- Collect intel ranges grouped by overlay type
                 local intel = bp.Intel
                 if intel then
                     if showOmni and intel.OmniRadius and intel.OmniRadius > 0 then
-                        SetRingDataKeyed(intelRanges, intel.OmniRadius, "Omni")
+                        AddRangeForType(rangesByType, "Omni", intel.OmniRadius)
                     end
                     if showRadar and intel.RadarRadius and intel.RadarRadius > 0 then
-                        SetRingDataKeyed(intelRanges, intel.RadarRadius, "Radar")
+                        AddRangeForType(rangesByType, "Radar", intel.RadarRadius)
                     end
                     if showSonar and intel.SonarRadius and intel.SonarRadius > 0 then
-                        SetRingDataKeyed(intelRanges, intel.SonarRadius, "Sonar")
+                        AddRangeForType(rangesByType, "Sonar", intel.SonarRadius)
                     end
                     if showCounterIntel then
                         local cloak = intel.CloakFieldRadius or 0
@@ -441,7 +453,7 @@ function Main(isReplay)
                         local radarStealth = intel.RadarStealthFieldRadius or 0
                         local maxCounter = MathMax(cloak, sonarStealth, radarStealth)
                         if maxCounter > 0 then
-                            SetRingDataKeyed(intelRanges, maxCounter, "CounterIntel")
+                            AddRangeForType(rangesByType, "CounterIntel", maxCounter)
                         end
                     end
                 end
@@ -450,45 +462,42 @@ function Main(isReplay)
 
         local finalRings = {}
 
-        -- Filter weapon ranges according to selectionRangeMode
-        if selectionRangeMode == "min_max" then
-            local minRange = nil
-            local maxRange = nil
-            for r in allWeaponRanges do
-                if not minRange or r < minRange then
-                    minRange = r
+        -- Filter ranges per type according to selectionRangeMode
+        for overlayType, ranges in rangesByType do
+            if selectionRangeMode == "min_max" then
+                local minRange = nil
+                local maxRange = nil
+                for r in ranges do
+                    if not minRange or r < minRange then
+                        minRange = r
+                    end
+                    if not maxRange or r > maxRange then
+                        maxRange = r
+                    end
                 end
-                if not maxRange or r > maxRange then
-                    maxRange = r
+
+                if minRange then
+                    SetRingDataKeyed(finalRings, minRange, overlayType)
+                end
+                if maxRange and maxRange ~= minRange then
+                    SetRingDataKeyed(finalRings, maxRange, overlayType)
+                end
+            elseif selectionRangeMode == "max" then
+                local maxRange = nil
+                for r in ranges do
+                    if not maxRange or r > maxRange then
+                        maxRange = r
+                    end
+                end
+
+                if maxRange then
+                    SetRingDataKeyed(finalRings, maxRange, overlayType)
+                end
+            else -- "all"
+                for r in ranges do
+                    SetRingDataKeyed(finalRings, r, overlayType)
                 end
             end
-
-            if minRange then
-                SetRingDataKeyed(finalRings, minRange, allWeaponRanges[minRange])
-            end
-            if maxRange and maxRange ~= minRange then
-                SetRingDataKeyed(finalRings, maxRange, allWeaponRanges[maxRange])
-            end
-        elseif selectionRangeMode == "max" then
-            local maxRange = nil
-            for r in allWeaponRanges do
-                if not maxRange or r > maxRange then
-                    maxRange = r
-                end
-            end
-
-            if maxRange then
-                SetRingDataKeyed(finalRings, maxRange, allWeaponRanges[maxRange])
-            end
-        else -- "all"
-            for r, overlayType in allWeaponRanges do
-                SetRingDataKeyed(finalRings, r, overlayType)
-            end
-        end
-
-        -- Add intel ranges (weapons take precedence if ranges coincide)
-        for r, overlayType in intelRanges do
-            SetRingDataKeyed(finalRings, r, overlayType)
         end
 
         return finalRings
@@ -572,7 +581,6 @@ function Main(isReplay)
     ---@field radius number
     ---@field thickness number
     ---@field type string?
-    ---@field range number
     local Ring = ClassSimple
     {
         __init = function(self, color, radius)
@@ -581,7 +589,6 @@ function Main(isReplay)
             self.radius = radius or 0
             self.thickness = 0.15
             self.type = nil
-            self.range = 0
         end,
 
         ---@param self Ring
@@ -624,7 +631,8 @@ function Main(isReplay)
                 return TableRemove(self.freeRings)
             end
             self.ringCount = self.ringCount + 1
-            return Ring()
+            local ring = Ring()
+            return ring
         end,
 
         ---Recycles a ring back into the pool
@@ -676,10 +684,7 @@ function Main(isReplay)
             ring.type = overlayType
             ring.thickness = thick
         end
-        if ring.range ~= range then
-            ring:SetRadius(range)
-            ring.range = range
-        end
+        ring.radius = range
         ring:SetPosition(mousePos)
     end
 
@@ -768,7 +773,7 @@ function Main(isReplay)
 
             -- 2. Remove rings whose ranges are no longer present
             local deadRanges = nil
-            for range in rings do
+            for range, ring in rings do
                 if not targetData[range] then
                     if not deadRanges then
                         deadRanges = {}
@@ -779,8 +784,11 @@ function Main(isReplay)
 
             if deadRanges then
                 for _, range in deadRanges do
-                    pool:Free(rings[range])
-                    rings[range] = nil
+                    local ring = rings[range]
+                    if ring then
+                        pool:Free(ring)
+                        rings[range] = nil
+                    end
                 end
             end
         end,
@@ -798,29 +806,29 @@ function Main(isReplay)
         ---@param self RangesWorldViewComponent
         ClearSelectionRings = function(self)
             local rings = self._selectionRings
-            if not rings then return end
+            if not rings or TableEmpty(rings) then return end
 
             local pool = self._ringPool
-            for range, ring in rings do
-                if pool then
+            if pool then
+                for _, ring in rings do
                     pool:Free(ring)
                 end
-                rings[range] = nil
             end
+            self._selectionRings = {}
         end,
 
         ---@param self RangesWorldViewComponent
         ClearHoverRings = function(self)
             local rings = self._hoverRings
-            if not rings then return end
+            if not rings or TableEmpty(rings) then return end
 
             local pool = self._ringPool
-            for range, ring in rings do
-                if pool then
+            if pool then
+                for _, ring in rings do
                     pool:Free(ring)
                 end
-                rings[range] = nil
             end
+            self._hoverRings = {}
         end,
 
         ---@param self RangesWorldViewComponent
@@ -867,11 +875,7 @@ function Main(isReplay)
                 self._buildRing = ring
             end
 
-            ring.pos = GetMouseWorldPos()
-            ring.radius = 28
-            local color, thick = GetColorAndThickness "AllMilitary"
-            ring.thickness = thick
-            ring:SetColor(color)
+            UpdateRing(ring, "AllMilitary", 28, GetMouseWorldPos())
         end,
 
         ---@param self RangesWorldViewComponent
@@ -939,8 +943,9 @@ function Main(isReplay)
                 self._buildRing = ring
             end
 
+            local ringPos
             if useMousePos then
-                ring.pos = GetMouseWorldPos()
+                ringPos = GetMouseWorldPos()
             else
                 local unit = builders[1]
                 local pos = unit:GetInterpolatedPosition()
@@ -959,13 +964,10 @@ function Main(isReplay)
                         end
                     end
                 end
-                ring.pos = pos
+                ringPos = pos
             end
 
-            ring.radius = radius
-            local color, thick = GetColorAndThickness "Miscellaneous"
-            ring.thickness = thick
-            ring:SetColor(color)
+            UpdateRing(ring, "Miscellaneous", radius, ringPos)
         end,
 
         ---@param self RangesWorldViewComponent
