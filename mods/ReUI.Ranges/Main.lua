@@ -77,6 +77,15 @@ function Main(isReplay)
         currentAlphaHex = string.format("%02x", alpha)
     end)
 
+    options.ringOpacity.OnChanged:Add(function(var, val)
+        for _, view in GetWorldViews() do
+            local comp = view:GetComponent("Ranges")
+            if comp then
+                comp:ResetRings()
+            end
+        end
+    end)
+
     options.showDirectFire:Bind(function(opt, val)
         showDirectFire = val
     end)
@@ -650,27 +659,6 @@ function Main(isReplay)
             self.freeCount = self.freeCount + 1
         end,
 
-        ---Returns the total number of rings created
-        ---@param self RingPool
-        ---@return number
-        GetRingCount = function(self)
-            return self.ringCount
-        end,
-
-        ---Returns the number of available free rings
-        ---@param self RingPool
-        ---@return number
-        GetFreeCount = function(self)
-            return self.freeCount
-        end,
-
-        ---Returns the number of currently active/in-use rings
-        ---@param self RingPool
-        ---@return number
-        GetActiveCount = function(self)
-            return self.ringCount - self.freeCount
-        end,
-
         ---Clears the pool
         ---@param self RingPool
         Clear = function(self)
@@ -714,13 +702,6 @@ function Main(isReplay)
             self._selectionRings = {}
             self._buildRing = nil
             self._showRings = true
-        end,
-
-        ---Returns the RingPool instance of this component
-        ---@param self RangesWorldViewComponent
-        ---@return RingPool
-        GetRingPool = function(self)
-            return self._ringPool
         end,
 
         ---@param self RangesWorldViewComponent
@@ -1019,6 +1000,16 @@ function Main(isReplay)
             end
         end,
 
+        ---@param self RangesWorldViewComponent
+        ResetRings = function(self)
+            self:ClearHoverRings()
+            self:ClearSelectionRings()
+            self:ClearBuildRings()
+            if self._ringPool then
+                self._ringPool:Clear()
+            end
+        end,
+
         ---Called when component is destroyed
         ---@param self RangesWorldViewComponent
         OnDestroy = function(self)
@@ -1040,29 +1031,7 @@ function Main(isReplay)
 
     ReUI.WorldView.PrimaryComponents.Ranges = RangesWorldViewComponent
 
-    -- Attach to existing WorldViews if mod is loaded/reloaded after UI creation
-    for _, view in GetWorldViews() do
-        if not view:GetComponent("Ranges") then
-            local comp = RangesWorldViewComponent(view, "Ranges")
-            view:AddComponent("Ranges", comp)
-            comp:Init()
-        end
-    end
-
-    ---Hot-reload teardown support
-    if __moduleinfo then
-        __moduleinfo.OnDirty = function()
-            for _, view in GetWorldViews() do
-                local comp = view:GetComponent("Ranges")
-                if comp then
-                    view:RemoveComponent("Ranges")
-                end
-            end
-        end
-    end
-
     return {
-        RingPool = RingPool,
         RangesWorldViewComponent = RangesWorldViewComponent,
     }
 end
