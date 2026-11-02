@@ -18,12 +18,23 @@ Welcome to the **FAF-UI-Mods** repository. This document serves as the operation
 
 ---
 
-## 2. Runtime Environment & Lua 5.0.1 Gotchas
+## 2. Runtime Environment & Engine Lua Dialect Quirks
 
-The Forged Alliance engine executes an embedded **Lua 5.0.1** environment with custom engine C++ bindings. AI agents **must strictly adhere** to the following dialect rules:
+The Forged Alliance engine executes an embedded, customized **Lua 5.0.1** environment with engine C++ bindings and compiler modifications. AI agents **must strictly adhere** to the following dialect rules and differences from standard Lua:
+
+### Custom Engine Dialect Features (Different from Standard Lua)
+- **Safe `nil` Indexing:** Indexing `nil` safely results in `nil` rather than throwing a runtime error (e.g., `local x = nil; local y = x.foo.bar` evaluates to `nil`).
+  - **Calling `nil` still errors:** Calling a `nil` variable (`val()`) will throw an `"attempt to call a nil value"` runtime error.
+  - **`nil` as a table key errors:** Using `nil` as a key (`t[nil]` or `t[nil] = val`) throws a runtime error.
+- **Nil-tolerant Table Functions:** Standard table inspectors safely accept `nil` without error:
+  - `table.getn(nil)` returns `0`.
+  - `table.empty(nil)` returns `true`.
+  - `table.getsize(nil)` returns `0`.
+- **`continue` Keyword in Loops:** Unlike standard Lua 5.0/5.1, the engine's compiler adds a native `continue` statement. It can be used directly inside `for`, `while`, and `repeat` loops to jump to the next iteration.
+- **Strict Global Reads:** Reading an undeclared/undefined global variable throws a runtime error instead of silently evaluating to `nil`. Always declare globals (e.g., via `---@declare-global`), use local upvalues, or check existence via `rawget(_G, "VarName")` / module tables.
 
 ### Syntax & Standard Library Constraints
-- **NO `#` length operator:** `#table` does NOT exist in Lua 5.0. Always use `table.getn(t)`.
+- **NO `#` length operator:** `#table` does NOT exist in Lua 5.0. Always use `table.getn(t)` (which also handles `nil` safely).
 - **Dictionary size:** Use `table.getsize(dict)` or `table.empty(t)`.
 - **Module imports:** Use `import('/lua/path/to/module.lua')` instead of `require()`.
 - **Script execution:** Use `doscript(path, env)` to evaluate scripts in isolated environments.
@@ -199,7 +210,7 @@ When verifying behavior or troubleshooting, filter the log for `ReUI:`, `ReUI.Co
 ---
 
 ## 6. Prohibited Actions for Agents
-- ❌ **DO NOT** use Lua 5.1+ syntax (`#`, `goto`, `//`, etc.).
+- ❌ **DO NOT** use unsupported Lua 5.1+ syntax (`#`, `goto`, `//`, etc.). Note: `continue` IS supported by the engine compiler.
 - ❌ **DO NOT** modify files in `Deprecated/`.
 - ❌ **DO NOT** overwrite engine global variables or functions directly.
 - ❌ **DO NOT** instantiate UI controls during `Load` / `Main()` stage (wait for `OnPostCreateUI`).
