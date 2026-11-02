@@ -45,6 +45,8 @@ function Main(isReplay)
     local selectedPreviewKey = "SHIFT"
     local buildPreviewKey = "SHIFT"
     local selectionRangeMode = "all"
+    local ringOpacity = 100
+    local currentAlphaHex = "ff"
 
     local showDirectFire = true
     local showIndirectFire = true
@@ -68,6 +70,11 @@ function Main(isReplay)
     end)
     options.selectionRangeMode:Bind(function(opt, val)
         selectionRangeMode = val
+    end)
+    options.ringOpacity:Bind(function(opt, val)
+        ringOpacity = val or 100
+        local alpha = MathFloor(MathMax(0, MathMin(255, ringOpacity * 2.55)))
+        currentAlphaHex = string.format("%02x", alpha)
     end)
 
     options.showDirectFire:Bind(function(opt, val)
@@ -312,9 +319,9 @@ function Main(isReplay)
     local function GetColorAndThickness(type)
         local params = overlayParams[type]
         if not params then
-            return "ffffffff", 0.15
+            return currentAlphaHex .. "ffffff", 0.15
         end
-        return ("ff%s"):format((params.NormalColor):sub(3)), params.Outer[1] / params.Type
+        return (currentAlphaHex .. (params.NormalColor):sub(3)), params.Outer[1] / params.Type
     end
 
     ---Helper to set or update a range entry in a key-based container.

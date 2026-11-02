@@ -5,6 +5,7 @@ ReUI.Options.Mods["ReUI.Ranges"] = {
     selectedPreviewKey = OptionValue("SHIFT"),
     buildPreviewKey = OptionValue("SHIFT"),
     selectionRangeMode = OptionValue("all"),
+    ringOpacity = OptionValue(100),
     showDirectFire = OptionValue(true),
     showIndirectFire = OptionValue(true),
     showAntiAir = OptionValue(true),
@@ -40,6 +41,7 @@ function Main(isReplay)
                 { text = "Only min and max", value = "min_max" },
                 { text = "Only max", value = "max" },
             })
+            q:OptionSlider("Ring opacity, %", options.ringOpacity, 0, 100, 5)
 
             q:Title("Weapon Ranges", 16)
             q:OptionCheckbox("Show Direct Fire weapon range", options.showDirectFire)
