@@ -6,7 +6,7 @@ description = [[Shows weapon ranges of selected units and build range. Also show
 Fixes overlapping rings and adds option to filter selection ranges (all / min-max / max).
 See options for mod in ReUI.Options menu!
 ]]
-author = "4z0t, Nomander"
+author = "4z0t, Nomander, HotCheese"
 icon = "/mods/ReUI.Ranges/icon.png"
 url = "https://github.com/4z0t/FAF-UI-Mods"
 selectable = true
