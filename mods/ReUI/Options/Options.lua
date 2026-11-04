@@ -239,7 +239,7 @@ function Main(isReplay)
         },
 
         ---@type ReUI.Options.Window | fun(title: string, fn: fun(q: OptionsContainer), id?: string): ReUI.Options.Window
-        Window = import("Modules/OptionControls/OptionsWindow.lua").OptionsWindow,
+        Window = import("Modules/OptionsWindow.lua").OptionsWindow,
 
         ---@param name string
         ---@param fn fun(frame:Frame):Control

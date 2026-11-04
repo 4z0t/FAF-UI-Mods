@@ -10,8 +10,11 @@ function Splitter()
 end
 
 ---@deprecated
+---@return OptionsContainerF
 function Column(index)
-    return false
+    return function(q)
+        return true
+    end
 end
 
 ---@deprecated
