@@ -31,6 +31,7 @@ function Main(isReplay)
                     { text = "Disabled", value = "NONE" },
                     { text = "Shift", value = "SHIFT" },
                     { text = "Ctrl", value = "CONTROL" },
+                    { text = "Ctrl or Shift", value = "EITHER" },
                 }
                 q:PushItemWidth(100)
                 q:OptionCombo("Hover", options.hoverPreviewKey, keys)

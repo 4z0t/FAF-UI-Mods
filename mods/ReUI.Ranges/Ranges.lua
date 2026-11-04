@@ -615,6 +615,18 @@ function Main(isReplay)
         return maxRange
     end
 
+    ---@param previewKey "NONE"|"SHIFT"|"CONTROL"|"EITHER"
+    ---@return boolean
+    local function IsPreviewKeyDown(previewKey)
+        if previewKey == "NONE" then
+            return false
+        end
+        if previewKey == "EITHER" then
+            return IsKeyDown("SHIFT") or IsKeyDown("CONTROL")
+        end
+        return IsKeyDown(previewKey)
+    end
+
     ---@class Ring
     ---@field pos Vector
     ---@field color string
@@ -993,14 +1005,14 @@ function Main(isReplay)
             local notIssuingOrder = not commandMode[2]
             self._isCachedSelection = false
 
-            if hoverPreviewKey ~= "NONE" and IsKeyDown(hoverPreviewKey) and notIssuingOrder then
+            if IsPreviewKeyDown(hoverPreviewKey) and notIssuingOrder then
                 self:UpdateHoverRings()
             else
                 self:ClearHoverRings()
             end
 
             if notIssuingOrder or givingMoveOrder then
-                if selectedPreviewKey ~= "NONE" and IsKeyDown(selectedPreviewKey) then
+                if IsPreviewKeyDown(selectedPreviewKey) then
                     self:UpdateSelectionRings()
                 else
                     self:ClearSelectionRings()
@@ -1008,7 +1020,7 @@ function Main(isReplay)
 
                 if IsKeyDown(18) then -- alt
                     self:UpdateReclaimRings()
-                elseif buildPreviewKey ~= "NONE" and IsKeyDown(buildPreviewKey) then
+                elseif IsPreviewKeyDown(buildPreviewKey) then
                     self:UpdateBuildRings(true)
                 else
                     self:ClearBuildRings()
