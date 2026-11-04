@@ -996,7 +996,10 @@ function Main(isReplay)
                         or orderName == "RULEUCC_Reclaim"
                         or orderName == "RULEUCC_Guard"))
             then
+                self:ClearSelectionRings()
                 self:UpdateBuildRings(false)
+            else
+                self:ClearSelectionRings()
             end
         end,
 
