@@ -57,6 +57,7 @@ function Main(isReplay)
     local showRadar = true
     local showSonar = true
     local showCounterIntel = true
+    local showShield = true
     local showInMinimap = false
 
     options.hoverPreviewKey:Bind(function(opt, val)
@@ -97,6 +98,9 @@ function Main(isReplay)
     end)
     options.showAntiNavy:Bind(function(opt, val)
         showAntiNavy = val
+    end)
+    options.showShield:Bind(function(opt, val)
+        showShield = val
     end)
     options.showCountermeasure:Bind(function(opt, val)
         showCountermeasure = val
@@ -414,6 +418,16 @@ function Main(isReplay)
             end
         end
 
+        if showShield then
+            local shield = bp.Defense.Shield
+            if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
+                local radius = (shield.ShieldSize or 10) / 2
+                local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+                local range = math.sqrt(radius * radius - height * height)
+                SetRingDataKeyed(rings, range, "Defense")
+            end
+        end
+
         return rings
     end
 
@@ -471,6 +485,16 @@ function Main(isReplay)
                         if maxCounter > 0 then
                             AddRangeForType(rangesByType, "CounterIntel", maxCounter)
                         end
+                    end
+                end
+
+                if showShield then
+                    local shield = bp.Defense.Shield
+                    if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
+                        local radius = (shield.ShieldSize or 10) / 2
+                        local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+                        local range = math.sqrt(radius * radius - height * height)
+                        AddRangeForType(rangesByType, "Defense", range)
                     end
                 end
             end

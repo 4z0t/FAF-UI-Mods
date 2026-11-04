@@ -11,6 +11,7 @@ ReUI.Options.Mods["ReUI.Ranges"] = {
     showAntiAir = OptionValue(true),
     showAntiNavy = OptionValue(true),
     showCountermeasure = OptionValue(true),
+    showShield = OptionValue(true),
     showOmni = OptionValue(true),
     showRadar = OptionValue(true),
     showSonar = OptionValue(true),
@@ -53,6 +54,7 @@ function Main(isReplay)
             q:OptionCheckbox("Show Anti air weapon range", options.showAntiAir)
             q:OptionCheckbox("Show Countermeasure weapon range", options.showCountermeasure)
             q:OptionCheckbox("Show Anti navy weapon range", options.showAntiNavy)
+            q:OptionCheckbox("Show Shield range", options.showShield)
 
             q:Title("Intel & Build Ranges", 16)
             q:OptionCheckbox("Show Omni range", options.showOmni)
