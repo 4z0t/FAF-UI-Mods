@@ -22,20 +22,24 @@ ReUI.Options.Mods["ReUI.Ranges"] = {
 function Main(isReplay)
     ReUI.Options.Add("ReUI.Ranges", function(frame)
         local options = ReUI.Options.Mods["ReUI.Ranges"]
-        return ReUI.Options.Window("Ranges", function(q)
+        return ReUI.Options.Window("ReUI.Ranges", function(q)
             q:Title("Keybindings & Modes", 16)
-            q:OptionCombo("Hover Preview key", options.hoverPreviewKey, {
-                { text = "SHIFT", value = "SHIFT" },
-                { text = "CONTROL", value = "CONTROL" },
-            })
-            q:OptionCombo("Selected Preview key", options.selectedPreviewKey, {
-                { text = "SHIFT", value = "SHIFT" },
-                { text = "CONTROL", value = "CONTROL" },
-            })
-            q:OptionCombo("Build Preview key", options.buildPreviewKey, {
-                { text = "SHIFT", value = "SHIFT" },
-                { text = "CONTROL", value = "CONTROL" },
-            })
+
+            if q:Collapsible("Preview keys") then
+                local keys = {
+                    { text = "Disabled", value = "NONE" },
+                    { text = "Shift", value = "SHIFT" },
+                    { text = "Ctrl", value = "CONTROL" },
+                }
+                q:PushItemWidth(100)
+                q:OptionCombo("Hover", options.hoverPreviewKey, keys)
+                q:SameLine(25)
+                q:OptionCombo("Selected", options.selectedPreviewKey, keys)
+                q:SameLine(25)
+                q:OptionCombo("Build", options.buildPreviewKey, keys)
+                q:PopItemWidth()
+            end
+
             q:OptionCombo("Selection ranges", options.selectionRangeMode, {
                 { text = "All ranges", value = "all" },
                 { text = "Only min and max", value = "min_max" },

@@ -174,7 +174,7 @@ function Main(isReplay)
 
     local lastEnhSyncTable = {}
     AddOnSyncHashedCallback(
-        ---@param enhSyncTable EnhancementSyncTable
+    ---@param enhSyncTable EnhancementSyncTable
         function(enhSyncTable)
             for entityId, enhSync in enhSyncTable do
                 local lastEnhSync = lastEnhSyncTable[entityId]
@@ -969,14 +969,14 @@ function Main(isReplay)
             local notIssuingOrder = not commandMode[2]
             self._isCachedSelection = false
 
-            if IsKeyDown(hoverPreviewKey) and notIssuingOrder then
+            if hoverPreviewKey ~= "NONE" and IsKeyDown(hoverPreviewKey) and notIssuingOrder then
                 self:UpdateHoverRings()
             else
                 self:ClearHoverRings()
             end
 
             if notIssuingOrder or givingMoveOrder then
-                if IsKeyDown(selectedPreviewKey) then
+                if selectedPreviewKey ~= "NONE" and IsKeyDown(selectedPreviewKey) then
                     self:UpdateSelectionRings()
                 else
                     self:ClearSelectionRings()
@@ -984,7 +984,7 @@ function Main(isReplay)
 
                 if IsKeyDown(18) then -- alt
                     self:UpdateReclaimRings()
-                elseif IsKeyDown(buildPreviewKey) then
+                elseif buildPreviewKey ~= "NONE" and IsKeyDown(buildPreviewKey) then
                     self:UpdateBuildRings(true)
                 else
                     self:ClearBuildRings()
