@@ -1,6 +1,6 @@
 name = "ReUI.Ranges"
-uid = "reui-ranges-1.0.0"
-version = 1
+uid = "reui-ranges-1.0.1"
+version = 2
 copyright = ""
 description = [[Shows weapon ranges of selected units and build range. Also shows them with unit under mouse.
 Fixes overlapping rings and adds option to filter selection ranges (all / min-max / max).
@@ -19,4 +19,4 @@ conflicts = { "rings-for-all-v1.0.0" }
 before = {}
 after = {}
 
-ReUI = 'ReUI.Ranges=1.0.0'
+ReUI = 'ReUI.Ranges=1.0.1'

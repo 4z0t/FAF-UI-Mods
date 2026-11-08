@@ -1,4 +1,4 @@
-Version = "1.0.0"
+Version = "1.0.1"
 
 ReUI.Require
 {
@@ -420,9 +420,10 @@ function Main(isReplay)
 
         if showShield then
             local shield = bp.Defense.Shield
-            if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
-                local radius = (shield.ShieldSize or 10) / 2
-                local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+            if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield and
+                shield.ShieldSize and shield.ShieldSize > 0 then
+                local radius = shield.ShieldSize * 0.5
+                local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY * 0.5
                 local range = math.sqrt(radius * radius - height * height)
                 SetRingDataKeyed(rings, range, "Defense")
             end
@@ -490,9 +491,11 @@ function Main(isReplay)
 
                 if showShield then
                     local shield = bp.Defense.Shield
-                    if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield then
-                        local radius = (shield.ShieldSize or 10) / 2
-                        local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY / 2
+                    if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield
+                        and
+                        shield.ShieldSize and shield.ShieldSize > 0 then
+                        local radius = shield.ShieldSize * 0.5
+                        local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY * 0.5
                         local range = math.sqrt(radius * radius - height * height)
                         AddRangeForType(rangesByType, "Defense", range)
                     end
