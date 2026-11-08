@@ -421,7 +421,7 @@ function Main(isReplay)
         if showShield then
             local shield = bp.Defense.Shield
             if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield and
-                shield.ShieldSize and shield.ShieldSize ~= 0 then
+                shield.ShieldSize and shield.ShieldSize > 0 then
                 local radius = shield.ShieldSize * 0.5
                 local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY * 0.5
                 local range = math.sqrt(radius * radius - height * height)
@@ -493,7 +493,7 @@ function Main(isReplay)
                     local shield = bp.Defense.Shield
                     if shield and not shield.PersonalShield and not shield.PersonalBubble and not shield.TransportShield
                         and
-                        shield.ShieldSize and shield.ShieldSize ~= 0 then
+                        shield.ShieldSize and shield.ShieldSize > 0 then
                         local radius = shield.ShieldSize * 0.5
                         local height = (shield.ShieldVerticalOffset or -1) + bp.SizeY * 0.5
                         local range = math.sqrt(radius * radius - height * height)
