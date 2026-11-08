@@ -1,5 +1,5 @@
 function setSelection(expression)
-    local others = utils.StringJoin(expression.others, " ")
+    local others = string.join(expression.others, " ")
 
     local units
     UMT.Units.HiddenSelect(function()
