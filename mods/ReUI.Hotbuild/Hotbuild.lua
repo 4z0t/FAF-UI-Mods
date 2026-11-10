@@ -9,7 +9,7 @@ ReUI.Require
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.0.0",
     "ReUI.UI.Quick >= 1.0.0",
-    "ReUI.Options >= 1.0.0"
+    "ReUI.Options >= 2.0.0"
 }
 
 function Main(isReplay)
@@ -104,7 +104,6 @@ function Main(isReplay)
     ---@param modifier any
     ---@return boolean
     local function BuildUnit(selection, name, data, modifier)
-
         GetCycleMap():HideCycle()
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
         local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
@@ -113,28 +112,67 @@ function Main(isReplay)
             return false
         end
 
-        local items = {}
-        local icons = {}
+        -- Deduce current tech level from current tech tab in ReUI.Construction / construction.lua
+        local currentTech = 0
+        if Construction.GetCurrentTechTab then
+            local ok, tab = pcall(Construction.GetCurrentTechTab)
+            if ok and type(tab) == "number" and tab > 0 then
+                currentTech = tab
+            end
+        end
+
+        -- If no tech tab is active (0), deduce from highest tech level of selected factory
+        if currentTech == 0 then
+            if not table.empty(EntityCategoryFilterDown(categories.TECH3 + categories.BUILTBYQUANTUMGATE, selection)) then
+                currentTech = 3
+            elseif not table.empty(EntityCategoryFilterDown(categories.TECH2, selection)) then
+                currentTech = 2
+            elseif not table.empty(EntityCategoryFilterDown(categories.TECH1, selection)) then
+                currentTech = 1
+            end
+        end
+
+        local techCategories = {
+            [1] = categories.TECH1,
+            [2] = categories.TECH2,
+            [3] = categories.TECH3,
+            [4] = categories.EXPERIMENTAL,
+        }
+
+        local targetTechCat = techCategories[currentTech]
+
+        local techItems = {}
+        local techIcons = {}
+        local allItems = {}
+        local allIcons = {}
+
         for _, entry in ipairs(data) do
             if type(entry) == "string" then
                 if buildable[entry] then
-                    table.insert(items, entry)
-                    table.insert(icons, entry)
+                    table.insert(allItems, entry)
+                    table.insert(allIcons, entry)
+                    if targetTechCat and EntityCategoryContains(targetTechCat, entry) then
+                        table.insert(techItems, entry)
+                        table.insert(techIcons, entry)
+                    end
                 end
             elseif CanBuildFactoryTemplate(entry, buildable) then
-                table.insert(items, entry)
-                table.insert(icons, entry.icon)
+                table.insert(allItems, entry)
+                table.insert(allIcons, entry.icon)
             end
         end
+
+        -- Prefer units matching the deduced tech level; fallback to all available
+        local items = (not table.empty(techItems)) and techItems or allItems
+        local icons = (not table.empty(techIcons)) and techIcons or allIcons
 
         local maxPos = table.getn(items)
         if maxPos == 0 then
             return false
         end
 
-        GetCycleMap():Cycle(1, name, icons, modifier)
-
-        local item = items[1]
+        local pos = GetCycleMap():Cycle(maxPos, name, icons, modifier)
+        local item = items[pos]
 
         local count = 1
         if modifier == "Shift" then
@@ -256,13 +294,9 @@ function Main(isReplay)
         Model.init()
         ViewModel.init()
 
-        if ReUI.Options and ReUI.Options.Add then
-            ReUI.Options.Add("ReUI.Hotbuild", function(frame)
-                return View.OpenWindow(frame)
-            end)
-        elseif ReUI.Options and ReUI.Options.Builder and ReUI.Options.Builder.AddOptions then
-            ReUI.Options.Builder.AddOptions("ReUI.Hotbuild", "ReUI.Hotbuild", View.init)
-        end
+        ReUI.Options.Add("ReUI.Hotbuild", function(frame)
+            return View.OpenWindow(frame)
+        end)
     end)
 
     ---@param name string

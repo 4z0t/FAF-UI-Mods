@@ -47,6 +47,16 @@ end
 function SetActive(name)
     activeName = name or ""
     active = Model.FetchHotBuild(activeName)
+    -- Migration for legacy profiles:
+    if active.Land and not active.Land_T3 and not active.Land_T1 then
+        active.Land_T3 = active.Land
+    end
+    if active.Air and not active.Air_T3 and not active.Air_T1 then
+        active.Air_T3 = active.Air
+    end
+    if active.Naval and not active.Naval_T3 and not active.Naval_T1 then
+        active.Naval_T3 = active.Naval
+    end
 end
 
 function AddConstructionBlueprints()
@@ -140,7 +150,8 @@ local function FindSimilarBlueprints(faction, bp, category)
     if not bps then
         bps = {}
         for prefixSkin, prefix in prefixes do
-            if Contains(globalBPs[category][prefixSkin], prefix[prefixId] .. suffix) then
+            local catBps = globalBPs[category] and globalBPs[category][prefixSkin]
+            if catBps and Contains(catBps, prefix[prefixId] .. suffix) then
                 bps[prefixSkin] = prefix[prefixId] .. suffix
             end
         end
@@ -267,7 +278,15 @@ end
 
 function FetchBlueprint(category, faction)
     active[category] = active[category] or {}
-    return active[category][faction]
+    local bp = active[category][faction]
+    if not bp then
+        -- Fallback for legacy categories (e.g. Land -> Land_T3)
+        local base = string.gsub(category, "_T%d", "")
+        if active[base] then
+            bp = active[base][faction]
+        end
+    end
+    return bp
 end
 
 function FetchConstructionBlueprints()
@@ -275,7 +294,7 @@ function FetchConstructionBlueprints()
 end
 
 function FetchBlueprints(category, faction)
-    return globalBPs[category][faction]
+    return (globalBPs[category] and globalBPs[category][faction]) or {}
 end
 
 function IsEmpty(index)

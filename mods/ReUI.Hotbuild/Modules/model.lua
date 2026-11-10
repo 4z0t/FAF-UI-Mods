@@ -23,15 +23,39 @@ local divisions = {
         category = categories.BUILTBYTIER3ENGINEER,
     },
     {
-        name = 'Land',
+        name = 'Land_T1',
+        category = categories.LAND * categories.BUILTBYTIER1FACTORY,
+    },
+    {
+        name = 'Land_T2',
+        category = categories.LAND * categories.BUILTBYTIER2FACTORY,
+    },
+    {
+        name = 'Land_T3',
         category = categories.LAND * (categories.BUILTBYTIER3FACTORY + categories.BUILTBYLANDTIER3FACTORY),
     },
     {
-        name = 'Air',
+        name = 'Air_T1',
+        category = categories.AIR * categories.BUILTBYTIER1FACTORY,
+    },
+    {
+        name = 'Air_T2',
+        category = categories.AIR * categories.BUILTBYTIER2FACTORY,
+    },
+    {
+        name = 'Air_T3',
         category = categories.AIR * (categories.BUILTBYTIER3FACTORY + categories.TRANSPORTBUILTBYTIER3FACTORY),
     },
     {
-        name = 'Naval',
+        name = 'Naval_T1',
+        category = categories.NAVAL * categories.BUILTBYTIER1FACTORY,
+    },
+    {
+        name = 'Naval_T2',
+        category = categories.NAVAL * categories.BUILTBYTIER2FACTORY,
+    },
+    {
+        name = 'Naval_T3',
         category = categories.NAVAL * categories.BUILTBYTIER3FACTORY,
     },
     {
@@ -53,16 +77,22 @@ local validCategory = categories.BUILTBYTIER1FACTORY +
 
 function Compile(data)
     local res = {}
-    for category, dat in data do
+    for category, dat in pairs(data) do
         if category == 'Construction' then
-            for index, bps in dat do
-                for faction, bp in bps do
+            for index, bps in pairs(dat) do
+                for faction, bp in pairs(bps) do
                     table.insert(res, bp)
                 end
             end
         else
-            for faction, bp in dat do
-                table.insert(res, bp)
+            for k, val in pairs(dat) do
+                if type(val) == "string" or (type(val) == "table" and val.templateData) then
+                    table.insert(res, val)
+                elseif type(val) == "table" then
+                    for faction, bp in pairs(val) do
+                        table.insert(res, bp)
+                    end
+                end
             end
         end
     end
@@ -150,6 +180,11 @@ function FilterBlueprints()
             end
         end
     end
+
+    -- Backwards compatibility aliases
+    globalBPs['Land'] = globalBPs['Land_T3']
+    globalBPs['Air'] = globalBPs['Air_T3']
+    globalBPs['Naval'] = globalBPs['Naval_T3']
 end
 
 function AddToUnitkeygroups(name, compiled)
