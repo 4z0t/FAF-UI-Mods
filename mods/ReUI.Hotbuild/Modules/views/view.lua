@@ -473,6 +473,7 @@ function OpenWindow(parent)
         q:Combo("Hotbuild Set", hotbuilds, function(idx, text)
             ctx.activeName = text
             ctx.swapIndex = false
+            ctx.constTopLine = 1
             ViewModel.SetActive(text)
             ctx:UpdateWindow()
         end, currentIdx)
@@ -502,6 +503,7 @@ function OpenWindow(parent)
             ViewModel.SetActive("")
             ctx.activeName = ""
             ctx.swapIndex = false
+            ctx.constTopLine = 1
             ctx:UpdateWindow()
         end)
         q:Tooltip("New Set", "Create a new empty hotbuild set")
@@ -547,7 +549,7 @@ function OpenWindow(parent)
             RenderFactionHeaders("Step")
 
             local constCount = ViewModel.FetchConstructionCount()
-            q:ScrollableListPreserved(0, 240, math.max(constCount, 4), 58, function(row, index)
+            q:ScrollableListPreserved(0, 240, constCount, 58, function(row, index)
                 local isSwap = (ctx.swapIndex == index)
                 local stepLabel = isSwap and ("[" .. index .. "*]") or ("#" .. index)
                 local currentIndex = index
@@ -581,6 +583,10 @@ function OpenWindow(parent)
                         if modifiers and modifiers.Left then
                             OpenBlueprintPicker("Construction", control._skin, clickedBp, function(newBp)
                                 ViewModel.SetConstructionBlueprint(control.id, control._skin, newBp)
+                                local newCount = ViewModel.FetchConstructionCount()
+                                if control.id >= newCount - 1 and newCount > 4 then
+                                    ctx.constTopLine = newCount - 4 + 1
+                                end
                                 ctx:UpdateWindow()
                             end, function()
                                 ViewModel.SetConstructionBlueprint(control.id, control._skin, nil)
@@ -599,11 +605,13 @@ function OpenWindow(parent)
                     local rowIndex = currentIndex
                     ag:Button("Fill", function(modifiers)
                         if modifiers and modifiers.Right then
-                            for _, s in ipairs(skins) do
-                                ViewModel.SetConstructionBlueprint(rowIndex, s, nil)
-                            end
+                            ViewModel.ClearConstructionBlueprints(rowIndex)
                         else
                             ViewModel.FillConstructionBlueprints(rowIndex)
+                        end
+                        local newCount = ViewModel.FetchConstructionCount()
+                        if rowIndex >= newCount - 1 and newCount > 4 then
+                            ctx.constTopLine = newCount - 4 + 1
                         end
                         ctx:UpdateWindow()
                     end, 11, 95, 26)
@@ -611,25 +619,20 @@ function OpenWindow(parent)
 
                     -- ag:SameLine(4)
                     ag:Button("X", function()
-                        for _, s in ipairs(skins) do
-                            ViewModel.SetConstructionBlueprint(rowIndex, s, nil)
-                        end
+                        ViewModel.ClearConstructionBlueprints(rowIndex)
                         ctx:UpdateWindow()
                     end, 11, 95, 26)
                     ag:Tooltip("Clear Row", "Clear all blueprints in this step")
                 end)
             end, function()
+                local maxTop = math.max(constCount - 4 + 1, 1)
+                if ctx.constTopLine and ctx.constTopLine > maxTop then
+                    ctx.constTopLine = maxTop
+                end
                 return ctx.constTopLine
             end, function(top)
                 ctx.constTopLine = top
             end)
-
-            q:Button("+ Add Step", function()
-                local count = ViewModel.FetchConstructionCount()
-                ViewModel.SetConstructionBlueprint(count + 1, "uef", nil)
-                ctx:UpdateWindow()
-            end, 12)
-            q:Tooltip("Add Step", "Add another step to the construction cycle")
         end
 
         -- Factory & Gate Layer Cycles

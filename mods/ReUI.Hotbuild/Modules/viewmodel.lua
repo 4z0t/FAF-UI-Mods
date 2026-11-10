@@ -63,10 +63,37 @@ function AddConstructionBlueprints()
 
 end
 
+local function GetMaxConstructionIndex()
+    local maxIdx = 0
+    if not active or not active.Construction then
+        return 0
+    end
+    for idx, step in pairs(active.Construction) do
+        if type(idx) == "number" and type(step) == "table" and not table.empty(step) then
+            if idx > maxIdx then
+                maxIdx = idx
+            end
+        end
+    end
+    for idx in pairs(active.Construction) do
+        if type(idx) == "number" and idx > maxIdx then
+            active.Construction[idx] = nil
+        end
+    end
+    return maxIdx
+end
+
 function SetConstructionBlueprint(index, faction, bp)
     active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
-    active.Construction[index][faction] = bp
+    if bp ~= nil then
+        active.Construction[index] = active.Construction[index] or {}
+        active.Construction[index][faction] = bp
+    else
+        if active.Construction[index] then
+            active.Construction[index][faction] = nil
+        end
+    end
+    GetMaxConstructionIndex()
 end
 
 function SetBlueprint(category, faction, bp)
@@ -76,9 +103,12 @@ end
 
 function Swap(i1, i2)
     active.Construction = active.Construction or {}
+    active.Construction[i1] = active.Construction[i1] or {}
+    active.Construction[i2] = active.Construction[i2] or {}
     local temp = active.Construction[i1]
     active.Construction[i1] = active.Construction[i2]
     active.Construction[i2] = temp
+    GetMaxConstructionIndex()
 end
 
 local function SingleBlueprint(bps)
@@ -233,15 +263,16 @@ function ClearBlueprints(category)
 end
 
 function FetchConstructionCount()
-    return table.getn(active.Construction or {}) + 1
+    return GetMaxConstructionIndex() + 1
 end
 
 function FillConstructionBlueprints(index)
     local activeBP
     local activeFaction
 
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return
+    end
     activeFaction, activeBP = SingleBlueprint(active.Construction[index])
     if activeBP then
         if type(activeBP) == "string" then
@@ -259,7 +290,10 @@ function FillConstructionBlueprints(index)
 end
 
 function ClearConstructionBlueprints(index)
-
+    if active.Construction and active.Construction[index] then
+        active.Construction[index] = {}
+        GetMaxConstructionIndex()
+    end
 end
 
 function FetchHotBuilds(new)
@@ -271,8 +305,9 @@ function FetchHotBuilds(new)
 end
 
 function FetchConstructionBlueprint(index, faction)
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return nil
+    end
     return active.Construction[index][faction]
 end
 
@@ -298,7 +333,8 @@ function FetchBlueprints(category, faction)
 end
 
 function IsEmpty(index)
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return true
+    end
     return table.empty(active.Construction[index])
 end
