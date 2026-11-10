@@ -39,7 +39,8 @@ local tierColors = {
 
 local factoryDivisions = {
     {
-        title = "Land Factories",
+        id = "hb_sec_land",
+        title = "Land Layer",
         categories = {
             { cat = "Land_T1", label = "Land T1" },
             { cat = "Land_T2", label = "Land T2" },
@@ -47,7 +48,8 @@ local factoryDivisions = {
         }
     },
     {
-        title = "Air Factories",
+        id = "hb_sec_air",
+        title = "Air Layer",
         categories = {
             { cat = "Air_T1", label = "Air T1" },
             { cat = "Air_T2", label = "Air T2" },
@@ -55,7 +57,8 @@ local factoryDivisions = {
         }
     },
     {
-        title = "Naval Factories",
+        id = "hb_sec_naval",
+        title = "Naval Layer",
         categories = {
             { cat = "Naval_T1", label = "Naval T1" },
             { cat = "Naval_T2", label = "Naval T2" },
@@ -63,6 +66,7 @@ local factoryDivisions = {
         }
     },
     {
+        id = "hb_sec_gate",
         title = "Quantum Gate",
         categories = {
             { cat = "Gate", label = "Gate" },
@@ -220,7 +224,8 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
     end
 
     local skinName = factionTitles[skin] or (type(skin) == "string" and (skin:sub(1,1):upper() .. skin:sub(2))) or tostring(skin)
-    local windowTitle = string.format("Select Blueprint: %s (%s)", tostring(skinName), tostring(category))
+    local catDisplay = tostring(category):gsub("_", " ")
+    local windowTitle = string.format("Select Blueprint: %s (%s)", tostring(skinName), tostring(catDisplay))
 
     pickerWindow = Quick.Window(windowTitle, function(pq)
         local pctx = pq:Context()
@@ -569,13 +574,13 @@ function OpenWindow(parent)
             q:Tooltip("Add Step", "Add another step to the construction cycle")
         end
 
-        q:Splitter()
+        -- Factory & Gate Layer Cycles
+        for _, div in ipairs(factoryDivisions) do
+            q:Splitter()
 
-        -- Factory & Gate Cycles
-        if q:Collapsible("Factory & Gate Cycles (Land, Air, Naval, Gate)", true, "hb_sec_factories") then
-            RenderFactionHeaders("Category")
+            if q:Collapsible(div.title, true, div.id) then
+                RenderFactionHeaders("Category")
 
-            for _, div in ipairs(factoryDivisions) do
                 for _, catData in ipairs(div.categories) do
                     local currentCat = catData.cat
                     local currentLabel = catData.label
