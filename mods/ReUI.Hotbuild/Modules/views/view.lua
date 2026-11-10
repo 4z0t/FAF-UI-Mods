@@ -1,6 +1,8 @@
 local UIUtil = import('/lua/ui/uiutil.lua')
 local Tooltip = import('/lua/ui/game/tooltip.lua')
 local LayoutFor = ReUI.UI.FloorLayoutFor
+local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
+local Group = import('/lua/maui/group.lua').Group
 
 local Quick = ReUI.UI.Quick
 local QuickContainer = Quick.Container
@@ -12,7 +14,6 @@ local ViewModel = import('../viewmodel.lua')
 local Model = import('../model.lua')
 
 local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
-local singleCategories = { 'Land', 'Air', 'Naval', 'Gate' }
 
 local factionColors = {
     cybran   = "ffff4040",
@@ -26,6 +27,103 @@ local factionTitles = {
     seraphim = "Seraphim",
     aeon     = "Aeon",
     uef      = "UEF",
+}
+
+local tierColors = {
+    T1   = "ff88ccff",
+    T2   = "ff88ff88",
+    T3   = "ffffcc44",
+    EXP  = "ffff4444",
+    TMPL = "ffff88ff",
+}
+
+local factoryDivisions = {
+    {
+        title = "Land Factories",
+        categories = {
+            { cat = "Land_T1", label = "Land T1" },
+            { cat = "Land_T2", label = "Land T2" },
+            { cat = "Land_T3", label = "Land T3" },
+        }
+    },
+    {
+        title = "Air Factories",
+        categories = {
+            { cat = "Air_T1", label = "Air T1" },
+            { cat = "Air_T2", label = "Air T2" },
+            { cat = "Air_T3", label = "Air T3" },
+        }
+    },
+    {
+        title = "Naval Factories",
+        categories = {
+            { cat = "Naval_T1", label = "Naval T1" },
+            { cat = "Naval_T2", label = "Naval T2" },
+            { cat = "Naval_T3", label = "Naval T3" },
+        }
+    },
+    {
+        title = "Quantum Gate",
+        categories = {
+            { cat = "Gate", label = "Gate" },
+        }
+    }
+}
+
+---@class GridItem : Group
+local GridItem = Class(Group) {
+    ---@param self GridItem
+    ---@param parent Control
+    ---@param entry table
+    ---@param isCurrent boolean
+    ---@param onSelect fun(entry:any)
+    __init = function(self, parent, entry, isCurrent, onSelect)
+        Group.__init(self, parent)
+        LayoutFor(self):Width(54):Height(54)
+
+        self._bg = Bitmap(self)
+        self._bg:SetSolidColor(isCurrent and "ff665500" or "ff1a1a1a")
+        LayoutFor(self._bg):Fill(self):DisableHitTest()
+
+        self._border = Bitmap(self)
+        self._border:SetSolidColor(isCurrent and "ffffcc00" or "ff3a3a3a")
+        LayoutFor(self._border):Fill(self):OffsetIn(self, 1, 1, 1, 1):DisableHitTest()
+
+        local inner = Bitmap(self)
+        inner:SetSolidColor(isCurrent and "ff2a2200" or "ff121212")
+        LayoutFor(inner):Fill(self):OffsetIn(self, 2, 2, 2, 2):DisableHitTest()
+
+        local iconFile = UIUtil.UIFile('/icons/units/' .. entry.id .. '_icon.dds', true)
+        self._icon = Bitmap(self, iconFile)
+        LayoutFor(self._icon):AtCenterIn(self):Width(46):Height(46):DisableHitTest()
+
+        self._badge = UIUtil.CreateText(self, entry.tier, 9, UIUtil.bodyFont, true)
+        self._badge:SetColor(tierColors[entry.tier] or "ffffffff")
+        LayoutFor(self._badge):AtRightBottomIn(self, 3, 2):DisableHitTest()
+
+        self.HandleEvent = function(s, event)
+            if event.Type == 'MouseEnter' then
+                self._border:SetSolidColor("ffffffff")
+                return true
+            elseif event.Type == 'MouseExit' then
+                self._border:SetSolidColor(isCurrent and "ffffcc00" or "ff3a3a3a")
+                return true
+            elseif event.Type == 'ButtonPress' then
+                onSelect(entry.raw)
+                return true
+            end
+            return false
+        end
+
+        local costText = ""
+        if entry.mass > 0 or entry.energy > 0 then
+            costText = string.format("\nCost: %d Mass • %d Energy", entry.mass, entry.energy)
+        end
+
+        Tooltip.AddControlTooltipManual(self, entry.name,
+            string.format("ID: %s\nTier: %s%s\n\n%s\n\nClick to select",
+                entry.id, entry.tier, costText, entry.desc))
+    end
 }
 
 ---@class HotbuildContainer : Quick.Container
@@ -122,7 +220,7 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
     end
 
     local skinName = factionTitles[skin] or (type(skin) == "string" and (skin:sub(1,1):upper() .. skin:sub(2))) or tostring(skin)
-    local windowTitle = string.format("Select %s (%s)", tostring(skinName), tostring(category))
+    local windowTitle = string.format("Select Blueprint: %s (%s)", tostring(skinName), tostring(category))
 
     pickerWindow = Quick.Window(windowTitle, function(pq)
         local pctx = pq:Context()
@@ -134,7 +232,7 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         end
 
         -- Search & Filter Bar
-        pq:PushItemWidth(160)
+        pq:PushItemWidth(150)
         local searchEdit = pq:Edit("Search", function(text)
             pctx.searchText = string.lower(text or "")
             pctx:UpdateWindow()
@@ -159,7 +257,7 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         end
 
         pq:SameLine(10)
-        pq:Button("Clear", function()
+        pq:Button("Clear Slot", function()
             if onClear then onClear() end
             CloseBlueprintPicker()
         end, 11)
@@ -176,11 +274,14 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
             local isTemplate = (type(item) == "table")
             local id = isTemplate and (item.icon or "template") or item
             local name = ""
+            local desc = ""
             local tier = "T1"
             local mass = 0
+            local energy = 0
 
             if isTemplate then
                 name = item.name or "Template"
+                desc = "Custom Build Template"
                 tier = "TMPL"
             else
                 local bp = __blueprints[id]
@@ -189,13 +290,15 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
                     if not name or name == "" then
                         name = bp.Description and LOC(bp.Description) or id
                     end
+                    desc = bp.Description and LOC(bp.Description) or ""
                     if EntityCategoryContains(categories.TECH1, id) then tier = "T1"
                     elseif EntityCategoryContains(categories.TECH2, id) then tier = "T2"
                     elseif EntityCategoryContains(categories.TECH3, id) then tier = "T3"
                     elseif EntityCategoryContains(categories.EXPERIMENTAL, id) then tier = "EXP"
                     end
-                    if bp.Economy and bp.Economy.BuildCostMass then
-                        mass = bp.Economy.BuildCostMass
+                    if bp.Economy then
+                        mass = bp.Economy.BuildCostMass or 0
+                        energy = bp.Economy.BuildCostEnergy or 0
                     end
                 else
                     name = id
@@ -212,8 +315,10 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
                     raw = item,
                     id = id,
                     name = name,
+                    desc = desc,
                     tier = tier,
                     mass = mass,
+                    energy = energy,
                     isTemplate = isTemplate,
                 })
             end
@@ -223,33 +328,32 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         if count == 0 then
             pq:Text("No matching blueprints found.", 12, UIUtil.bodyFont, "ff888888")
         else
-            pq:ScrollableList(0, 320, count, 44, function(row, index)
-                local entry = filtered[index]
-                if not entry then return end
-                local isCurrent = (entry.raw == currentBlueprint)
+            -- 8-column grid layout
+            local COLUMNS = 8
+            local numRows = math.ceil(count / COLUMNS)
+            if numRows < 1 then numRows = 1 end
 
-                row:Group(0, 42, function(g)
-                    local iconFile = UIUtil.UIFile('/icons/units/' .. entry.id .. '_icon.dds', true)
-                    g:Image(iconFile, 38, 38)
-                    g:SameLine(8)
-                    g:Group(260, 38, function(info)
-                        local titleCol = isCurrent and UIUtil.highlightColor or "ffffffff"
-                        info:Text(entry.name, 12, UIUtil.titleFont, titleCol)
-                        local sub = entry.id .. " • " .. entry.tier
-                        if entry.mass > 0 then
-                            sub = sub .. " • " .. entry.mass .. "m"
+            pq:ScrollableList(0, 270, numRows, 58, function(row, rowIndex)
+                for col = 1, COLUMNS do
+                    local itemIndex = (rowIndex - 1) * COLUMNS + col
+                    if itemIndex <= count then
+                        local entry = filtered[itemIndex]
+                        if col > 1 then
+                            row:SameLine(4)
                         end
-                        info:Text(sub, 10, UIUtil.bodyFont, "ffaaaaaa")
-                    end)
-                    g:SameLine(10)
-                    local selectedEntry = entry
-                    g:Button(isCurrent and "Selected" or "Select", function()
-                        if onSelect then
-                            onSelect(selectedEntry.raw)
-                        end
-                        CloseBlueprintPicker()
-                    end, 11)
-                end)
+                        local isCurrent = (entry.raw == currentBlueprint)
+                        local item = GridItem(row._control, entry, isCurrent, function(chosen)
+                            if onSelect then
+                                onSelect(chosen)
+                            end
+                            CloseBlueprintPicker()
+                        end)
+                        row:Builder():AddControl(item, {
+                            width = 54,
+                            height = 54,
+                        })
+                    end
+                end
             end)
         end
     end, "hotbuild_bp_picker")
@@ -342,7 +446,7 @@ function OpenWindow(parent)
         q:SameLine(6)
         q:Button("Delete", function()
             if ctx.activeName and ctx.activeName ~= "" then
-                ViewModel.SaveActive() -- deletes activeName
+                ViewModel.SaveActive() -- deletes activeName in Model
                 ViewModel.SetActive("")
                 ctx.activeName = ""
                 ctx.swapIndex = false
@@ -471,56 +575,60 @@ function OpenWindow(parent)
         if q:Collapsible("Factory & Gate Cycles (Land, Air, Naval, Gate)", true, "hb_sec_factories") then
             RenderFactionHeaders("Category")
 
-            for _, category in ipairs(singleCategories) do
-                local currentCat = category
-                q:Group(65, 52, function(g)
-                    g:Title(currentCat, 13)
-                end)
+            for _, div in ipairs(factoryDivisions) do
+                for _, catData in ipairs(div.categories) do
+                    local currentCat = catData.cat
+                    local currentLabel = catData.label
 
-                for sIdx, skin in ipairs(skins) do
-                    q:SameLine(sIdx == 1 and 8 or 6)
-                    local currentSkin = skin
-                    local bp = ViewModel.FetchBlueprint(currentCat, currentSkin)
-                    q:BlueprintSlot(bp, currentSkin, function(control, modifiers, clickedBp)
-                        if modifiers and modifiers.Left then
-                            OpenBlueprintPicker(control.category, control._skin, clickedBp, function(newBp)
-                                ViewModel.SetBlueprint(control.category, control._skin, newBp)
-                                ctx:UpdateWindow()
-                            end, function()
+                    q:Group(65, 52, function(g)
+                        g:Title(currentLabel, 12)
+                    end)
+
+                    for sIdx, skin in ipairs(skins) do
+                        q:SameLine(sIdx == 1 and 8 or 6)
+                        local currentSkin = skin
+                        local bp = ViewModel.FetchBlueprint(currentCat, currentSkin)
+                        q:BlueprintSlot(bp, currentSkin, function(control, modifiers, clickedBp)
+                            if modifiers and modifiers.Left then
+                                OpenBlueprintPicker(control.category, control._skin, clickedBp, function(newBp)
+                                    ViewModel.SetBlueprint(control.category, control._skin, newBp)
+                                    ctx:UpdateWindow()
+                                end, function()
+                                    ViewModel.SetBlueprint(control.category, control._skin, nil)
+                                    ctx:UpdateWindow()
+                                end)
+                            elseif modifiers and modifiers.Right then
                                 ViewModel.SetBlueprint(control.category, control._skin, nil)
                                 ctx:UpdateWindow()
-                            end)
-                        elseif modifiers and modifiers.Right then
-                            ViewModel.SetBlueprint(control.category, control._skin, nil)
-                            ctx:UpdateWindow()
-                        end
-                    end, 175, 52, nil, currentCat)
-                end
+                            end
+                        end, 175, 52, nil, currentCat)
+                    end
 
-                q:SameLine(8)
-                q:Group(95, 52, function(ag)
-                    local catToFill = currentCat
-                    ag:Button("Fill", function(modifiers)
-                        if modifiers and modifiers.Right then
+                    q:SameLine(8)
+                    q:Group(95, 52, function(ag)
+                        local catToFill = currentCat
+                        ag:Button("Fill", function(modifiers)
+                            if modifiers and modifiers.Right then
+                                for _, s in ipairs(skins) do
+                                    ViewModel.SetBlueprint(catToFill, s, nil)
+                                end
+                            else
+                                ViewModel.FillBlueprints(catToFill)
+                            end
+                            ctx:UpdateWindow()
+                        end, 11)
+                        ag:Tooltip("Fill Category", "Left-click: auto-fill other factions\nRight-click: clear all slots in category")
+
+                        ag:SameLine(4)
+                        ag:Button("X", function()
                             for _, s in ipairs(skins) do
                                 ViewModel.SetBlueprint(catToFill, s, nil)
                             end
-                        else
-                            ViewModel.FillBlueprints(catToFill)
-                        end
-                        ctx:UpdateWindow()
-                    end, 11)
-                    ag:Tooltip("Fill Category", "Left-click: auto-fill other factions\nRight-click: clear all slots in category")
-
-                    ag:SameLine(4)
-                    ag:Button("X", function()
-                        for _, s in ipairs(skins) do
-                            ViewModel.SetBlueprint(catToFill, s, nil)
-                        end
-                        ctx:UpdateWindow()
-                    end, 11)
-                    ag:Tooltip("Clear Category", "Clear all blueprints in this category")
-                end)
+                            ctx:UpdateWindow()
+                        end, 11)
+                        ag:Tooltip("Clear Category", "Clear all blueprints in this category")
+                    end)
+                end
             end
         end
 
