@@ -205,8 +205,35 @@ function CloseBlueprintPicker()
     end
 end
 
----@class BlueprintPickerWindow : Quick.Window
-local BlueprintPickerWindow = ReUI.Core.Class(QuickWindow)
+---@class HotbuildBaseWindow : Quick.Window
+local HotbuildBaseWindow = ReUI.Core.Class(QuickWindow)
+{
+    ---@param self HotbuildBaseWindow
+    ---@param title string
+    ---@param fn fun(q: Quick.Container)
+    ---@param id? string
+    __init = function(self, title, fn, id)
+        QuickWindow.__init(self, title, fn, id)
+        if self._frame then
+            self._frame:Destroy()
+            self._frame = nil
+        end
+        self._frame = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
+    end,
+
+    ---@param self HotbuildBaseWindow
+    ---@param layouter ReUI.UI.Layouter
+    InitLayout = function(self, layouter)
+        QuickWindow.InitLayout(self, layouter)
+        if self._frame then
+            self._frame:Surround(self, 64, 64)
+            LayoutFor(self._frame):Under(self, 2)
+        end
+    end,
+}
+
+---@class BlueprintPickerWindow : HotbuildBaseWindow
+local BlueprintPickerWindow = ReUI.Core.Class(HotbuildBaseWindow)
 {
     Prefix = "ReUI.Hotbuild.PickerWindow",
     DefaultPos = { 300, 120 },
@@ -214,14 +241,14 @@ local BlueprintPickerWindow = ReUI.Core.Class(QuickWindow)
     ---@param self BlueprintPickerWindow
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
-        QuickWindow.InitLayout(self, layouter)
+        HotbuildBaseWindow.InitLayout(self, layouter)
         LayoutFor(self._resizeGrip):Hide()
     end,
 
     ---@param self BlueprintPickerWindow
     OnClose = function(self)
         pickerWindow = nil
-        QuickWindow.OnClose(self)
+        HotbuildBaseWindow.OnClose(self)
     end,
 
     ---@param self BlueprintPickerWindow
@@ -437,8 +464,8 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
     end, "hotbuild_bp_picker")
 end
 
----@class HotbuildWindow : Quick.Window
-local HotbuildWindow = ReUI.Core.Class(QuickWindow)
+---@class HotbuildWindow : HotbuildBaseWindow
+local HotbuildWindow = ReUI.Core.Class(HotbuildBaseWindow)
 {
     Prefix = "ReUI.Hotbuild.Window",
     DefaultPos = { 240, 80 },
@@ -447,7 +474,7 @@ local HotbuildWindow = ReUI.Core.Class(QuickWindow)
     ---@param self HotbuildWindow
     OnClose = function(self)
         CloseBlueprintPicker()
-        QuickWindow.OnClose(self)
+        HotbuildBaseWindow.OnClose(self)
     end,
 }
 
