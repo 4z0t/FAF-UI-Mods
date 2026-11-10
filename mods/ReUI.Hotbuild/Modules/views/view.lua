@@ -208,28 +208,7 @@ end
 ---@class HotbuildBaseWindow : Quick.Window
 local HotbuildBaseWindow = ReUI.Core.Class(QuickWindow)
 {
-    ---@param self HotbuildBaseWindow
-    ---@param title string
-    ---@param fn fun(q: Quick.Container)
-    ---@param id? string
-    __init = function(self, title, fn, id)
-        QuickWindow.__init(self, title, fn, id)
-        if self._frame then
-            self._frame:Destroy()
-            self._frame = nil
-        end
-        self._frame = UIUtil.CreateNinePatchStd(self, '/scx_menu/lan-game-lobby/dialog/background/')
-    end,
-
-    ---@param self HotbuildBaseWindow
-    ---@param layouter ReUI.UI.Layouter
-    InitLayout = function(self, layouter)
-        QuickWindow.InitLayout(self, layouter)
-        if self._frame then
-            self._frame:Surround(self, 64, 64)
-            LayoutFor(self._frame):Under(self, 2)
-        end
-    end,
+    BorderClass = Quick.NinePatchBorder,
 }
 
 ---@class BlueprintPickerWindow : HotbuildBaseWindow
@@ -249,27 +228,6 @@ local BlueprintPickerWindow = ReUI.Core.Class(HotbuildBaseWindow)
     OnClose = function(self)
         pickerWindow = nil
         HotbuildBaseWindow.OnClose(self)
-    end,
-
-    ---@param self BlueprintPickerWindow
-    ---@param w number
-    ---@param h number
-    OnContentResize = function(self, w, h)
-        self._minWidth = w + self._padding * 2
-        self._minHeight = h + self._padding + 24
-
-        self._width = self._minWidth
-        self._height = self._minHeight
-
-        LayoutFor(self._content)
-            :Below(self._titleBar)
-            :AtLeftIn(self, self._padding)
-            :AtRightIn(self, self._padding)
-            :AtBottomIn(self, self._padding)
-
-        LayoutFor(self)
-            :Width(self._width)
-            :Height(self._height)
     end,
 }
 
@@ -589,7 +547,7 @@ function OpenWindow(parent)
             RenderFactionHeaders("Step")
 
             local constCount = ViewModel.FetchConstructionCount()
-            q:ScrollableListPreserved(0, 240, constCount, 58, function(row, index)
+            q:ScrollableListPreserved(0, 240, math.max(constCount, 4), 58, function(row, index)
                 local isSwap = (ctx.swapIndex == index)
                 local stepLabel = isSwap and ("[" .. index .. "*]") or ("#" .. index)
                 local currentIndex = index
@@ -610,7 +568,7 @@ function OpenWindow(parent)
                             ctx.swapIndex = currentIndex
                             ctx:UpdateWindow()
                         end
-                    end, 12)
+                    end, 12, 65)
                     g:Tooltip("Swap Step", isSwap and "Selected for swap! Click another step to swap." or "Click to swap with another step")
                 end)
 
@@ -637,7 +595,7 @@ function OpenWindow(parent)
 
                 -- 3. Row Actions: Fill & Clear
                 row:SameLine(8)
-                row:Group(95, 52, function(ag)
+                row:Group(95 + 30, 52, function(ag)
                     local rowIndex = currentIndex
                     ag:Button("Fill", function(modifiers)
                         if modifiers and modifiers.Right then
@@ -648,16 +606,16 @@ function OpenWindow(parent)
                             ViewModel.FillConstructionBlueprints(rowIndex)
                         end
                         ctx:UpdateWindow()
-                    end, 11)
+                    end, 11, 95, 26)
                     ag:Tooltip("Fill Row", "Left-click: auto-fill other factions\nRight-click: clear all slots in step")
 
-                    ag:SameLine(4)
+                    -- ag:SameLine(4)
                     ag:Button("X", function()
                         for _, s in ipairs(skins) do
                             ViewModel.SetConstructionBlueprint(rowIndex, s, nil)
                         end
                         ctx:UpdateWindow()
-                    end, 11)
+                    end, 11, 95, 26)
                     ag:Tooltip("Clear Row", "Clear all blueprints in this step")
                 end)
             end, function()
@@ -721,16 +679,16 @@ function OpenWindow(parent)
                                 ViewModel.FillBlueprints(catToFill)
                             end
                             ctx:UpdateWindow()
-                        end, 11)
+                        end, 11, 95, 26)
                         ag:Tooltip("Fill Category", "Left-click: auto-fill other factions\nRight-click: clear all slots in category")
 
-                        ag:SameLine(4)
+                        -- ag:SameLine(4)
                         ag:Button("X", function()
                             for _, s in ipairs(skins) do
                                 ViewModel.SetBlueprint(catToFill, s, nil)
                             end
                             ctx:UpdateWindow()
-                        end, 11)
+                        end, 11, 95, 26)
                         ag:Tooltip("Clear Category", "Clear all blueprints in this category")
                     end)
                 end
