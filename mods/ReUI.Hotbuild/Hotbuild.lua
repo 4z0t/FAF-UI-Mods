@@ -8,6 +8,7 @@ ReUI.Require
     "ReUI.UI.Controls >= 1.0.0",
     "ReUI.UI.Views >= 1.2.0",
     "ReUI.UI.Views.Grid >= 1.0.0",
+    "ReUI.UI.Quick >= 1.0.0",
     "ReUI.Options >= 1.0.0"
 }
 
@@ -255,7 +256,13 @@ function Main(isReplay)
         Model.init()
         ViewModel.init()
 
-        ReUI.Options.Builder.AddOptions("ReUI.Hotbuild", "ReUI.Hotbuild", View.init)
+        if ReUI.Options and ReUI.Options.Add then
+            ReUI.Options.Add("ReUI.Hotbuild", function(frame)
+                return View.OpenWindow(frame)
+            end)
+        elseif ReUI.Options and ReUI.Options.Builder and ReUI.Options.Builder.AddOptions then
+            ReUI.Options.Builder.AddOptions("ReUI.Hotbuild", "ReUI.Hotbuild", View.init)
+        end
     end)
 
     ---@param name string
@@ -268,5 +275,9 @@ function Main(isReplay)
         ProcessHotbuild = ProcessHotbuild,
         GetCycleMap = GetCycleMap,
         AddHotbuild = AddHotbuild,
+        OpenWindow = function(parent)
+            local View = import("Modules/views/view.lua")
+            return View.OpenWindow(parent)
+        end,
     }
 end

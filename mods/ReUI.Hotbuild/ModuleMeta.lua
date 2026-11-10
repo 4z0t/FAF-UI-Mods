@@ -18,3 +18,9 @@ end
 ---@param data string[]|table[]
 function ReUI.Hotbuild.AddHotbuild(name, data)
 end
+
+---Opens the Hotbuild configuration window
+---@param parent? Control
+---@return Quick.Window
+function ReUI.Hotbuild.OpenWindow(parent)
+end
