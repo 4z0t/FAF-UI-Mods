@@ -353,14 +353,31 @@ QuickContainer = Class()
     ---@param onClick? fun(modifiers:KeyModifiers)
     ---@param size? number
     ---@return Button
-    Button = function(self, text, onClick, size)
-        local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, size or 14)
+    Button = function(self, text, onClick, size, width, height)
+        local btnSize = 14
+        if type(size) == "table" then
+            width = width or size.width
+            height = height or size.height
+            btnSize = size.size or 14
+        elseif type(size) == "number" then
+            btnSize = size
+        end
+        local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, btnSize)
         if onClick then
             btn.OnClick = function(control, modifiers) onClick(modifiers) end
         end
+        local defaultWidth = LayoutFor:UnscaleNumber(btn.Width())
+        local defaultHeight = LayoutFor:UnscaleNumber(btn.Height())
+
+        local w = width
+        if w == nil then
+            w = self:Builder():GetItemWidth(defaultWidth)
+        end
+        local h = height or defaultHeight
+
         self:Builder():AddControl(btn, {
-            width = LayoutFor:UnscaleNumber(btn.Width()),
-            height = LayoutFor:UnscaleNumber(btn.Height()),
+            width = w,
+            height = h,
         })
         return btn
     end,

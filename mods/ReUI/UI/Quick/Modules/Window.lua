@@ -2,6 +2,7 @@ local UIUtil = import('/lua/ui/uiutil.lua')
 local Bitmap = import('/lua/maui/bitmap.lua').Bitmap
 local Dragger = import("/lua/maui/dragger.lua").Dragger
 local Button = import("/lua/maui/button.lua").Button
+local NinePatch = import("/lua/ui/controls/ninepatch.lua").NinePatch
 
 local LayoutFor = ReUI.UI.FloorLayoutFor
 local WindowFrame = ReUI.UI.Views.WindowFrame
@@ -20,7 +21,7 @@ local closeButton = {
 }
 
 ---@class Quick.Border : ReUI.UI.Views.WindowFrame
-local Border = ReUI.Core.Class(WindowFrame)
+Border = ReUI.Core.Class(WindowFrame)
 {
     Textures = {
         tl = UIUtil.SkinnableFile("/game/mini-map-brd/mini-map_brd_ul.dds"),
@@ -35,6 +36,37 @@ local Border = ReUI.Core.Class(WindowFrame)
     },
 }
 
+---@class Quick.NinePatchBorder : NinePatch
+NinePatchBorder = Class(NinePatch)
+{
+    TexturePath = '/scx_menu/lan-game-lobby/dialog/background/',
+    FudgeX = 64,
+    FudgeY = 64,
+
+    ---@param self Quick.NinePatchBorder
+    ---@param parent Control
+    ---@param texturePath? string
+    ---@param fudgeX? number
+    ---@param fudgeY? number
+    __init = function(self, parent, texturePath, fudgeX, fudgeY)
+        local path = texturePath or self.TexturePath
+        local SkinnableFile = UIUtil.SkinnableFile
+        NinePatch.__init(self, parent,
+            SkinnableFile(path .. 'center.dds'),
+            SkinnableFile(path .. 'topLeft.dds'),
+            SkinnableFile(path .. 'topRight.dds'),
+            SkinnableFile(path .. 'bottomLeft.dds'),
+            SkinnableFile(path .. 'bottomRight.dds'),
+            SkinnableFile(path .. 'left.dds'),
+            SkinnableFile(path .. 'right.dds'),
+            SkinnableFile(path .. 'top.dds'),
+            SkinnableFile(path .. 'bottom.dds')
+        )
+        if fudgeX then self.FudgeX = fudgeX end
+        if fudgeY then self.FudgeY = fudgeY end
+    end,
+}
+
 ---@param name string
 ---@return string
 local function FormatName(name)
@@ -42,7 +74,7 @@ local function FormatName(name)
 end
 
 ---@class Quick.Window : ReUI.UI.Controls.Group
----@field _frame Quick.Border
+---@field _frame Control?
 ---@field _titleBar Group
 ---@field _title Text
 ---@field _closeBtn Button
@@ -56,6 +88,7 @@ end
 ---@field _position ReUI.Options.OptionRef
 ---@field _context Quick.Context
 ---@field _fn fun(q: Quick.Container)
+---@field BorderClass? fun(parent: Control): Control
 QuickWindow = ReUI.Core.Class(Group)
 {
     DefaultPos = { 400, 100 },
@@ -63,6 +96,8 @@ QuickWindow = ReUI.Core.Class(Group)
     Prefix = "Quick.Windows",
 
     ContextClass = QuickContext,
+
+    BorderClass = Border,
 
     ---@param self Quick.Window
     ---@param title string
@@ -84,7 +119,7 @@ QuickWindow = ReUI.Core.Class(Group)
 
         self._position = ReUI.Options.OptionRef { self.Prefix, FormatName(id or title) }
 
-        self._frame      = Border(self)
+        self._frame      = self:CreateFrame()
         self._titleBar   = Group(self)
         self._title      = UIUtil.CreateText(self._titleBar, title, 14, UIUtil.titleFont)
         self._closeBtn   = Button(self._titleBar,
@@ -95,6 +130,15 @@ QuickWindow = ReUI.Core.Class(Group)
         self._resizeGrip = Bitmap(self)
 
         self:SetupInteractions()
+    end,
+
+    ---@param self Quick.Window
+    ---@return Control?
+    CreateFrame = function(self)
+        if self.BorderClass then
+            return self.BorderClass(self)
+        end
+        return nil
     end,
 
     ---@param self Quick.Window
@@ -119,10 +163,9 @@ QuickWindow = ReUI.Core.Class(Group)
     ---@param self Quick.Window
     ---@param layouter ReUI.UI.Layouter
     InitLayout = function(self, layouter)
-        LayoutFor(self._frame)
-            :OffsetIn(self, -5, -1, -5, -5)
-            :Under(self)
-            :DisableHitTest(true)
+        if self._frame then
+            self:InitFrameLayout(self._frame, layouter)
+        end
 
         LayoutFor(self._titleBar)
             :AtLeftTopIn(self)
@@ -163,6 +206,23 @@ QuickWindow = ReUI.Core.Class(Group)
             :AtBottomIn(self, self._padding)
     end,
 
+    ---@param self Quick.Window
+    ---@param frame Control
+    ---@param layouter ReUI.UI.Layouter
+    InitFrameLayout = function(self, frame, layouter)
+        if frame.Surround then
+            local fx = frame.FudgeX or self.BorderFudgeX or 64
+            local fy = frame.FudgeY or self.BorderFudgeY or 64
+            frame:Surround(self, fx, fy)
+            LayoutFor(frame):Under(self, 2)
+        else
+            LayoutFor(frame)
+                :OffsetIn(self, -5, -1, -5, -5)
+                :Under(self)
+                :DisableHitTest(true)
+        end
+    end,
+
     ---@nodiscard
     ---@param self Quick.Window
     ---@return Quick.Context
@@ -177,8 +237,8 @@ QuickWindow = ReUI.Core.Class(Group)
         self._minWidth = w + self._padding * 2
         self._minHeight = h + self._padding + TITLE_BAR_HEIGHT
 
-        self._width = math.max(self._minWidth, self._width)
-        self._height = math.max(self._minHeight, self._height)
+        self._width = self._minWidth
+        self._height = self._minHeight
 
         LayoutFor(self._content)
             :Below(self._titleBar)
