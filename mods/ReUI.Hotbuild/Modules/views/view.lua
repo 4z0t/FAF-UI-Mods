@@ -195,6 +195,7 @@ local HotbuildContext = Class(QuickContext)
 }
 
 local pickerWindow = nil
+local pickerColumns = 10
 
 ---Closes the blueprint picker window if open
 function CloseBlueprintPicker()
@@ -203,6 +204,47 @@ function CloseBlueprintPicker()
         pickerWindow = nil
     end
 end
+
+---@class BlueprintPickerWindow : Quick.Window
+local BlueprintPickerWindow = ReUI.Core.Class(QuickWindow)
+{
+    Prefix = "ReUI.Hotbuild.PickerWindow",
+    DefaultPos = { 300, 120 },
+
+    ---@param self BlueprintPickerWindow
+    ---@param layouter ReUI.UI.Layouter
+    InitLayout = function(self, layouter)
+        QuickWindow.InitLayout(self, layouter)
+        LayoutFor(self._resizeGrip):Hide()
+    end,
+
+    ---@param self BlueprintPickerWindow
+    OnClose = function(self)
+        pickerWindow = nil
+        QuickWindow.OnClose(self)
+    end,
+
+    ---@param self BlueprintPickerWindow
+    ---@param w number
+    ---@param h number
+    OnContentResize = function(self, w, h)
+        self._minWidth = w + self._padding * 2
+        self._minHeight = h + self._padding + 24
+
+        self._width = self._minWidth
+        self._height = self._minHeight
+
+        LayoutFor(self._content)
+            :Below(self._titleBar)
+            :AtLeftIn(self, self._padding)
+            :AtRightIn(self, self._padding)
+            :AtBottomIn(self, self._padding)
+
+        LayoutFor(self)
+            :Width(self._width)
+            :Height(self._height)
+    end,
+}
 
 ---@param category string
 ---@param skin SkinName
@@ -227,7 +269,7 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
     local catDisplay = tostring(category):gsub("_", " ")
     local windowTitle = string.format("Select Blueprint: %s (%s)", tostring(skinName), tostring(catDisplay))
 
-    pickerWindow = Quick.Window(windowTitle, function(pq)
+    pickerWindow = BlueprintPickerWindow(windowTitle, function(pq)
         local pctx = pq:Context()
         if pctx.searchText == nil then
             pctx.searchText = ""
@@ -235,18 +277,23 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         if pctx.selectedTier == nil then
             pctx.selectedTier = "All"
         end
+        if pctx.columns == nil then
+            pctx.columns = pickerColumns or 10
+        end
+
+        local COLUMNS = pctx.columns
 
         -- Search & Filter Bar
-        pq:PushItemWidth(150)
+        pq:PushItemWidth(140)
         local searchEdit = pq:Edit("Search", function(text)
             pctx.searchText = string.lower(text or "")
             pctx:UpdateWindow()
         end, 40, pctx.searchText)
         pq:PopItemWidth()
 
-        pq:SameLine(10)
-        pq:Text("Tier:", 12)
-        pq:SameLine(4)
+        pq:SameLine(8)
+        pq:Text("Tier:", 11, UIUtil.bodyFont, "ff888888")
+        pq:SameLine(3)
         local tiers = { "All", "T1", "T2", "T3", "EXP" }
         for _, tier in ipairs(tiers) do
             local currentTier = tier
@@ -258,10 +305,35 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
                     pctx:UpdateWindow()
                 end, 11)
             end
-            pq:SameLine(3)
+            pq:SameLine(2)
         end
 
-        pq:SameLine(10)
+        pq:SameLine(8)
+        pq:Text("Cols:", 11, UIUtil.bodyFont, "ff888888")
+        pq:SameLine(3)
+        pq:Button("-", function()
+            if pctx.columns > 5 then
+                pctx.columns = pctx.columns - 1
+                pickerColumns = pctx.columns
+                pctx:UpdateWindow()
+            end
+        end, 10)
+        pq:Tooltip("Fewer Columns", "Decrease grid columns")
+
+        pq:SameLine(2)
+        pq:Text(tostring(COLUMNS), 11, UIUtil.titleFont, UIUtil.highlightColor)
+
+        pq:SameLine(2)
+        pq:Button("+", function()
+            if pctx.columns < 20 then
+                pctx.columns = pctx.columns + 1
+                pickerColumns = pctx.columns
+                pctx:UpdateWindow()
+            end
+        end, 10)
+        pq:Tooltip("More Columns", "Increase grid columns")
+
+        pq:SameLine(8)
         pq:Button("Clear Slot", function()
             if onClear then onClear() end
             CloseBlueprintPicker()
@@ -333,33 +405,34 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         if count == 0 then
             pq:Text("No matching blueprints found.", 12, UIUtil.bodyFont, "ff888888")
         else
-            -- 8-column grid layout
-            local COLUMNS = 8
             local numRows = math.ceil(count / COLUMNS)
-            if numRows < 1 then numRows = 1 end
+            local rowWidth = COLUMNS * 54 + (COLUMNS - 1) * 4
 
-            pq:ScrollableList(0, 270, numRows, 58, function(row, rowIndex)
-                for col = 1, COLUMNS do
-                    local itemIndex = (rowIndex - 1) * COLUMNS + col
-                    if itemIndex <= count then
-                        local entry = filtered[itemIndex]
-                        if col > 1 then
-                            row:SameLine(4)
-                        end
-                        local isCurrent = (entry.raw == currentBlueprint)
-                        local item = GridItem(row._control, entry, isCurrent, function(chosen)
-                            if onSelect then
-                                onSelect(chosen)
+            for r = 1, numRows do
+                local isLastRow = (r == numRows)
+                pq:Group(rowWidth, isLastRow and 54 or 58, function(row)
+                    for col = 1, COLUMNS do
+                        local itemIndex = (r - 1) * COLUMNS + col
+                        if itemIndex <= count then
+                            local entry = filtered[itemIndex]
+                            if col > 1 then
+                                row:SameLine(4)
                             end
-                            CloseBlueprintPicker()
-                        end)
-                        row:Builder():AddControl(item, {
-                            width = 54,
-                            height = 54,
-                        })
+                            local isCurrent = (entry.raw == currentBlueprint)
+                            local item = GridItem(row._control, entry, isCurrent, function(chosen)
+                                if onSelect then
+                                    onSelect(chosen)
+                                end
+                                CloseBlueprintPicker()
+                            end)
+                            row:Builder():AddControl(item, {
+                                width = 54,
+                                height = 54,
+                            })
+                        end
                     end
-                end
-            end)
+                end)
+            end
         end
     end, "hotbuild_bp_picker")
 end
