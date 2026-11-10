@@ -60,11 +60,12 @@ local Builder = Class()
 
     ---@nodiscard
     ---@param self Quick.Builder
+    ---@param defaultWidth? number
     ---@return number
-    GetItemWidth = function(self)
+    GetItemWidth = function(self, defaultWidth)
         local n = table.getn(self._widthStack)
         if n == 0 then
-            return 0
+            return defaultWidth or 0
         end
         return self._widthStack[n]
     end,
@@ -471,7 +472,6 @@ QuickContainer = Class()
 
         UIUtil.SetupEditStd(edit, "ff00ff00", 'ff000000', "ffffffff",
             UIUtil.highlightColor, UIUtil.bodyFont, 16, charLimit or 100)
-        if initial then edit:SetText(initial) end
         if onEdit then
             edit.OnEnterPressed = function(e, text)
                 onEdit(text)
@@ -483,9 +483,10 @@ QuickContainer = Class()
         group.Label = name
 
         self:Builder():AddControl(group, {
-            width = self:Builder():GetItemWidth(),
+            width = self:Builder():GetItemWidth(200),
             height = 40
         })
+        if initial then edit:SetText(initial) end
         return edit
     end,
 
