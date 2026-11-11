@@ -88,7 +88,10 @@ local validCategory = categories.BUILTBYTIER1FACTORY +
 
 function Compile(data)
     local res = {}
-    for category, dat in pairs(data) do
+    local divs = Enumerate(divisions):Reverse():ToArray()
+    for _, div in ipairs(divs) do
+        local category = div.name
+        local dat = data[category] or {}
         if category == 'Construction' then
             for index, bps in pairs(dat) do
                 for faction, bp in pairs(bps) do
