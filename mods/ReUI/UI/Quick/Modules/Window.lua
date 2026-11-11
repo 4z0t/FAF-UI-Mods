@@ -282,6 +282,10 @@ QuickWindow = ReUI.Core.Class(Group)
                 end
                 PostDragger(self:GetRootFrame(), event.KeyCode, drag)
                 return true
+            elseif event.Type == "MouseEnter" then
+                self._title:SetColor(UIUtil.factionTextColor)
+            elseif event.Type == "MouseExit" then
+                self._title:SetColor(UIUtil.fontColor)
             end
             return false
         end
