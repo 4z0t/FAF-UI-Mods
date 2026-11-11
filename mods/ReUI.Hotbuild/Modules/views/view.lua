@@ -17,8 +17,8 @@ local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
 local factionColors = {
     cybran   = "ffff4040",
-    seraphim = "ff66ff66",
-    aeon     = "ff40e0d0",
+    seraphim = "FFffd700",
+    aeon     = "6BF32B",
     uef      = "ff4da6ff",
 }
 
