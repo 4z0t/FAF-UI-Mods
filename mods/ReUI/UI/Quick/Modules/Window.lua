@@ -272,10 +272,12 @@ QuickWindow = ReUI.Core.Class(Group)
                 local offX = event.MouseX - self.Left()
                 local offY = event.MouseY - self.Top()
                 drag.OnMove = function(d, x, y)
-                    LayoutFor(self):Left(x - offX):Top(y - offY)
+                    LayoutFor(self)
+                        :Left(math.max(x - offX, 0))
+                        :Top(math.max(y - offY, 0))
                 end
                 drag.OnRelease = function(d, x, y)
-                    self._position:Set { x - offX, y - offY }
+                    self._position:Set { math.max(x - offX, 0), math.max(y - offY, 0) }
                     d:Destroy()
                 end
                 PostDragger(self:GetRootFrame(), event.KeyCode, drag)
