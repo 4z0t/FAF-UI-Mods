@@ -250,86 +250,13 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
         allBps = ViewModel.FetchBlueprints(category, skin) or {}
     end
 
-    local skinName = factionTitles[skin] or (type(skin) == "string" and (skin:sub(1,1):upper() .. skin:sub(2))) or tostring(skin)
+    local skinName = factionTitles[skin] or (type(skin) == "string" and (skin:sub(1, 1):upper() .. skin:sub(2))) or
+        tostring(skin)
     local catDisplay = tostring(category):gsub("_", " ")
     local windowTitle = string.format("Select Blueprint: %s (%s)", tostring(skinName), tostring(catDisplay))
 
     pickerWindow = BlueprintPickerWindow(windowTitle, function(pq)
-        local pctx = pq:Context()
-        if pctx.searchText == nil then
-            pctx.searchText = ""
-        end
-        if pctx.selectedTier == nil then
-            pctx.selectedTier = "All"
-        end
-        if pctx.columns == nil then
-            pctx.columns = pickerColumns or 10
-        end
-
-        local COLUMNS = pctx.columns
-
-        -- Search & Filter Bar
-        pq:PushItemWidth(140)
-        local searchEdit = pq:Edit("Search", function(text)
-            pctx.searchText = string.lower(text or "")
-            pctx:UpdateWindow()
-        end, 40, pctx.searchText)
-        pq:PopItemWidth()
-
-        pq:SameLine(8)
-        pq:Text("Tier:", 11, UIUtil.bodyFont, "ff888888")
-        pq:SameLine(3)
-        local tiers = { "All", "T1", "T2", "T3", "EXP" }
-        for _, tier in ipairs(tiers) do
-            local currentTier = tier
-            if pctx.selectedTier == currentTier then
-                pq:Text("[" .. currentTier .. "]", 12, UIUtil.titleFont, UIUtil.highlightColor)
-            else
-                pq:Button(currentTier, function()
-                    pctx.selectedTier = currentTier
-                    pctx:UpdateWindow()
-                end, 11)
-            end
-            pq:SameLine(2)
-        end
-
-        pq:SameLine(8)
-        pq:Text("Cols:", 11, UIUtil.bodyFont, "ff888888")
-        pq:SameLine(3)
-        pq:Button("-", function()
-            if pctx.columns > 5 then
-                pctx.columns = pctx.columns - 1
-                pickerColumns = pctx.columns
-                pctx:UpdateWindow()
-            end
-        end, 10)
-        pq:Tooltip("Fewer Columns", "Decrease grid columns")
-
-        pq:SameLine(2)
-        pq:Text(tostring(COLUMNS), 11, UIUtil.titleFont, UIUtil.highlightColor)
-
-        pq:SameLine(2)
-        pq:Button("+", function()
-            if pctx.columns < 20 then
-                pctx.columns = pctx.columns + 1
-                pickerColumns = pctx.columns
-                pctx:UpdateWindow()
-            end
-        end, 10)
-        pq:Tooltip("More Columns", "Increase grid columns")
-
-        pq:SameLine(8)
-        pq:Button("Clear Slot", function()
-            if onClear then onClear() end
-            CloseBlueprintPicker()
-        end, 11)
-        pq:Tooltip("Clear", "Remove blueprint from this slot")
-
-        pq:Splitter()
-
-        -- Filter candidate blueprints
-        local search = pctx.searchText
-        local filterTier = pctx.selectedTier
+        local COLUMNS = 10
         local filtered = {}
 
         for _, item in ipairs(allBps) do
@@ -367,23 +294,16 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
                 end
             end
 
-            local matchTier = (filterTier == "All") or (filterTier == tier) or (isTemplate and filterTier == "All")
-            local matchSearch = (search == "")
-                or (string.find(string.lower(name), search, 1, true) ~= nil)
-                or (string.find(string.lower(id), search, 1, true) ~= nil)
-
-            if matchTier and matchSearch then
-                table.insert(filtered, {
-                    raw = item,
-                    id = id,
-                    name = name,
-                    desc = desc,
-                    tier = tier,
-                    mass = mass,
-                    energy = energy,
-                    isTemplate = isTemplate,
-                })
-            end
+            table.insert(filtered, {
+                raw = item,
+                id = id,
+                name = name,
+                desc = desc,
+                tier = tier,
+                mass = mass,
+                energy = energy,
+                isTemplate = isTemplate,
+            })
         end
 
         local count = table.getn(filtered)
@@ -571,7 +491,8 @@ function OpenWindow(parent)
                             ctx:UpdateWindow()
                         end
                     end, 12, 65)
-                    g:Tooltip("Swap Step", isSwap and "Selected for swap! Click another step to swap." or "Click to swap with another step")
+                    g:Tooltip("Swap Step",
+                        isSwap and "Selected for swap! Click another step to swap." or "Click to swap with another step")
                 end)
 
                 -- 2. Four faction slots
@@ -683,7 +604,8 @@ function OpenWindow(parent)
                             end
                             ctx:UpdateWindow()
                         end, 11, 95, 26)
-                        ag:Tooltip("Fill Category", "Left-click: auto-fill other factions\nRight-click: clear all slots in category")
+                        ag:Tooltip("Fill Category",
+                            "Left-click: auto-fill other factions\nRight-click: clear all slots in category")
 
                         -- ag:SameLine(4)
                         ag:Button("X", function()
@@ -699,7 +621,8 @@ function OpenWindow(parent)
         end
 
         q:Splitter()
-        q:Text("Tips: Left-click slot to pick unit • Right-click slot to clear • Click # to swap steps • 'Fill' auto-matches across factions", 11, UIUtil.bodyFont, "ff888888")
+        q:Text("Tips: Left-click slot to pick unit • Right-click slot to clear • Click # to swap steps • 'Fill' auto-matches across factions"
+            , 11, UIUtil.bodyFont, "ff888888")
     end, "reui_hotbuild_window")
 
     return mainWindow
