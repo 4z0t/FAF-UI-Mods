@@ -75,6 +75,118 @@ local validCategory = categories.BUILTBYTIER1FACTORY +
     categories.BUILTBYLANDTIER3FACTORY +
     categories.TRANSPORTBUILTBYTIER3FACTORY
 
+function GetBlueprintTech(bp)
+    local bpId = bp
+    if type(bp) == "table" then
+        bpId = bp.icon
+        if not bpId and bp.templateData and bp.templateData[1] then
+            bpId = bp.templateData[1].id
+        end
+        if not bpId and bp.templateData and bp.templateData[3] then
+            bpId = bp.templateData[3][1]
+        end
+    end
+    if type(bpId) ~= "string" then
+        return nil
+    end
+    local blueprint = __blueprints[bpId]
+    if blueprint then
+        local hash = blueprint.CategoriesHash
+        if hash then
+            if hash.TECH1 then return 1 end
+            if hash.TECH2 then return 2 end
+            if hash.TECH3 then return 3 end
+            if hash.EXPERIMENTAL then return 3 end
+        end
+        if blueprint.Categories then
+            for _, cat in ipairs(blueprint.Categories) do
+                if cat == "TECH1" then return 1
+                elseif cat == "TECH2" then return 2
+                elseif cat == "TECH3" then return 3
+                elseif cat == "EXPERIMENTAL" then return 3
+                end
+            end
+        end
+    end
+    -- Fallback by ID naming convention (e.g. uel0104 -> 1, uel0205 -> 2, delk002 -> 3)
+    local _, _, tierChar = string.find(bpId, "%a+0(%d)")
+    if tierChar then
+        local t = tonumber(tierChar)
+        if t and t >= 1 and t <= 3 then
+            return t
+        elseif t and t >= 4 then
+            return 3
+        end
+    end
+    return 1
+end
+
+function MigrateHotBuild(data)
+    if not data or type(data) ~= "table" then
+        return data
+    end
+
+    local factoryLayers = { "Land", "Air", "Naval" }
+
+    -- 1. Migrate legacy Land, Air, Naval tables into tech-specific slots
+    for _, layer in ipairs(factoryLayers) do
+        local legacy = data[layer]
+        if legacy and type(legacy) == "table" and not table.empty(legacy) then
+            for faction, bp in pairs(legacy) do
+                if bp then
+                    local tech = GetBlueprintTech(bp) or 1
+                    local targetCat = string.format("%s_T%d", layer, tech)
+                    data[targetCat] = data[targetCat] or {}
+                    if not data[targetCat][faction] then
+                        data[targetCat][faction] = bp
+                    end
+                end
+            end
+            data[layer] = nil
+        end
+    end
+
+    -- 2. Repair any previous faulty migration where Land/Air/Naval was dumped into T3
+    --    even though the units were actually Tech 1 or Tech 2.
+    for _, layer in ipairs(factoryLayers) do
+        local t3Cat = layer .. "_T3"
+        if data[t3Cat] and type(data[t3Cat]) == "table" then
+            for faction, bp in pairs(data[t3Cat]) do
+                if bp then
+                    local tech = GetBlueprintTech(bp)
+                    if tech and tech < 3 then
+                        local actualCat = string.format("%s_T%d", layer, tech)
+                        data[actualCat] = data[actualCat] or {}
+                        if not data[actualCat][faction] then
+                            data[actualCat][faction] = bp
+                            data[t3Cat][faction] = nil
+                        end
+                    end
+                end
+            end
+        end
+
+        local t2Cat = layer .. "_T2"
+        if data[t2Cat] and type(data[t2Cat]) == "table" then
+            for faction, bp in pairs(data[t2Cat]) do
+                if bp then
+                    local tech = GetBlueprintTech(bp)
+                    if tech and tech == 1 then
+                        local actualCat = layer .. "_T1"
+                        data[actualCat] = data[actualCat] or {}
+                        if not data[actualCat][faction] then
+                            data[actualCat][faction] = bp
+                            data[t2Cat][faction] = nil
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return data
+end
+
 function Compile(data)
     local res = {}
     for category, dat in pairs(data) do
@@ -215,6 +327,7 @@ end
 function LoadHotBuilds()
     hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
     for name, hotbuild in hotBuilds do
+        MigrateHotBuild(hotbuild)
         local compiled = Compile(hotbuild)
         AddToUnitkeygroups(name, compiled)
     end
@@ -230,10 +343,12 @@ end
 
 function FilterEmptyTables(data)
     data = table.deepcopy(data)
-    data.Construction = IPairsEnumerator
-        :Enumerate(data.Construction)
-        :Where(function(bps) return not table.empty(bps) end)
-        :ToArray()
+    if data.Construction then
+        data.Construction = IPairsEnumerator
+            :Enumerate(data.Construction)
+            :Where(function(bps) return not table.empty(bps) end)
+            :ToArray()
+    end
     return data
 end
 
