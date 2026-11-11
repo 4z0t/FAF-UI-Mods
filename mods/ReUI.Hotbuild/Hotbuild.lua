@@ -106,11 +106,7 @@ function Main(isReplay)
     local function BuildUnit(selection, name, data, modifier)
         GetCycleMap():HideCycle()
         local availableOrders, availableToggles, buildableCategories = GetUnitCommandData(selection)
-        local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories))
 
-        if table.empty(buildable) then
-            return false
-        end
 
         -- Deduce current tech level from current tech tab in ReUI.Construction / construction.lua
         local currentTech = 0
@@ -121,28 +117,20 @@ function Main(isReplay)
             end
         end
 
-        -- If no tech tab is active (0), deduce from highest tech level of selected factory
-        if currentTech == 0 then
-            if not table.empty(EntityCategoryFilterDown(categories.TECH3 + categories.BUILTBYQUANTUMGATE, selection)) then
-                currentTech = 3
-            elseif not table.empty(EntityCategoryFilterDown(categories.TECH2, selection)) then
-                currentTech = 2
-            elseif not table.empty(EntityCategoryFilterDown(categories.TECH1, selection)) then
-                currentTech = 1
-            end
-        end
-
         local techCategories = {
             [1] = categories.TECH1,
-            [2] = categories.TECH2,
-            [3] = categories.TECH3,
-            [4] = categories.EXPERIMENTAL,
+            [2] = categories.TECH2 + categories.TECH1,
+            [3] = categories.TECH3 + categories.TECH2 + categories.TECH1,
         }
 
-        local targetTechCat = techCategories[currentTech]
+        local buildable = ToSet(EntityCategoryGetUnitList(buildableCategories *
+            (techCategories[currentTech] or categories.ALLUNITS)))
 
-        local techItems = {}
-        local techIcons = {}
+        if table.empty(buildable) then
+            return false
+        end
+
+
         local allItems = {}
         local allIcons = {}
 
@@ -151,10 +139,6 @@ function Main(isReplay)
                 if buildable[entry] then
                     table.insert(allItems, entry)
                     table.insert(allIcons, entry)
-                    if targetTechCat and EntityCategoryContains(targetTechCat, entry) then
-                        table.insert(techItems, entry)
-                        table.insert(techIcons, entry)
-                    end
                 end
             elseif CanBuildFactoryTemplate(entry, buildable) then
                 table.insert(allItems, entry)
@@ -162,17 +146,16 @@ function Main(isReplay)
             end
         end
 
-        -- Prefer units matching the deduced tech level; fallback to all available
-        local items = (not table.empty(techItems)) and techItems or allItems
-        local icons = (not table.empty(techIcons)) and techIcons or allIcons
+        local items = allItems
+        local icons = allIcons
 
         local maxPos = table.getn(items)
         if maxPos == 0 then
             return false
         end
 
-        local pos = GetCycleMap():Cycle(maxPos, name, icons, modifier)
-        local item = items[pos]
+        GetCycleMap():Cycle(1, name, icons, modifier)
+        local item = items[1]
 
         local count = 1
         if modifier == "Shift" then
