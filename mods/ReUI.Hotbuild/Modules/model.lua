@@ -88,8 +88,8 @@ local validCategory = categories.BUILTBYTIER1FACTORY +
 
 function Compile(data)
     local res = {}
-    local divs = Enumerate(divisions):Reverse():ToArray()
-    for _, div in ipairs(divs) do
+    for i = table.getn(divisions), 1, -1 do
+        local div = divisions[i]
         local category = div.name
         local dat = data[category] or {}
         if category == 'Construction' then
