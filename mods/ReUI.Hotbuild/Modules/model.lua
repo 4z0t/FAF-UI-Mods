@@ -1,10 +1,6 @@
-local Prefs = import('/lua/user/prefs.lua')
-local KeyMapper = import('/lua/keymap/keymapper.lua')
 local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 
-
-local Enumerate = ReUI.LINQ.Enumerate
 local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 local PairsEnumerator = ReUI.LINQ.PairsEnumerator
 
@@ -213,8 +209,11 @@ function AddToUnitkeygroups(name, compiled)
     }
 end
 
+---@type ReUI.Options.OptionRef
+local prefLink = ReUI.Options.OptionRef { "ReUI.Hotbuild.List" }
+
 function LoadHotBuilds()
-    hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
+    hotBuilds = prefLink:Get() or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
         AddToUnitkeygroups(name, compiled)
@@ -245,7 +244,7 @@ function SaveHotBuild(name, data, save)
     local compiled = Compile(data)
     AddToUnitkeygroups(name, compiled)
     ResetIdRelations(hotBuilds)
-    Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+    prefLink:Set(hotBuilds)
     if save then
         SavePreferences()
     end
@@ -254,7 +253,7 @@ end
 function DelHotBuild(name)
     if name then
         hotBuilds[name] = nil
-        Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+        prefLink:Set(hotBuilds)
     end
 end
 
