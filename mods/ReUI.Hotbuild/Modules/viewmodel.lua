@@ -49,6 +49,36 @@ function SetActive(name)
     active = Model.FetchHotBuild(activeName)
 end
 
+function SetNoSelectionAction(action)
+    active = active or {}
+    if action and action ~= "" then
+        active.NoSelection = action
+    else
+        active.NoSelection = nil
+    end
+end
+
+function GetNoSelectionAction()
+    return active and active.NoSelection
+end
+
+function GetNoSelectionActionTitle()
+    if not active or not active.NoSelection or active.NoSelection == "" then
+        return "<None - click to set>"
+    end
+    local KeyMapper = import("/lua/keymap/keymapper.lua")
+    local action = active.NoSelection
+    local name = KeyMapper.GetActionName(action)
+    if name and name ~= "" and string.find(name, "<LOC") ~= 1 then
+        return name
+    end
+    local keyActions = KeyMapper.GetKeyActions()
+    if keyActions and keyActions[action] and keyActions[action].name then
+        return keyActions[action].name
+    end
+    return action
+end
+
 function AddConstructionBlueprints()
 
 end

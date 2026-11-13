@@ -472,7 +472,7 @@ QuickContainer = Class()
         LayoutFor(group)
             :Top(0)
             :Left(0)
-            :Width(0)
+            :Width(200)
             :Height(0)
 
         local name = UIUtil.CreateText(group, label, 14, UIUtil.bodyFont)
@@ -495,6 +495,7 @@ QuickContainer = Class()
                 return true
             end
         end
+        if initial then edit:SetText(initial) end
 
         group.Edit = edit
         group.Label = name
@@ -503,7 +504,6 @@ QuickContainer = Class()
             width = self:Builder():GetItemWidth(200),
             height = 40
         })
-        if initial then edit:SetText(initial) end
         return edit
     end,
 

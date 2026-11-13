@@ -184,9 +184,9 @@ function FilterBlueprints()
     end
 end
 
-function AddToUnitkeygroups(name, compiled)
+function AddToUnitkeygroups(name, compiled, noSelection)
     local formattedName = ReUI.Actions.FormatActionName(name:lower())
-    ReUI.Hotbuild.AddHotbuild(formattedName, compiled)
+    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, noSelection)
     local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
     unitkeygroups[formattedName] = IPairsEnumerator
         :Enumerate(compiled)
@@ -216,7 +216,7 @@ function LoadHotBuilds()
     hotBuilds = prefLink:Get() or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
-        AddToUnitkeygroups(name, compiled)
+        AddToUnitkeygroups(name, compiled, hotbuild.NoSelection)
     end
     ResetIdRelations(hotBuilds)
 end
@@ -242,7 +242,7 @@ end
 function SaveHotBuild(name, data, save)
     hotBuilds[name] = FilterEmptyTables(data)
     local compiled = Compile(data)
-    AddToUnitkeygroups(name, compiled)
+    AddToUnitkeygroups(name, compiled, data.NoSelection)
     ResetIdRelations(hotBuilds)
     prefLink:Set(hotBuilds)
     if save then

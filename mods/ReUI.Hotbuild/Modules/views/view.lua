@@ -342,6 +342,256 @@ function OpenBlueprintPicker(category, skin, currentBlueprint, onSelect, onClear
     end, "hotbuild_bp_picker")
 end
 
+local actionPickerWindow = nil
+
+---Closes the action picker window if open
+function CloseActionPicker()
+    if not IsDestroyed(actionPickerWindow) then
+        actionPickerWindow:Destroy()
+        actionPickerWindow = nil
+    end
+end
+
+---@class ActionListItem : Group
+local ActionListItem = Class(Group) {
+    ---@param self ActionListItem
+    ---@param parent Control
+    ---@param entry table
+    ---@param isCurrent boolean
+    ---@param onSelect fun(key:string)
+    __init = function(self, parent, entry, isCurrent, onSelect)
+        Group.__init(self, parent)
+        LayoutFor(self):Width(520):Height(38)
+
+        self._bg = Bitmap(self)
+        self._bg:SetSolidColor(isCurrent and "ff443311" or "ff1a1a1a")
+        LayoutFor(self._bg):Fill(self):DisableHitTest()
+
+        self._border = Bitmap(self)
+        self._border:SetSolidColor(isCurrent and "ffffcc00" or "ff333333")
+        LayoutFor(self._border):Fill(self):OffsetIn(self, 1, 1, 1, 1):DisableHitTest()
+
+        local inner = Bitmap(self)
+        inner:SetSolidColor(isCurrent and "ff2a2000" or "ff141414")
+        LayoutFor(inner):Fill(self):OffsetIn(self, 2, 2, 2, 2):DisableHitTest()
+
+        -- Title text: Name
+        local title = UIUtil.CreateText(self, entry.name, 11, UIUtil.bodyFont, true)
+        title:SetColor(isCurrent and "ffffcc00" or "ffffffff")
+        title:SetClipToWidth(true)
+        LayoutFor(title):AtLeftTopIn(self, 8, 3):Width(390):DisableHitTest()
+
+        -- Category badge: [CATEGORY]
+        local catText = string.upper(entry.category or "OTHER")
+        local catBadge = UIUtil.CreateText(self, "[" .. catText .. "]", 9, UIUtil.bodyFont, true)
+        catBadge:SetColor("ff66bbff")
+        LayoutFor(catBadge):AtRightTopIn(self, 8, 4):DisableHitTest()
+
+        -- Subtitle: Action key / Command
+        local sub = entry.key
+        if entry.action and entry.action ~= "" and entry.action ~= entry.key then
+            sub = sub .. " • " .. entry.action
+        end
+        local subtitle = UIUtil.CreateText(self, sub, 9, UIUtil.bodyFont, true)
+        subtitle:SetColor("ff888888")
+        subtitle:SetClipToWidth(true)
+        LayoutFor(subtitle):AtLeftBottomIn(self, 8, 3):Width(504):DisableHitTest()
+
+        self.HandleEvent = function(s, event)
+            if event.Type == 'MouseEnter' then
+                self._border:SetSolidColor("ffffffff")
+                return true
+            elseif event.Type == 'MouseExit' then
+                self._border:SetSolidColor(isCurrent and "ffffcc00" or "ff333333")
+                return true
+            elseif event.Type == 'ButtonPress' then
+                onSelect(entry.key)
+                return true
+            end
+            return false
+        end
+
+        Tooltip.AddControlTooltipManual(self, entry.name,
+            string.format("Key: %s\nCategory: %s\nCommand: %s\n\nClick to set as No Selection Action",
+                entry.key, entry.category, entry.action or "N/A"))
+    end
+}
+
+---@class ActionPickerWindow : HotbuildBaseWindow
+local ActionPickerWindow = ReUI.Core.Class(HotbuildBaseWindow)
+{
+    Prefix = "ReUI.Hotbuild.ActionPickerWindow",
+    DefaultPos = { 320, 120 },
+    ContextClass = HotbuildContext,
+
+    ---@param self ActionPickerWindow
+    OnClose = function(self)
+        actionPickerWindow = nil
+        HotbuildBaseWindow.OnClose(self)
+    end,
+}
+
+---@param currentAction? string
+---@param onSelect fun(action:string)
+---@param onClear fun()
+function OpenActionPicker(currentAction, onSelect, onClear)
+    CloseActionPicker()
+
+    local KeyMapper = import("/lua/keymap/keymapper.lua")
+    local allKeyActions = KeyMapper.GetKeyActions() or {}
+
+    local allActionsList = {}
+    for k, v in pairs(allKeyActions) do
+        if not (v.category and string.find(string.lower(v.category), "hotbuild")) then
+            local actionName = KeyMapper.GetActionName(k)
+            if not actionName or actionName == "" or string.find(actionName, "<LOC") == 1 then
+                actionName = k
+            end
+            local cat = v.category or "other"
+            table.insert(allActionsList, {
+                key = k,
+                name = actionName,
+                category = cat,
+                action = v.action or "",
+            })
+        end
+    end
+
+    table.sort(allActionsList, function(a, b)
+        if a.category ~= b.category then
+            if a.category == "selection" then return true end
+            if b.category == "selection" then return false end
+            return a.category < b.category
+        end
+        return a.name < b.name
+    end)
+
+    actionPickerWindow = ActionPickerWindow("Select Action (When No Selection)", function(pq)
+        local pctx = pq:Context()
+        if pctx.searchText == nil then pctx.searchText = "" end
+        if pctx.selectedCat == nil then pctx.selectedCat = "selection" end
+        if pctx.customCmd == nil then pctx.customCmd = currentAction or "" end
+        if pctx.listTop == nil then pctx.listTop = 1 end
+
+        -- 1. Search Bar & Clear
+        pq:PushItemWidth(200)
+        local searchEdit = pq:Edit("Search", function(text)
+            pctx.searchText = string.lower(text or "")
+            pctx.listTop = 1
+            pctx:UpdateWindow()
+        end, 50, pctx.searchText)
+        pq:PopItemWidth()
+
+        pq:SameLine(8)
+        pq:Button("Search", function()
+            pctx.searchText = string.lower(searchEdit and searchEdit:GetText() or "")
+            pctx.listTop = 1
+            pctx:UpdateWindow()
+        end, 11, 60, 24)
+
+        if pctx.searchText ~= "" then
+            pq:SameLine(4)
+            pq:Button("Clear", function()
+                pctx.searchText = ""
+                pctx.listTop = 1
+                pctx:UpdateWindow()
+            end, 11, 50, 24)
+        end
+
+        pq:SameLine(10)
+        pq:Button("None (Clear Action)", function()
+            if onClear then onClear() end
+            CloseActionPicker()
+        end, 11, 140, 24)
+        pq:Tooltip("None", "Set no action (do nothing when nothing selected)")
+
+        -- 2. Category filter buttons
+        local cats = { "selection", "orders", "ui", "camera", "all" }
+        pq:Group(0, 26, function(cg)
+            cg:Text("Category:", 11, UIUtil.bodyFont, "ffaaaaaa")
+            for _, cat in ipairs(cats) do
+                cg:SameLine(6)
+                local isCatActive = (pctx.selectedCat == cat)
+                local catLabel = (cat == "all") and "All" or (cat:sub(1, 1):upper() .. cat:sub(2))
+                if isCatActive then
+                    catLabel = "[" .. catLabel .. "]"
+                end
+                local currentCat = cat
+                cg:Button(catLabel, function()
+                    pctx.selectedCat = currentCat
+                    pctx.listTop = 1
+                    pctx:UpdateWindow()
+                end, 10, isCatActive and 75 or 65, 20)
+            end
+        end)
+
+        -- 3. Custom console command row
+        pq:Group(0, 36, function(cg)
+            cg:PushItemWidth(380)
+            local cmdEdit = cg:Edit("Or custom console command:", function(text)
+                pctx.customCmd = text
+            end, 150, pctx.customCmd)
+            cg:PopItemWidth()
+
+            cg:SameLine(8)
+            cg:Button("Use Command", function()
+                local cmd = (cmdEdit and cmdEdit:GetText()) or pctx.customCmd
+                if cmd and cmd ~= "" then
+                    if onSelect then onSelect(cmd) end
+                    CloseActionPicker()
+                end
+            end, 11, 105, 24)
+            cg:Tooltip("Use Custom Command", "Use this exact command as the no-selection action")
+        end)
+
+        pq:Splitter()
+
+        -- Filter actions list
+        local search = pctx.searchText
+        local selCat = pctx.selectedCat
+
+        local filtered = {}
+        for _, act in ipairs(allActionsList) do
+            local catMatch = (selCat == "all") or (act.category == selCat)
+            local searchMatch = (search == "")
+                or (string.find(string.lower(act.name), search, 1, true) ~= nil)
+                or (string.find(string.lower(act.key), search, 1, true) ~= nil)
+                or (string.find(string.lower(act.action), search, 1, true) ~= nil)
+                or (string.find(string.lower(act.category), search, 1, true) ~= nil)
+
+            if catMatch and searchMatch then
+                table.insert(filtered, act)
+            end
+        end
+
+        local count = table.getn(filtered)
+        if count == 0 then
+            pq:Text("No matching actions found.", 12, UIUtil.bodyFont, "ff888888")
+        else
+            pq:ScrollableListPreserved(550, 300, count, 42, function(row, index)
+                local entry = filtered[index]
+                local isCurrent = (entry.key == currentAction or entry.action == currentAction)
+                local item = ActionListItem(row._control, entry, isCurrent, function(chosenKey)
+                    if onSelect then onSelect(chosenKey) end
+                    CloseActionPicker()
+                end)
+                row:Builder():AddControl(item, {
+                    width = 520,
+                    height = 38,
+                })
+            end, function()
+                local maxTop = math.max(count - 7 + 1, 1)
+                if pctx.listTop and pctx.listTop > maxTop then
+                    pctx.listTop = maxTop
+                end
+                return pctx.listTop
+            end, function(top)
+                pctx.listTop = top
+            end)
+        end
+    end, "hotbuild_action_picker")
+end
+
 ---@class HotbuildWindow : HotbuildBaseWindow
 local HotbuildWindow = ReUI.Core.Class(HotbuildBaseWindow)
 {
@@ -352,6 +602,7 @@ local HotbuildWindow = ReUI.Core.Class(HotbuildBaseWindow)
     ---@param self HotbuildWindow
     OnClose = function(self)
         CloseBlueprintPicker()
+        CloseActionPicker()
         HotbuildBaseWindow.OnClose(self)
     end,
 }
@@ -439,6 +690,36 @@ function OpenWindow(parent)
             end
         end)
         q:Tooltip("Delete Set", "Delete the active hotbuild set")
+
+        -- No Selection Action row
+        q:Group(0, 26, function(ag)
+            ag:Text("When nothing selected:", 11, UIUtil.bodyFont, "ffaaaaaa")
+            ag:SameLine(10)
+            local currentAction = ViewModel.GetNoSelectionAction()
+            local actionTitle = ViewModel.GetNoSelectionActionTitle()
+            local isSet = (currentAction and currentAction ~= "")
+
+            ag:Button(actionTitle, function()
+                OpenActionPicker(currentAction, function(selectedAction)
+                    ViewModel.SetNoSelectionAction(selectedAction)
+                    ctx:UpdateWindow()
+                end, function()
+                    ViewModel.SetNoSelectionAction(nil)
+                    ctx:UpdateWindow()
+                end)
+            end, 11, 320, 24)
+            ag:Tooltip("No Selection Action",
+                "Action to perform when hotbuild key is pressed with no units selected.\nClick to choose from all available actions or set custom command.")
+
+            if isSet then
+                ag:SameLine(6)
+                ag:Button("X", function()
+                    ViewModel.SetNoSelectionAction(nil)
+                    ctx:UpdateWindow()
+                end, 11, 26, 24)
+                ag:Tooltip("Clear Action", "Remove the no-selection action")
+            end
+        end)
 
         q:Splitter()
 

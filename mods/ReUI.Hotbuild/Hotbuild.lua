@@ -240,15 +240,58 @@ function Main(isReplay)
         return true
     end
 
+    local function ExecuteAction(action, modifier)
+        if not action or action == "" then
+            return false
+        end
+        if type(action) == "function" then
+            action()
+            return true
+        end
+        if type(action) == "string" then
+            local KeyMapper = import("/lua/keymap/keymapper.lua")
+            local keyActions = KeyMapper.GetKeyActions() or {}
+
+            local actionToRun = action
+            if modifier == "Shift" and keyActions["shift_" .. action] then
+                actionToRun = "shift_" .. action
+            end
+
+            if keyActions[actionToRun] and keyActions[actionToRun].action then
+                ConExecute(keyActions[actionToRun].action)
+                return true
+            end
+
+            if keyActions[action] and keyActions[action].action then
+                ConExecute(keyActions[action].action)
+                return true
+            end
+
+            if ReUI and ReUI.Actions and ReUI.Actions.ProcessAction then
+                local ok = pcall(ReUI.Actions.ProcessAction, action)
+                if ok then
+                    return true
+                end
+            end
+
+            ConExecute(action)
+            return true
+        end
+        return false
+    end
+
     ---@param name string
     ---@return boolean
     local function ProcessHotbuild(name)
-        local data = hotbuilds[name]
+        local hb = hotbuilds[name]
 
-        if not data then
+        if not hb then
             WARN("Hotbuild " .. name .. " doesn't exist")
             return false
         end
+
+        local data = hb.data or hb
+        local noSelection = hb.noSelection
 
         local modifier = ""
         if IsKeyDown("Shift") then modifier = "Shift"
@@ -256,7 +299,10 @@ function Main(isReplay)
         end
 
         local selection = GetSelectedUnits()
-        if not selection then
+        if not selection or table.empty(selection) then
+            if noSelection and noSelection ~= "" then
+                return ExecuteAction(noSelection, modifier)
+            end
             return false
         end
 
@@ -284,8 +330,16 @@ function Main(isReplay)
 
     ---@param name string
     ---@param data string[]|table[]
-    local function AddHotbuild(name, data)
-        hotbuilds[name] = data
+    ---@param noSelection? string
+    local function AddHotbuild(name, data, noSelection)
+        if type(data) == "table" and data.data then
+            hotbuilds[name] = data
+        else
+            hotbuilds[name] = {
+                data = data,
+                noSelection = noSelection or (type(data) == "table" and (data.noSelection or data.NoSelection)),
+            }
+        end
     end
 
     return {
