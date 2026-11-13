@@ -187,9 +187,9 @@ end
 local KeyMapper = import("/lua/keymap/keymapper.lua")
 local keyActions = KeyMapper.GetKeyActions()
 
-function AddToUnitkeygroups(name, compiled, noSelection)
+function AddToUnitkeygroups(name, compiled, otherAction)
     local formattedName = ReUI.Actions.FormatActionName(name:lower())
-    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, keyActions[noSelection].action or noSelection)
+    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, keyActions[otherAction].action or otherAction)
 
     local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
     unitkeygroups[formattedName] = IPairsEnumerator
@@ -220,7 +220,7 @@ function LoadHotBuilds()
     hotBuilds = prefLink:Get() or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
-        AddToUnitkeygroups(name, compiled, hotbuild.NoSelection)
+        AddToUnitkeygroups(name, compiled, hotbuild.Action)
     end
     ResetIdRelations(hotBuilds)
 end
@@ -246,7 +246,7 @@ end
 function SaveHotBuild(name, data, save)
     hotBuilds[name] = FilterEmptyTables(data)
     local compiled = Compile(data)
-    AddToUnitkeygroups(name, compiled, data.NoSelection)
+    AddToUnitkeygroups(name, compiled, data.Action)
     ResetIdRelations(hotBuilds)
     prefLink:Set(hotBuilds)
     if save then

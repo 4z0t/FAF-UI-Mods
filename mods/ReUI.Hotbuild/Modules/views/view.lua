@@ -466,7 +466,7 @@ function OpenActionPicker(currentAction, onSelect, onClear)
         return a.name < b.name
     end)
 
-    actionPickerWindow = ActionPickerWindow("Select Action (When No Selection)", function(pq)
+    actionPickerWindow = ActionPickerWindow("Custom Action", function(pq)
         local pctx = pq:Context()
         if pctx.searchText == nil then pctx.searchText = "" end
         if pctx.selectedCat == nil then pctx.selectedCat = "selection" end
@@ -503,7 +503,7 @@ function OpenActionPicker(currentAction, onSelect, onClear)
             if onClear then onClear() end
             CloseActionPicker()
         end, 11, 140, 24)
-        pq:Tooltip("None", "Set no action (do nothing when nothing selected)")
+        pq:Tooltip("None", "Set no action")
 
         -- 2. Category filter buttons
         local cats = { "selection", "orders", "ui", "camera", "all" }
@@ -541,7 +541,7 @@ function OpenActionPicker(currentAction, onSelect, onClear)
                     CloseActionPicker()
                 end
             end, 11, 105, 24)
-            cg:Tooltip("Use Custom Command", "Use this exact command as the no-selection action")
+            cg:Tooltip("Use Custom Command", "Use this exact command as the custom action")
         end)
 
         pq:Splitter()
@@ -693,7 +693,7 @@ function OpenWindow(parent)
 
         -- No Selection Action row
         q:Group(0, 26, function(ag)
-            ag:Text("When nothing selected:", 11, UIUtil.bodyFont, "ffaaaaaa")
+            ag:Text("Custom action:", 11, UIUtil.bodyFont, "ffaaaaaa")
             ag:SameLine(10)
             local currentAction = ViewModel.GetNoSelectionAction()
             local actionTitle = ViewModel.GetNoSelectionActionTitle()
@@ -708,8 +708,8 @@ function OpenWindow(parent)
                     ctx:UpdateWindow()
                 end)
             end, 11, 320, 24)
-            ag:Tooltip("No Selection Action",
-                "Action to perform when hotbuild key is pressed with no units selected.\nClick to choose from all available actions or set custom command.")
+            ag:Tooltip("Custom action",
+                "Action to perform when hotbuild key is pressed with nothing to build.\nClick to choose from all available actions or set custom command.")
 
             if isSet then
                 ag:SameLine(6)
@@ -717,7 +717,7 @@ function OpenWindow(parent)
                     ViewModel.SetNoSelectionAction(nil)
                     ctx:UpdateWindow()
                 end, 11, 26, 24)
-                ag:Tooltip("Clear Action", "Remove the no-selection action")
+                ag:Tooltip("Clear Action", "Remove the custom action")
             end
         end)
 

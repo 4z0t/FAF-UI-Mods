@@ -52,22 +52,22 @@ end
 function SetNoSelectionAction(action)
     active = active or {}
     if action and action ~= "" then
-        active.NoSelection = action
+        active.Action = action
     else
-        active.NoSelection = nil
+        active.Action = nil
     end
 end
 
 function GetNoSelectionAction()
-    return active and active.NoSelection
+    return active and active.Action
 end
 
 function GetNoSelectionActionTitle()
-    if not active or not active.NoSelection or active.NoSelection == "" then
+    if not active or not active.Action or active.Action == "" then
         return "<None - click to set>"
     end
     local KeyMapper = import("/lua/keymap/keymapper.lua")
-    local action = active.NoSelection
+    local action = active.Action
     local name = KeyMapper.GetActionName(action)
     if name and name ~= "" and string.find(name, "<LOC") ~= 1 then
         return name

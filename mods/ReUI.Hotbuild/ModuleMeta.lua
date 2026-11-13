@@ -16,8 +16,8 @@ end
 
 ---@param name string
 ---@param data string[]|table[]
----@param noSelectionAction? string
-function ReUI.Hotbuild.AddHotbuild(name, data, noSelectionAction)
+---@param otherAction? string
+function ReUI.Hotbuild.AddHotbuild(name, data, otherAction)
 end
 
 ---Opens the Hotbuild configuration window

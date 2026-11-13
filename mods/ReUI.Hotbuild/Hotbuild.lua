@@ -262,7 +262,7 @@ function Main(isReplay)
         end
 
         local data = hb.data or hb
-        local noSelection = hb.noSelection
+        local otherAction = hb.action
 
         local modifier = ""
         if IsKeyDown("Shift") then modifier = "Shift"
@@ -271,16 +271,19 @@ function Main(isReplay)
 
         local selection = GetSelectedUnits()
         if not selection or table.empty(selection) then
-            return ExecuteAction(noSelection)
+            return ExecuteAction(otherAction)
         end
 
         if not
             table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE + categories.xrl0403,
                 selection)) then
             return BuildStructure(selection, name, data, modifier)
-        else
+        elseif not
+            table.empty(EntityCategoryFilterDown(categories.FACTORY + categories.EXTERNALFACTORY, selection)) then
             return BuildUnit(selection, name, data, modifier)
         end
+
+        return ExecuteAction(otherAction)
     end
 
     ReUI.Core.OnPostCreateUI(function(isReplay)
@@ -298,14 +301,14 @@ function Main(isReplay)
 
     ---@param name string
     ---@param data string[]|table[]
-    ---@param noSelection? string
-    local function AddHotbuild(name, data, noSelection)
+    ---@param action? string
+    local function AddHotbuild(name, data, action)
         if type(data) == "table" and data.data then
             hotbuilds[name] = data
         else
             hotbuilds[name] = {
                 data = data,
-                noSelection = noSelection or (type(data) == "table" and (data.noSelection or data.NoSelection)),
+                action = action,
             }
         end
     end
