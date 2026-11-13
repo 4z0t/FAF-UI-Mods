@@ -75,16 +75,23 @@ ReactiveOption = ReUI.Core.Class()
             self._prev = self:Get()
         end
 
-        self._var:Set(value)
-        self.OnChanged:Invoke(self, value)
+        self:_InternalSet(value)
     end,
 
     ---@param self ReUI.Options.ReactiveOption
     Restore = function(self)
-        if self._prev ~= nil then
-            self:Set(self._prev)
+        local prev = self._prev
+        if prev ~= nil then
             self._prev = nil
+            self:_InternalSet(prev)
         end
+    end,
+
+    ---@param self ReUI.Options.ReactiveOption
+    ---@param value any
+    _InternalSet = function(self, value)
+        self._var:Set(value)
+        self.OnChanged:Invoke(self, value)
     end,
 
     ---@param self ReUI.Options.ReactiveOption

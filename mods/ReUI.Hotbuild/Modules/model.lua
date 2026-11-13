@@ -1,12 +1,8 @@
-local Prefs = import('/lua/user/prefs.lua')
-local KeyMapper = import('/lua/keymap/keymapper.lua')
 local Templates = import("/lua/ui/game/build_templates.lua")
 local FactoryTemplates = import("/lua/ui/templates_factory.lua")
 
-
-local LINQ = ReUI.LINQ
-local Enumerate = LINQ.Enumerate
-local ToSet = LINQ.IPairsEnumerator:ToSet()
+local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
+local PairsEnumerator = ReUI.LINQ.PairsEnumerator
 
 ---@alias SkinName 'cybran'|'seraphim'|'aeon'|'uef'
 ---@type SkinName[]
@@ -14,203 +10,254 @@ local skins = { 'cybran', 'seraphim', 'aeon', 'uef' }
 
 ---@class DivisionData
 ---@field name string
----@field all string[]
----@field any string[]
+---@field category EntityCategory
+---@field tech EntityCategory?
 
 ---@type DivisionData[]
 local divisions = {
     {
         name = 'Construction',
-        all = {},
-        any = { 'BUILTBYTIER3ENGINEER' }
+        category = categories.BUILTBYTIER3ENGINEER,
     },
     {
-        name = 'Land',
-        all = { 'LAND' },
-        any = { 'BUILTBYTIER3FACTORY', 'BUILTBYLANDTIER3FACTORY' }
+        name = 'Land_T1',
+        category = categories.LAND * categories.BUILTBYTIER1FACTORY,
+        tech = categories.TECH1,
     },
     {
-        name = 'Air',
-        all = { 'AIR' },
-        any = { 'BUILTBYTIER3FACTORY', 'TRANSPORTBUILTBYTIER3FACTORY' }
+        name = 'Land_T2',
+        category = categories.LAND * categories.BUILTBYTIER2FACTORY,
+        tech = categories.TECH2,
     },
     {
-        name = 'Naval',
-        all = { 'NAVAL' },
-        any = { 'BUILTBYTIER3FACTORY' }
+        name = 'Land_T3',
+        category = categories.LAND * (categories.BUILTBYTIER3FACTORY + categories.BUILTBYLANDTIER3FACTORY),
+        tech = categories.TECH3,
+    },
+    {
+        name = 'Air_T1',
+        category = categories.AIR * categories.BUILTBYTIER1FACTORY,
+        tech = categories.TECH1,
+    },
+    {
+        name = 'Air_T2',
+        category = categories.AIR * categories.BUILTBYTIER2FACTORY,
+        tech = categories.TECH2,
+    },
+    {
+        name = 'Air_T3',
+        category = categories.AIR * (categories.BUILTBYTIER3FACTORY + categories.TRANSPORTBUILTBYTIER3FACTORY),
+        tech = categories.TECH3,
+    },
+    {
+        name = 'Naval_T1',
+        category = categories.NAVAL * categories.BUILTBYTIER1FACTORY,
+        tech = categories.TECH1,
+    },
+    {
+        name = 'Naval_T2',
+        category = categories.NAVAL * categories.BUILTBYTIER2FACTORY,
+        tech = categories.TECH2,
+    },
+    {
+        name = 'Naval_T3',
+        category = categories.NAVAL * categories.BUILTBYTIER3FACTORY,
+        tech = categories.TECH3,
     },
     {
         name = 'Gate',
-        all = {},
-        any = { 'BUILTBYQUANTUMGATE' }
+        category = categories.BUILTBYQUANTUMGATE,
     }
 }
 
-local legalCategories = ToSet
-{
-    'BUILTBYTIER1FACTORY', 'BUILTBYTIER2FACTORY',
-    'BUILTBYTIER3FACTORY',
-    'BUILTBYTIER1ENGINEER', 'BUILTBYTIER2ENGINEER', 'BUILTBYTIER3ENGINEER',
-    'BUILTBYCOMMANDER', 'BUILTBYQUANTUMGATE', 'BUILTBYLANDTIER3FACTORY', -- special for sparky
-    'TRANSPORTBUILTBYTIER3FACTORY' -- all transports and mercy
-}
+local validCategory = categories.BUILTBYTIER1FACTORY +
+    categories.BUILTBYTIER2FACTORY +
+    categories.BUILTBYTIER3FACTORY +
+    categories.BUILTBYTIER1ENGINEER +
+    categories.BUILTBYTIER2ENGINEER +
+    categories.BUILTBYTIER3ENGINEER +
+    categories.BUILTBYCOMMANDER +
+    categories.BUILTBYQUANTUMGATE +
+    categories.BUILTBYLANDTIER3FACTORY +
+    categories.TRANSPORTBUILTBYTIER3FACTORY
 
-local sacu = ToSet
-{
-    "url0301",
-    "xsl0301",
-    "ual0301",
-    "uel0301",
-}
 
 function Compile(data)
     local res = {}
-    for category, dat in data do
+    for i = table.getn(divisions), 1, -1 do
+        local div = divisions[i]
+        local category = div.name
+        local dat = data[category] or {}
         if category == 'Construction' then
-            for index, bps in dat do
-                for faction, bp in bps do
+            for index, bps in pairs(dat) do
+                for faction, bp in pairs(bps) do
                     table.insert(res, bp)
                 end
             end
         else
-            for faction, bp in dat do
-                table.insert(res, bp)
+            for k, val in pairs(dat) do
+                if type(val) == "string" or (type(val) == "table" and val.templateData) then
+                    table.insert(res, val)
+                elseif type(val) == "table" then
+                    for faction, bp in pairs(val) do
+                        table.insert(res, bp)
+                    end
+                end
             end
         end
     end
     return res
 end
 
-local function ResetIdRelations()
-
+local function ResetIdRelations(hotBuilds)
+    import('/lua/keymap/hotkeylabels.lua').init()
 end
-
-local strLen = string.len
 
 ---@alias BPHotbuildData string|table
 
 local hotBuilds
----@type table<string,table<SkinName, BPHotbuildData>>
+---@type table<string,table<SkinName, BPHotbuildData[]>>
 globalBPs = {}
 
-function ClearHotBuildActions()
-    local actions = Prefs.GetFromCurrentProfile("UserKeyActions") or {}
-    for name, action in actions do
-        if action.category == 'ReUI.Hotbuild' then
-            actions[name] = nil
+local function CanBuildTemplate(template, bpIds)
+    local templateData = template.templateData
+    for i = 3, table.getn(templateData) do
+        local entry = templateData[i]
+        local id = entry[1]
+        if not id or not bpIds[id] then
+            return false
         end
     end
-    Prefs.SetToCurrentProfile("UserKeyActions", actions)
+    return true
+end
+
+local function CanBuildFactoryTemplate(template, bpIds)
+    local templateData = template.templateData
+    for _, entry in ipairs(templateData) do
+        if not bpIds[entry.id] then
+            return false
+        end
+    end
+    return true
 end
 
 function FilterBlueprints()
-    local bps = Enumerate(__blueprints, next)
-        ---@param bp EntityBlueprint
-        ---@param id string
-        :Where(function(bp, id)
-            -- add SACU filter
-            if sacu[string.sub(id, 1, 7)] then
-                return true
-            end
-            if strLen(id) == 7 then
-                return Enumerate(bp.Categories):Any(function(cat) return legalCategories[cat] end)
-            end
-            return false
-        end)
-        :ToTable()
+    local templates = Templates.GetTemplates() or {}
+    local factoryTemplates = FactoryTemplates.GetTemplates() or {}
 
-    local templates = Templates.GetTemplates()
-    for i, div in divisions do
+    ---@param div DivisionData
+    for _, div in divisions do
         globalBPs[div.name] = {}
-        for j, skin in skins do
+        for _, skin in skins do
             local upperSkin = string.upper(skin)
 
-            local bpIds = Enumerate(bps, next)
-                ---@param bp UnitBlueprint
-                :Where(function(bp)
-                    local categories = bp.CategoriesHash
-                    return categories[upperSkin] and
-                        Enumerate(div.all):All(function(cat) return categories[cat] end) and
-                        Enumerate(div.any):Any(function(cat) return categories[cat] end)
-                end)
-                :Keys()
-                :ToSet()
+            local category = div.category * categories[upperSkin] * validCategory
+            local templateCategory = category
 
-            globalBPs[div.name][skin] = Enumerate(bpIds, next)
+            if div.tech ~= nil then
+                ---@type EntityCategory
+                category = category * div.tech --[[@diagnostic disable-line:assign-type-mismatch]]
+            end
+
+            local bpIds = IPairsEnumerator:Enumerate(EntityCategoryGetUnitList(category)):ToSet()
+
+            globalBPs[div.name][skin] = PairsEnumerator
+                :Enumerate(bpIds)
                 :Keys()
                 :OrderBy(function(value) return string.sub(value, 4) end)
                 :ToArray()
 
-            local function CanBuildTemplate(template, bpIds)
-                local templateData = template.templateData
-                for i = 3, table.getn(templateData) do
-                    local entry = templateData[i]
-                    local id = entry[1]
-                    if not id or not bpIds[id] then
-                        return false
-                    end
-                end
-                return true
-            end
+            local templateBps = IPairsEnumerator:Enumerate(EntityCategoryGetUnitList(templateCategory)):ToSet()
 
             for _, template in templates do
-                if CanBuildTemplate(template, bpIds) then
+                if CanBuildTemplate(template, templateBps) then
                     table.insert(globalBPs[div.name][skin], template)
                 end
             end
 
+            for _, template in factoryTemplates do
+                if CanBuildFactoryTemplate(template, templateBps) then
+                    table.insert(globalBPs[div.name][skin], template)
+                end
+            end
         end
     end
 end
 
-function AddToUnitkeygroups(name, compiled)
-    local formattedName = ReUI.Actions.FormatActionName(name)
-    ReUI.Hotbuild.AddHotbuild(formattedName, compiled)
+local KeyMapper = import("/lua/keymap/keymapper.lua")
+local keyActions = KeyMapper.GetKeyActions()
+
+function AddToUnitkeygroups(name, compiled, otherAction)
+    local formattedName = ReUI.Actions.FormatActionName(name:lower())
+    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, keyActions[otherAction].action or otherAction)
+
+    local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
+    unitkeygroups[formattedName] = IPairsEnumerator
+        :Enumerate(compiled)
+        :Select(function(value)
+            if type(value) == 'string' then
+                return value
+            end
+            return value.templateData[3][1] or false
+        end)
+        :Where(function(value) return value end)
+        :ToArray()
+
     ReUI.Actions.AddSimpleAction
     {
         formattedName = formattedName,
         description = name,
         action = string.format('UI_Lua ReUI.Hotbuild.ProcessHotbuild("%s")', formattedName),
         category = 'ReUI.Hotbuild',
+        modifiers = { shift = true, alt = true }
     }
 end
 
+---@type ReUI.Options.OptionRef
+local prefLink = ReUI.Options.OptionRef { "ReUI.Hotbuild.List" }
+
 function LoadHotBuilds()
-    ClearHotBuildActions()
-    hotBuilds = Prefs.GetFromCurrentProfile('hotbuildoverhaul') or {}
+    hotBuilds = prefLink:Get() or {}
     for name, hotbuild in hotBuilds do
         local compiled = Compile(hotbuild)
-        AddToUnitkeygroups(name, compiled)
+        AddToUnitkeygroups(name, compiled, hotbuild.Action)
     end
-    ResetIdRelations()
+    ResetIdRelations(hotBuilds)
 end
 
 function FetchHotBuildsKeys()
-    return Enumerate(hotBuilds, next)
+    return PairsEnumerator
+        :Enumerate(hotBuilds)
         :Keys()
         :ToArray()
 end
 
 function FilterEmptyTables(data)
     data = table.deepcopy(data)
-    data.Construction = Enumerate(data.Construction)
-        :Where(function(bps) return not table.empty(bps) end)
-        :ToArray()
+    if data.Construction then
+        data.Construction = IPairsEnumerator
+            :Enumerate(data.Construction)
+            :Where(function(bps) return not table.empty(bps) end)
+            :ToArray()
+    end
     return data
 end
 
-function SaveHotBuild(name, data)
+function SaveHotBuild(name, data, save)
     hotBuilds[name] = FilterEmptyTables(data)
     local compiled = Compile(data)
-    AddToUnitkeygroups(name, compiled)
-    ResetIdRelations()
-    Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+    AddToUnitkeygroups(name, compiled, data.Action)
+    ResetIdRelations(hotBuilds)
+    prefLink:Set(hotBuilds)
+    if save then
+        SavePreferences()
+    end
 end
 
 function DelHotBuild(name)
     if name then
         hotBuilds[name] = nil
-        Prefs.SetToCurrentProfile("hotbuildoverhaul", hotBuilds)
+        prefLink:Set(hotBuilds)
     end
 end
 

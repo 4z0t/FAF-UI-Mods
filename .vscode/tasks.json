@@ -12,11 +12,12 @@
         "C:\\ProgramData\\FAForever\\bin\\logs\\game.log",
         "/EnableDiskWatch",
         "/showlog",
-
         "/division",
         "master",
         "/subdivision",
-        "I"
+        "I",
+        "/prefs",
+        "GameDev.prefs"
       ],
       "type": "shell"
     }

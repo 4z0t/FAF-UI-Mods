@@ -6,15 +6,14 @@ local Contains = LINQ.IPairsEnumerator:Contains()
 
 local View = import("views/view.lua")
 local Model = import("model.lua")
-local Share = import("share.lua")
 
 local active
 local activeName
 
 local prefixes = {
-    ["aeon"] = { "ua", "xa", "da", "za" },
-    ["uef"] = { "ue", "xe", "de", "ze" },
-    ["cybran"] = { "ur", "xr", "dr", "zr" },
+    ["aeon"]     = { "ua", "xa", "da", "za" },
+    ["uef"]      = { "ue", "xe", "de", "ze" },
+    ["cybran"]   = { "ur", "xr", "dr", "zr" },
     ["seraphim"] = { "xs", "us", "ds", "zs" }
 }
 local globalBPs
@@ -26,7 +25,7 @@ end
 function SaveActive(name)
     Model.DelHotBuild(activeName)
     if name and name ~= "" then
-        Model.SaveHotBuild(name, active)
+        Model.SaveHotBuild(name, active, true)
         activeName = name
     end
 end
@@ -45,25 +44,76 @@ function SaveReceived(name, data)
     View.UpdateItems()
 end
 
-function SendActiveBuildTable()
-    if activeName ~= "" then
-        Share.SendBuildTable(nil, activeName, active)
-    end
-end
-
 function SetActive(name)
     activeName = name or ""
     active = Model.FetchHotBuild(activeName)
+end
+
+function SetNoSelectionAction(action)
+    active = active or {}
+    if action and action ~= "" then
+        active.Action = action
+    else
+        active.Action = nil
+    end
+end
+
+function GetNoSelectionAction()
+    return active and active.Action
+end
+
+function GetNoSelectionActionTitle()
+    if not active or not active.Action or active.Action == "" then
+        return "<None - click to set>"
+    end
+    local KeyMapper = import("/lua/keymap/keymapper.lua")
+    local action = active.Action
+    local name = KeyMapper.GetActionName(action)
+    if name and name ~= "" and string.find(name, "<LOC") ~= 1 then
+        return name
+    end
+    local keyActions = KeyMapper.GetKeyActions()
+    if keyActions and keyActions[action] and keyActions[action].name then
+        return keyActions[action].name
+    end
+    return action
 end
 
 function AddConstructionBlueprints()
 
 end
 
+local function GetMaxConstructionIndex()
+    local maxIdx = 0
+    if not active or not active.Construction then
+        return 0
+    end
+    for idx, step in pairs(active.Construction) do
+        if type(idx) == "number" and type(step) == "table" and not table.empty(step) then
+            if idx > maxIdx then
+                maxIdx = idx
+            end
+        end
+    end
+    for idx in pairs(active.Construction) do
+        if type(idx) == "number" and idx > maxIdx then
+            active.Construction[idx] = nil
+        end
+    end
+    return maxIdx
+end
+
 function SetConstructionBlueprint(index, faction, bp)
     active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
-    active.Construction[index][faction] = bp
+    if bp ~= nil then
+        active.Construction[index] = active.Construction[index] or {}
+        active.Construction[index][faction] = bp
+    else
+        if active.Construction[index] then
+            active.Construction[index][faction] = nil
+        end
+    end
+    GetMaxConstructionIndex()
 end
 
 function SetBlueprint(category, faction, bp)
@@ -73,9 +123,12 @@ end
 
 function Swap(i1, i2)
     active.Construction = active.Construction or {}
+    active.Construction[i1] = active.Construction[i1] or {}
+    active.Construction[i2] = active.Construction[i2] or {}
     local temp = active.Construction[i1]
     active.Construction[i1] = active.Construction[i2]
     active.Construction[i2] = temp
+    GetMaxConstructionIndex()
 end
 
 local function SingleBlueprint(bps)
@@ -122,7 +175,13 @@ local similars = {
         ["aeon"] = "xaa0305",
         ["uef"] = "uea0305",
         ["cybran"] = "xra0305"
-    } -- T3 gunships
+    }, -- T3 gunships
+    {
+        ["aeon"] = "ual0201",
+        ["uef"] = "uel0201",
+        ["cybran"] = "url0107",
+        ["seraphim"] = "xsl0201"
+    }, -- T1 land tanks + mantis
 }
 
 local function FindSimilarBlueprints(faction, bp, category)
@@ -135,13 +194,14 @@ local function FindSimilarBlueprints(faction, bp, category)
             break
         end
     end
-    local bps = LINQ.Enumerate(similars):First(function(k, v)
+    local bps = LINQ.Enumerate(similars):First(function(v)
         return v[faction] == bp
     end)
     if not bps then
         bps = {}
         for prefixSkin, prefix in prefixes do
-            if Contains(globalBPs[category][prefixSkin], prefix[prefixId] .. suffix) then
+            local catBps = globalBPs[category] and globalBPs[category][prefixSkin]
+            if catBps and Contains(catBps, prefix[prefixId] .. suffix) then
                 bps[prefixSkin] = prefix[prefixId] .. suffix
             end
         end
@@ -151,8 +211,13 @@ end
 
 local function ConvertTemplate(faction, template, category)
     local templates = {}
-    for prefixSkin, prefix in prefixes do
-        templates[prefixSkin] = table.deepcopy(template)
+    local function GetFactionTemplate(faction)
+        local t = templates[faction]
+        if not t then
+            t = table.deepcopy(template)
+            templates[faction] = t
+        end
+        return t
     end
 
     local templateData = template.templateData
@@ -160,7 +225,29 @@ local function ConvertTemplate(faction, template, category)
         local id = templateData[i][1]
         local bps = FindSimilarBlueprints(faction, id, category)
         for skin, bp in bps do
-            templates[skin].templateData[i][1] = bp
+            GetFactionTemplate(skin).templateData[i][1] = bp
+        end
+    end
+
+    local bps = FindSimilarBlueprints(faction, template.icon, category)
+    for skin, bp in bps do
+        GetFactionTemplate(skin).icon = bp
+    end
+    return templates
+end
+
+local function ConvertFactoryTemplate(faction, template, category)
+    local templates = {}
+    for prefixSkin, prefix in prefixes do
+        templates[prefixSkin] = table.deepcopy(template)
+    end
+
+    local templateData = template.templateData
+    for i, entry in ipairs(templateData) do
+        local id = entry.id
+        local bps = FindSimilarBlueprints(faction, id, category)
+        for skin, bp in bps do
+            templates[skin].templateData[i].id = bp
         end
     end
 
@@ -177,9 +264,16 @@ function FillBlueprints(category)
     active[category] = active[category] or {}
     activeFaction, activeBP = SingleBlueprint(active[category])
     if activeBP then
-        local bps = FindSimilarBlueprints(activeFaction, activeBP, category)
-        for faction, bp in bps do
-            SetBlueprint(category, faction, bp)
+        if type(activeBP) == "string" then
+            local bps = FindSimilarBlueprints(activeFaction, activeBP, category)
+            for faction, bp in bps do
+                SetBlueprint(category, faction, bp)
+            end
+        elseif type(activeBP) == "table" then
+            local bps = ConvertFactoryTemplate(activeFaction, activeBP, category)
+            for faction, bp in bps do
+                SetBlueprint(category, faction, bp)
+            end
         end
     end
 end
@@ -189,15 +283,16 @@ function ClearBlueprints(category)
 end
 
 function FetchConstructionCount()
-    return table.getn(active.Construction or {}) + 1
+    return GetMaxConstructionIndex() + 1
 end
 
 function FillConstructionBlueprints(index)
     local activeBP
     local activeFaction
 
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return
+    end
     activeFaction, activeBP = SingleBlueprint(active.Construction[index])
     if activeBP then
         if type(activeBP) == "string" then
@@ -215,7 +310,10 @@ function FillConstructionBlueprints(index)
 end
 
 function ClearConstructionBlueprints(index)
-
+    if active.Construction and active.Construction[index] then
+        active.Construction[index] = {}
+        GetMaxConstructionIndex()
+    end
 end
 
 function FetchHotBuilds(new)
@@ -227,8 +325,9 @@ function FetchHotBuilds(new)
 end
 
 function FetchConstructionBlueprint(index, faction)
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return nil
+    end
     return active.Construction[index][faction]
 end
 
@@ -242,11 +341,12 @@ function FetchConstructionBlueprints()
 end
 
 function FetchBlueprints(category, faction)
-    return globalBPs[category][faction]
+    return (globalBPs[category] and globalBPs[category][faction]) or {}
 end
 
 function IsEmpty(index)
-    active.Construction = active.Construction or {}
-    active.Construction[index] = active.Construction[index] or {}
+    if not active or not active.Construction or not active.Construction[index] then
+        return true
+    end
     return table.empty(active.Construction[index])
 end
