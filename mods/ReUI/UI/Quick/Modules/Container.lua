@@ -495,6 +495,10 @@ QuickContainer = Class()
                 onEdit(text)
                 return true
             end
+
+            edit.OnLoseKeyboardFocus = function(e)
+                onEdit(e:GetText())
+            end
         end
         if initial then edit:SetText(initial) end
 
