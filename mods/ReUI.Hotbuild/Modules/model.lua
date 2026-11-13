@@ -189,7 +189,7 @@ local keyActions = KeyMapper.GetKeyActions()
 
 function AddToUnitkeygroups(name, compiled, noSelection)
     local formattedName = ReUI.Actions.FormatActionName(name:lower())
-    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, keyActions[noSelection].action)
+    ReUI.Hotbuild.AddHotbuild(formattedName, compiled, keyActions[noSelection].action or noSelection)
 
     local unitkeygroups = import("/lua/keymap/unitkeygroups.lua").unitkeygroups
     unitkeygroups[formattedName] = IPairsEnumerator

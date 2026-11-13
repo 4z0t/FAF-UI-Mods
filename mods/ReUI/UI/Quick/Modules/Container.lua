@@ -467,12 +467,13 @@ QuickContainer = Class()
     ---@param initial? string
     ---@return Edit
     Edit = function(self, label, onEdit, charLimit, initial)
+        local width = self:Builder():GetItemWidth(200)
         local group = Group(self._control)
 
         LayoutFor(group)
             :Top(0)
             :Left(0)
-            :Width(200)
+            :Width(width)
             :Height(0)
 
         local name = UIUtil.CreateText(group, label, 14, UIUtil.bodyFont)
@@ -501,7 +502,7 @@ QuickContainer = Class()
         group.Label = name
 
         self:Builder():AddControl(group, {
-            width = self:Builder():GetItemWidth(200),
+            width = width,
             height = 40
         })
         return edit
