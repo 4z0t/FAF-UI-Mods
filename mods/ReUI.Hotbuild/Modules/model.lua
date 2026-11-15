@@ -26,7 +26,7 @@ local divisions = {
     },
     {
         name = 'Land_T2',
-        category = categories.LAND * categories.BUILTBYTIER2FACTORY,
+        category = categories.LAND * categories.BUILTBYTIER2FACTORY + categories.BUILTBYAIRTIER2FACTORY,
         tech = categories.TECH2,
     },
     {
@@ -36,12 +36,12 @@ local divisions = {
     },
     {
         name = 'Air_T1',
-        category = categories.AIR * categories.BUILTBYTIER1FACTORY,
+        category = categories.AIR * categories.BUILTBYTIER1FACTORY + categories.TRANSPORTBUILTBYTIER1FACTORY,
         tech = categories.TECH1,
     },
     {
         name = 'Air_T2',
-        category = categories.AIR * categories.BUILTBYTIER2FACTORY,
+        category = categories.AIR * categories.BUILTBYTIER2FACTORY + categories.TRANSPORTBUILTBYTIER2FACTORY,
         tech = categories.TECH2,
     },
     {
@@ -229,6 +229,7 @@ function FetchHotBuildsKeys()
     return PairsEnumerator
         :Enumerate(hotBuilds)
         :Keys()
+        :OrderBy(function(v) return v end)
         :ToArray()
 end
 

@@ -42,27 +42,27 @@ local factoryDivisions = {
         id = "hb_sec_land",
         title = "Land Layer",
         categories = {
-            { cat = "Land_T1", label = "Land T1" },
-            { cat = "Land_T2", label = "Land T2" },
             { cat = "Land_T3", label = "Land T3" },
+            { cat = "Land_T2", label = "Land T2" },
+            { cat = "Land_T1", label = "Land T1" },
         }
     },
     {
         id = "hb_sec_air",
         title = "Air Layer",
         categories = {
-            { cat = "Air_T1", label = "Air T1" },
-            { cat = "Air_T2", label = "Air T2" },
             { cat = "Air_T3", label = "Air T3" },
+            { cat = "Air_T2", label = "Air T2" },
+            { cat = "Air_T1", label = "Air T1" },
         }
     },
     {
         id = "hb_sec_naval",
         title = "Naval Layer",
         categories = {
-            { cat = "Naval_T1", label = "Naval T1" },
-            { cat = "Naval_T2", label = "Naval T2" },
             { cat = "Naval_T3", label = "Naval T3" },
+            { cat = "Naval_T2", label = "Naval T2" },
+            { cat = "Naval_T1", label = "Naval T1" },
         }
     },
     {
