@@ -1,6 +1,6 @@
 name = "ReUI.Score"
-uid = "reui-score-1.2.4"
-version = 5
+uid = "reui-score-1.2.5"
+version = 6
 copyright = ""
 description = [[Check on Github and official Discord server for more details.
 https://github.com/4z0t/FAF-UI-Mods
@@ -14,4 +14,4 @@ enabled = true
 exclusive = false
 ui_only = true
 
-ReUI = 'ReUI.Score=1.2.4'
+ReUI = 'ReUI.Score=1.2.5'

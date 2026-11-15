@@ -43,6 +43,45 @@ end
 
 
 local armiesFormattedTable
+
+---Drops the cached army data so the next GetArmiesFormattedTable call rebuilds it
+---with the current alliances (teams can change mid-game).
+function ResetArmiesFormattedTable()
+    armiesFormattedTable = nil
+end
+
+---@type integer[]
+local scoreArmyIds
+
+---Ids of all armies shown in the scoreboard. These never change during a game.
+---@return integer[]
+local function GetScoreArmyIds()
+    if not scoreArmyIds then
+        scoreArmyIds = ReUI.LINQ.Enumerate(GetArmiesFormattedTable())
+            :Select "id"
+            :ToArray()
+        table.sort(scoreArmyIds)
+    end
+    return scoreArmyIds
+end
+
+---Returns a string describing the current alliance between every pair of armies shown in the scoreboard.
+---It changes whenever two of them become allies or enemies mid-game
+---(team swaps done by sim mods, unlocked teams diplomacy).
+---@return string
+function GetAllianceKey()
+    local ids = GetScoreArmyIds()
+    local n = table.getn(ids)
+    local key = {}
+    for i = 1, n - 1 do
+        local a = ids[i]
+        for j = i + 1, n do
+            table.insert(key, IsAlly(a, ids[j]) and "1" or "0")
+        end
+    end
+    return table.concat(key)
+end
+
 ---returns army data
 ---@return ArmyData[]
 function GetArmiesFormattedTable()
