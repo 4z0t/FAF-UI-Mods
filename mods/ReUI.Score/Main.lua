@@ -58,14 +58,16 @@ function Main(isReplay)
             --#region Options
             scoreboard.Layouter.Scale = ReUI.UI.LayoutFunctions.Div(options.scoreboardScale:Raw(), 100)
 
-            options.scoreboardScale.OnChange = function()
+            -- the handlers are named so they can be applied again when the army lines are rebuilt
+            local function OnScaleChanged()
                 scoreboard:ResetWidthComponents()
                 scoreboard:ApplyToViews(function(armyId, view)
                     view:ResetFont()
                 end)
             end
+            options.scoreboardScale.OnChange = OnScaleChanged
 
-            options.teamColorAsBG.OnChange = function(var)
+            local function OnTeamColorBGChanged(var)
 
                 local _teamColorAsBG = options.teamColorAsBG()
                 local _teamColorAlpha = options.teamColorAlpha()
@@ -87,10 +89,10 @@ function Main(isReplay)
                 end)
 
             end
+            options.teamColorAsBG.OnChange = OnTeamColorBGChanged
+            options.teamColorAlpha.OnChange = OnTeamColorBGChanged
 
-            options.teamColorAlpha.OnChange = options.teamColorAsBG.OnChange
-
-            options.useDivisions:Bind(function(var)
+            local function OnUseDivisionsChanged(var)
                 local _useDivisions = var()
 
                 scoreboard:ApplyToViews(function(armyId, armyView)
@@ -103,7 +105,8 @@ function Main(isReplay)
                     end
                 end)
 
-            end)
+            end
+            options.useDivisions:Bind(OnUseDivisionsChanged)
 
             local ResourceDisplay = import("Modules/ResourceDisplay.lua")
             ---@type  table<string, IResourceDisplay>
@@ -114,7 +117,7 @@ function Main(isReplay)
                 ["income+storage+maxstorage"] = ResourceDisplay.FullResourceDisplay(),
             }
 
-            options.displayMode:Bind(function(var)
+            local function OnDisplayModeChanged(var)
                 ---@type string
                 local mode = var()
 
@@ -127,9 +130,10 @@ function Main(isReplay)
                         scoreboard._display:Apply(armyView)
                     end
                 end)
-            end)
+            end
+            options.displayMode:Bind(OnDisplayModeChanged)
 
-            options.player.color.name:Bind(function(opt)
+            local function OnNameColorChanged(opt)
                 local mode = opt()
 
                 scoreboard:ApplyToViews(function(armyId, armyView)
@@ -141,9 +145,10 @@ function Main(isReplay)
                         armyView.NameColor = armyView.TeamColor
                     end
                 end)
-            end)
+            end
+            options.player.color.name:Bind(OnNameColorChanged)
 
-            options.player.color.icon:Bind(function(opt)
+            local function OnIconColorChanged(opt)
                 local mode = opt()
 
                 scoreboard:ApplyToViews(function(armyId, armyView)
@@ -158,9 +163,10 @@ function Main(isReplay)
                         armyView._faction.MaskColor = armyView.TeamColor
                     end
                 end)
-            end)
+            end
+            options.player.color.icon:Bind(OnIconColorChanged)
 
-            options.player.color.rating:Bind(function(opt)
+            local function OnRatingColorChanged(opt)
                 local mode = opt()
 
                 scoreboard:ApplyToViews(function(armyId, armyView)
@@ -172,10 +178,22 @@ function Main(isReplay)
                         armyView.RatingColor = armyView.TeamColor
                     end
                 end)
-            end)
+            end
+            options.player.color.rating:Bind(OnRatingColorChanged)
 
-            options.teamColorAlpha:OnChange()
-            options.scoreboardScale:OnChange()
+            OnTeamColorBGChanged()
+            OnScaleChanged()
+
+            -- army lines are recreated when alliances change mid-game, the new ones need the same option state
+            scoreboard.OnArmyViewsRebuilt = function(self)
+                OnScaleChanged()
+                OnTeamColorBGChanged()
+                OnUseDivisionsChanged(options.useDivisions)
+                OnDisplayModeChanged(options.displayMode)
+                OnNameColorChanged(options.player.color.name)
+                OnIconColorChanged(options.player.color.icon)
+                OnRatingColorChanged(options.player.color.rating)
+            end
             --#endregion
 
             ReUI.UI.Global["ScoreBoard"] = scoreboard

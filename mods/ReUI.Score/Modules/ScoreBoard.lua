@@ -1,5 +1,6 @@
 --#region Upvalues
 local GetFocusArmy = GetFocusArmy
+local GetSystemTimeSeconds = GetSystemTimeSeconds
 
 --#endregion
 
@@ -23,6 +24,12 @@ local TeamViewsContainer = import("TeamViewsContainer.lua").TeamViewsContainer
 --#region Local Variables
 local animationSpeed = 300
 
+-- seconds of real time between alliance checks
+local allianceCheckInterval = 0.5
+
+-- offset of the collapsed scoreboard, same value the layouts pass to the collapse animation
+local collapsedOffset = 25
+
 local slideForward = ReUI.UI.Animation.Factory.Base
     :OnStart()
     :OnFrame(function(control, delta)
@@ -42,6 +49,9 @@ local slideForward = ReUI.UI.Animation.Factory.Base
 ---@field _display IResourceDisplay
 ---@field _focusArmy integer
 ---@field _lines ArmyView[]
+---@field _allianceKey string
+---@field _nextAllianceCheck number
+---@field OnArmyViewsRebuilt? fun(self: ReUI.Score.ScoreBoard)
 ---@field isHovered boolean
 ScoreBoard = ReUI.Core.Class(Group)
 {
@@ -63,6 +73,11 @@ ScoreBoard = ReUI.Core.Class(Group)
             self._title:SetQuality(SessionGetScenarioInfo().Options.Quality)
         end
         self:ResetWidthComponents()
+
+        Utils.ResetArmiesFormattedTable()
+        self._allianceKey = Utils.GetAllianceKey()
+        self._nextAllianceCheck = 0
+
         self:_InitArmyViews()
     end,
 
@@ -212,10 +227,92 @@ ScoreBoard = ReUI.Core.Class(Group)
     ---@param self ReUI.Score.ScoreBoard
     ---@param data ArmyScoreData[]?
     Update = function(self, data)
+        self:CheckAlliances()
         if self._title then
             self._title:Update(data)
         end
         self:UpdateArmiesData(data)
+    end,
+
+    ---Rebuilds the army lines if any two armies became allies or enemies since the last check
+    ---(team swaps done by sim mods, unlocked teams diplomacy).
+    ---@param self ReUI.Score.ScoreBoard
+    CheckAlliances = function(self)
+        -- while hidden the rebuild waits, it runs on the first check after the scoreboard is shown again
+        if self:IsHidden() then
+            return
+        end
+
+        local now = GetSystemTimeSeconds()
+        if now < self._nextAllianceCheck then
+            return
+        end
+        self._nextAllianceCheck = now + allianceCheckInterval
+
+        local key = Utils.GetAllianceKey()
+        if key == self._allianceKey then
+            return
+        end
+        self._allianceKey = key
+        self:RebuildArmyViews()
+    end,
+
+    ---Recreates the army lines from the current alliances:
+    ---new allies get income and share buttons, new enemies lose them, teams are regrouped.
+    ---@param self ReUI.Score.ScoreBoard
+    RebuildArmyViews = function(self)
+        Utils.ResetArmiesFormattedTable()
+
+        -- keep colors set from outside (team color mode in multifunction.lua)
+        local armyColors = {}
+        for armyId, armyView in self:GetArmyViews() do
+            armyColors[armyId] = armyView.ArmyColor()
+        end
+
+        self:_RebuildArmyViews()
+
+        for armyId, armyView in self:GetArmyViews() do
+            if armyColors[armyId] then
+                armyView.ArmyColor = armyColors[armyId]
+            end
+        end
+
+        self:_ReapplyLayout()
+
+        if self.OnArmyViewsRebuilt then
+            self:OnArmyViewsRebuilt()
+        end
+
+        self:UpdateArmiesData(self.ScoreCache)
+    end,
+
+    ---@param self ReUI.Score.ScoreBoard
+    _RebuildArmyViews = function(self)
+        for _, armyView in self._lines do
+            armyView:Destroy()
+        end
+        self:_InitArmyViews()
+    end,
+
+    ---Applies the current layout again so the new lines get positioned and styled like the old ones
+    ---@param self ReUI.Score.ScoreBoard
+    _ReapplyLayout = function(self)
+        local arrow = self._arrow
+        local collapsed = arrow and arrow:IsChecked()
+
+        self.Layout = self.Layout
+
+        -- the layout recreates the collapse arrow unchecked and puts the scoreboard back on screen,
+        -- restore the collapsed state without replaying the animation
+        arrow = self._arrow
+        if collapsed and arrow then
+            arrow:SetCheck(true, true)
+            local width = self.Width()
+            self.Layouter(self)
+                :Right(function()
+                    return GetFrame(0).Right() + width + self.Layouter:ScaleNumber(collapsedOffset)
+                end)
+        end
     end,
 
     ---@param self ReUI.Score.ScoreBoard
@@ -312,6 +409,12 @@ ReplayScoreBoard = ReUI.Core.Class(ScoreBoard)
     _InitArmyViews = function(self)
         self._armiesContainer = ArmyViewsContainer(self)
         self._teamsContainer = TeamViewsContainer(self)
+    end,
+
+    ---@param self ReUI.Score.ReplayScoreBoard
+    _RebuildArmyViews = function(self)
+        self._armiesContainer:Rebuild()
+        self._teamsContainer:Rebuild()
     end,
 
     ---@param self ReUI.Score.ReplayScoreBoard

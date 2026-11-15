@@ -12,6 +12,8 @@ TeamViewsContainer = ReUI.Core.Class(ArmyViewsContainer)
         local IPairsEnumerator = ReUI.LINQ.IPairsEnumerator
 
         self._armyViews = {}
+        -- cleared so a rebuild into a game without teams does not keep the old ones
+        self._teams = nil
 
         local armiesData = Utils.GetArmiesFormattedTable()
 

@@ -199,6 +199,45 @@ ArmyViewsContainer = ReUI.Core.Class(Group)
         self._armyDataCache = armiesData
     end,
 
+    ---Recreates the lines from the current army data (alliances changed mid-game).
+    ---Keeps the selected data columns, the collapsed columns and the sorting.
+    ---@param self ArmyViewsContainer
+    Rebuild = function(self)
+        local contracted = {}
+        local _, sample = next(self._armyViews or {})
+        if sample then
+            for i, dataText in sample._data do
+                if dataText._contracted then
+                    contracted[i] = true
+                end
+            end
+        end
+
+        for _, armyView in self._lines do
+            armyView:Destroy()
+        end
+        self._lines = {}
+        self._armyViews = {}
+
+        self:_InitArmyViews()
+
+        for _, armyView in self._armyViews do
+            for i, _ in contracted do
+                armyView:ContractData(i)
+            end
+        end
+
+        self:Layout()
+
+        if self._lines[1] then
+            -- Height can still be the 0 set when there were no lines
+            self.Height:Set(function() return self.Bottom() - self.Top() end)
+        else
+            -- Bottom can still point at a destroyed line
+            self.Bottom:Set(function() return self.Top() + self.Height() end)
+        end
+    end,
+
     ---@param self ArmyViewsContainer
     ---@param data ArmyData[]?
     Update = function(self, data)
