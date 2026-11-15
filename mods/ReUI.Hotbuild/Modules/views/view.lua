@@ -620,7 +620,7 @@ function OpenWindow(parent)
 
     ViewModel.SetActive()
 
-    mainWindow = HotbuildWindow("Hotbuild Overhaul", function(q)
+    mainWindow = HotbuildWindow("ReUI.Hotbuild", function(q)
         local ctx = q:Context()
 
         if ctx.activeName == nil then
