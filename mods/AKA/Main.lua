@@ -140,7 +140,7 @@ function Main()
                     :Action 'StartCommandMode order RULEUCC_Attack',
             }
 
-        CategoryMatcher "Select nearest idle t1 engineer / reclaim / toggle shields / toggle stealth"
+        CategoryMatcher "Select nearest idle t1 engineer / reclaim / toggle shields / toggle stealth / toggle jamming"
             :Modifiers { shift = true }
             {
                 CategoryAction()
@@ -153,6 +153,12 @@ function Main()
                         return Contains(toggles, "RULEUTC_ShieldToggle")
                     end)
                     :Action(function() Misc.toggleScript "Shield" end),
+                CategoryAction()
+                    :Match(function(selection)
+                        local orders, toggles, _ = GetUnitCommandData(selection)
+                        return Contains(toggles, "RULEUTC_JammingToggle")
+                    end)
+                    :Action(function() Misc.toggleScript "Jamming" end),
                 CategoryAction()
                     :Match(function(selection)
                         local orders, toggles, _ = GetUnitCommandData(selection)
