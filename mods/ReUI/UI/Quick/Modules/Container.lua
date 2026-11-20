@@ -60,11 +60,12 @@ local Builder = Class()
 
     ---@nodiscard
     ---@param self Quick.Builder
+    ---@param defaultWidth? number
     ---@return number
-    GetItemWidth = function(self)
+    GetItemWidth = function(self, defaultWidth)
         local n = table.getn(self._widthStack)
         if n == 0 then
-            return 0
+            return defaultWidth or 0
         end
         return self._widthStack[n]
     end,
@@ -352,14 +353,31 @@ QuickContainer = Class()
     ---@param onClick? fun(modifiers:KeyModifiers)
     ---@param size? number
     ---@return Button
-    Button = function(self, text, onClick, size)
-        local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, size or 14)
+    Button = function(self, text, onClick, size, width, height)
+        local btnSize = 14
+        if type(size) == "table" then
+            width = width or size.width
+            height = height or size.height
+            btnSize = size.size or 14
+        elseif type(size) == "number" then
+            btnSize = size
+        end
+        local btn = UIUtil.CreateButtonStd(self._control, '/widgets02/small', text, btnSize)
         if onClick then
             btn.OnClick = function(control, modifiers) onClick(modifiers) end
         end
+        local defaultWidth = LayoutFor:UnscaleNumber(btn.Width())
+        local defaultHeight = LayoutFor:UnscaleNumber(btn.Height())
+
+        local w = width
+        if w == nil then
+            w = self:Builder():GetItemWidth(defaultWidth)
+        end
+        local h = height or defaultHeight
+
         self:Builder():AddControl(btn, {
-            width = LayoutFor:UnscaleNumber(btn.Width()),
-            height = LayoutFor:UnscaleNumber(btn.Height()),
+            width = w,
+            height = h,
         })
         return btn
     end,
@@ -449,12 +467,13 @@ QuickContainer = Class()
     ---@param initial? string
     ---@return Edit
     Edit = function(self, label, onEdit, charLimit, initial)
+        local width = self:Builder():GetItemWidth(200)
         local group = Group(self._control)
 
         LayoutFor(group)
             :Top(0)
             :Left(0)
-            :Width(0)
+            :Width(width)
             :Height(0)
 
         local name = UIUtil.CreateText(group, label, 14, UIUtil.bodyFont)
@@ -471,19 +490,23 @@ QuickContainer = Class()
 
         UIUtil.SetupEditStd(edit, "ff00ff00", 'ff000000', "ffffffff",
             UIUtil.highlightColor, UIUtil.bodyFont, 16, charLimit or 100)
-        if initial then edit:SetText(initial) end
         if onEdit then
             edit.OnEnterPressed = function(e, text)
                 onEdit(text)
                 return true
             end
+
+            edit.OnLoseKeyboardFocus = function(e)
+                onEdit(e:GetText())
+            end
         end
+        if initial then edit:SetText(initial) end
 
         group.Edit = edit
         group.Label = name
 
         self:Builder():AddControl(group, {
-            width = self:Builder():GetItemWidth(),
+            width = width,
             height = 40
         })
         return edit

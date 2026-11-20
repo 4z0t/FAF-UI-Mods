@@ -1,11 +1,11 @@
-local Opt = ReUI.Options.Opt
+local OptionValue = ReUI.Options.OptionValue
+
 ReUI.Options.Mods["ReUI.Hotbuild"] = {
 }
 
 function Main(isReplay)
-    local Options = ReUI.Options.Builder
-    local options = ReUI.Options.Mods["ReUI.Hotbuild"]
-
-
-
+    local View = import("Modules/views/view.lua")
+    ReUI.Options.Add("ReUI.Hotbuild", function(frame)
+        return View.OpenWindow(frame)
+    end)
 end

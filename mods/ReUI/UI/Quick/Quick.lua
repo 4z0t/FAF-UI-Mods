@@ -7,10 +7,14 @@ ReUI.Require
 }
 
 function Main(isReplay)
+    local WindowModule = import("Modules/Window.lua")
     ---@class ReUI.UI.Quick : ReUI.Module
     return {
         ---@type Quick.Window | fun(title: string, fn: fun(q: Quick.Container), id?: string): Quick.Window
-        Window = import("Modules/Window.lua").QuickWindow,
+        Window = WindowModule.QuickWindow,
+
+        Border = WindowModule.Border,
+        NinePatchBorder = WindowModule.NinePatchBorder,
 
         ---@type Quick.Container
         Container = import("Modules/Container.lua").QuickContainer,
