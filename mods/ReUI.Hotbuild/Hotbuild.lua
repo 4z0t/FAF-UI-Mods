@@ -277,10 +277,14 @@ function Main(isReplay)
         if not
             table.empty(EntityCategoryFilterDown(categories.ENGINEER - categories.STRUCTURE + categories.xrl0403,
                 selection)) then
-            return BuildStructure(selection, name, data, modifier)
+            if BuildStructure(selection, name, data, modifier) then
+                return true
+            end
         elseif not
             table.empty(EntityCategoryFilterDown(categories.FACTORY + categories.EXTERNALFACTORY, selection)) then
-            return BuildUnit(selection, name, data, modifier)
+            if BuildUnit(selection, name, data, modifier) then
+                return true
+            end
         end
 
         return ExecuteAction(otherAction)
