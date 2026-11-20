@@ -270,7 +270,7 @@ function Main(isReplay)
         end
 
         local selection = GetSelectedUnits()
-        if not selection or table.empty(selection) then
+        if not selection or table.empty(selection) or table.empty(data) then
             return ExecuteAction(otherAction)
         end
 
