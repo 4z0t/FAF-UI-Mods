@@ -22,6 +22,10 @@ OptionTextEdit = ReUI.Core.Class(OptionControl) {
             option:Set(text)
             return true
         end
+
+        self._edit.OnLoseKeyboardFocus = function(e)
+            option:Set(e:GetText())
+        end
     end,
 
     ---@param self ReUI.Options.OptionTextEdit
