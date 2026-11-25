@@ -12,6 +12,7 @@ OptionControl = ReUI.Core.Class(Group)
 
         self._option = option
         self._option.OnChanged:Add { self, self.ValueChanged }
+        self._option.OnSaved:Add { self, self.ValueSaved }
     end,
 
     Option = ReUI.Core.Property
@@ -29,7 +30,14 @@ OptionControl = ReUI.Core.Class(Group)
     end,
 
     ---@param self ReUI.Options.OptionControl
+    ---@param option ReUI.Options.ReactiveOption
+    ---@param value any
+    ValueSaved = function(self, option, value)
+    end,
+
+    ---@param self ReUI.Options.OptionControl
     OnDestroy = function(self)
+        self._option.OnSaved:Remove { self, self.ValueSaved }
         self._option.OnChanged:Remove { self, self.ValueChanged }
         self._option = nil
 
